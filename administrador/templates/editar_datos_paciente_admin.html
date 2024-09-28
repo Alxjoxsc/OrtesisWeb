@@ -45,8 +45,14 @@
             <div class="campo campo-sexo">
                 <label for="sexo">Sexo:</label>
                 <select id="sexo" name="sexo" required>
-                    <option value="masculino">Masculino</option>
-                    <option value="femenino">Femenino</option>
+                    <option value="masculino" 
+                    {% if paciente.sexo|lower == "masculino" or paciente.sexo|lower == "m" %}selected{% endif %}>
+                    Masculino
+                </option>
+                <option value="femenino" 
+                {% if paciente.sexo|lower == "femenino" or paciente.sexo|lower == "f" %}selected{% endif %}>
+                Femenino
+                </option>
                 </select>
             </div>
             <div class="campo campo-edad">
@@ -62,15 +68,18 @@
             </div>
             <div class="campo campo-terapeuta">
                 <label for="terapeuta">Terapeuta a Cargo:</label>
-                <input type="text" id="terapeuta" name="terapeuta" value = "{% if paciente.terapeuta %}{{paciente.terapeuta.user.first_name}} {% else %} Sin Terapeuta {% endif %}" required>
+                <div class="terapeuta-contenedor">
+                    <input type="text" id="terapeuta" name="terapeuta" value="{% if paciente.terapeuta %}{{paciente.terapeuta.user.first_name}} {% else %} Sin Terapeuta {% endif %}" readonly>
+                    <button type="button" class="btn-azul">Reasignar Terapeuta</button>
+                </div>
             </div>
         </div>
         
         <label for="descripcion">Descripción de la Patología:</label>
-        <textarea id="descripcion" name="descripcion" rows="4" value = "{{ paciente.historial_medico }}" required></textarea>
+        <textarea id="descripcion" name="descripcion" rows="4"  required>{{ paciente.historial_medico}}</textarea>
         
         <div class="buttons">
-            <button type="button" onclick="window.location.href='mostrar_paciente_administrador.html'" class="cancel">Cancelar</button>
+            <button type="button" onclick="window.location.href='{% url 'mostrar_paciente_administrador' paciente.id %}'" class="cancel">Cancelar</button>
             <button type="submit" class="confirm">Confirmar Cambios</button>
         </div>
     </div>
