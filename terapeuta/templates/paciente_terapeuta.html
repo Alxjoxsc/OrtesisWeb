@@ -44,9 +44,10 @@
                     <p class="rut">{{ paciente.rut }}</p>
                     <p class="edad">{{ paciente.edad }} años</p>
                     <p class="tratamiento">{{ paciente.patologia }}</p>
-                    <a href="#" class="report-button">
+                    <a href="{% url 'historial_paciente' paciente.id %}" class="report-button">
                         <img src="{% static 'icons/Tabla de reportes.svg' %}" alt="Tabla de reportes" class="report-icon">
                     </a>
+                    
                 </div>
             </li>
             {% empty %}

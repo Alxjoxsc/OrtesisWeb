@@ -9,6 +9,7 @@ import json
 from django.db.models import Q
 from .models import Paciente
 from django.core.paginator import Paginator
+from django.shortcuts import render, get_object_or_404
 
 @role_required('Terapeuta')
 
@@ -106,11 +107,14 @@ def cambiar_estado_paciente(request, id):
             return JsonResponse({"status": "error", "message": "Paciente no encontrado"}, status=404)
     return JsonResponse({"status": "error", "message": "Método no permitido"}, status=405)
 
+def historial_paciente_view(request, paciente_id):
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+    for paciente in Paciente.objects.all():
+        paciente.edad = calcular_edad(paciente.fecha_nacimiento)
+    context = {'paciente': paciente}
+    return render(request, 'historial_paciente.html', context)
 
-
-
-
-
+#-------------------------------------CITAS-------------------------------------
 @role_required('Terapeuta')
 def agendar_cita(request):    
     if request.user.is_authenticated:
