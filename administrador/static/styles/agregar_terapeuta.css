@@ -42,7 +42,7 @@ form {
 }
 
 .form-group {
-    margin: 5px;
+    margin: 0.3125rem;
 }
 
 .table {
@@ -56,11 +56,18 @@ form {
 .table th, .table td {
     padding: 12px 15px;
     border: 1px solid #dddddd;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
 }
 
 .table th {
     background-color: #001058;
     color: #ffffff;
+}
+
+.table .columna-eliminar{
+    width: 10%;
 }
 
 .table tr:nth-child(even) {
@@ -77,6 +84,39 @@ form {
     font-weight: bold;
 }
 
+input[type="checkbox"] {
+    /* Ajustar el tamaño */
+    width: 20px;
+    height: 20  px;
+    /* Crear bordes redondeados */
+    border-radius: 50%;
+    /* Color del borde */
+    border: 2px solid #ccc;
+    /* Color de fondo inicial */
+    background-color: transparent;
+    /* Ocultar la apariencia predeterminada del checkbox */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    /* Transición suave para el cambio de fondo */
+    transition: background-color 0.3s ease;
+    cursor: pointer; /* Cambia el cursor al pasar sobre el checkbox */
+}
+
+/* Cambiar el fondo cuando el checkbox está seleccionado */
+input[type="checkbox"]:checked {
+    background-color: #001058;
+}
+
+/* Estilo del checkmark */
+input[type="checkbox"]::after {
+    content: "";
+    display: block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%; /* Bordes redondeados*/
+}
+
 .contenedor-botones {
     width: 18.75rem;
     display: flex;
@@ -86,7 +126,7 @@ form {
     margin: 1.25rem 0 1.25rem 0;
 }
 
-.boton-confirmar{
+.boton-azul{
     background-color: #001058;
     color: white;
     padding: 0.625rem 1.25rem;
@@ -96,7 +136,7 @@ form {
     cursor: pointer;
 }
 
-.boton-confirmar:hover{
+.boton-azul:hover{
     background-color: #1a2a80;
     color: white;
 }
@@ -135,6 +175,6 @@ form {
 
 @media screen and (max-width: 600px){
     html{
-        font-size: 14px;
+        font-size: 12px;
     }
 }

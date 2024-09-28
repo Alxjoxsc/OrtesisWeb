@@ -161,7 +161,7 @@
                     <th>Día</th>
                     <th>Hora de Inicio</th>
                     <th>Hora de Fin</th>
-                    <th>Eliminar</th>
+                    <th class="columna-eliminar">Eliminar</th>
                 </tr>
             </thead>
             <tbody id="horarios-tbody">
@@ -182,7 +182,7 @@
                 {% endfor %}
             </tbody>
         </table>
-        <button type="button" class="btn btn-secondary" id="add-schedule">Añadir Horario</button>
+        <button type="button" class="boton-azul" id="agregar-horario">Añadir Horario +</button>
     
         {% if horario_formset.non_field_errors %}
             <div class="error">
@@ -193,7 +193,7 @@
     
     <div class="contenedor-botones">
         <button class="boton-cancelar" id="boton-cancelar">Cancelar</button>
-        <button class="boton-confirmar" type="submit">Agregar terapeuta</button>
+        <button class="boton-azul" type="submit">Agregar terapeuta</button>
     </div>
     
 </form>
@@ -202,7 +202,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const addScheduleButton = document.getElementById('add-schedule');
+        const addScheduleButton = document.getElementById('agregar-horario');
         const horariosTbody = document.getElementById('horarios-tbody');
         const totalFormsInput = document.getElementById('id_horario_set-TOTAL_FORMS');
         let scheduleIndex = parseInt(totalFormsInput.value); // Establecer el índice inicial
