@@ -28,7 +28,7 @@ body {
     margin-bottom: 15px;
 }
 
-/* Clase base para todos los campos de entrada */
+/* Clase base para grupos de 2 hacia abajo */
 .campo {
     flex: 1;
     text-align: left;
@@ -53,7 +53,7 @@ input[type="number"]{
     border-radius: 5px;
     height: 40px;
     box-sizing: border-box;
-    margin-right: 25px; /* Ajusta el espacio entre los elementos a la derecha */
+    margin-right: 25px;
 }
 
 textarea {
@@ -97,7 +97,26 @@ button {
 .terapeuta-contenedor input{
     margin-right: 0px;
 }
-.btn-azul {
+.btn-reasignar {
+    background-color: #001058;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.proximacita-contenedor {
+    display: flex;
+    align-items: center;
+    margin-left: 0px;
+}
+
+.proximacita-contenedor input{
+    margin-right: 0px;
+}
+.btn-reagendar {
     background-color: #001058;
     color: white;
     border: none;

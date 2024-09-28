@@ -167,20 +167,28 @@ def agendar_cita_administrador(request):
         return redirect('mostrar_paciente_administrador', paciente_instance.id)
     return render(request, 'mostrar_paciente_administrador.html', {'paciente': paciente_instance})
 
+@role_required('Administrador')
 def editar_datos_paciente_admin(request, id):
     paciente = get_object_or_404(Paciente, id=id)
     # guarda cambios
     if request.method == 'POST':
-        paciente.first_name = request.POST.get('first_name')
-        paciente.last_name = request.POST.get('last_name')
+        paciente.first_name = request.POST.get('nombres')
+        paciente.last_name = request.POST.get('apellidos')
         paciente.rut = request.POST.get('rut')
+        # paciente.prox_cita = request.POST.get('proximaCita')  # Descomentar si es necesario
         paciente.telefono = request.POST.get('telefono')
-        paciente.correo = request.POST.get('correo')
+        paciente.email = request.POST.get('correo')  # Asegúrate de que el campo en el modelo sea 'email'
         paciente.sexo = request.POST.get('sexo')
-        paciente.date = request.POST.get('date')
+        paciente.fecha_nacimiento = request.POST.get('fecha_nacimiento')
         paciente.patologia = request.POST.get('patologia')
-        paciente.terapeuta = request.POST.get('terapeuta')
-        paciente.save()
+        paciente.Terapeuta = request.POST.get('terapeuta')  # Asegúrate de que el campo en el modelo sea 'terapeuta'
+        paciente.historial_medico = request.POST.get('descripcion')
+        
+        try:
+            paciente.save()
+        except Exception as e:
+            print("Error al guardar el paciente:", e)  # Agrega un manejo de errores para identificar problemas
+        
         return redirect('admin_pacientes')
 
     return render(request, 'editar_datos_paciente_admin.html', {'paciente': paciente})
