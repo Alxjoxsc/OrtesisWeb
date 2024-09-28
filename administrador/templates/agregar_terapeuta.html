@@ -17,7 +17,6 @@
 
 {% block content %}
 <form action="{% url 'agregar_terapeuta' %}" method="POST">
-    {{ horario_formset.management_form }} <!-- Necesario para que Django pueda manejar el formset, contiene datos ocultos para gestionar el formset -->
     {% csrf_token %}
     <h2> Datos del terapeuta </h2>
 
@@ -162,39 +161,35 @@
                     <th>Día</th>
                     <th>Hora de Inicio</th>
                     <th>Hora de Fin</th>
+                    <th>Eliminar</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="horarios-tbody">
+                {{ horario_formset.management_form }}
                 {% for form in horario_formset %}
                     <tr>
                         <!-- Campo Día -->
-                        <td>
-                            <label for="{{ form.dia.id_for_label }}">{{ form.dia.label }}</label>
-                            {{ form.dia }}
-                        </td>
-                        
+                        <td>{{ form.dia }}</td>
                         <!-- Campo Hora de Inicio -->
-                        <td>
-                            <label for="{{ form.hora_inicio.id_for_label }}">{{ form.hora_inicio.label }}</label>
-                            {{ form.hora_inicio }}
-                        </td>
-                        
+                        <td>{{ form.hora_inicio }}</td>
                         <!-- Campo Hora de Fin -->
+                        <td>{{ form.hora_final }}</td>
+                        <!-- Campo para eliminar -->
                         <td>
-                            <label for="{{ form.hora_final.id_for_label }}">{{ form.hora_final.label }}</label>
-                            {{ form.hora_final }}
+                            {{ form.DELETE }}
                         </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
+        <button type="button" class="btn btn-secondary" id="add-schedule">Añadir Horario</button>
     
         {% if horario_formset.non_field_errors %}
             <div class="error">
                 {{ horario_formset.non_field_errors }}
             </div>
         {% endif %}
-    </div>
+    </div>    
     
     <div class="contenedor-botones">
         <button class="boton-cancelar" id="boton-cancelar">Cancelar</button>
@@ -202,6 +197,78 @@
     </div>
     
 </form>
+
+<!-- Script para añadir un nuevo formulario de horario -->
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addScheduleButton = document.getElementById('add-schedule');
+        const horariosTbody = document.getElementById('horarios-tbody');
+        const totalFormsInput = document.getElementById('id_horario_set-TOTAL_FORMS');
+        let scheduleIndex = parseInt(totalFormsInput.value); // Establecer el índice inicial
+    
+        addScheduleButton.addEventListener('click', function () {
+            // Crear una nueva fila para el nuevo horario
+            const newRow = document.createElement('tr');
+            newRow.className = 'horario-row';
+    
+            // Crear los elementos de formulario
+            const diaSelect = document.createElement('select');
+            diaSelect.name = `horario_set-${scheduleIndex}-dia`;
+            diaSelect.className = 'seleccion';
+            diaSelect.id = `id_horario_set-${scheduleIndex}-dia`;
+    
+            // Agregar las opciones al select
+            const days = ['---------', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+            days.forEach(day => {
+                const option = document.createElement('option');
+                option.value = day;
+                option.textContent = day;
+                diaSelect.appendChild(option);
+            });
+    
+            const horaInicioInput = document.createElement('input');
+            horaInicioInput.type = 'time';
+            horaInicioInput.name = `horario_set-${scheduleIndex}-hora_inicio`;
+            horaInicioInput.className = 'campo-formulario';
+            horaInicioInput.id = `id_horario_set-${scheduleIndex}-hora_inicio`;
+    
+            const horaFinInput = document.createElement('input');
+            horaFinInput.type = 'time';
+            horaFinInput.name = `horario_set-${scheduleIndex}-hora_final`;
+            horaFinInput.className = 'campo-formulario';
+            horaFinInput.id = `id_horario_set-${scheduleIndex}-hora_final`;
+    
+            // Crear campo para eliminar
+            const deleteInput = document.createElement('input');
+            deleteInput.type = 'checkbox';
+            deleteInput.name = `horario_set-${scheduleIndex}-DELETE`;
+            deleteInput.id = `id_horario_set-${scheduleIndex}-DELETE`;
+
+            // Agregar los campos a la nueva fila
+            newRow.appendChild(tdElement(diaSelect));
+            newRow.appendChild(tdElement(horaInicioInput));
+            newRow.appendChild(tdElement(horaFinInput));
+            newRow.appendChild(tdElement(deleteInput));
+    
+            // Agregar la nueva fila al tbody
+            horariosTbody.appendChild(newRow);
+    
+            // Incrementar el índice para el siguiente formulario
+            totalFormsInput.value = scheduleIndex + 1;
+            scheduleIndex++;
+        });
+    
+        function tdElement(...children) {
+            const td = document.createElement('td');
+            children.forEach(child => td.appendChild(child));
+            return td;
+        }
+    });
+    </script>
+    
+    
+
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         var regionField = document.getElementById("id_region");
@@ -246,7 +313,6 @@
         });
     });
 </script>
-
 <script>
     document.getElementById("boton-cancelar").addEventListener("click", function(){
         window.location.href = "{% url 'gestion_terapeutas' %}";

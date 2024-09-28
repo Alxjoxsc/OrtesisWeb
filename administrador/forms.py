@@ -381,5 +381,6 @@ HorarioFormSet = inlineformset_factory(
     Terapeuta,
     Horario,
     form=HorarioForm,
-    extra=7,  # 7 días de la semana, lunes a domingo
+    extra=1,  # Se envia solo un formularo. pero se pueden agregar más
+    can_delete=True # Se pueden eliminar los formularios
 )

@@ -5,7 +5,7 @@ from autenticacion.decorators import role_required
 from .forms import CrearTerapeutaForm, HorarioFormSet
 from autenticacion.models import Provincia, Comuna
 from django.http import JsonResponse
-from terapeuta.models import Paciente
+from terapeuta.models import Paciente, Horario
 
 # Create your views here.
 @role_required('Administrador')
@@ -79,7 +79,7 @@ def agregar_terapeuta(request):
         
     else:
         terapeuta_form = CrearTerapeutaForm()
-        horario_formset = HorarioFormSet()
+        horario_formset = HorarioFormSet(queryset=Horario.objects.none()) # Creamos un formset vacío, para que no se prellene con datos
     
     return render(request, 'agregar_terapeuta.html', {
         'terapeuta_form': terapeuta_form,
