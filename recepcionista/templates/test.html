@@ -1,0 +1,19 @@
+{% extends 'recepcionista_base.html' %}
+
+{% load static %}
+
+{% block title %}Agregar Paciente{% endblock %}
+
+{% block extra_head%}
+
+<link rel="stylesheet" href="{% static 'styles/agregar_paciente.css' %}">
+<link rel="stylesheet" href="{% static 'styles/formularios.css' %}">
+
+{% endblock %}
+
+{% block content %}
+<div class="contenedor-formulario">
+    <h1>Agregar paciente</h1>
+    <form action="{% url 'agregar_paciente' %}" method="POST">
+        <!--{{ horario_formset.management_form }} <!-- Necesario para que Django pueda manejar el formset, contiene datos ocultos para gestionar el formset -->-->
+        {% csrf_token %}

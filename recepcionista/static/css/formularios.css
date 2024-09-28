@@ -1,0 +1,29 @@
+/* Estilos para campos de formulario */
+.campo-formulario {
+    width: 100%;
+    padding: 0.5rem;
+    margin: 0.3125rem 0;
+    box-sizing: border-box;
+    border: 0.0625rem solid #ccc;
+    border-radius: 0.25rem;
+}
+
+/* Estilos para selecciones */
+.seleccion {
+    width: 100%;
+    padding: 0.5rem;
+    margin: 0.3125rem 0;
+    box-sizing: border-box;
+    border: 0.0625rem solid #ccc;
+    border-radius: 0.25rem;
+    background-color: #f8f8f8; /* Color de fondo */
+}
+
+/* Estilos para textarea */
+textarea.campo-formulario {
+    height: 6.25rem;
+}
+
+.form-check-input {
+    margin-top: 0.25rem;
+}

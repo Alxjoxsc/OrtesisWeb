@@ -333,25 +333,28 @@ h1 {
 /* Ajustar el contenedor de la cabecera */
 .header {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end; /* Alinea el contenido al final del contenedor (derecha) */
     align-items: center;
     margin-bottom: 20px;
     padding: 10px;
+    width: 100%; /* Asegura que el contenedor use todo el ancho */
 }
 
-/* Botón Agregar Paciente */
+/* Ajustes del botón */
 .agregar-paciente-btn {
     background-color: #373d58;
     color: white;
-    padding: 10px 20px;
+    padding: 7px 20px;
     border: none;
-    border-radius: 5px;
+    border-radius: 15px;
     font-size: 14px;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 10px;
+    text-decoration: none; /* Quita el subrayado */
 }
+
 
 /* Formulario de búsqueda */
 .busqueda-form {
