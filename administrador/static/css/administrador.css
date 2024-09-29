@@ -152,3 +152,36 @@
     color: #333;
     margin: 0;
 }
+.modal {
+    display: none; /* Inicialmente oculto */
+    position: fixed; /* Fijado en la pantalla */
+    z-index: 1; /* Asegúrate de que esté sobre otros elementos */
+    left: 0;
+    top: 0;
+    width: 100%; /* Ocupa todo el ancho de la pantalla */
+    height: 100%; /* Ocupa todo el alto de la pantalla */
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro con transparencia */
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto; /* Centrado vertical */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Ancho del modal */
+    max-width: 500px; /* Ancho máximo */
+    text-align: center;
+}
+
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    cursor: pointer;
+}

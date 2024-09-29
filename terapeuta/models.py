@@ -19,8 +19,6 @@ class Terapeuta(models.Model):
 
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}"
-    
-from django.db import models
 
 class Paciente(models.Model):
     terapeuta = models.ForeignKey(Terapeuta, on_delete=models.CASCADE, null=True, blank=True)
@@ -65,11 +63,6 @@ class Cita(models.Model):
         terapeuta_nombre = f"{self.terapeuta.user.first_name} {self.terapeuta.user.last_name}" if self.terapeuta else "Sin terapeuta"
         paciente_nombre = f"{self.paciente.user.first_name} {self.paciente.user.last_name}" if self.paciente else "Sin paciente"
         return f"{terapeuta_nombre} - {paciente_nombre}"
-
-
-
-    
-
 
 class Rutina(models.Model):
     terapeuta = models.ForeignKey(Terapeuta, on_delete=models.CASCADE, null=True, blank=True)

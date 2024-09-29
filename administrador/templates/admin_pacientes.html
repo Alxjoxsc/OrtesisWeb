@@ -1,6 +1,8 @@
 {% extends 'base_admin.html' %}
 {% load static %}
-
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/administrador.css' %}">
+{% endblock %}
 {% block content %}
 <div class="pacientes-container mt-4">
     <div class="header">
@@ -22,6 +24,14 @@
         <a href="{% url 'listar_pacientes_inactivos' %}" class="btn {% if estado == 'inactivos' %}active{% endif %}" type="button">Inactivos</a>
     </div>
 
+    <div class="mt-3">
+        {% if estado == 'activos' %}
+            <button id="inactivar-btn" class="btn btn-warning" disabled>Pasar a estado inactivo</button>
+        {% elif estado == 'inactivos' %}
+            <button id="restaurar-btn" class="btn btn-success" disabled>Restaurar seleccionados</button>
+        {% endif %}
+    </div>
+    
     <div class="table-responsive mt-3">
         <table class="table align-middle mb-0">
             <thead class="table-light">
@@ -46,15 +56,24 @@
                             {% if paciente.is_active %}Activo{% else %}Inactivo{% endif %}
                         </span>
                     </td>
-                    <td>{{ paciente.terapeuta.nombre }}</td>
+                    <td>{% if paciente.terapeuta %}{{ paciente.terapeuta.nombre }}{% else %}Sin terapeuta{% endif %}</td>
                     <td>{{ paciente.date_joined }}</td>
                     <td class="text-end">
-                        <a href="#" class="btn btn-outline-primary btn-sm me-2" title="Ver detalles">
-                            <i class="bi bi-file-earmark-text"></i>
+                        <a href="{% url 'mostrar_paciente_administrador' paciente.id %}" class="btn btn-outline-danger btn-sm" title="Ver detalle paciente" 
+                           onclick="mostrarPopUp('{{ paciente.id }}', '{{ paciente.first_name }} {{ paciente.last_name }}', '{{ paciente.rut }}', '{{ paciente.patologia }}')">
+                            <img src="{% static 'icons/Detalle.svg' %}" alt="Ver Detalle" />
                         </a>
-                        <a href="#" class="btn btn-outline-secondary btn-sm" title="Ver terapeuta">
-                            <i class="bi bi-person"></i>
+                        {% if estado == 'activos' %}
+                        <a href="#" class="btn btn-outline-danger btn-sm" title="Pasar a estado inactivo" 
+                           onclick="mostrarPopUpInactivar('{{ paciente.id }}', '{{ paciente.first_name }} {{ paciente.last_name }}')">
+                            <img src="{% static 'icons/DeleteUser.svg' %}" alt="Inactivar" />
                         </a>
+                        {% elif estado == 'inactivos' %}
+                        <a href="#" class="btn btn-outline-danger btn-sm" title="Restaurar a estado activo" 
+                           onclick="mostrarPopUpRestaurar('{{ paciente.id }}', '{{ paciente.first_name }} {{ paciente.last_name }}')">
+                            <img src="{% static 'icons/more.svg' %}" alt="Restaurar" />
+                        </a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% empty %}
@@ -69,16 +88,18 @@
         </table>
     </div>
 
-    <!-- Botones de acciones -->
-    <div class="mt-3">
-        {% if estado == 'activos' %}
-            <button id="inactivar-btn" class="btn btn-warning" disabled>Pasar a estado inactivo</button>
-        {% elif estado == 'inactivos' %}
-            <button id="restaurar-btn" class="btn btn-success" disabled>Restaurar seleccionados</button>
-        {% endif %}
+    <div id="popupModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-button" onclick="cerrarPopUp()">&times;</span>
+            <h2 id="popup-titulo"></h2>
+            <p id="popup-mensaje"></p>
+            <button id="confirmButton" onclick="confirmarCambioEstado()">Confirmar</button>
+            <button class="cancel-button" onclick="cerrarPopUp()">Cancelar</button>
+        </div>
     </div>
 </div>
 {% endblock %}
+
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -87,67 +108,98 @@
         const inactivarBtn = document.getElementById('inactivar-btn');
         const restaurarBtn = document.getElementById('restaurar-btn');
 
-        // Seleccionar o deseleccionar todos los checkboxes
-        selectAllCheckbox.addEventListener('change', function() {
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = selectAllCheckbox.checked;
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', function() {
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+                updateButtonsState();
             });
-            updateButtonsState();
-        });
+        }
 
-        // Manejar el cambio de estado de los checkboxes
         checkboxes.forEach(checkbox => {
             checkbox.addEventListener('change', updateButtonsState);
         });
-        //activar o desctivar botones
+
         function updateButtonsState() {
             const selectedCheckboxes = Array.from(checkboxes).filter(checkbox => checkbox.checked);
-        
-            if (selectedCheckboxes.length === 0) {
-                inactivarBtn.disabled = true;
-                restaurarBtn.disabled = true;
-                return;
+            
+            if (inactivarBtn) {
+                inactivarBtn.disabled = selectedCheckboxes.length === 0 || !selectedCheckboxes.some(checkbox => {
+                    const badge = checkbox.closest('tr').querySelector('td:nth-child(4) .badge');
+                    return badge.textContent.trim() === 'Activo';
+                });
             }
-        
-            const anyActive = selectedCheckboxes.some(checkbox => {
-                const badge = checkbox.closest('tr').querySelector('td:nth-child(4) .badge');
-                return badge.textContent.trim() === 'Activo';
-            });
-        
-            const anyInactive = selectedCheckboxes.some(checkbox => {
-                const badge = checkbox.closest('tr').querySelector('td:nth-child(4) .badge');
-                return badge.textContent.trim() === 'Inactivo';
-            });
-        
-            inactivarBtn.disabled = !anyActive; 
-            restaurarBtn.disabled = !anyInactive; 
+
+            if (restaurarBtn) {
+                restaurarBtn.disabled = selectedCheckboxes.length === 0 || !selectedCheckboxes.some(checkbox => {
+                    const badge = checkbox.closest('tr').querySelector('td:nth-child(4) .badge');
+                    return badge.textContent.trim() === 'Inactivo';
+                });
+            }
         }
 
-        // Acción de pasar a inactivo
-        inactivarBtn.addEventListener('click', function() {
-            const selectedIds = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
-            fetch("{% url 'cambiar_estado_inactivo' %}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}',
-                },
-                body: JSON.stringify({ pacientes_ids: selectedIds })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    location.reload();
-                } else {
-                    alert('Error al inactivar los pacientes.');
-                }
+        if (inactivarBtn) {
+            inactivarBtn.addEventListener('click', function() {
+                mostrarPopUpCambioEstado('inactivo');
             });
-        });
+        }
 
-        // Acción de restaurar pacientes inactivos
-        restaurarBtn.addEventListener('click', function() {
-            const selectedIds = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
-            fetch("{% url 'restaurar_paciente' %}", {
+        if (restaurarBtn) {
+            restaurarBtn.addEventListener('click', function() {
+                mostrarPopUpCambioEstado('activo');
+            });
+        }
+
+        // Pop-up para varios pacientes
+        window.mostrarPopUpCambioEstado = function(estado) {
+            const selectedCheckboxes = Array.from(checkboxes).filter(cb => cb.checked);
+            const cantidadSeleccionados = selectedCheckboxes.length;
+            const titulo = estado === 'inactivo' ? 'Cambiar a estado inactivo' : 'Restaurar a estado activo';
+            const mensaje = estado === 'inactivo' 
+                ? `¿Desea cambiar a estado inactivo a ${cantidadSeleccionados} pacientes? Los pacientes podrán ser visualizados y reactivados en la sección de inactivos.`
+                : `¿Desea restaurar a estado activo a ${cantidadSeleccionados} pacientes? Los pacientes podrán ser visualizados en la sección de activos y se considerarán como pacientes en tratamiento.`;
+
+            document.getElementById('popup-titulo').textContent = titulo;
+            document.getElementById('popup-mensaje').textContent = mensaje;
+            document.getElementById('popupModal').style.display = 'block';
+
+            document.getElementById('confirmButton').setAttribute('data-estado', estado);
+            document.getElementById('confirmButton').setAttribute('data-ids', JSON.stringify(selectedCheckboxes.map(cb => cb.value)));
+        };
+
+        // Pop-up individual para un paciente
+        window.mostrarPopUpInactivar = function(pacienteId, nombre, rut) {
+            const titulo = `Cambiar a estado inactivo a ${nombre}`;
+            const mensaje = `¿Está seguro de que desea inactivar al paciente ${nombre} (${rut})? Este paciente podrá ser reactivado en la sección de inactivos.`;
+
+            document.getElementById('popup-titulo').textContent = titulo;
+            document.getElementById('popup-mensaje').textContent = mensaje;
+            document.getElementById('popupModal').style.display = 'block';
+
+            document.getElementById('confirmButton').setAttribute('data-estado', 'inactivo');
+            document.getElementById('confirmButton').setAttribute('data-ids', JSON.stringify([pacienteId]));
+        };
+        window.mostrarPopUpRestaurar = function(id, nombre) {
+            document.getElementById('popup-titulo').textContent = `Restaurar paciente`;
+            document.getElementById('popup-mensaje').textContent = `¿Está seguro de que desea restaurar a ${nombre}?`;
+            document.getElementById('popupModal').style.display = 'block';
+        
+            document.getElementById('confirmButton').setAttribute('data-estado', 'activo');
+            document.getElementById('confirmButton').setAttribute('data-ids', JSON.stringify([id]));
+        };
+
+        window.cerrarPopUp = function() {
+            document.getElementById('popupModal').style.display = 'none';
+        };
+
+        window.confirmarCambioEstado = function() {
+            const estado = document.getElementById('confirmButton').getAttribute('data-estado');
+            const selectedIds = JSON.parse(document.getElementById('confirmButton').getAttribute('data-ids'));
+
+            const url = estado === 'inactivo' ? "{% url 'cambiar_estado_inactivo' %}" : "{% url 'restaurar_paciente' %}";
+
+            fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -160,10 +212,15 @@
                 if (data.status === 'success') {
                     location.reload();
                 } else {
-                    alert('Error al restaurar los pacientes.');
+                    alert(`Error al ${estado === 'inactivo' ? 'inactivar' : 'restaurar'} los pacientes.`);
                 }
             });
-        });
+
+            cerrarPopUp();
+        };
     });
+    
 </script>
+<script src="{% static 'js/admin_buscador_paciente.js' %}"></script>
 {% endblock %}
+

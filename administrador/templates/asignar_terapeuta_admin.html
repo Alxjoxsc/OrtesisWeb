@@ -1,0 +1,12 @@
+<!-- asignar_terapeuta.html -->
+<h2>Asignar Terapeuta a {{ paciente.first_name }} {{ paciente.last_name }}</h2>
+<form method="post">
+    {% csrf_token %}
+    <label for="terapeuta">Seleccionar Terapeuta:</label>
+    <select name="terapeuta" id="terapeuta">
+        {% for terapeuta in terapeutas %}
+            <option value="{{ terapeuta.id }}">{{ terapeuta }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Asignar Terapeuta</button>
+</form>

@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calendario</title>
-    <link rel="stylesheet" href="{% static 'css/calendar_recepcionista.css' %}">
+    <link rel="stylesheet" href="{% static 'css/calendar_administrador.css' %}">
 </head>
 
 <body>
@@ -32,7 +32,7 @@
         <div class="popup-content">
             <span class="close" id="closePopup">&times;</span>
             <h2>Agendar Cita <span id="fechaSeleccionada"></span></h2>
-            <form id="formCita" method="POST" action="{% url 'agendar_cita_recepcionista' %}">
+            <form id="formCita" method="POST" action="{% url 'agendar_cita_administrador' %}">
                 {% csrf_token %}
                 <label for="titulo" class="campo">Título:</label>
                 <input type="text" id="titulo" name="titulo" required placeholder="Ingrese el título de la cita">
@@ -67,13 +67,13 @@
         </div>
     </div>
 
-    <script src="{% static 'js/calendar.js' %}"></script>
+    <script src="{% static 'js/calendar_asignar_paciente_administrador.js' %}"></script>
 </body>
 
 </html>
 
     <script 
-    src="{% static 'js/calendar_asignar_paciente.js' %}"
+    src="{% static 'js/calendar_asignar_paciente_administrador.js' %}"
     type="text/javascript">
         const citas = JSON.parse('{{ citas|safe }}');
     </script>

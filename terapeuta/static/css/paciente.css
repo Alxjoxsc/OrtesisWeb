@@ -1,8 +1,3 @@
-body {
-    height: 100%;
-    margin: 0;
-    font-family: Arial, sans-serif;
-}
 
 .main-container {
     display: flex;
@@ -44,7 +39,7 @@ body {
 .search-button {
     height: 30px;
     margin-top: 2px;
-    background-color: #008CAB;
+    background-color: black;
     color: white;
     cursor: pointer;
     border-radius: 8px;
@@ -52,6 +47,16 @@ body {
 
 .search-button:hover {
     background-color: #01a4c9;
+}
+
+/* Icono de búsqueda */
+.search-icon {
+    position: absolute;
+    right: 10px; /* Ajusta el espacio del icono */
+    top: 50%;
+    transform: translateY(-50%); /* Centra verticalmente el icono */
+    width: 20px; /* Ajusta el tamaño del icono */
+    height: 20px;
 }
 
 .field-titles {
@@ -63,9 +68,47 @@ body {
     margin-left: 15px;
 }
 
-.title-item {
-    width: 20%;
-    text-align: left;
+/* Estilos para el contenedor de la lista */
+.li-container {
+    margin-bottom: 20px;
+}
+
+.li-container ul{
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    margin-left: 0;
+}
+
+/* Estilos para cada paciente */
+.paciente {
+    width: 1000px;
+    display: flex;
+    justify-content: space-between; /* Asegura que los datos se alineen de manera uniforme debajo de los h2 */
+    border: 1px solid #ccc;
+    padding: 20px;
+    padding-left: 5px;
+    margin-left: 0;
+    margin-bottom: 7px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra suave */
+}
+
+/* Usar flexbox para alinear los datos horizontalmente */
+.paciente-info {
+    display: flex;
+    justify-content: space-between; /* Distribuye el espacio de manera uniforme */
+    padding-left: 10px;
+}
+
+/* Estilos para los elementos dentro de la información del paciente */
+.paciente-info p {
+    flex: 1; /* Hace que cada elemento ocupe el mismo espacio */
+    margin: 0; /* Margen reducido entre los elementos */
+    margin-top: 2px; /* Agregar un pequeño margen superior */
+    font-size: 16px;
+    min-width: 205px; /* Ancho mínimo para que los textos no se encimen */
 }
 
 .patient-row {
@@ -106,44 +149,25 @@ body {
     display: none;
 }
 
-/* ESTILOS POPUP CONFIRMACION DE DESVINCULACION/DESACTIVACION */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    position: relative; /* Posiciona la paginación de manera relativa */
+    top: -10px; /* Desplaza la paginación hacia arriba */
+    margin: 0; /* Elimina el margen para evitar separación extra */
 }
 
-.modal-content {
-    background-color: #fff;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 500px;
-    text-align: center;
-}
-
-.close-button {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.close-button:hover,
-.close-button:focus {
-    color: black;
-    text-decoration: none;
+.prev-button, .next-button {
+    display: inline-block;
+    margin: 0 5px; /* Reduce el espacio entre los botones */
     cursor: pointer;
+    font-size: 14px; /* Disminuye el tamaño de la fuente para los botones */
 }
 
-button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
+.previous-icon, .next-icon {
+    width: 0.8em; /* Reduce el tamaño del ícono */
+    height: auto; /* Mantiene la proporción del ícono */
+    vertical-align: middle; /* Alinea el ícono verticalmente en el centro */
 }

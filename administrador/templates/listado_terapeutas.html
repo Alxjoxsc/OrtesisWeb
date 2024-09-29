@@ -38,7 +38,7 @@
         
         <!-- Lista de terapeutas -->
         {% for terapeuta in terapeuta %}
-        <a href="{% url 'calendar_asignar_paciente' terapeuta.id paciente.id%}">
+        <a href="{% url 'calendar_asignar_paciente_administrador' terapeuta.id paciente.id%}">
             <div class="terapeuta-card">
                 <span>{{ terapeuta.user.first_name}} {{terapeuta.user.last_name }}</span>
                 <span>{{ terapeuta.user.profile.rut }}</span>

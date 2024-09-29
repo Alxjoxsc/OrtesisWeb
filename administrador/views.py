@@ -1,11 +1,11 @@
 import json
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 from autenticacion.decorators import role_required
 from .forms import CrearTerapeutaForm, HorarioFormSet
 from autenticacion.models import Provincia, Comuna
 from django.http import JsonResponse
-from terapeuta.models import Paciente, Horario
+from terapeuta.models import Paciente, Terapeuta, Cita, Horario
 
 # Create your views here.
 @role_required('Administrador')
@@ -18,9 +18,11 @@ def base_admin_view(request):
 def admin_pacientes(request):
     pacientes = Paciente.objects.all() 
     return render(request, 'admin_pacientes.html',{'pacientes': pacientes})
+
 def agregar_paciente_admin(request):
     # lógica de la vista
     return render(request, 'agregar_paciente_admin.html')
+
 def listar_pacientes_activos(request):
     # Obtener todos los pacientes activos
     pacientes_activos = Paciente.objects.filter(is_active=True)
@@ -102,3 +104,66 @@ def comunas_api(request):
         return JsonResponse(list(comunas), safe=False)
     else:
         return JsonResponse([], safe=False)
+    
+@role_required('Administrador')
+def mostrar_paciente_administrador(request, paciente_id):
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+    return render(request, 'mostrar_paciente_administrador.html', {'paciente': paciente})
+
+@role_required('Administrador')
+def listado_terapeutas(request, paciente_id):
+    paciente = Paciente.objects.get(id=paciente_id)
+    terapeuta = Terapeuta.objects.all()
+    return render(request, 'listado_terapeutas.html', {'terapeuta': terapeuta, 'paciente': paciente})
+
+@role_required('Administrador')
+def calendar_asignar_paciente_administrador(request, terapeuta_id, paciente_id):
+    terapeuta = Terapeuta.objects.get(id=terapeuta_id)
+    paciente = Paciente.objects.get(id=paciente_id)
+    cita = Cita.objects.all()
+    horario_terapeuta = {
+        'lunes': {'inicio': 8, 'fin': 13},
+        'martes': {'inicio': 8, 'fin': 13},
+        'miercoles': {'inicio': 8, 'fin': 13},
+        'jueves': {'inicio': 8, 'fin': 13},
+        'viernes': {'inicio': 8, 'fin': 13},
+        'sabado': None,
+        'domingo': None,
+    }
+    return render(request, 'calendar_asignar_paciente_administrador.html', {'horario_terapeuta': horario_terapeuta, 'cita': cita,
+                                                              'paciente':paciente, 'terapeuta':terapeuta})
+@role_required('Administrador')
+def agendar_cita_administrador(request):
+    if request.method == 'POST':
+        titulo = request.POST['titulo']
+        terapeuta_id = request.POST['terapeuta']
+        paciente_id = request.POST['paciente']
+        fecha = request.POST['fecha']
+        hora = request.POST['hora']
+        sala = request.POST['sala']
+        detalle = request.POST['detalle']
+    
+        terapeuta_instance = Terapeuta.objects.get(id=terapeuta_id)
+        
+        paciente_instance = Paciente.objects.get(id=paciente_id)
+        print(paciente_instance)
+        
+        cita = Cita(
+            terapeuta = terapeuta_instance,
+            titulo = titulo,
+            paciente = paciente_instance,
+            fecha = fecha,
+            hora = hora,
+            sala = sala,
+            detalle = detalle
+        )
+        cita.save()
+        
+        #Guardar la asignación del terapeuta al paciente
+        
+        paciente_instance.terapeuta_id = terapeuta_instance.id
+        paciente_instance.save()
+        
+        return redirect('mostrar_paciente_administrador', paciente_instance.id)
+    return render(request, 'mostrar_paciente_administrador.html', {'paciente': paciente_instance})
+

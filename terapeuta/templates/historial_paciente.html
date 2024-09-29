@@ -1,0 +1,152 @@
+{% extends 'terapeuta_base.html' %}
+{% load static %}
+
+{% block extra_head %} 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/historial_paciente.css' %}">
+{% endblock %}
+
+{% block title %}Historial del paciente{% endblock %}
+
+{% block header %}
+        <!-- Botón para volver -->
+        <a href="{% url 'paciente_terapeuta' %}" class="back-button">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    <div class="contenedor-header">
+        <h1>Historial del paciente</h1>
+        <button class="desvincular-btn">Desvincular paciente <i class="fas fa-unlink"></i></button>
+    </div>
+{% endblock %}
+
+{% block content %}
+<div class="contenedor-principal">
+    <!-- Sección superior con info del paciente y progreso -->
+    <div class="contenedor-superior">
+        <div class="info-paciente">
+            <h2>{{ paciente.first_name }} {{ paciente.last_name }} | {{ paciente.rut }}</h2>
+            <div class="info-detalle">
+                <p>Edad: {{paciente.edad}}</p>
+                <p>Patología: {{paciente.patologia}}</p>
+            </div>
+        </div>
+        <button class="progreso-paciente-btn" onclick="#">
+            <div class="progreso-paciente-content">
+                <h3>PROGRESO DEL PACIENTE</h3>
+                <span class="progreso-icono">
+                    <i class="fas fa-chart-bar"></i>
+                </span>
+            </div>
+        </button>
+    </div>
+
+    <div class="contenedor-inferior">
+        <div class="info-cita">
+            <p>Próxima Cita: 30/08 <i class="fas fa-calendar-alt"></i></p>
+        </div>
+        <div class="acciones-paciente">
+            <button class="btn-observaciones">Observaciones</button>
+            <button class="btn-añadir-rutina"><i class="fas fa-plus"></i> Añadir Rutina</button>
+        </div>
+    </div>
+</div>
+
+    <div class="acciones-paciente">  
+        <button class="btn-modificar-rutina"><i class="fas fa-edit"></i> Modificar rutina actual</button>
+    </div>
+
+    <div class="contenedor-rutinas">
+        <div class="rutina-card">
+            <div class="rutina-header">
+                <h3>Rutina Actual</h3>
+                <p>Fecha de Inicio: 21/03/2024</p>
+            </div>
+            <div class="rutina-info">
+                <p>Sesiones Realizadas: 2 de 8</p>
+                <p>Frecuencia de Sesiones: 1 cada 2 días</p>
+            </div>
+            <div class="rutina-detalles">
+                <div class="detalle">
+                    <p>Ángulo Inicial: 35°</p>
+                </div>
+                <div class="detalle">
+                    <p>Ángulo Final: 90°</p>
+                </div>
+                <div class="detalle">
+                    <p>Velocidad: XX</p>
+                </div>
+                <div class="detalle">
+                    <p>Repeticiones: 12</p>
+                </div>
+            </div>
+            <div class="rutina-estado">
+                <p>Estado: En Proceso</p>
+                <button class="btn-ver-sesiones">Ver Sesiones <i class="fas fa-chevron-down"></i></button>
+            </div>
+        </div>
+
+        <!-- Rutina anterior 1 -->
+        <div class="rutina-card">
+            <div class="rutina-header">
+                <h3>Rutina #03</h3>
+                <p>Fecha de Inicio: 01/03/2024</p>
+            </div>
+            <div class="rutina-info">
+                <p>Sesiones Realizadas: 6 de 8</p>
+                <p>Frecuencia de Sesiones: 1 cada 2 días</p>
+            </div>
+            <div class="rutina-detalles">
+                <div class="detalle">
+                    <p>Ángulo Inicial: 45°</p>
+                </div>
+                <div class="detalle">
+                    <p>Ángulo Final: 80°</p>
+                </div>
+                <div class="detalle">
+                    <p>Velocidad: XX</p>
+                </div>
+                <div class="detalle">
+                    <p>Repeticiones: 12</p>
+                </div>
+            </div>
+            <div class="rutina-estado">
+                <p>Estado: Incompleta</p>
+                <button class="btn-ver-sesiones">Ver Sesiones <i class="fas fa-chevron-down"></i></button>
+            </div>
+        </div>
+
+        <!-- Rutina anterior 2 -->
+        <div class="rutina-card">
+            <div class="rutina-header">
+                <h3>Rutina #02</h3>
+                <p>Fecha de Inicio: 21/02/2024</p>
+            </div>
+            <div class="rutina-info">
+                <p>Sesiones Realizadas: 8 de 8</p>
+                <p>Frecuencia de Sesiones: 1 cada 2 días</p>
+            </div>
+            <div class="rutina-detalles">
+                <div class="detalle">
+                    <p>Ángulo Inicial: 45°</p>
+                </div>
+                <div class="detalle">
+                    <p>Ángulo Final: 70°</p>
+                </div>
+                <div class="detalle">
+                    <p>Velocidad: XX</p>
+                </div>
+                <div class="detalle">
+                    <p>Repeticiones: 12</p>
+                </div>
+            </div>
+            <div class="rutina-estado">
+                <p>Estado: Completa</p>
+                <button class="btn-ver-sesiones">Ver Sesiones <i class="fas fa-chevron-down"></i></button>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}

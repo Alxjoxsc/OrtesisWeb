@@ -11,11 +11,14 @@ from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import FormView
 from .forms import SendMailForm, SetPasswordForm
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.core.mail import send_mail
 from django.views import View
-from django.contrib.auth.models import Group, User
 from .forms import RutLoginForm
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_str  # Cambiado de force_text a force_str para Django 3.x+
+
 
 # AUTENTICACION DE USUARIOS #
 
@@ -106,6 +109,21 @@ def acceso_denegado(request):
 class CustomPasswordResetConfirmView(PasswordResetConfirmView):
     form_class = SetPasswordForm
     success_url = reverse_lazy('password_reset_complete')
+
+    def dispatch(self, *args, **kwargs):
+        # Validar si el token es válido o si ya fue utilizado
+        try:
+            uid = force_str(urlsafe_base64_decode(self.kwargs['uidb64']))
+            user = User.objects.get(pk=uid)
+            if not default_token_generator.check_token(user, self.kwargs['token']):
+                # Redirigir a acceso_denegado si el token es inválido o ya fue utilizado
+                return redirect('acceso_denegado')
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            # Redirigir a acceso_denegado si algo sale mal (por ejemplo, usuario no encontrado)
+            return redirect('acceso_denegado')
+
+        # Si el token es válido, continuar con la vista normal
+        return super().dispatch(*args, **kwargs)
 
 class SendMailConfirmView(View):
     def get(self, request):

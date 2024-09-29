@@ -104,16 +104,6 @@
             <input type="number" id="altura" name="altura" step="0.01" placeholder="Ingrese la altura">
         </div>
 
-        <div>
-            <label for="motivo_desvinculacion">Motivo de Desvinculación</label>
-            <select id="motivo_desvinculacion" name="motivo_desvinculacion">
-                <option value="">Seleccionar Motivo</option>
-                <option value="Terminó tratamiento">Terminó tratamiento</option>
-                <option value="Cambio de terapeuta">Cambio de terapeuta</option>
-                <option value="Otro">Otro</option>
-            </select>
-        </div>
-
         <div class="buttons">
             <button type="button" class="btn btn-cancelar" onclick="window.location.href='{% url 'recepcionista_pacientes_activos' %}'">Cancelar</button>
             <button type="submit" class="btn btn-continuar">

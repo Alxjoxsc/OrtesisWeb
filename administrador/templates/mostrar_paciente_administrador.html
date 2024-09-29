@@ -4,7 +4,7 @@
 
 <div class="container-paciente">
     <!-- Flecha de regreso -->
-    <div class="back-arrow" onclick="window.location.href='{% url 'recepcionista_pacientes_activos' %}';">
+    <div class="back-arrow" onclick="window.location.href='{% url 'admin_pacientes' %}';">
         &#8592;
     </div>
 
@@ -32,8 +32,8 @@
         </div>
         
         <div class="footer-card">
-            <button class="btn" onclick="window.location.href='{% url 'asignar_terapeuta' paciente.id %}'" >Asignar Terapeuta</button>
-            <button class="btn" >Asignar Cita</button>
+            <button class="btn" onclick="window.location.href='{% url 'listado_terapeutas' paciente.id %}'" >Asignar Terapeuta</button>
+            <button class="btn">Reagendar Cita</button>
         </div>
     </div>
 </div>

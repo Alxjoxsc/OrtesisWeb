@@ -1,3 +1,12 @@
+/* Estilos generales */
+body {
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
 
 /* Contenedor general del calendario */
 .calendar-container {
@@ -15,7 +24,7 @@
     display: flex;
     justify-content: center;
     width: 130px;
-
+    
 }
 /* Encabezado del calendario */
 .calendar-header {
@@ -34,14 +43,9 @@
     justify-content: center;
     width: 130px;
 }
-.view-options {
-    display: flex;
-    justify-content: space-between;
-    width: auto;
-}
 /* Botones de navegación */
 .nav-button {
-    background-color: #008CAB;
+    background-color: #001058;
     border: none;
     color: white;
     padding: 12px;
@@ -69,12 +73,12 @@
     text-align: center;
     border: 1px solid #ddd;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease; 
 }
 
 .day:hover {
-    background-color: #82b2bd;
-    border-color: #399fb6;
+    background-color: #82b2bd; 
+    border-color: #399fb6; 
 }
 
 .day-name, .day, .empty-day {
@@ -88,17 +92,17 @@
 }
 
 .today {
-    background-color: #008CAB;
+    background-color: #001058;
     color: white;
 }
 
 /* Ajustes generales para la vista semanal */
 
 .week-view-container {
-    height: 450px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    border: 1px solid #ddd;
+    height: 450px; 
+    overflow-y: auto; 
+    overflow-x: hidden; 
+    border: 1px solid #ddd; 
     border-radius: 5px;
 }
 
@@ -108,7 +112,7 @@
 }
 
 .week-view th {
-    background-color: #008CAB;
+    background-color: #001058;
     color: white;
     padding: 10px;
     text-align: center;
@@ -127,7 +131,7 @@
 
 /* Efecto hover sobre las celdas de las horas */
 .week-view td:hover {
-    background-color: #82b2bd;
+    background-color: #82b2bd; 
     border-color: #399fb6;
 }
 
@@ -142,57 +146,23 @@
 
 /* Estilos del pop-up */
 .popup {
-    display: none;
+    display: none; 
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 100;
-    overflow-y: auto;
+    z-index: 100; 
+    overflow-y: auto; 
+}
+form {
+    display: flex;
+    flex-direction: column;
 }
 
 label {
     font-weight: bold;
-}
-.popup-content {
-    background-color: white;
-    margin: 5% auto;
-    padding: 20px;
-    border-radius: 8px;
-    width: 400px;
-    position: relative;
-    z-index: 101;
-    text-align: center;
-}
-/* Estilos del popup de citas */
-.modal {
-    display: none;
-    position: absolute;
-    background-color: white;
-    border: 1px solid #ddd;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    z-index: 101;
-    padding: 20px;
-    border-radius: 8px;
-    width: 400px;
-}
-.modal-content {
-    padding: 10px;
-}
-.popup-content h2, .modal-content h2 {
-    text-align: center;
-    font-size: 20px;
-    margin-bottom: 20px;
-}
-.close, .close-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    cursor: pointer;
-    font-size: 20px;
-    color: #333;
 }
 
 input[type="text"], input[type="time"], input[type="date"], select, textarea {
@@ -204,17 +174,7 @@ input[type="text"], input[type="time"], input[type="date"], select, textarea {
     margin: 0;
     box-sizing: border-box;
 }
-/* Estilo de los items dentro del popup de citas */
-.cita-item {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    background-color: #f9f9f9;
-}
-.cita-item p {
-    margin: 5px 0;
-}
+
 
 /* Estilo de los botones */
 button {
@@ -222,7 +182,7 @@ button {
     font-size: 16px;
     border: none;
     border-radius: 4px;
-    background-color: #008CAB;
+    background-color: #001058;
     color: white;
     cursor: pointer;
     width: 48%;
@@ -231,7 +191,7 @@ button {
 .botones {
     display: flex;
     justify-content: space-between;
-    margin: 15px; 
+    margin: 15px;
 }
 
 #cancelarBtn {
@@ -244,12 +204,12 @@ button {
 }
 
 #confirmarBtn {
-    background-color: #006A60;
+    background-color: #001058;
     color: white;
 }
 
 #confirmarBtn:hover {
-    background-color: #006A60;
+    background-color: #001058;
 }
 
 .popup-content {
@@ -270,6 +230,7 @@ button {
 .campo {
     margin:10px;
 }
+
 #fechaSeleccionada {
     display: none; /* Oculta el span */
 }
@@ -281,21 +242,6 @@ button {
     right: 20px;
     cursor: pointer;
     font-size: 24px;
-}
-/* Resaltar días y horas con citas */
-.dia-con-cita {
-    position: relative;
-}
-.dia-con-cita::after {
-    content: '';
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    width: 4px;
-    height: 4px;
-    background-color: #008CAB;
-    border: 2px solid #008CAB;
-    border-radius: 50%;
 }
 
 /* Vista semanal adicional */
@@ -314,87 +260,37 @@ button {
     background-color: rgba(0, 128, 0, 0.2); /* Color de fondo para las horas de trabajo */
     border: 1px solid #008000; /* Borde para destacar más */
 }
-/* Estilo para el popup */
-#popupCitas {
-    background-color: #008CAB;
-    border: 2px #008CAB;
-    padding: 10px;
-    border-radius: 8px;
-    width: 300px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+
+/*Calendar_asignar_paciente*/
+
+.buttons {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px; /* Espacio entre los botones */
 }
-/* Estilo para el contenido de las citas */
-.cita-item {
-    background-color: #ffffff;
-    margin: 5px;
-    padding: 5px;
+
+.btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff; /* Color del botón */
+    color: white;
+    border: none;
     border-radius: 5px;
-    text-align: center;
-}
-#closePopupCitas {
-    position: absolute;
-    top: 0px;
-    right: 5px;
-    font-size: 24px;
     cursor: pointer;
 }
-/* Estilo del popup de edición */
-#popupEditarCita {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 2000;  /* Aseguramos que tenga un z-index mayor que el popup de citas */
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
+
+.btn-cancelar {
+    background-color: #dc3545; /* Color del botón de cancelar */
 }
-.mostrar {
-    display: block !important;
+
+.btn-continuar {
+    background-color: #001058   ; /* Color del botón de continuar */
 }
-/* Cuando el popup de edición está activo */
-#popupEditarCita.mostrar {
-    opacity: 1;
-    visibility: visible;
-}
-/* Estilo para ocultar el popup de citas mientras se edita */
-#popupCitas {
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-#popupEditarCita.mostrar ~ #popupCitas {
-    opacity: 0;
-    visibility: hidden;
-}
-/* Estilo del popup de edición */
-#popupEditarCita label {
-    display: block; /* Cada label en una línea separada */
-    text-align: left; /* Alinea el texto a la izquierda */
-    margin-bottom: 5px; /* Espacio entre la etiqueta y el campo */
-    font-size: 18px;
-    font-weight: 600;
-    line-height: 29.05px;
-}
-#popupEditarCita texthora {
-    text-align: left; /* Alinea el texto a la izquierda */
-    margin-bottom: 5px; /* Espacio entre la etiqueta y el campo */
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 19.36px;
-}
-#popupEditarCita input[type="text"],
-#popupEditarCita input[type="date"],
-#popupEditarCita select {
-    width: calc(100% - 0px);  /* Ajustar el ancho para ocupar el espacio restante */
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box; /* Incluir padding y border en el ancho total */
-}
-/* Ajustar el ancho del campo de hora */
-#popupEditarCita input[type="time"] {
-    width: 80px;  /* Ajusta el ancho según sea necesario */
-    text-align: left; /* Alinea el texto a la izquierda */
+
+.btn:hover {
+    opacity: 0.9; /* Efecto de hover */
 }
 
 /* ---- Media Queries para hacer responsive ---- */

@@ -45,6 +45,7 @@ class PasswordResetForm(forms.Form):
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError('Las contraseñas no coinciden.')
         return password2
+    
     def clean_rut(self):
         rut = self.cleaned_data.get('rut')
 
@@ -69,5 +70,4 @@ class PasswordResetForm(forms.Form):
         # Validación del dígito verificador
         if dv != verificador:
             raise forms.ValidationError('El dígito verificador del RUT no es válido.')
-
         return rut

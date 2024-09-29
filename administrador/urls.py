@@ -16,4 +16,8 @@ urlpatterns = [
     path('administrador/agregar_terapeuta/', views.agregar_terapeuta, name='agregar_terapeuta'),
     path('api/provincias/', views.provincias_api, name='provincias_api'),
     path('api/comunas/', views.comunas_api, name='comunas_api'),
+    path('mostrar_paciente_administrador/<int:paciente_id>', views.mostrar_paciente_administrador, name='mostrar_paciente_administrador'),
+    path('listado_terapeutas/<int:paciente_id>', views.listado_terapeutas, name='listado_terapeutas'),
+    path('calendar_asignar_paciente_administrador/<int:terapeuta_id>/<int:paciente_id>', views.calendar_asignar_paciente_administrador, name='calendar_asignar_paciente_administrador'),
+    path('agendar_cita_administrador/',views.agendar_cita_administrador, name='agendar_cita_administrador' )
 ]

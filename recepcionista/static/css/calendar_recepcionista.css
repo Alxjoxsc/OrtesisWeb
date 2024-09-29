@@ -175,6 +175,7 @@ input[type="text"], input[type="time"], input[type="date"], select, textarea {
     box-sizing: border-box;
 }
 
+
 /* Estilo de los botones */
 button {
     padding: 10px;
@@ -190,6 +191,7 @@ button {
 .botones {
     display: flex;
     justify-content: space-between;
+    margin: 15px;
 }
 
 #cancelarBtn {
@@ -221,8 +223,12 @@ button {
 }
 .popup-content h2 {
     text-align: center;
-    margin: 20;
+    margin: 20px;
     font-size: 24px;
+}
+
+.campo {
+    margin:10px;
 }
 
 #fechaSeleccionada {
@@ -287,3 +293,59 @@ button {
     opacity: 0.9; /* Efecto de hover */
 }
 
+/* ---- Media Queries para hacer responsive ---- */
+
+/* Estilos para pantallas medianas (tabletas) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    /* Ajustar el tamaño del popup */
+    .popup-content {
+        width: 60%;
+    }
+
+    /* Botones más grandes en tabletas */
+    button {
+        font-size: 18px;
+        width: 48%;
+    }
+
+    /* Ajustar el margen de los campos */
+    .campo {
+        margin: 15px;
+    }
+}
+
+/* Estilos para pantallas pequeñas (móviles) */
+@media (max-width: 767px) {
+    /* Ajustar el tamaño del popup */
+    .popup-content {
+        width: 90%;
+    }
+
+    /* Cambiar el diseño de los botones en una columna */
+    .botones {
+        flex-direction: column;
+        align-items: center;
+        margin: 0;
+    }
+
+    button {
+        width: 100%; /* Los botones ocupan el ancho completo */
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    /* Ajustar los márgenes de los campos en pantallas pequeñas */
+    .campo {
+        margin: 10px 5px;
+    }
+
+    /* El título del popup será más pequeño */
+    .popup-content h2 {
+        font-size: 20px;
+    }
+
+    /* Ajustar el tamaño del botón de cerrar */
+    .close {
+        font-size: 20px;
+    }
+}
