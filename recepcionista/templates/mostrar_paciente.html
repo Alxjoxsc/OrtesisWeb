@@ -27,7 +27,7 @@
                 <p><strong>Correo Electrónico:</strong> {{ paciente.email }}</p>
                 <p><strong>Descripción de la Patología:</strong></p>
                 <p>{{ paciente.historial_medico }}</p>
-                <p><strong>Terapeuta a Cargo:</strong> {% if paciente.terapeuta %}{{paciente.terapeuta.user.first_name}} {% else %} Sin Terapeuta {% endif %}</p>
+                <p><strong>Terapeuta a Cargo:</strong> {% if paciente.terapeuta %}{{paciente.terapeuta.user.first_name}} {{paciente.terapeuta.user.last_name}} {% else %} Sin Terapeuta {% endif %}</p>
             </div>
         </div>
         

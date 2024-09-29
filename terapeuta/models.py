@@ -20,6 +20,10 @@ class Terapeuta(models.Model):
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}"
 
+from django.db import models
+from terapeuta.models import Terapeuta
+from django.utils import timezone  # Para obtener la fecha y hora actuales
+
 class Paciente(models.Model):
     terapeuta = models.ForeignKey(Terapeuta, on_delete=models.CASCADE, null=True, blank=True)
     rut = models.CharField(max_length=13)
@@ -35,20 +39,47 @@ class Paciente(models.Model):
     medicamentos = models.CharField(max_length=500, null=True, blank=True)
     patologia = models.CharField(max_length=100, null=True, blank=True)
     alergias = models.CharField(max_length=100, null=True, blank=True)
-    progreso = models.TextField(null=True, blank=True)
+    
+    # Se dejan estos campos con la opción de estar vacíos
+    progreso = models.TextField(null=True, blank=True)  
+    motivo_desvinculacion = models.CharField(
+        max_length=500,
+        choices=(
+            ("Terminó tratamiento", "Terminó tratamiento"), 
+            ("Cambio de terapeuta", "Cambio de terapeuta"), 
+            ("Otro", "Otro")
+        ),
+        null=True, blank=True
+    )
+
     dispositivo_ortesis = models.CharField(max_length=100, null=True, blank=True)
-    actividad_fisica = models.CharField(max_length=100, choices=(("Sedentario", "Sedentario"), ("Moderado", "Moderado"), ("Activo", "Activo")), null=True, blank=True)
+    actividad_fisica = models.CharField(
+        max_length=100,
+        choices=(
+            ("Sedentario", "Sedentario"), 
+            ("Moderado", "Moderado"), 
+            ("Activo", "Activo")
+        ),
+        null=True, blank=True
+    )
+    
     peso = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, default=0.0)
     altura = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, default=0.0)
+    
+    # Se establece un valor predeterminado para el IMC
     imc = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, default=0.0)
-    motivo_desvinculacion = models.CharField(max_length=500, choices=(("Terminó tratamiento", "Terminó tratamiento"), ("Cambio de terapeuta", "Cambio de terapeuta"), ("Otro", "Otro")), null=True, blank=True)
-    date_joined = models.DateField()
+
     direccion = models.CharField(max_length=255, null=True, blank=True)
-    is_active = models.BooleanField(default=True)
+    
+    # Se asigna automáticamente la fecha en que se crea el paciente
+    date_joined = models.DateField(default=timezone.now)  
+    
+    # El paciente estará activo por defecto
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+
 
 
 class Cita(models.Model):

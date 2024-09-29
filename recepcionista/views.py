@@ -5,6 +5,8 @@ from autenticacion.decorators import role_required
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.utils import timezone
+from .forms import CrearPacienteForm
+from django.db import transaction
 
 
 @role_required('Recepcionista')
@@ -31,7 +33,17 @@ def recepcionista_pacientes_activos(request):
 
 @role_required('Recepcionista')
 def agregar_paciente(request):
-    return render(request, 'agregar_paciente.html')
+    if request.method == 'POST':
+        paciente_form = CrearPacienteForm(request.POST)
+        
+        if paciente_form.is_valid():
+            paciente = paciente_form.save()
+            paciente_id = paciente.id
+            return redirect('mostrar_paciente', paciente_id = paciente_id)
+    else:
+        paciente_form = CrearPacienteForm()
+    
+    return render(request, 'agregar_paciente.html', {'paciente_form': paciente_form})
 
 @role_required('Recepcionista')
 def asignar_terapeuta(request, id):
