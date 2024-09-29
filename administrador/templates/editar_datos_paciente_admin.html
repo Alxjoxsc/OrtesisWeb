@@ -16,8 +16,7 @@
             });
         {% endif %}
         $('form').on('submit', function(e) {
-            e.preventDefault();
-            
+            e.preventDefault();    
             $.ajax({
                 type: 'POST',
                 url: $(this).attr('action'),
@@ -43,6 +42,9 @@
         {% csrf_token %}
 
         <div class="container">
+            <button class="btn-regresar" onclick="window.location.href=this.dataset.url" data-url="{% url 'mostrar_paciente_administrador' paciente.id %}">
+                &larr;
+            </button>
             <div class="header">
                 <h1>Editar Paciente</h1>
             </div>
@@ -67,9 +69,15 @@
                     <label for="proximaCita">Próxima Cita:</label>
                     <div class="proximacita-contenedor">
                         <input type="date" id="proximaCita" name="proximaCita" value="{{ fecha_cita|date:'Y-m-d' }}" readonly>
+                        {% if terapeuta_asignado %}
                         <button type="button" class="btn-reagendar" onclick="window.location.href=this.dataset.url" data-url="{% url 'redirigir_asignar_cita' terapeuta_asignado paciente.id %}">
-                            Asignar Cita
+                            Reagendar
                         </button>
+                        {% else %}
+                        <button type="button" class="btn-reagendar" disabled>
+                            Reagendar
+                        </button>
+                        {% endif %}
                     </div>
                 </div>
             </div>

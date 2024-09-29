@@ -208,7 +208,7 @@ def editar_datos_paciente_admin(request, paciente_id, terapeuta=None):
             paciente.sexo = sexo
             paciente.fecha_nacimiento = fecha_nacimiento
             paciente.patologia = patologia
-            paciente.terapeuta_id = terapeuta
+            paciente.Terapeuta_id = terapeuta
             paciente.historial_medico = descripcion
             
 

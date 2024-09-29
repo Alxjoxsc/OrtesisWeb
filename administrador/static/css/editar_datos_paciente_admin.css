@@ -139,3 +139,15 @@ button {
     background-color: #006A60;
     color: white;
 }
+
+.btn-regresar {
+    background-color: transparent;
+    color: #000000;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    padding: 0;
+}
