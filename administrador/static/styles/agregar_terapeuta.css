@@ -1,7 +1,51 @@
+.header {
+    display: flex;
+    width: 100%;
+    flex-flow: column nowrap;
+    align-items: flex-start; 
+}
+
 .main-content {
     margin: 1rem;
     display: flex;
     flex-direction: column;
+}
+
+.contenido-modal-exito {
+    display: flex;
+    background-color: #fefefe;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 0.625rem;
+    width: 18.75rem;
+    height: 14.0625rem;
+    margin: auto; /* Centrar horizontalmente */
+    position: absolute; /* Centrar verticalmente */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.contenido-modal-exito img{
+    width: 75px;
+    height: 75px;
+}
+
+.contenido-modal-exito p{
+    font-size: 1.25rem;
+}
+
+.boton-continuar{
+    background-color: rgba(76, 175, 80, 0.9608);
+    color: white;
+    padding: 0.625rem 1.25rem;
+    border: none;
+    border-radius: 3.125rem;
+    font-size: 1rem;
+    cursor: pointer;
 }
 
 h1{

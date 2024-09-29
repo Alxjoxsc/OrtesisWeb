@@ -8,15 +8,28 @@
 
 <link rel="stylesheet" href="{% static 'styles/agregar_terapeuta.css' %}">
 <link rel="stylesheet" href="{% static 'styles/formularios.css' %}">
-
+<link rel="stylesheet" href="{% static 'styles/modal.css' %}">
 {% endblock %}
 
 {% block header %}
+<a href="{% url 'gestion_terapeutas' %}">
+    <img src="{% static 'icons/Volver-atras.svg' %}" alt="">
+</a>
 <h1>Agregar terapeuta</h1>
 {% endblock %}
 
 {% block content %}
-<form action="{% url 'agregar_terapeuta' %}" method="POST">
+<!-- Contenedor para el mensaje de éxito -->
+<div id="mensaje-exito" class="modal">
+    <div class="contenido-modal-exito">
+        <img src="{% static 'icons/Exito.svg' %}" alt="Éxito">
+        <p>¡Terapeuta agregado con éxito!</p>
+        <button class="boton-continuar" onclick="cerrarModal()">Continuar</button>
+    </div>
+</div>
+
+<!-- Formulario para agregar un terapeuta -->
+<form action="{% url 'agregar_terapeuta' %}" method="POST" onsubmit="return mostrarMensajeExito()">
     {% csrf_token %}
     <h2> Datos del terapeuta </h2>
 
@@ -197,6 +210,22 @@
     </div>
     
 </form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mostrar el modal si 'success' es verdadero
+        {% if success %}
+            var mensajeExito = document.getElementById("mensaje-exito");
+            mensajeExito.style.display = "block"; // Mostrar el modal
+        {% endif %}
+    });
+
+    // Función para cerrar el modal
+    function cerrarModal() {
+        var mensajeExito = document.getElementById("mensaje-exito");
+        mensajeExito.style.display = "none"; // Ocultar el modal
+    }
+</script>
 
 <!-- Script para añadir un nuevo formulario de horario -->
 
