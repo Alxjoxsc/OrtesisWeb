@@ -6,7 +6,7 @@ from autenticacion.decorators import role_required
 from .forms import CrearTerapeutaForm, HorarioFormSet
 from autenticacion.models import Provincia, Comuna
 from django.http import JsonResponse
-from terapeuta.models import Paciente, Terapeuta, Cita
+from terapeuta.models import Paciente, Terapeuta, Cita, Horario
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from django.urls import reverse
