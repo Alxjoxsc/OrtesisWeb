@@ -21,6 +21,12 @@
                 <h2 id="month-year">Agosto 2024</h2>
             </div>
             <div class="view-options">
+                <button id="add" class="nav-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" class="bi bi-plus-circle" viewBox="0 0 16 16">
+                        <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm1 7h3a.5.5 0 0 1 0 1H9v3a.5.5 0 0 1-1 0V8H5a.5.5 0 0 1 0-1h3V4a.5.5 0 0 1 1 0v3z"/>
+                    </svg>
+                </button>
+                </button>
                 <button id="week-view" class="nav-button">Sem</button>
                 <button id="month-view" class="nav-button">Mes</button>
             </div>
@@ -63,7 +69,114 @@
             </form>
         </div>
     </div>
+    
+    <div id="popupCitas" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span id="closePopupCitas" class="close">&times;</span>
+            <div id="popup-content">
+            </div>
+        </div>
+    </div>
+    <!-- Popup para editar cita -->
+    <div id="popupEditarCita" class="popup" style="display: none;">
+        <div class="popup-content">
+            <span id="closePopupEditarCita" class="close">&times;</span>
+            <h2>Detalle Cita</h2>
+            <form id="formEditarCita" method="POST" action="{% url 'editar_cita' %}">
+                {% csrf_token %}
+                <input type="hidden" name="cita_id" id="cita_id"> 
+                <label for="titulo">Título</label><br>  
+                <input type="text" id="titulo" name="titulo" required><br><br>
+                <label for="paciente">Paciente</label><br>
+                <select id="paciente" name="paciente">
+                    <option value="">Seleccione el paciente que citará</option>
+                    {% for paciente in paciente %}
+                        <option value="{{ paciente.id }}">{{ paciente.user.first_name }} {{paciente.user.last_name}}</option> 
+                    {% endfor %}
+                </select><br><br>
+                <label for="fecha">Fecha</label><br>
+                <input type="date" id="fecha" name="fecha" required><br><br>
+                <label for="hora">Hora</label><br>
+                <texthora for="titulo">Desde </texthora><input type="time" id="hora" name="hora" required><texthora for="titulo"> Hasta </texthora><input type="time" id="hora" name="hora" required><br><br>
+                <label for="sala">Sala</label><br>
+                <input type="text" id="sala" name="sala" required><br><br>
+                <label for="detalle">Detalle</label><br>
+                <input type="text" id="detalle" name="detalle" required><br><br>
+                <div class="botones">
+                    <button type="button" id="cancelarBtn">Cancelar</button>
+                    <button type="submit" id="confirmarBtn">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
+    <script type="text/javascript">
+        const citas = {{ fechas_citas|safe }};  // datos como JSON al frontend
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll(".day").forEach(day => {
+                day.addEventListener("click", function () {
+                    const selectedDate = this.getAttribute("data-fecha");
+                    const citasDelDia = obtenerCitasPorFecha(selectedDate);
+                    if (citasDelDia.length > 0) {
+                        mostrarPopupCitas(citasDelDia);
+                    } else {
+                        alert("No hay citas agendadas para este día.");
+                    }
+                });
+            });
+            // Función para mostrar el popup con las citas
+            function mostrarPopupCitas(citasDelDia) {
+                const popupCitas = document.getElementById("popupCitas");
+                const popupCitasContent = document.getElementById("popup-content");
+                // Limpiar el contenido previo
+                popupCitasContent.innerHTML = '';
+                // Agregar las citas al popup
+                citasDelDia.forEach(cita => {
+                    const citaElement = document.createElement('div');
+                    citaElement.classList.add('cita-item');
+                    citaElement.setAttribute('data-cita-id', cita.id);  // Agregar el dataset con el ID de la cita
+                    citaElement.innerHTML = `
+                        <p> ${cita.titulo}</p>
+                        <p> ${cita.hora}</p>
+                        <p><strong>Descripción:</strong> ${cita.descripcion}</p>
+                    `;
+                    popupCitasContent.appendChild(citaElement);
+                    // Agregar el evento de clic a todo el contenedor #popup-content
+                    document.getElementById("popup-content").addEventListener("click", function (event) {
+                        if (event.target.classList.contains("cita-item") || event.target.parentNode.classList.contains("cita-item")) {
+                            const citaId = event.target.getAttribute("data-cita-id") || event.target.parentNode.getAttribute("data-cita-id");
+                            const cita = citas.find(c => c.id === parseInt(citaId));
+                            if (cita) {
+                                // Mostrar el popup para editar la cita
+                                document.getElementById("popupEditarCita").classList.add("mostrar");
+                                console.log("Popup para editar la cita mostrado");
+                    
+                                // Rellenar los campos del formulario con los datos de la cita
+                                document.getElementById("cita_id").value = cita.id;
+                                document.getElementById("titulo").value = cita.titulo;
+                                document.getElementById("paciente").value = cita.paciente.id;
+                                document.getElementById("fecha").value = cita.fecha;
+                                document.getElementById("hora").value = cita.hora;
+                                document.getElementById("sala").value = cita.sala;
+                                document.getElementById("detalle").value = cita.descripcion;
+                            }
+                        }
+                    });
+                });
+                // Mostrar el popup con las citas
+                popupCitas.style.display = 'block';
+            }
+            // Función para cerrar el popup cuando se presiona el botón de cerrar
+            document.getElementById("closePopupCitas").addEventListener("click", function () {
+                cerrarPopupCitas();
+            });
+            // Función para cerrar el popup
+            function cerrarPopupCitas() {
+                const popupCitas = document.getElementById("popupCitas");
+                popupCitas.style.display = 'none';
+            }
+        });
+    </script>
     <script src="{% static 'js/calendar.js' %}"></script>
 </body>
 

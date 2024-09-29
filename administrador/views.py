@@ -85,7 +85,7 @@ def agregar_terapeuta(request):
         
     else:
         terapeuta_form = CrearTerapeutaForm()
-        horario_formset = HorarioFormSet()
+        horario_formset = HorarioFormSet(queryset=Horario.objects.none()) # Creamos un formset vacío, para que no se prellene con datos
     
     return render(request, 'agregar_terapeuta.html', {
         'terapeuta_form': terapeuta_form,
