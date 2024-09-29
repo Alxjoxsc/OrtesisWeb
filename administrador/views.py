@@ -1,4 +1,5 @@
 import json
+import re
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 from autenticacion.decorators import role_required
@@ -6,6 +7,8 @@ from .forms import CrearTerapeutaForm, HorarioFormSet
 from autenticacion.models import Provincia, Comuna
 from django.http import JsonResponse
 from terapeuta.models import Paciente, Terapeuta, Cita
+from django.core.exceptions import ValidationError
+from django.contrib import messages
 
 # Create your views here.
 @role_required('Administrador')
@@ -168,27 +171,96 @@ def agendar_cita_administrador(request):
     return render(request, 'mostrar_paciente_administrador.html', {'paciente': paciente_instance})
 
 @role_required('Administrador')
-def editar_datos_paciente_admin(request, id):
-    paciente = get_object_or_404(Paciente, id=id)
-    # guarda cambios
+def editar_datos_paciente_admin(request, paciente_id):
+    paciente = Paciente.objects.get(id=paciente_id)
+    
     if request.method == 'POST':
-        paciente.first_name = request.POST.get('nombres')
-        paciente.last_name = request.POST.get('apellidos')
-        paciente.rut = request.POST.get('rut')
-        # paciente.prox_cita = request.POST.get('proximaCita')  # Descomentar si es necesario
-        paciente.telefono = request.POST.get('telefono')
-        paciente.email = request.POST.get('correo')  # Asegúrate de que el campo en el modelo sea 'email'
-        paciente.sexo = request.POST.get('sexo')
-        paciente.fecha_nacimiento = request.POST.get('fecha_nacimiento')
-        paciente.patologia = request.POST.get('patologia')
-        paciente.Terapeuta = request.POST.get('terapeuta')  # Asegúrate de que el campo en el modelo sea 'terapeuta'
-        paciente.historial_medico = request.POST.get('descripcion')
+        # Obtener datos del formulario
+        nombres = request.POST.get('nombres')
+        apellidos = request.POST.get('apellidos')
+        rut = request.POST.get('rut')
+        telefono = request.POST.get('telefono')
+        correo = request.POST.get('correo')
+        sexo = request.POST.get('sexo')
+        fecha_nacimiento = request.POST.get('fecha_nacimiento')
+        patologia = request.POST.get('patologia')
+        terapeuta = request.POST.get('terapeuta')
+        descripcion = request.POST.get('descripcion')
         
         try:
-            paciente.save()
-        except Exception as e:
-            print("Error al guardar el paciente:", e)  # Agrega un manejo de errores para identificar problemas
+            # Validar datos
+            validar_datos(nombres, apellidos, rut, telefono, correo)
+            
+            # Si la validación es exitosa, guardar los cambios
+            paciente.first_name = nombres
+            paciente.last_name = apellidos
+            paciente.rut = rut
+            # paciente.prox_cita = request.POST.get('proximaCita') # Si es necesario
+            paciente.telefono = telefono
+            paciente.email = correo
+            paciente.sexo = sexo
+            paciente.fecha_nacimiento = fecha_nacimiento
+            paciente.patologia = patologia
+            paciente.Terapeuta = terapeuta
+            paciente.historial_medico = descripcion
+            
+            paciente.save() 
+            messages.success(request, 'Los Datos del Paciente se han Guardado Correctamente')
+            return redirect('admin_pacientes')
+            
+        except ValidationError as ve:
+            messages.error(request, str(ve))
+            return render(request, 'editar_datos_paciente_admin.html', {'paciente': paciente})
         
-        return redirect('admin_pacientes')
-
+        except Exception as e:
+            print("Error al guardar el paciente:", e)
+            messages.error(request, 'Error al Guardar los Datos del Paciente')
+            
     return render(request, 'editar_datos_paciente_admin.html', {'paciente': paciente})
+
+def validar_datos(nombres, apellidos, rut, telefono, correo):
+    # Validación de Nombres
+    if not nombres or not re.match(r'^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$', nombres):
+        raise ValidationError("Nombres NO Válidos")
+    
+    # Validación de Apellidos
+    if not apellidos or not re.match(r'^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$', apellidos):
+        raise ValidationError("Apellidos NO Válidos")
+    
+    # Validación de RUT
+    validar_rut(rut)
+    
+    # Validación del número de teléfono
+    if not re.match(r'^\d{7,15}$', telefono):
+        raise ValidationError("Número de Teléfono NO Válido")
+    
+    # Validación de correo
+    if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', correo):
+        raise ValidationError("Correo Electrónico NO Válido")
+
+def validar_rut(rut):
+    # Limpiar RUT: eliminar puntos y espacios, y dejar solo el guion y dígito verificador
+    rut = rut.replace(" ", "").replace(".", "").strip()
+    
+    # Validar el formato
+    if not re.match(r'^\d{1,8}-[0-9kK]$', rut):
+        raise ValidationError("El RUT es inválido.")
+    
+    # Separar el número y el dígito verificador
+    rut_numeros, dv = rut.split('-')
+    total = 0
+    factor = 2
+    
+    for digit in reversed(rut_numeros):
+        total += int(digit) * factor
+        factor = factor + 1 if factor < 7 else 2
+    
+    dv_calculado = 11 - (total % 11)
+    
+    if dv_calculado == 11:
+        dv_calculado = '0'
+    elif dv_calculado == 10:
+        dv_calculado = 'K'
+    
+    if str(dv_calculado) != dv.upper():
+        raise ValidationError("El RUT es inválido.")
