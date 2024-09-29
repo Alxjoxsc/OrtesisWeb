@@ -63,12 +63,12 @@
                     <label for="rut">RUT:</label>
                     <input type="text" id="rut" name="rut" value="{{ paciente.rut }}" required>
                 </div>
-                <div class="campo campo-proximacita">
+                <div class="campo campo-proximaCita">
                     <label for="proximaCita">Próxima Cita:</label>
                     <div class="proximacita-contenedor">
-                        <input type="date" id="proximaCita" name="proximaCita" value="{{ paciente.fecha_nacimiento|date:'Y-m-d' }}" readonly>
-                        <button type="button" class="btn-reagendar" onclick="redirigir()">
-                            Reagendar
+                        <input type="date" id="proximaCita" name="proximaCita" value="{{ fecha_cita|date:'Y-m-d' }}" readonly>
+                        <button type="button" class="btn-reagendar" onclick="window.location.href=this.dataset.url" data-url="{% url 'redirigir_asignar_cita' terapeuta_asignado paciente.id %}">
+                            Asignar Cita
                         </button>
                     </div>
                 </div>

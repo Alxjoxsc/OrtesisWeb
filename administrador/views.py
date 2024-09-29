@@ -172,9 +172,16 @@ def agendar_cita_administrador(request):
     return render(request, 'mostrar_paciente_administrador.html', {'paciente': paciente_instance})
 
 @role_required('Administrador')
-def editar_datos_paciente_admin(request, paciente_id):
+def editar_datos_paciente_admin(request, paciente_id, terapeuta=None):
     paciente = get_object_or_404(Paciente, id=paciente_id)
-    
+
+    # Obtener la lista de terapeutas
+    terapeutas = Terapeuta.objects.all()
+
+    # Obtener la última cita del paciente
+    ultima_cita = Cita.objects.filter(paciente=paciente).order_by('-fecha', '-hora').first()
+    fecha_cita = ultima_cita.fecha if ultima_cita else None  # Obtener la fecha de la última cita
+
     if request.method == 'POST':
         # Obtener datos del formulario
         nombres = request.POST.get('nombres')
@@ -185,28 +192,28 @@ def editar_datos_paciente_admin(request, paciente_id):
         sexo = request.POST.get('sexo')
         fecha_nacimiento = request.POST.get('fecha_nacimiento')
         patologia = request.POST.get('patologia')
-        terapeuta = request.POST.get('terapeuta')
+        terapeuta = request.POST.get('terapeuta') or paciente.terapeuta.id  # Mantener terapeuta existente si no se proporciona uno nuevo
         descripcion = request.POST.get('descripcion')
 
         try:
             # Validar datos
             validar_datos(nombres, apellidos, rut, telefono, correo)
-            
+
             # Si la validación es exitosa, guardar los cambios
             paciente.first_name = nombres
             paciente.last_name = apellidos
             paciente.rut = rut
-            # paciente.prox_cita = request.POST.get('proximaCita') # Si es necesario
             paciente.telefono = telefono
             paciente.email = correo
             paciente.sexo = sexo
             paciente.fecha_nacimiento = fecha_nacimiento
             paciente.patologia = patologia
-            paciente.Terapeuta = terapeuta  # Asegúrate de que el campo se llama 'terapeuta'
+            paciente.terapeuta_id = terapeuta
             paciente.historial_medico = descripcion
             
+
             paciente.save()
-            
+
             # Respuesta JSON en caso de éxito
             return JsonResponse({
                 'success': True,
@@ -219,7 +226,7 @@ def editar_datos_paciente_admin(request, paciente_id):
                 'success': False,
                 'error': str(ve)
             })
-        
+
         except Exception as e:
             print("Error al guardar el paciente:", e)
             return JsonResponse({
@@ -228,8 +235,13 @@ def editar_datos_paciente_admin(request, paciente_id):
             })
 
     # Renderizar la plantilla inicialmente
-    return render(request, 'editar_datos_paciente_admin.html', {'paciente': paciente})
-
+    return render(request, 'editar_datos_paciente_admin.html', {
+        'paciente': paciente,
+        'terapeutas': terapeutas,  # Pasar la lista de terapeutas a la plantilla
+        'terapeuta_asignado': paciente.terapeuta.id if paciente.terapeuta else None,  # Terapeuta actual
+        'fecha_cita': fecha_cita  # Pasar la fecha de la última cita al contexto
+    })
+    
 def validar_datos(nombres, apellidos, rut, telefono, correo):
     # Validación de Nombres
     if not nombres or not re.match(r'^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$', nombres):
@@ -256,7 +268,7 @@ def validar_rut(rut):
     
     # Validar el formato
     if not re.match(r'^\d{1,8}-[0-9kK]$', rut):
-        raise ValidationError("El RUT es inválido.")
+        raise ValidationError("RUT NO Válido")
     
     # Separar el número y el dígito verificador
     rut_numeros, dv = rut.split('-')
@@ -276,3 +288,6 @@ def validar_rut(rut):
     
     if str(dv_calculado) != dv.upper():
         raise ValidationError("El RUT es inválido.")
+    
+def redirigir_asignar_cita(request, terapeuta_id, paciente_id):
+    return redirect('calendar_asignar_paciente_administrador', terapeuta_id=terapeuta_id, paciente_id=paciente_id)

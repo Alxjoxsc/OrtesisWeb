@@ -19,6 +19,7 @@ urlpatterns = [
     path('mostrar_paciente_administrador/<int:paciente_id>', views.mostrar_paciente_administrador, name='mostrar_paciente_administrador'),
     path('listado_terapeutas/<int:paciente_id>', views.listado_terapeutas, name='listado_terapeutas'),
     path('editar-datos-paciente/<int:paciente_id>', views.editar_datos_paciente_admin, name='editar_datos_paciente_admin'),
+    path('redirigir_asignar_cita/<int:terapeuta_id>/<int:paciente_id>/', views.redirigir_asignar_cita, name='redirigir_asignar_cita'),
     path('calendar_asignar_paciente_administrador/<int:terapeuta_id>/<int:paciente_id>', views.calendar_asignar_paciente_administrador, name='calendar_asignar_paciente_administrador'),
     path('agendar_cita_administrador/',views.agendar_cita_administrador, name='agendar_cita_administrador' )
 ]
