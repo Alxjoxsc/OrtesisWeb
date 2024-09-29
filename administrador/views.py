@@ -8,7 +8,8 @@ from autenticacion.models import Provincia, Comuna
 from django.http import JsonResponse
 from terapeuta.models import Paciente, Terapeuta, Cita
 from django.core.exceptions import ValidationError
-from django.contrib import messages
+from django.http import JsonResponse
+from django.urls import reverse
 
 # Create your views here.
 @role_required('Administrador')
@@ -172,7 +173,7 @@ def agendar_cita_administrador(request):
 
 @role_required('Administrador')
 def editar_datos_paciente_admin(request, paciente_id):
-    paciente = Paciente.objects.get(id=paciente_id)
+    paciente = get_object_or_404(Paciente, id=paciente_id)
     
     if request.method == 'POST':
         # Obtener datos del formulario
@@ -186,7 +187,7 @@ def editar_datos_paciente_admin(request, paciente_id):
         patologia = request.POST.get('patologia')
         terapeuta = request.POST.get('terapeuta')
         descripcion = request.POST.get('descripcion')
-        
+
         try:
             # Validar datos
             validar_datos(nombres, apellidos, rut, telefono, correo)
@@ -201,21 +202,32 @@ def editar_datos_paciente_admin(request, paciente_id):
             paciente.sexo = sexo
             paciente.fecha_nacimiento = fecha_nacimiento
             paciente.patologia = patologia
-            paciente.Terapeuta = terapeuta
+            paciente.Terapeuta = terapeuta  # Asegúrate de que el campo se llama 'terapeuta'
             paciente.historial_medico = descripcion
             
-            paciente.save() 
-            messages.success(request, 'Los Datos del Paciente se han Guardado Correctamente')
-            return redirect('admin_pacientes')
+            paciente.save()
             
+            # Respuesta JSON en caso de éxito
+            return JsonResponse({
+                'success': True,
+                'message': 'Los Datos del Paciente se han Guardado Correctamente',
+                'redirect_url': reverse('listar_pacientes_activos')
+            })
+
         except ValidationError as ve:
-            messages.error(request, str(ve))
-            return render(request, 'editar_datos_paciente_admin.html', {'paciente': paciente})
+            return JsonResponse({
+                'success': False,
+                'error': str(ve)
+            })
         
         except Exception as e:
             print("Error al guardar el paciente:", e)
-            messages.error(request, 'Error al Guardar los Datos del Paciente')
-            
+            return JsonResponse({
+                'success': False,
+                'error': 'Error al Guardar los Datos del Paciente'
+            })
+
+    # Renderizar la plantilla inicialmente
     return render(request, 'editar_datos_paciente_admin.html', {'paciente': paciente})
 
 def validar_datos(nombres, apellidos, rut, telefono, correo):
