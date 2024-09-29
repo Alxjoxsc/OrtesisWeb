@@ -51,6 +51,7 @@
 .profile {
     display: flex;
     align-items: center;
+    justify-content: center;
     margin-top: 10px;
     margin-bottom: 10px;
     width: 90%;
@@ -221,7 +222,7 @@
     .sidebar_recepcionista {
         display: flex;
         width: 100%; /* La barra lateral ocupará todo el ancho de la pantalla */
-        height: 130px; /* Reducir la altura para que parezca una barra horizontal */
+        height: 150px; /* Reducir la altura para que parezca una barra horizontal */
         position: fixed;
         flex-direction: row; /* Cambiar la dirección de la barra para que los elementos se alineen horizontalmente */
         justify-content: space-around; /* Espaciado entre los elementos */
@@ -243,7 +244,7 @@
     .menu {
         display: flex;
         flex-flow: row nowrap; /* Los ítems del menú se colocan en una fila */
-        justify-content: center;
+        justify-content: space-between;
         width: 100%; /* Asegurar que el menú ocupe todo el espacio disponible */
         align-items: center; /* Centrar los ítems del menú verticalmente */
         flex-grow: 1;
@@ -300,7 +301,7 @@
     .sidebar_recepcionista {
         display: flex;
         width: 100%; /* La barra lateral ocupará todo el ancho de la pantalla */
-        height: 130px; /* Reducir la altura para que parezca una barra horizontal */
+        height: 150px; /* Reducir la altura para que parezca una barra horizontal */
         position: fixed;
         flex-direction: row; /* Cambiar la dirección de la barra para que los elementos se alineen horizontalmente */
         justify-content: space-around; /* Espaciado entre los elementos */
@@ -322,7 +323,7 @@
     .menu {
         display: flex;
         flex-flow: row wrap; /* Los ítems del menú se colocan en una fila */
-        justify-content: center;
+        justify-content: left;
         width: 100%; /* Asegurar que el menú ocupe todo el espacio disponible */
         align-items: center; /* Centrar los ítems del menú verticalmente */
         flex-grow: 1;
