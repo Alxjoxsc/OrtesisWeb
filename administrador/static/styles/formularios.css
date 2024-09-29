@@ -27,3 +27,11 @@ textarea.campo-formulario {
 .form-check-input {
     margin-top: 0.25rem;
 }
+
+.errorlist{
+    color: #d40909;
+    font-size: 0.875rem;
+    margin-top: 0.1563rem;
+    margin-bottom: 0.1563rem;
+    list-style: none;
+}
