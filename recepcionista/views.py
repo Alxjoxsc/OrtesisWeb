@@ -192,5 +192,8 @@ def formulario_agregar_paciente(request):
 
 def mostrar_paciente(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
-    return render(request, 'mostrar_paciente.html', {'paciente': paciente})
+    edad = paciente.calcular_edad()
+    imc = paciente.calcular_imc()
+    cita = Cita.objects.filter(paciente=paciente)
+    return render(request, 'mostrar_paciente.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc})
 

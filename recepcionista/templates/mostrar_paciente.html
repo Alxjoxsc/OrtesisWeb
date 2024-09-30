@@ -14,20 +14,103 @@
         <div class="datos-paciente">
             <div class="columna">
                 <p><strong>Nombre:</strong> {{ paciente.first_name }} {{ paciente.last_name }}</p>
-                <p><strong>Sexo:</strong> {{ paciente.sexo }}</p>
-                <p><strong>Número de Teléfono:</strong> {{ paciente.telefono }}</p>
-                <p><strong>Patología:</strong> {{ paciente.patologia }}</p>
-                <p><strong>Estado:</strong> Activo</p>
-                <p><strong>Próxima Cita:</strong> 12/09/2024</p>
-            </div>
-
-            <div class="columna">
                 <p><strong>Rut:</strong> {{ paciente.rut }}</p>
-                <p><strong>Edad:</strong> 27</p>
+                <p><strong>Fecha de Ingreso:</strong> {{ paciente.date_joined }}</p>
+                <p><strong>Estado:</strong> 
+                    {% if paciente.is_active %}
+                        Activo
+                    {% else %}
+                        Inactivo
+                    {% endif %}
+                </p>  
+                <p><strong>Edad:</strong> {{ edad }}</p>
+                <p><strong>Sexo:</strong> {{ paciente.sexo }}</p>
+                <p><strong>Número de teléfono:</strong> {{ paciente.telefono }}</p>
                 <p><strong>Correo Electrónico:</strong> {{ paciente.email }}</p>
-                <p><strong>Descripción de la Patología:</strong></p>
-                <p>{{ paciente.historial_medico }}</p>
-                <p><strong>Terapeuta a Cargo:</strong> {% if paciente.terapeuta %}{{paciente.terapeuta.user.first_name}} {{paciente.terapeuta.user.last_name}} {% else %} Sin Terapeuta {% endif %}</p>
+                <p><strong>Patología:</strong> {{ paciente.patologia }}</p>
+                <p><strong>Dirección:</strong> {{ paciente.calle }}, {{paciente.comuna}}, {{paciente.provincia}}, {{paciente.region}}</p>
+                <p><strong>Peso:</strong></p>
+                    {% if paciente.peso %}
+                        <p>{{ paciente.peso }}</p>
+                    {% else %}
+                        Sin peso ingresado
+                    {% endif %}
+                <p><strong>Altura:</strong></p>
+                    {% if paciente.altura %}
+                        <p>{{ paciente.altura }}</p>
+                    {% else %}
+                        Sin altura ingresada
+                    {% endif %}
+                <p><strong>IMC:</strong></p>
+                    {% if imc %}
+                        <p>{{ imc }}</p>
+                    {% else %}
+                        Sin IMC ingresado
+                    {% endif %}
+                <p><strong>Historial médico:</strong></p>
+                    {% if paciente.historial_medico %}
+                        <p>{{ paciente.historial_medico }}</p>
+                    {% else %}
+                        Sin historial médico
+                    {% endif %}
+                <p><strong>Medicamentos:</strong> 
+                    {% if paciente.medicamentos %}
+                        {{paciente.medicamentos}}
+                    {% else %}
+                        Sin medicamentos ingresados
+                    {% endif %}
+                    </p>
+                <p><strong>Alergias:</strong> 
+                    {% if paciente.alergias %}
+                        {{paciente.alergias}}
+                    {% else %}
+                        Sin alergias
+                    {% endif %}
+                    </p>
+                <p><strong>Progreso:</strong> 
+                    {% if paciente.progreso %}
+                        {{paciente.progreso}}
+                    {% else %}
+                        Sin progreso ingresado
+                    {% endif %}
+                    </p>
+                {% if not paciente.is_active %}
+                    <p><strong>Motivo de desvinculación:</strong> 
+                        {% if paciente.motivo_desvinculacion %}
+                            {{paciente.motivo_desvinculacion}}
+                        {% else %}
+                            Sin motivo de desvinculación ingresado
+                        {% endif %}
+                    </p>
+                {% endif %}
+                <p><strong>Dispositivo Órtesis:</strong> 
+                    {% if paciente.dispositivo_ortesis %}
+                        {{paciente.dispositivo_ortesis}}
+                    {% else %}
+                        Sin dispositivo de órtesis ingresado
+                    {% endif %}
+                </p>
+                <p><strong>Actividad física:</strong> 
+                    {% if paciente.actividad_fisica %}
+                        {{paciente.actividad_fisica}}
+                    {% else %}
+                        Sin actividad física ingresada
+                    {% endif %}
+                </p>
+                <p><strong>Próxima Cita:</strong> 
+                    {% if cita.fecha %}
+                        {{cita.fecha}}
+                    {% else %}
+                        Sin cita asignada
+                    {% endif %}
+                </p>
+                <p><strong>Terapeuta a Cargo:</strong> 
+                    {% if paciente.terapeuta %}
+                        {{paciente.terapeuta.user.first_name}} {{paciente.terapeuta.user.last_name}} 
+                    {% else %} 
+                        Sin terapeuta asignado
+                    {% endif %}
+                </p>
             </div>
         </div>
         

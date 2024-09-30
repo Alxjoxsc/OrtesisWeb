@@ -24,6 +24,17 @@ from django.db import models
 from terapeuta.models import Terapeuta
 from django.utils import timezone  # Para obtener la fecha y hora actuales
 
+from django.db import models
+from terapeuta.models import Terapeuta
+from autenticacion.models import Region, Provincia, Comuna  # Importamos los modelos de ubicación
+from django.utils import timezone  # Para manejar la fecha y hora actual
+
+from django.db import models
+from terapeuta.models import Terapeuta
+from autenticacion.models import Region, Provincia, Comuna  # Importamos los modelos de ubicación
+from django.utils import timezone  # Para manejar la fecha y hora actual
+from datetime import date  # Para calcular la edad
+
 class Paciente(models.Model):
     terapeuta = models.ForeignKey(Terapeuta, on_delete=models.CASCADE, null=True, blank=True)
     rut = models.CharField(max_length=13)
@@ -40,15 +51,10 @@ class Paciente(models.Model):
     patologia = models.CharField(max_length=100, null=True, blank=True)
     alergias = models.CharField(max_length=100, null=True, blank=True)
     
-    # Se dejan estos campos con la opción de estar vacíos
+    # Campos adicionales que se pueden dejar vacíos
     progreso = models.TextField(null=True, blank=True)  
     motivo_desvinculacion = models.CharField(
         max_length=500,
-        choices=(
-            ("Terminó tratamiento", "Terminó tratamiento"), 
-            ("Cambio de terapeuta", "Cambio de terapeuta"), 
-            ("Otro", "Otro")
-        ),
         null=True, blank=True
     )
 
@@ -65,13 +71,16 @@ class Paciente(models.Model):
     
     peso = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, default=0.0)
     altura = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, default=0.0)
-    
-    # Se establece un valor predeterminado para el IMC
-    imc = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, default=0.0)
 
-    direccion = models.CharField(max_length=255, null=True, blank=True)
-    
-    # Se asigna automáticamente la fecha en que se crea el paciente
+    # Nuevas relaciones con Región, Provincia y Comuna
+    region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True)
+    provincia = models.ForeignKey(Provincia, on_delete=models.SET_NULL, null=True, blank=True)
+    comuna = models.ForeignKey(Comuna, on_delete=models.SET_NULL, null=True, blank=True)
+
+    # Dirección detallada (Calle)
+    calle = models.CharField(max_length=255, null=True, blank=True)
+
+    # Fecha de creación del paciente
     date_joined = models.DateField(default=timezone.now)  
     
     # El paciente estará activo por defecto
@@ -79,6 +88,28 @@ class Paciente(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+    
+    def calcular_imc(self, *args, **kwargs):
+        """Calcula el imc en base al peso y altura ingresados en el forms.py"""
+        if self.altura and self.altura > 0:  # Asegúrate de que la altura no sea cero
+            imc = round(self.peso / (self.altura ** 2), 2)  # IMC = peso / altura^2
+        else:
+            imc = None
+        
+        return imc
+
+    def calcular_edad(self):
+        """ Calcula la edad actual del paciente basada en su fecha de nacimiento. """
+        hoy = date.today()  # Fecha actual
+        edad = hoy.year - self.fecha_nacimiento.year
+
+        # Ajuste si la fecha de nacimiento aún no ha ocurrido este año
+        if hoy.month < self.fecha_nacimiento.month or (hoy.month == self.fecha_nacimiento.month and hoy.day < self.fecha_nacimiento.day):
+            edad -= 1
+
+        return edad
+
+
 
 
 

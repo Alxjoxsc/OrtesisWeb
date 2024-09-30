@@ -1,7 +1,8 @@
 from django import forms
-from terapeuta.models import Terapeuta, Paciente
-from autenticacion.models import Region, Provincia, Comuna  # Asegúrate de importar tus modelos
+from terapeuta.models import Paciente
+from autenticacion.models import Region, Provincia, Comuna  # Importamos los modelos de ubicación
 from django.utils import timezone  # Para manejar la fecha y hora actual
+from decimal import Decimal
 
 class CrearPacienteForm(forms.ModelForm):
 
@@ -67,7 +68,7 @@ class CrearPacienteForm(forms.ModelForm):
 
     telefono_emergencia = forms.CharField(
         max_length=12, 
-        label='Teléfono', 
+        label='Teléfono Emergencia', 
         required=False,
         widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ej: +56 9 1234 5678'})
     )
@@ -89,7 +90,7 @@ class CrearPacienteForm(forms.ModelForm):
     patologia = forms.CharField(
         max_length=50, 
         label='Patología', 
-        required=False,
+        required=True,
         widget=forms.TextInput(attrs={'class':'campo-formulario', 'placeholder' :'Ingrese la patología del paciente'})
     )
 
@@ -130,11 +131,32 @@ class CrearPacienteForm(forms.ModelForm):
         widget=forms.NumberInput(attrs={'class':'campo-formulario', 'placeholder': 'Ej: 1.75'})
     )
 
-    direccion = forms.CharField(
-        max_length=255, 
-        label='Dirección', 
-        required=False,
-        widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ej: Calle 123, Comuna, Región'})
+    region = forms.ModelChoiceField(
+        queryset=Region.objects.all(),  # Cargamos todas las regiones
+        label='Región',
+        required=True,
+        widget=forms.Select(attrs={'class': 'campo-formulario'})
+    )
+
+    provincia = forms.ModelChoiceField(
+        queryset=Provincia.objects.all(),  # Cargamos todas las provincias
+        label='Provincia',
+        required=True,
+        widget=forms.Select(attrs={'class': 'campo-formulario'})
+    )
+
+    comuna = forms.ModelChoiceField(
+        queryset=Comuna.objects.all(),  # Cargamos todas las comunas
+        label='Comuna',
+        required=True,
+        widget=forms.Select(attrs={'class': 'campo-formulario'})
+    )
+
+    calle = forms.CharField(
+        max_length=255,
+        label='Calle',
+        required=True,
+        widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ej: Calle 123'})
     )
 
     class Meta:
@@ -157,11 +179,42 @@ class CrearPacienteForm(forms.ModelForm):
             'actividad_fisica', 
             'peso', 
             'estatura', 
-            'direccion',  # Incluido como un campo adicional
+            'region',  # Añadido campo región
+            'provincia',  # Añadido campo provincia
+            'comuna',  # Añadido campo comuna
+            'calle',  # Añadido campo calle
         ]
 
+    def clean(self):
+        cleaned_data = super().clean()
+
+        # Validación ejemplo: Teléfono
+        telefono = cleaned_data.get('telefono')
+        if telefono and not telefono.startswith('+'):
+            self.add_error('telefono', 'El número de teléfono debe comenzar con un "+" seguido del código de país.')
+
+        # Validación para el campo de peso
+        peso = cleaned_data.get('peso')
+        if peso and peso <= 0:
+            self.add_error('peso', 'El peso debe ser un valor positivo.')
+
+        return cleaned_data
+    
+    def clean_peso(self):
+        peso = self.cleaned_data.get('peso')
+        print(f'Peso original: {peso}')
+        if peso is not None:
+            return Decimal(str(peso).replace(',', '.'))
+        return peso
+
+    def clean_estatura(self):
+        estatura = self.cleaned_data.get('estatura')
+        print(f'Estatura original: {estatura}')
+        if estatura is not None:
+            return Decimal(str(estatura).replace(',', '.'))
+        return estatura
+
     def save(self, commit=True):
-        # Creamos el paciente con los datos del formulario
         paciente = Paciente.objects.create(
             rut=self.cleaned_data['rut'],
             first_name=self.cleaned_data['first_name'],
@@ -175,19 +228,22 @@ class CrearPacienteForm(forms.ModelForm):
             historial_medico=self.cleaned_data['historial_medico'],
             medicamentos=self.cleaned_data['medicamentos'],
             patologia=self.cleaned_data['patologia'],
-            alergias=self.cleaned_data['alergia'],  # Corregido
+            alergias=self.cleaned_data['alergia'],
             dispositivo_ortesis=self.cleaned_data['dispositivo_ortesis'],
             actividad_fisica=self.cleaned_data['actividad_fisica'],
             peso=self.cleaned_data['peso'],
-            altura=self.cleaned_data['estatura'],  # Corregido
-            direccion=self.cleaned_data['direccion'],  # Nuevo
-            progreso='',  # Campo predeterminado vacío
-            motivo_desvinculacion='',  # Campo predeterminado vacío
-            date_joined=timezone.now(),  # Fecha de creación asignada automáticamente
-            is_active=True  # Activo por defecto
+            altura=self.cleaned_data['estatura'],
+            region=self.cleaned_data['region'],
+            provincia=self.cleaned_data['provincia'],
+            comuna=self.cleaned_data['comuna'],
+            calle=self.cleaned_data['calle'],  # Calle agregada manualmente
+            progreso='',
+            motivo_desvinculacion='',
+            date_joined=timezone.now(),
+            is_active=True
         )
 
         if commit:
             paciente.save()
 
-        return paciente  # Retornamos el paciente creado
+        return paciente
