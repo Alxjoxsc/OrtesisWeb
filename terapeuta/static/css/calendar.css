@@ -383,18 +383,16 @@ button {
 }
 #popupEditarCita input[type="text"],
 #popupEditarCita input[type="date"],
-#popupEditarCita select {
+#popupEditarCita input[type="time"],
+#popupEditarCita select,
+#popupEditarCita textarea {
     width: calc(100% - 0px);  /* Ajustar el ancho para ocupar el espacio restante */
+    background-color: #E0E0E0;  /* Cambia el color de fondo aquí */
     padding: 8px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box; /* Incluir padding y border en el ancho total */
-}
-/* Ajustar el ancho del campo de hora */
-#popupEditarCita input[type="time"] {
-    width: 80px;  /* Ajusta el ancho según sea necesario */
-    text-align: left; /* Alinea el texto a la izquierda */
 }
 
 /* ---- Media Queries para hacer responsive ---- */
@@ -452,4 +450,75 @@ button {
     .close {
         font-size: 20px;
     }
+}
+
+/* Estilos del fondo del popup de confirmación de cambios */
+#popupConfirmarCambios {
+    display: none; /* Oculto por defecto */
+    position: fixed;
+    top: 0; 
+    left: 0;
+    width: 100%; 
+    height: 100%; /* Cubre toda la pantalla */
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo translúcido oscuro */
+    z-index: 3000; /* Asegura que el popup esté sobre otros elementos */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Estilos del contenido del popup */
+#popupConfirmarCambios .popup-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px; /* Ajusta según lo que necesites */
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombras para resaltar el popup */
+}
+
+#popupConfirmarCambios h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+#popupConfirmarCambios hr {
+    margin-bottom: 15px;
+}
+
+#popupConfirmarCambios p {
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+#popupConfirmarCambios .botones {
+    display: flex;
+    justify-content: space-between;
+    margin: 15px 0;
+}
+
+#cancelarConfirmacionBtn {
+    background-color: #FF0000;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+}
+
+#cancelarConfirmacionBtn:hover {
+    background-color: #CC0000;
+}
+
+#confirmarCambiosBtn {
+    background-color: #008CAB;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+}
+
+#confirmarCambiosBtn:hover {
+    background-color: #006A60;
 }

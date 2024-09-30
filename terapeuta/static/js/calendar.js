@@ -8,6 +8,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const monthViewButton = document.getElementById('month-view');
     const popup = document.getElementById('popup');
     const btnAgendar = document.getElementById('add');
+    const popupEditarCita = document.getElementById('popupEditarCita');  // Popup de editar cita
+    const closePopupEditarCita = document.getElementById('closePopupEditarCita');  // Botón "x" de cerrar en el popup editar cita
+    const popupConfirmarCambios = document.getElementById('popupConfirmarCambios');
+    const cancelarConfirmacionBtn = document.getElementById('cancelarConfirmacionBtn');
+    const confirmarCambiosBtn = document.getElementById('confirmarCambiosBtn');
+    const confirmarBtn = document.getElementById('confirmarBtn'); // Botón que abre este popup
+    // Selecciona el botón de eliminar cita
+    const eliminarBtn = document.getElementById('eliminarBtn');
     let currentDate = new Date();
     let currentView = 'month';  // 'month' o 'week'
     let citas = []; // Variable global para almacenar las citas
@@ -116,12 +124,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         });
-        // Cerrar popup de edición
-        document.getElementById("closePopupEditarCita").addEventListener("click", function () {
-            document.getElementById("popupEditarCita").style.display = "none";
+        
+        // Cerrar popup de edición con la "x"
+        closePopupEditarCita.addEventListener("click", function () {
+            popupEditarCita.classList.remove("mostrar");  // Ocultar el popup
         });
     }
 
+    // Cerrar el popup de edición al hacer clic fuera del mismo
+    window.addEventListener("click", function (event) {
+        if (event.target === popupEditarCita) {
+            popupEditarCita.classList.remove("mostrar");
+        }
+    });
+    
     //------------------------------------VISTA SEMANAL------------------------------------
     function generateWeekView() {
         const startOfWeek = getStartOfWeek(currentDate);
@@ -256,7 +272,7 @@ document.addEventListener('DOMContentLoaded', function () {
             citaElement.innerHTML = `
                 <p> ${cita.titulo}</p>
                 <p> ${cita.hora}</p>
-                <p><strong>Descripción:</strong> ${cita.descripcion}</p>
+                <p> Descripción: ${cita.descripcion}</p>
             `;
             popupCitasContent.appendChild(citaElement);
 
@@ -305,5 +321,71 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert("No hay citas agendadas para este día.");
             }
         });
+    });
+
+    // Función para abrir el popup de confirmación
+    function abrirPopupConfirmacion() {
+        popupConfirmarCambios.style.display = 'flex';
+    }
+
+    // Escucha para cualquier clic dentro del documento
+    document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'confirmarBtn') {
+            event.preventDefault();
+            console.log('Botón Confirmar clickeado');
+            abrirPopupConfirmacion();  // Aquí abrirás el popup
+        }
+    });
+
+    // Escucha para el clic en el botón Confirmar del formulario de edición de citas
+    confirmarBtn.addEventListener('click', function (event) {
+        event.preventDefault(); // Evita el envío del formulario inmediatamente
+        abrirPopupConfirmacion(); // Abre el popup cuando se presiona el botón Confirmar
+    });
+
+    // Cerrar el popup de confirmación al presionar "Cancelar"
+    cancelarConfirmacionBtn.addEventListener('click', function () {
+        popupConfirmarCambios.style.display = 'none';  // Cierra el popup
+    });
+
+    // Confirmar cambios y cerrar el popup
+    confirmarCambiosBtn.addEventListener('click', function () {
+        // Cierra el popup y envía el formulario
+        popupConfirmarCambios.style.display = 'none';  
+        document.getElementById('formEditarCita').submit();  // Enviar el formulario después de la confirmación
+    });
+
+    // Cerrar el popup si se hace clic fuera del contenido
+    window.addEventListener('click', function (event) {
+        if (event.target === popupConfirmarCambios) {
+            popupConfirmarCambios.style.display = 'none';  // Cerrar si se hace clic fuera del popup
+        }
+    });
+
+    // Agrega el evento de clic para el botón de eliminar cita
+    eliminarBtn.addEventListener('click', function () {
+        const citaId = document.getElementById('cita_id').value; // Obtener el ID de la cita
+
+        if (confirm('¿Estás seguro de que deseas eliminar esta cita?')) {
+            // Realizar una solicitud AJAX para eliminar la cita
+            fetch(`/eliminar-cita/${citaId}/`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Cita eliminada exitosamente.');
+                    location.reload(); // Recargar la página para actualizar el calendario
+                } else {
+                    alert('Hubo un error al eliminar la cita.');
+                }
+            })
+            .catch(error => {
+                console.error('Error al eliminar la cita:', error);
+            });
+        }
     });
 });
