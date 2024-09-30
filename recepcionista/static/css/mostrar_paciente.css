@@ -1,0 +1,90 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
+
+.container-paciente {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: auto; /* Para permitir scrollbar si es necesario */
+}
+
+.back-arrow {
+    cursor: pointer;
+    color: #373D58;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+.card-paciente {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.datos-paciente {
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    background-color: #fafafa;
+}
+
+.columna {
+    display: flex;
+    flex-direction: column;
+}
+
+strong {
+    color: #555;
+}
+
+.estado-activo {
+    color: green; /* Color para el estado activo */
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.footer-card {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 10px 15px;
+    background-color: #373D58;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+@media (max-width: 600px) {
+    .container-paciente {
+        padding: 10px;
+    }
+    
+    .btn {
+        width: 100%;
+        margin-top: 10px;
+    }
+}
+.btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}

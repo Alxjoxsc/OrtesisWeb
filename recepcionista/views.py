@@ -7,6 +7,7 @@ from django.core.paginator import Paginator
 from django.utils import timezone
 from .forms import CrearPacienteForm
 from django.db import transaction
+from django.core.exceptions import ObjectDoesNotExist
 
 
 @role_required('Recepcionista')
@@ -46,10 +47,23 @@ def agregar_paciente(request):
     return render(request, 'agregar_paciente.html', {'paciente_form': paciente_form})
 
 @role_required('Recepcionista')
-def asignar_terapeuta(request, id):
+def elegir_terapeuta(request, id):
     paciente = Paciente.objects.get(id=id)
     terapeuta = Terapeuta.objects.all()
-    return render(request, 'asignar_terapeuta.html', {'terapeuta': terapeuta, 'paciente': paciente})
+    return render(request, 'elegir_terapeuta.html', {'terapeuta': terapeuta, 'paciente': paciente})
+
+@role_required('Recepcionista')
+def asignar_terapeuta(request, terapeuta_id, paciente_id):
+    print(paciente_id)
+    print(terapeuta_id)
+    paciente = Paciente.objects.get(id=paciente_id)
+    terapeuta = Terapeuta.objects.get(id=terapeuta_id)
+    print(paciente)
+    
+    paciente.terapeuta_id = terapeuta.id
+    paciente.save()
+    
+    return render(request, 'mostrar_paciente.html', {'paciente': paciente})
 
 
 @role_required('Recepcionista')
@@ -79,7 +93,7 @@ def listar_terapeutas_activos(request):
     return render(request, 'terapeutas.html', {'terapeutas': page_obj})
 
 @role_required('Recepcionista')
-def calendar_asignar_paciente(request, terapeuta_id, paciente_id):
+def calendar_asignar_paciente(request, paciente_id, terapeuta_id):
     terapeuta = Terapeuta.objects.get(id=terapeuta_id)
     paciente = Paciente.objects.get(id=paciente_id)
     cita = Cita.objects.all()
@@ -109,25 +123,40 @@ def agendar_cita_recepcionista(request):
         terapeuta_instance = Terapeuta.objects.get(id=terapeuta_id)
         
         paciente_instance = Paciente.objects.get(id=paciente_id)
-        print(paciente_instance)
-        
-        cita = Cita(
-            terapeuta = terapeuta_instance,
-            titulo = titulo,
-            paciente = paciente_instance,
-            fecha = fecha,
-            hora = hora,
-            sala = sala,
-            detalle = detalle
-        )
-        cita.save()
+        try:
+            # Intentar obtener una cita existente para el paciente y el terapeuta
+            cita = Cita.objects.get(paciente=paciente_instance, terapeuta=terapeuta_instance)
+
+            # Si existe, actualizar los campos
+            cita.titulo = titulo
+            cita.fecha = fecha
+            cita.hora = hora
+            cita.sala = sala
+            cita.detalle = detalle
+            mensaje = "Cita actualizada exitosamente."
+
+        except ObjectDoesNotExist:
+            # Si no existe, crear una nueva cita
+            cita = Cita(
+                terapeuta=terapeuta_instance,
+                paciente=paciente_instance,
+                titulo=titulo,
+                fecha=fecha,
+                hora=hora,
+                sala=sala,
+                detalle=detalle
+            )
+            mensaje = "Nueva cita creada exitosamente."
+    
+            # Guardar los cambios (ya sea la nueva cita o la cita actualizada)
+            cita.save()
         
         #Guardar la asignación del terapeuta al paciente
         
         paciente_instance.terapeuta_id = terapeuta_instance.id
         paciente_instance.save()
         
-        return redirect('mostrar_paciente', paciente_instance.id)
+        return redirect('mostrar_paciente_con_terapeuta', paciente_instance.id, terapeuta_instance.id)
     return render(request, 'mostrar_paciente.html', {'paciente': paciente_instance})
 
     
@@ -190,10 +219,19 @@ def formulario_agregar_paciente(request):
 
     return render(request, 'agregar_paciente.html')
 
-def mostrar_paciente(request, paciente_id):
+def mostrar_paciente_sin_terapeuta(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
     edad = paciente.calcular_edad()
     imc = paciente.calcular_imc()
-    cita = Cita.objects.filter(paciente=paciente)
+    cita = Cita.objects.filter(paciente_id=paciente_id).order_by('fecha').first()
     return render(request, 'mostrar_paciente.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc})
+
+
+def mostrar_paciente_con_terapeuta(request, paciente_id, terapeuta_id):
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+    terapeuta = Terapeuta.objects.get(id=terapeuta_id)
+    edad = paciente.calcular_edad()
+    imc = paciente.calcular_imc()
+    cita = Cita.objects.filter(paciente_id=paciente_id).order_by('fecha').first()
+    return render(request, 'mostrar_paciente.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc, 'terapeuta':terapeuta})
 

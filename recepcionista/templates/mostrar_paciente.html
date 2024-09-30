@@ -2,10 +2,11 @@
 {% load static %}
 {% block content %}
 
+<link rel="stylesheet" type="text/css" href="{% static 'css/mostrar_paciente.css' %}">
+
 <div class="container-paciente">
-    <!-- Flecha de regreso -->
     <div class="back-arrow" onclick="window.location.href='{% url 'recepcionista_pacientes_activos' %}';">
-        &#8592;
+        &#8592; Regresar
     </div>
 
     <h1>Información Paciente</h1>
@@ -15,108 +16,49 @@
             <div class="columna">
                 <p><strong>Nombre:</strong> {{ paciente.first_name }} {{ paciente.last_name }}</p>
                 <p><strong>Rut:</strong> {{ paciente.rut }}</p>
-                <p><strong>Fecha de Ingreso:</strong> {{ paciente.date_joined }}</p>
                 <p><strong>Estado:</strong> 
                     {% if paciente.is_active %}
-                        Activo
+                        Activo <span class="estado-activo"></span>
                     {% else %}
                         Inactivo
                     {% endif %}
-                </p>  
+                </p>
                 <p><strong>Edad:</strong> {{ edad }}</p>
                 <p><strong>Sexo:</strong> {{ paciente.sexo }}</p>
                 <p><strong>Número de teléfono:</strong> {{ paciente.telefono }}</p>
                 <p><strong>Correo Electrónico:</strong> {{ paciente.email }}</p>
                 <p><strong>Patología:</strong> {{ paciente.patologia }}</p>
-                <p><strong>Dirección:</strong> {{ paciente.calle }}, {{paciente.comuna}}, {{paciente.provincia}}, {{paciente.region}}</p>
-                <p><strong>Peso:</strong></p>
-                    {% if paciente.peso %}
-                        <p>{{ paciente.peso }}</p>
-                    {% else %}
-                        Sin peso ingresado
-                    {% endif %}
-                <p><strong>Altura:</strong></p>
-                    {% if paciente.altura %}
-                        <p>{{ paciente.altura }}</p>
-                    {% else %}
-                        Sin altura ingresada
-                    {% endif %}
-                <p><strong>IMC:</strong></p>
-                    {% if imc %}
-                        <p>{{ imc }}</p>
-                    {% else %}
-                        Sin IMC ingresado
-                    {% endif %}
-                <p><strong>Historial médico:</strong></p>
-                    {% if paciente.historial_medico %}
-                        <p>{{ paciente.historial_medico }}</p>
-                    {% else %}
-                        Sin historial médico
-                    {% endif %}
-                <p><strong>Medicamentos:</strong> 
-                    {% if paciente.medicamentos %}
-                        {{paciente.medicamentos}}
-                    {% else %}
-                        Sin medicamentos ingresados
-                    {% endif %}
-                    </p>
-                <p><strong>Alergias:</strong> 
-                    {% if paciente.alergias %}
-                        {{paciente.alergias}}
-                    {% else %}
-                        Sin alergias
-                    {% endif %}
-                    </p>
-                <p><strong>Progreso:</strong> 
-                    {% if paciente.progreso %}
-                        {{paciente.progreso}}
-                    {% else %}
-                        Sin progreso ingresado
-                    {% endif %}
-                    </p>
+                <p><strong>Dirección:</strong> {{ paciente.calle }}, {{ paciente.comuna}}, {{ paciente.provincia}}, {{ paciente.region}}</p>
+                <p><strong>Peso:</strong> {{ paciente.peso|default:"Sin peso ingresado" }}</p>
+                <p><strong>Altura:</strong> {{ paciente.altura|default:"Sin altura ingresada" }}</p>
+                <p><strong>IMC:</strong> {{ imc|default:"Sin IMC ingresado" }}</p>
+                <p><strong>Historial médico:</strong> {{ paciente.historial_medico|default:"Sin historial médico" }}</p>
+                <p><strong>Medicamentos:</strong> {{ paciente.medicamentos|default:"Sin medicamentos ingresados" }}</p>
+                <p><strong>Alergias:</strong> {{ paciente.alergias|default:"Sin alergias" }}</p>
+                <p><strong>Progreso:</strong> {{ paciente.progreso|default:"Sin progreso ingresado" }}</p>
                 {% if not paciente.is_active %}
-                    <p><strong>Motivo de desvinculación:</strong> 
-                        {% if paciente.motivo_desvinculacion %}
-                            {{paciente.motivo_desvinculacion}}
-                        {% else %}
-                            Sin motivo de desvinculación ingresado
-                        {% endif %}
-                    </p>
+                    <p><strong>Motivo de desvinculación:</strong> {{ paciente.motivo_desvinculacion|default:"Sin motivo de desvinculación ingresado" }}</p>
                 {% endif %}
-                <p><strong>Dispositivo Órtesis:</strong> 
-                    {% if paciente.dispositivo_ortesis %}
-                        {{paciente.dispositivo_ortesis}}
-                    {% else %}
-                        Sin dispositivo de órtesis ingresado
-                    {% endif %}
-                </p>
-                <p><strong>Actividad física:</strong> 
-                    {% if paciente.actividad_fisica %}
-                        {{paciente.actividad_fisica}}
-                    {% else %}
-                        Sin actividad física ingresada
-                    {% endif %}
-                </p>
+                <p><strong>Dispositivo Órtesis:</strong> {{ paciente.dispositivo_ortesis|default:"Sin dispositivo de órtesis ingresado" }}</p>
+                <p><strong>Actividad física:</strong> {{ paciente.actividad_fisica|default:"Sin actividad física ingresada" }}</p>
                 <p><strong>Próxima Cita:</strong> 
-                    {% if cita.fecha %}
-                        {{cita.fecha}}
+                    {% if cita %}
+                        {{ cita.fecha }}
                     {% else %}
                         Sin cita asignada
                     {% endif %}
-                </p>
-                <p><strong>Terapeuta a Cargo:</strong> 
-                    {% if paciente.terapeuta %}
-                        {{paciente.terapeuta.user.first_name}} {{paciente.terapeuta.user.last_name}} 
-                    {% else %} 
-                        Sin terapeuta asignado
-                    {% endif %}
-                </p>
+                </p>                
+                <p><strong>Terapeuta a Cargo:</strong> {{ paciente.terapeuta.user.first_name }} {{ paciente.terapeuta.user.last_name|default:"Sin terapeuta asignado" }}</p>
             </div>
         </div>
         
         <div class="footer-card">
-            <button class="btn" onclick="window.location.href='{% url 'asignar_terapeuta' paciente.id %}'" >Asignar Terapeuta</button>
-            <button class="btn" >Asignar Cita</button>
+            <button class="btn" onclick="window.location.href='{% url 'elegir_terapeuta' paciente.id %}'">Asignar Terapeuta</button>
+            {% if paciente.terapeuta_id %}
+                <button class="btn" onclick="window.location.href='{% url 'calendar_asignar_paciente' paciente.id paciente.terapeuta_id %}'">Asignar Cita</button>
+            {% else %}
+                <button class="btn" disabled title="No se puede asignar cita sin terapeuta">Asignar Cita</button>
+            {% endif %}
         </div>
     </div>
 </div>

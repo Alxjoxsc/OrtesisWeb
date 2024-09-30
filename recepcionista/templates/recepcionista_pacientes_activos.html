@@ -55,9 +55,15 @@
                     </td>                    
                     <td>{{ paciente.date_joined }}</td>
                     <td class="text-end">
-                        <a href="{% url 'mostrar_paciente' paciente.id %}" class="btn btn-outline-primary btn-sm me-2" title="Ver detalles">
-                            <i class="bi bi-file-earmark-text"></i>
-                        </a>                        
+                        {% if paciente.terapeuta_id %}
+                            <a href="{% url 'mostrar_paciente_con_terapeuta' paciente.id paciente.terapeuta_id %}" class="btn btn-outline-primary btn-sm me-2" title="Ver detalles">
+                                <i class="bi bi-file-earmark-text"></i>
+                            </a>  
+                        {% else %}
+                            <a href="{% url 'mostrar_paciente_sin_terapeuta' paciente.id %}" class="btn btn-outline-primary btn-sm me-2" title="Ver detalles">
+                                <i class="bi bi-file-earmark-text"></i>
+                            </a>
+                        {% endif %}
                         <a href="#" class="btn btn-outline-secondary btn-sm" title="Ver terapeuta">
                             <i class="bi bi-person"></i>
                         </a>
