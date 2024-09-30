@@ -1,0 +1,79 @@
+{% extends 'administrador_base.html' %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/administrador.css' %}">
+<div class="container-paciente">  
+    <div class="header">
+        <h2>Asignar Terapeuta</h2>
+        <form method="get" action="{% url 'admin_pacientes' %}" class="busqueda-form">
+            <div class="busqueda-input">
+                <input type="text" name="q" placeholder="Búsqueda por Nombre o Rut" value="{{ request.GET.q }}">
+            </div>
+        </form>
+    </div>
+
+    <div class="header">
+        <button type="button" class="filtro-btn">
+            Filtrar <span class="flecha">▼</span>
+        </button>
+        <div class="dropdown-content">
+            <label>
+                <input type="checkbox" name="filtro" value="fecha_ingreso"> Fecha de Ingreso
+            </label>
+            <label>
+                <input type="checkbox" name="filtro" value="especialidad"> Especialidad
+            </label>
+        </div>
+    </div>
+
+    <!-- Encabezado de la lista de terapeutas -->
+    <div class="lista-terapeutas">
+        <div class="header-lista">
+            <span><strong>Nombre</strong></span>
+            <span><strong>Rut</strong></span>
+            <span><strong>Disponibilidad</strong></span>
+            <span><strong>Especialidad</strong></span>
+            <span><strong>Fecha de Ingreso</strong></span>
+        </div>
+        
+        <!-- Lista de terapeutas -->
+        {% for terapeuta in terapeuta %}
+        {% with url='asignar_terapeuta_administrador' %}
+            {% with paciente_id=paciente.id %}
+                {% with terapeuta_id=terapeuta.id %}
+                        <a href="javascript:void(0);" 
+                            title="Pasar a estado inactivo"
+                            onclick="mostrarPopUpAsignarTerapeuta('{{ paciente.id }}', '{{ paciente.first_name }} {{ paciente.last_name }}', '{{ paciente.rut}}', '{{terapeuta.user.first_name}} {{terapeuta.user.last_name}}', '{% url url paciente_id terapeuta_id %}')">
+                                <div class="terapeuta-card">
+                                    <span>{{ terapeuta.user.first_name }} {{ terapeuta.user.last_name }}</span>
+                                    <span>{{ terapeuta.user.profile.rut }}</span>
+                                    <span class="disponibilidad-disponible">{{ terapeuta.disponibilidad }}</span>
+                                    <span>{{ terapeuta.especialidad }}</span>
+                                    <span>{{ terapeuta.fecha_ingreso }}</span>
+                                    <img src="{% static 'icons/terapeuta.svg' %}" alt="Icono terapeuta">
+                                </div>
+                        </a>
+                        {% endwith %}
+                {% endwith %}
+            {% endwith %}
+        {% empty %}
+            <p>No se encontraron terapeutas activos.</p>
+        {% endfor %}
+
+    </div>
+</div>
+
+<div id="popupModal" style="display:none;">
+    <div class="popup-content">
+        <h3 id="popup-titulo"></h3>
+        <p id="popup-mensaje"></p>
+        <button id="confirmButton">Confirmar</button>
+        <button onclick="document.getElementById('popupModal').style.display='none'">Cancelar</button>
+    </div>
+</div>
+
+
+<script src="{% static 'js/popup.js' %}">
+{% endblock %}

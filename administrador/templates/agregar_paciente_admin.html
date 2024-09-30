@@ -1,129 +1,199 @@
-{% extends 'base_admin.html' %}
+{% extends 'administrador_base.html' %}
+
 {% load static %}
-{% block head %}
-    <link rel="stylesheet" href="{% static 'css/paciente.css' %}">
+
+{% block title %}Gestión de pacientes{% endblock %}
+
+{% block extra_head%}
+<link rel="stylesheet" href="{% static 'styles/agregar_paciente.css' %}">
+<link rel="stylesheet" href="{% static 'styles/formularios.css' %}">
+<link rel="stylesheet" href="{% static 'styles/modal.css' %}">
 {% endblock %}
+
+{% block header %}
+<a href="{% url 'admin_pacientes' %}">
+    <img src="{% static 'icons/Volver-atras.svg' %}" alt="">
+</a>
+<h1>Agregar paciente</h1>
+{% endblock %}
+
 {% block content %}
-
-<div class="container">
-    <!-- Flecha de regreso -->
-    <div class="back-arrow" onclick="window.location.href='{% url 'listar_pacientes_activos' %}';">
-        &#8592;
+<!-- Contenedor para el mensaje de éxito -->
+<div id="mensaje-exito" class="modal">
+    <div class="contenido-modal-exito">
+        <img src="{% static 'icons/Exito.svg' %}" alt="Éxito">
+        <p>¡paciente agregado con éxito!</p>
+        <button class="boton-continuar" onclick="cerrarModal()">Continuar</button>
     </div>
-    <h1>Agregar Paciente</h1>
-    
-    <form id="formularioPaciente" method="POST" action="{% url 'formulario_agregar_paciente' %}">
-        {% csrf_token %}
-        <div>
-            <label for="nombres">Nombres</label>
-            <input type="text" id="nombres" name="nombres" placeholder="Ingrese los nombres del paciente" required>
-        </div>
-
-        <div>
-            <label for="apellidos">Apellidos</label>
-            <input type="text" id="apellidos" name="apellidos" placeholder="Ingrese los apellidos del paciente" required>
-        </div>
-
-        <div>
-            <label for="rut">Rut</label>
-            <input type="text" id="rut" name="rut" placeholder="Sin puntos y con guión. Ej: 12345678-9" required>
-        </div>
-
-        <div>
-            <label for="telefono">Número de Teléfono</label>
-            <input type="text" id="telefono" name="telefono" placeholder="Ej: 912345678">
-        </div>
-
-        <div>
-            <label for="correo">Correo Electrónico</label>
-            <input type="email" id="correo" name="correo" placeholder="Ej: correo@example.cl">
-        </div>
-
-        <div>
-            <label for="fecha_nacimiento">Fecha de Nacimiento</label>
-            <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
-        </div>
-
-        <div>
-            <label for="sexo">Sexo</label>
-            <select id="sexo" name="sexo" required>
-                <option value="">Seleccionar Sexo</option>
-                <option value="Masculino">Masculino</option>
-                <option value="Femenino">Femenino</option>
-                <option value="Otro">Otro</option>
-            </select>
-        </div>
-
-        <div>
-            <label for="patologia">Patología</label>
-            <input type="text" id="patologia" name="patologia" placeholder="Ingrese la patología del paciente">
-        </div>
-
-        <div>
-            <label for="descripcion">Descripción de la Patología</label>
-            <textarea id="descripcion" name="historial_medico" rows="5" placeholder="Ingrese una descripción de la patología (máximo 1000 caracteres)"></textarea>
-        </div>
-
-        <div>
-            <label for="medicamentos">Medicamentos</label>
-            <input type="text" id="medicamentos" name="medicamentos" placeholder="Ingrese medicamentos">
-        </div>
-
-        <div>
-            <label for="alergias">Alergias</label>
-            <input type="text" id="alergias" name="alergias" placeholder="Ingrese alergias">
-        </div>
-
-        <div>
-            <label for="contacto_emergencia">Contacto de Emergencia</label>
-            <input type="text" id="contacto_emergencia" name="contacto_emergencia" placeholder="Ingrese el contacto de emergencia">
-        </div>
-
-        <div>
-            <label for="telefono_emergencia">Teléfono de Emergencia</label>
-            <input type="text" id="telefono_emergencia" name="telefono_emergencia" placeholder="Ej: 912345678">
-        </div>
-
-        <div>
-            <label for="actividad_fisica">Actividad Física</label>
-            <select id="actividad_fisica" name="actividad_fisica">
-                <option value="">Seleccionar Actividad Física</option>
-                <option value="Sedentario">Sedentario</option>
-                <option value="Moderado">Moderado</option>
-                <option value="Activo">Activo</option>
-            </select>
-        </div>
-
-        <div>
-            <label for="peso">Peso (kg)</label>
-            <input type="number" id="peso" name="peso" step="0.01" placeholder="Ingrese el peso">
-        </div>
-
-        <div>
-            <label for="altura">Altura (cm)</label>
-            <input type="number" id="altura" name="altura" step="0.01" placeholder="Ingrese la altura">
-        </div>
-
-        <div>
-            <label for="motivo_desvinculacion">Motivo de Desvinculación</label>
-            <select id="motivo_desvinculacion" name="motivo_desvinculacion">
-                <option value="">Seleccionar Motivo</option>
-                <option value="Terminó tratamiento">Terminó tratamiento</option>
-                <option value="Cambio de terapeuta">Cambio de terapeuta</option>
-                <option value="Otro">Otro</option>
-            </select>
-        </div>
-
-        <div class="buttons">
-            <button type="button" class="btn btn-cancelar" onclick="window.location.href='{% url 'listar_pacientes_activos' %}'">Cancelar</button>
-            <button type="submit" class="btn btn-continuar">
-                continuar
-            </button>
-        </div>
-        
-    </form>
 </div>
 
-<script src="{% static 'js/guardar_datos.js' %}"></script>
+<!-- Formulario para agregar un paciente -->
+<form action="{% url 'agregar_paciente_admin' %}" method="POST" onsubmit="return mostrarMensajeExito()">
+    {% csrf_token %}
+    <h2> Datos del paciente </h2>
+
+    {% comment %} DATOS DEL paciente COLUMNA IZQUIERDA {% endcomment %}
+    <div class="divisor-formulario">
+        <div class="datos-columna-izquierda">
+
+            <!-- Campo RUT -->
+            <div class="form-group">
+                <label for="{{ paciente_form.rut.id_for_label }}">{{ paciente_form.rut.label }}</label>
+                {{ paciente_form.rut }}
+                <div class="error">{{ paciente_form.rut.errors }}</div>
+            </div>
+
+            <!-- Campo Nombre -->
+            <div class="form-group">
+                <label for="{{ paciente_form.first_name.id_for_label }}">{{ paciente_form.first_name.label }}</label>
+                {{ paciente_form.first_name }}
+                <div class="error">{{ paciente_form.first_name.errors }}</div>
+            </div>
+
+            <!-- Campo Apellido -->
+            <div class="form-group">
+                <label for="{{ paciente_form.last_name.id_for_label }}">{{ paciente_form.last_name.label }}</label>
+                {{ paciente_form.last_name }}
+                <div class="error">{{ paciente_form.last_name.errors }}</div>
+            </div>
+
+            <!-- Patologia -->
+            <div class="form-group">
+                <label for="{{ paciente_form.patologia.id_for_label }}">{{ paciente_form.patologia.label }}</label>
+                {{ paciente_form.patologia }}
+                <div class="error">{{ paciente_form.patologia.errors }}</div>
+            </div>
+
+            <!-- Campo Sexo -->
+            <div class="form-group">
+                <label for="{{ paciente_form.sexo.id_for_label }}">{{ paciente_form.sexo.label }}</label>
+                {{ paciente_form.sexo }}
+                <div class="error">{{ paciente_form.sexo.errors }}</div>
+            </div>
+
+            <!-- Campo Peso -->
+            <div class="form-group">
+                <label for="{{ paciente_form.peso.id_for_label }}">{{ paciente_form.peso.label }}</label>
+                {{ paciente_form.peso }}
+                <div class="error">{{ paciente_form.peso.errors }}</div>
+            </div>
+
+            <!-- Campo Estatura -->
+            <div class="form-group">
+                <label for="{{ paciente_form.estatura.id_for_label }}">{{ paciente_form.estatura.label }}</label>
+                {{ paciente_form.estatura }}
+                <div class="error">{{ paciente_form.estatura.errors }}</div>
+            </div>
+
+            <!-- Historial Médico -->
+            <div class="form-group">
+                <label for="{{ paciente_form.historial_medico.id_for_label }}">{{ paciente_form.historial_medico.label }}</label>
+                {{ paciente_form.historial_medico }}
+                <div class="error">{{ paciente_form.historial_medico.errors }}</div>
+            </div>
+
+            <!-- Medicamentos -->
+            <div class="form-group">
+                <label for="{{ paciente_form.medicamentos.id_for_label }}">{{ paciente_form.medicamentos.label }}</label>
+                {{ paciente_form.medicamentos }}
+                <div class="error">{{ paciente_form.medicamentos.errors }}</div>
+            </div>
+
+            <!-- Alergias -->
+            <div class="form-group">
+                <label for="{{ paciente_form.alergia.id_for_label }}">{{ paciente_form.alergia.label }}</label>
+                {{ paciente_form.alergia }}
+                <div class="error">{{ paciente_form.alergia.errors }}</div>
+            </div>
+
+        </div>
+
+        {% comment %} DATOS DEL paciente COLUMNA DERECHA {% endcomment %}
+
+        <div class="datos-columna-derecha">
+
+            <!-- Campo Fecha de Nacimiento -->
+            <div class="form-group">
+                <label for="{{ paciente_form.fecha_nacimiento.id_for_label }}">{{ paciente_form.fecha_nacimiento.label }}</label>
+                {{ paciente_form.fecha_nacimiento }}
+                <div class="error">{{ paciente_form.fecha_nacimiento.errors }}</div>
+            </div>
+            <!-- Campo Email -->
+            <div class="form-group">
+                <label for="{{ paciente_form.email.id_for_label }}">{{ paciente_form.email.label }}</label>
+                {{ paciente_form.email }}
+                <div class="error">{{ paciente_form.email.errors }}</div>
+            </div>
+
+            <!-- Campo Teléfono -->
+            <div class="form-group">
+                <label for="{{ paciente_form.telefono.id_for_label }}">{{ paciente_form.telefono.label }}</label>
+                {{ paciente_form.telefono }}
+                <div class="error">{{ paciente_form.telefono.errors }}</div>
+            </div>
+
+            <!-- Contacto Emergencia -->
+            <div class="form-group">
+                <label for="{{ paciente_form.contacto_emergencia.id_for_label }}">{{ paciente_form.contacto_emergencia.label }}</label>
+                {{ paciente_form.contacto_emergencia }}
+                <div class="error">{{ paciente_form.contacto_emergencia.errors }}</div>
+            </div>
+
+            <!-- Telefono Emergencia -->
+            <div class="form-group">
+                <label for="{{ paciente_form.telefono_emergencia.id_for_label }}">{{ paciente_form.telefono_emergencia.label }}</label>
+                {{ paciente_form.telefono_emergencia }}
+                <div class="error">{{ paciente_form.telefono_emergencia.errors }}</div>
+            </div>
+
+            <!-- Campo Dirección -->
+            <div class="form-group">
+                <label for="{{ paciente_form.region.id_for_label }}">{{ paciente_form.region.label }}</label>
+                {{ paciente_form.region }}
+                <div class="error">{{ paciente_form.region.errors }}</div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ paciente_form.provincia.id_for_label }}">{{ paciente_form.provincia.label }}</label>
+                {{ paciente_form.provincia }}
+                <div class="error">{{ paciente_form.provincia.errors }}</div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ paciente_form.comuna.id_for_label }}">{{ paciente_form.comuna.label }}</label>
+                {{ paciente_form.comuna }}
+                <div class="error">{{ paciente_form.comuna.errors }}</div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ paciente_form.calle.id_for_label }}">{{ paciente_form.calle.label }}</label>
+                {{ paciente_form.calle }}
+                <div class="error">{{ paciente_form.calle.errors }}</div>
+            </div>
+
+        </div>
+    </div>
+    <div class="contenedor-botones">
+        <button class="boton-cancelar" id="boton-cancelar">Cancelar</button>
+        <button class="boton-azul" type="submit">Agregar paciente</button>
+    </div>
+
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mostrar el modal si 'success' es verdadero
+        {% if success %}
+            var mensajeExito = document.getElementById("mensaje-exito");
+            mensajeExito.style.display = "block"; // Mostrar el modal
+        {% endif %}
+    });
+
+    // Función para cerrar el modal
+    function cerrarModal() {
+        var mensajeExito = document.getElementById("mensaje-exito");
+        mensajeExito.style.display = "none"; // Ocultar el modal
+    }
+</script>
 
 {% endblock %}

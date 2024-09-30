@@ -2,10 +2,12 @@ import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 from autenticacion.decorators import role_required
-from .forms import CrearTerapeutaForm, HorarioFormSet
+from .forms import CrearTerapeutaForm, HorarioFormSet, CrearPacienteForm
 from autenticacion.models import Provincia, Comuna
 from django.http import JsonResponse
 from terapeuta.models import Paciente, Terapeuta, Cita, Horario
+from django.utils import timezone
+from django.core.exceptions import ObjectDoesNotExist
 
 # Create your views here.
 @role_required('Administrador')
@@ -20,8 +22,55 @@ def admin_pacientes(request):
     return render(request, 'admin_pacientes.html',{'pacientes': pacientes})
 
 def agregar_paciente_admin(request):
-    # lógica de la vista
-    return render(request, 'agregar_paciente_admin.html')
+    success = False
+    if request.method == 'POST':
+        form = CrearPacienteForm(request.POST)
+        if form.is_valid():
+            form.save()
+            # Guarda el nuevo paciente y almacena el objeto en 'paciente'
+            paciente = form.save()  # Esto devuelve el objeto paciente creado
+            success = True
+            return redirect('mostrar_paciente_administrador', paciente_id=paciente.id)
+    else:
+        form = CrearPacienteForm()
+        
+    return render(request, 'agregar_paciente_admin.html', {
+        'paciente_form': form,
+        'success': success,
+    })
+    
+def elegir_terapeuta_administrador(request, paciente_id):
+    paciente = Paciente.objects.get(id=paciente_id)
+    terapeuta = Terapeuta.objects.all()
+    return render(request, 'elegir_terapeuta_administrador.html', {'terapeuta': terapeuta, 'paciente': paciente})
+
+def asignar_terapeuta_administrador(request, terapeuta_id, paciente_id):
+    print(paciente_id)
+    print(terapeuta_id)
+    paciente = Paciente.objects.get(id=paciente_id)
+    terapeuta = Terapeuta.objects.get(id=terapeuta_id)
+    print(paciente)
+    
+    paciente.terapeuta_id = terapeuta.id
+    paciente.save()
+    
+    return render(request, 'mostrar_paciente_administrador.html', {'paciente': paciente})
+
+def mostrar_paciente_sin_terapeuta(request, paciente_id):
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+    edad = paciente.calcular_edad()
+    imc = paciente.calcular_imc()
+    cita = Cita.objects.filter(paciente_id=paciente_id).order_by('fecha').last()
+    return render(request, 'mostrar_paciente.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc})
+
+
+def mostrar_paciente_con_terapeuta(request, paciente_id, terapeuta_id):
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+    terapeuta = Terapeuta.objects.get(id=terapeuta_id)
+    edad = paciente.calcular_edad()
+    imc = paciente.calcular_imc()
+    cita = Cita.objects.filter(paciente_id=paciente_id).order_by('fecha').last()
+    return render(request, 'mostrar_paciente.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc, 'terapeuta':terapeuta})
 
 def listar_pacientes_activos(request):
     # Obtener todos los pacientes activos
@@ -126,7 +175,7 @@ def listado_terapeutas(request, paciente_id):
     return render(request, 'listado_terapeutas.html', {'terapeuta': terapeuta, 'paciente': paciente})
 
 @role_required('Administrador')
-def calendar_asignar_paciente_administrador(request, terapeuta_id, paciente_id):
+def calendar_asignar_paciente_administrador(request, paciente_id, terapeuta_id):
     terapeuta = Terapeuta.objects.get(id=terapeuta_id)
     paciente = Paciente.objects.get(id=paciente_id)
     cita = Cita.objects.all()
@@ -155,23 +204,40 @@ def agendar_cita_administrador(request):
         terapeuta_instance = Terapeuta.objects.get(id=terapeuta_id)
         
         paciente_instance = Paciente.objects.get(id=paciente_id)
-        print(paciente_instance)
-        
-        cita = Cita(
-            terapeuta = terapeuta_instance,
-            titulo = titulo,
-            paciente = paciente_instance,
-            fecha = fecha,
-            hora = hora,
-            sala = sala,
-            detalle = detalle
-        )
-        cita.save()
+        try:
+            # Intentar obtener una cita existente para el paciente y el terapeuta
+            cita = Cita.objects.filter(paciente=paciente_instance, terapeuta=terapeuta_instance).latest('fecha')
+
+            # Si existe, actualizar los campos
+            cita.titulo = titulo
+            cita.fecha = fecha
+            cita.hora = hora
+            cita.sala = sala
+            cita.detalle = detalle
+            mensaje = "Cita actualizada exitosamente."
+
+        except ObjectDoesNotExist:
+            # Si no existe, crear una nueva cita
+            cita = Cita(
+                terapeuta=terapeuta_instance,
+                paciente=paciente_instance,
+                titulo=titulo,
+                fecha=fecha,
+                hora=hora,
+                sala=sala,
+                detalle=detalle
+            )
+            mensaje = "Nueva cita creada exitosamente."
+    
+            # Guardar los cambios (ya sea la nueva cita o la cita actualizada)
+            cita.save()
         
         #Guardar la asignación del terapeuta al paciente
         
         paciente_instance.terapeuta_id = terapeuta_instance.id
         paciente_instance.save()
+        
+        #Guardar la asignación del terapeuta al paciente
         
         return redirect('mostrar_paciente_administrador', paciente_instance.id)
     return render(request, 'mostrar_paciente_administrador.html', {'paciente': paciente_instance})

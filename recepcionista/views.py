@@ -125,8 +125,7 @@ def agendar_cita_recepcionista(request):
         paciente_instance = Paciente.objects.get(id=paciente_id)
         try:
             # Intentar obtener una cita existente para el paciente y el terapeuta
-            cita = Cita.objects.get(paciente=paciente_instance, terapeuta=terapeuta_instance)
-
+            cita = Cita.objects.filter(paciente=paciente_instance, terapeuta=terapeuta_instance).latest('fecha')
             # Si existe, actualizar los campos
             cita.titulo = titulo
             cita.fecha = fecha
@@ -223,7 +222,7 @@ def mostrar_paciente_sin_terapeuta(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
     edad = paciente.calcular_edad()
     imc = paciente.calcular_imc()
-    cita = Cita.objects.filter(paciente_id=paciente_id).order_by('fecha').first()
+    cita = Cita.objects.filter(paciente_id=paciente_id).order_by('fecha').last()
     return render(request, 'mostrar_paciente.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc})
 
 
@@ -232,6 +231,6 @@ def mostrar_paciente_con_terapeuta(request, paciente_id, terapeuta_id):
     terapeuta = Terapeuta.objects.get(id=terapeuta_id)
     edad = paciente.calcular_edad()
     imc = paciente.calcular_imc()
-    cita = Cita.objects.filter(paciente_id=paciente_id).order_by('fecha').first()
+    cita = Cita.objects.filter(paciente_id=paciente_id).order_by('fecha').last()
     return render(request, 'mostrar_paciente.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc, 'terapeuta':terapeuta})
 

@@ -18,6 +18,11 @@ urlpatterns = [
     path('api/comunas/', views.comunas_api, name='comunas_api'),
     path('mostrar_paciente_administrador/<int:paciente_id>', views.mostrar_paciente_administrador, name='mostrar_paciente_administrador'),
     path('listado_terapeutas/<int:paciente_id>', views.listado_terapeutas, name='listado_terapeutas'),
-    path('calendar_asignar_paciente_administrador/<int:terapeuta_id>/<int:paciente_id>', views.calendar_asignar_paciente_administrador, name='calendar_asignar_paciente_administrador'),
-    path('agendar_cita_administrador/',views.agendar_cita_administrador, name='agendar_cita_administrador' )
+    path('calendar_asignar_paciente_administrador/<int:paciente_id>/<int:terapeuta_id>', views.calendar_asignar_paciente_administrador, name='calendar_asignar_paciente_administrador'),
+    path('agendar_cita_administrador/',views.agendar_cita_administrador, name='agendar_cita_administrador' ),
+    path('elegir_terapeuta_administrador/<int:paciente_id>/', views.elegir_terapeuta_administrador, name='elegir_terapeuta_administrador'),
+    path('asignar_terapeuta_administrador/<int:paciente_id>//<int:terapeuta_id>/', views.asignar_terapeuta_administrador, name='asignar_terapeuta_administrador'),
+    path('mostrar_paciente_con_terapeuta/<int:paciente_id>//<int:terapeuta_id>/', views.mostrar_paciente_con_terapeuta, name='mostrar_paciente_con_terapeuta'),
+    path('mostrar_paciente_sin_terapeuta/<int:paciente_id>/', views.mostrar_paciente_sin_terapeuta, name='mostrar_paciente_sin_terapeuta')
+
 ]

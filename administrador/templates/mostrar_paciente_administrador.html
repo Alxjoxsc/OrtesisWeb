@@ -1,11 +1,12 @@
-{% extends 'base_recepcionista.html' %}
+{% extends 'administrador_base.html' %}
 {% load static %}
 {% block content %}
 
+<link rel="stylesheet" type="text/css" href="{% static 'styles/mostrar_paciente.css' %}">
+
 <div class="container-paciente">
-    <!-- Flecha de regreso -->
     <div class="back-arrow" onclick="window.location.href='{% url 'admin_pacientes' %}';">
-        &#8592;
+        &#8592; Regresar
     </div>
 
     <h1>Información Paciente</h1>
@@ -14,26 +15,50 @@
         <div class="datos-paciente">
             <div class="columna">
                 <p><strong>Nombre:</strong> {{ paciente.first_name }} {{ paciente.last_name }}</p>
-                <p><strong>Sexo:</strong> {{ paciente.sexo }}</p>
-                <p><strong>Número de Teléfono:</strong> {{ paciente.telefono }}</p>
-                <p><strong>Patología:</strong> {{ paciente.patologia }}</p>
-                <p><strong>Estado:</strong> Activo</p>
-                <p><strong>Próxima Cita:</strong> 12/09/2024</p>
-            </div>
-
-            <div class="columna">
                 <p><strong>Rut:</strong> {{ paciente.rut }}</p>
-                <p><strong>Edad:</strong> 27</p>
+                <p><strong>Estado:</strong> 
+                    {% if paciente.is_active %}
+                        Activo <span class="estado-activo"></span>
+                    {% else %}
+                        Inactivo
+                    {% endif %}
+                </p>
+                <p><strong>Edad:</strong> {{ edad }}</p>
+                <p><strong>Sexo:</strong> {{ paciente.sexo }}</p>
+                <p><strong>Número de teléfono:</strong> {{ paciente.telefono }}</p>
                 <p><strong>Correo Electrónico:</strong> {{ paciente.email }}</p>
-                <p><strong>Descripción de la Patología:</strong></p>
-                <p>{{ paciente.historial_medico }}</p>
-                <p><strong>Terapeuta a Cargo:</strong> {% if paciente.terapeuta %}{{paciente.terapeuta.user.first_name}} {% else %} Sin Terapeuta {% endif %}</p>
+                <p><strong>Patología:</strong> {{ paciente.patologia }}</p>
+                <p><strong>Dirección:</strong> {{ paciente.calle }}, {{ paciente.comuna}}, {{ paciente.provincia}}, {{ paciente.region}}</p>
+                <p><strong>Peso:</strong> {{ paciente.peso|default:"Sin peso ingresado" }}</p>
+                <p><strong>Altura:</strong> {{ paciente.altura|default:"Sin altura ingresada" }}</p>
+                <p><strong>IMC:</strong> {{ imc|default:"Sin IMC ingresado" }}</p>
+                <p><strong>Historial médico:</strong> {{ paciente.historial_medico|default:"Sin historial médico" }}</p>
+                <p><strong>Medicamentos:</strong> {{ paciente.medicamentos|default:"Sin medicamentos ingresados" }}</p>
+                <p><strong>Alergias:</strong> {{ paciente.alergias|default:"Sin alergias" }}</p>
+                <p><strong>Progreso:</strong> {{ paciente.progreso|default:"Sin progreso ingresado" }}</p>
+                {% if not paciente.is_active %}
+                    <p><strong>Motivo de desvinculación:</strong> {{ paciente.motivo_desvinculacion|default:"Sin motivo de desvinculación ingresado" }}</p>
+                {% endif %}
+                <p><strong>Dispositivo Órtesis:</strong> {{ paciente.dispositivo_ortesis|default:"Sin dispositivo de órtesis ingresado" }}</p>
+                <p><strong>Actividad física:</strong> {{ paciente.actividad_fisica|default:"Sin actividad física ingresada" }}</p>
+                <p><strong>Próxima Cita:</strong> 
+                    {% if cita %}
+                        {{ cita.fecha }}
+                    {% else %}
+                        Sin cita asignada
+                    {% endif %}
+                </p>                
+                <p><strong>Terapeuta a Cargo:</strong> {{ paciente.terapeuta.user.first_name }} {{ paciente.terapeuta.user.last_name|default:"Sin terapeuta asignado" }}</p>
             </div>
         </div>
         
         <div class="footer-card">
-            <button class="btn" onclick="window.location.href='{% url 'listado_terapeutas' paciente.id %}'" >Asignar Terapeuta</button>
-            <button class="btn">Reagendar Cita</button>
+            <button class="btn" onclick="window.location.href='{% url 'elegir_terapeuta_administrador' paciente.id %}'">Asignar Terapeuta</button>
+            {% if paciente.terapeuta_id %}
+                <button class="btn" onclick="window.location.href='{% url 'calendar_asignar_paciente_administrador' paciente.id paciente.terapeuta_id %}'">Asignar Cita</button>
+            {% else %}
+                <button class="btn" disabled title="No se puede asignar cita sin terapeuta">Asignar Cita</button>
+            {% endif %}
         </div>
     </div>
 </div>
