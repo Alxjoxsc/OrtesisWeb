@@ -5,7 +5,7 @@ from autenticacion.decorators import role_required
 from .forms import CrearTerapeutaForm, HorarioFormSet
 from autenticacion.models import Provincia, Comuna
 from django.http import JsonResponse
-from terapeuta.models import Paciente, Terapeuta, Cita
+from terapeuta.models import Paciente, Terapeuta, Cita, Horario
 
 # Create your views here.
 @role_required('Administrador')
@@ -67,6 +67,9 @@ def logout_view(request):
 
 @role_required('Administrador')
 def agregar_terapeuta(request):
+
+    success = False # Variable para indicar que el terapeuta no fue creado exitosamente
+
     if request.method == 'POST':
         terapeuta_form = CrearTerapeutaForm(request.POST)
         horario_formset = HorarioFormSet(request.POST)
@@ -77,15 +80,21 @@ def agregar_terapeuta(request):
                 horario_formset.instance = terapeuta # Asignamos el terapeuta a los horarios
                 horario_formset.save()
             
-            return redirect('gestion_terapeutas') # Redirigimos a la vista de gestión de terapeutas
+            success = True # Variable para indicar que el terapeuta fue creado exitosamente
+            return render(request, 'agregar_terapeuta.html', {
+                'success': success,
+                'terapeuta_form': CrearTerapeutaForm(), # Creamos un nuevo formulario vacío
+                'horario_formset': HorarioFormSet(queryset=Horario.objects.none())
+            })
         
     else:
         terapeuta_form = CrearTerapeutaForm()
-        horario_formset = HorarioFormSet()
+        horario_formset = HorarioFormSet(queryset=Horario.objects.none()) # Creamos un formset vacío, para que no se prellene con datos
     
     return render(request, 'agregar_terapeuta.html', {
         'terapeuta_form': terapeuta_form,
-        'horario_formset': horario_formset
+        'horario_formset': horario_formset,
+        'success': success # Variable para indicar que el terapeuta no fue creado exitosamente
     })
 
 #### CARGA DE DATOS DE REGIONES, PROVINCIAS Y COMUNAS ####

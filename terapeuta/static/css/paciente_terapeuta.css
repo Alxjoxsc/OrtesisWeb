@@ -1,9 +1,63 @@
-/* Estilos generales */
-main {
+.header h1 {
+    display: flex;
     margin: 0;
-    font-family: Arial, sans-serif;
+    margin-bottom: 20px;
+    font-size: 27px;
+    color: black;
 }
 
+.search-container {
+    display: flex;
+    width: 70%;
+}
+
+.search-icon {
+    position: flex;
+    justify-content: flex-end;
+    width: 20px; 
+    height: 20px;
+    margin-left: -30px;
+    margin-top: 8px;
+}
+/* Estilos para la barra de búsqueda */
+.search-bar {
+    display: flex;
+    padding: 8px;
+    font-size: 16px;
+    background-color: #D9D9D9;
+    border: 0.5px solid rgb(165, 165, 165);
+    border-radius: 5px;
+    width: 50%;
+}
+
+.search-bar:focus {
+    outline: none;
+    border-color: black;
+}
+
+.clear-button {
+    display: flex;
+    gap: 5px;
+    background-color: #f5554a;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 20px;
+    height: auto;
+}
+
+.clear-button:hover {
+    background-color: #d32f2f;
+}
+
+.no-results {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 18px;
+    color: #ff0000; /* Puedes cambiar el color del texto a tu gusto */
+}
 .container {
     display: flex;
     flex-direction: column;
@@ -12,102 +66,51 @@ main {
     width: 100%;
 }
 
-/* Estilos del header */
-.header {
+.contenedor-header {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    gap: 40px; /* Espacio entre el título y la barra de búsqueda */
-    margin-top: -2px;
-    margin-bottom: 7px; /* Espacio debajo del header */
-    padding-top: 0;
-    padding-left: 20px;
+    gap: 40px;
+    margin-bottom: 7px;
+    padding-left: 40px;
     position: relative;
-    top: -20px;
+    top: 40px;
 }
 
-.header h1 {
-    margin: 0;
-    margin-bottom: 20px;
-    font-size: 40px;
-    color: black;
+.titulos-atributos{
+    display: flex;
+    justify-content: space-between;
+    width: 75%;
+    margin-bottom: 10px;
+    margin-left: 30px;
+    margin-top: 40px;
 }
 
-.header h2 {
-    margin: 0;
-    margin-bottom: 0; /* Espacio pequeño debajo de los h2 */
-    font-size: 20px;
-    color: black;
-}
-
-.header .rut {
-    flex-basis: 32%; /* Ancho específico para "Rut" */
-}
-
-.header .edad {
-    flex-basis: 9%; /* Ancho específico para "Edad" */
-}
-
-.header .tratamiento {
-    flex-basis: 36%; /* Ancho específico para "Tratamiento" */
-}
-
-/* Estilos para el contenedor de la búsqueda */
-.search-container {
-    position: relative;
-    width: 700px; /* Ajusta el tamaño según sea necesario */
-}
-
-/* Estilos para la barra de búsqueda */
-.search-bar {
-    padding: 8px;
-    font-size: 16px;
-    background-color: #D9D9D9;
-    border: 1px solid black;
-    border-radius: 4px;
-    width: 700px;
-}
-
-.search-bar:focus {
-    outline: none;
-    border-color: black;
-}
-
-/* Icono de búsqueda */
-.search-icon {
-    position: absolute;
-    right: 10px; /* Ajusta el espacio del icono */
-    top: 50%;
-    transform: translateY(-50%); /* Centra verticalmente el icono */
-    width: 20px; /* Ajusta el tamaño del icono */
-    height: 20px;
-}
-
-/* Estilos para el contenedor de la lista */
 .li-container {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .li-container ul{
+    display: flex;
+    flex-direction: column;
     list-style-type: none;
-    padding: 0;
-    margin: 0;
     margin-left: 12px;
+    width: 100%;
 }
 
 /* Estilos para cada paciente */
 .paciente {
-    width: 1000px;
+    width: 95%;
     display: flex;
-    justify-content: space-between; /* Asegura que los datos se alineen de manera uniforme debajo de los h2 */
+    justify-content: space-between;
     border: 1px solid #ccc;
     padding: 20px;
     padding-left: 5px;
     margin-left: 0;
     margin-bottom: 7px;
     border-radius: 8px;
-    background-color: #f9f9f9;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra suave */
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(107, 107, 107, 0.2);
 }
 
 /* Usar flexbox para alinear los datos horizontalmente */
@@ -115,6 +118,7 @@ main {
     display: flex;
     justify-content: space-between; /* Distribuye el espacio de manera uniforme */
     padding-left: 10px;
+    width: 100%;
 }
 
 /* Estilos para los elementos dentro de la información del paciente */
@@ -137,12 +141,11 @@ main {
     align-self: flex-start; /* Asegura que el botón se quede arriba a la izquierda */
 }
 
-/* Estilos para el icono de reportes */
 .report-icon {
     position: relative;
     right: 10px; /* Ajusta el espacio del icono */
-    transform: translateX(100%); /* Centra verticalmente el icono */
-    width: 28px; /* Ajusta el tamaño del icono */
+    transform: translateX(100%);
+    width: 28px; 
     height: 28px;
 }
 
