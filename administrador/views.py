@@ -1,4 +1,5 @@
 import json
+import re
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 from autenticacion.decorators import role_required
@@ -6,6 +7,9 @@ from .forms import CrearTerapeutaForm, HorarioFormSet
 from autenticacion.models import Provincia, Comuna
 from django.http import JsonResponse
 from terapeuta.models import Paciente, Terapeuta, Cita, Horario
+from django.core.exceptions import ValidationError
+from django.http import JsonResponse
+from django.urls import reverse
 
 # Create your views here.
 @role_required('Administrador')
@@ -176,3 +180,123 @@ def agendar_cita_administrador(request):
         return redirect('mostrar_paciente_administrador', paciente_instance.id)
     return render(request, 'mostrar_paciente_administrador.html', {'paciente': paciente_instance})
 
+@role_required('Administrador')
+def editar_datos_paciente_admin(request, paciente_id, terapeuta=None):
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+
+    # Obtener la lista de terapeutas
+    terapeutas = Terapeuta.objects.all()
+
+    # Obtener la última cita del paciente
+    ultima_cita = Cita.objects.filter(paciente=paciente).order_by('-fecha', '-hora').first()
+    fecha_cita = ultima_cita.fecha if ultima_cita else None  # Obtener la fecha de la última cita
+
+    if request.method == 'POST':
+        # Obtener datos del formulario
+        nombres = request.POST.get('nombres')
+        apellidos = request.POST.get('apellidos')
+        rut = request.POST.get('rut')
+        telefono = request.POST.get('telefono')
+        correo = request.POST.get('correo')
+        sexo = request.POST.get('sexo')
+        fecha_nacimiento = request.POST.get('fecha_nacimiento')
+        patologia = request.POST.get('patologia')
+        terapeuta = request.POST.get('terapeuta') or paciente.terapeuta.id  # Mantener terapeuta existente si no se proporciona uno nuevo
+        descripcion = request.POST.get('descripcion')
+
+        try:
+            # Validar datos
+            validar_datos(nombres, apellidos, rut, telefono, correo)
+
+            # Si la validación es exitosa, guardar los cambios
+            paciente.first_name = nombres
+            paciente.last_name = apellidos
+            paciente.rut = rut
+            paciente.telefono = telefono
+            paciente.email = correo
+            paciente.sexo = sexo
+            paciente.fecha_nacimiento = fecha_nacimiento
+            paciente.patologia = patologia
+            paciente.Terapeuta_id = terapeuta
+            paciente.historial_medico = descripcion
+            
+
+            paciente.save()
+
+            # Respuesta JSON en caso de éxito
+            return JsonResponse({
+                'success': True,
+                'message': 'Los Datos del Paciente se han Guardado Correctamente',
+                'redirect_url': reverse('listar_pacientes_activos')
+            })
+
+        except ValidationError as ve:
+            return JsonResponse({
+                'success': False,
+                'error': str(ve)
+            })
+
+        except Exception as e:
+            print("Error al guardar el paciente:", e)
+            return JsonResponse({
+                'success': False,
+                'error': 'Error al Guardar los Datos del Paciente'
+            })
+
+    # Renderizar la plantilla inicialmente
+    return render(request, 'editar_datos_paciente_admin.html', {
+        'paciente': paciente,
+        'terapeutas': terapeutas,  # Pasar la lista de terapeutas a la plantilla
+        'terapeuta_asignado': paciente.terapeuta.id if paciente.terapeuta else None,  # Terapeuta actual
+        'fecha_cita': fecha_cita  # Pasar la fecha de la última cita al contexto
+    })
+    
+def validar_datos(nombres, apellidos, rut, telefono, correo):
+    # Validación de Nombres
+    if not nombres or not re.match(r'^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$', nombres):
+        raise ValidationError("Nombres NO Válidos")
+    
+    # Validación de Apellidos
+    if not apellidos or not re.match(r'^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$', apellidos):
+        raise ValidationError("Apellidos NO Válidos")
+    
+    # Validación de RUT
+    validar_rut(rut)
+    
+    # Validación del número de teléfono
+    if not re.match(r'^\d{7,15}$', telefono):
+        raise ValidationError("Número de Teléfono NO Válido")
+    
+    # Validación de correo
+    if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', correo):
+        raise ValidationError("Correo Electrónico NO Válido")
+
+def validar_rut(rut):
+    # Limpiar RUT: eliminar puntos y espacios, y dejar solo el guion y dígito verificador
+    rut = rut.replace(" ", "").replace(".", "").strip()
+    
+    # Validar el formato
+    if not re.match(r'^\d{1,8}-[0-9kK]$', rut):
+        raise ValidationError("RUT NO Válido")
+    
+    # Separar el número y el dígito verificador
+    rut_numeros, dv = rut.split('-')
+    total = 0
+    factor = 2
+    
+    for digit in reversed(rut_numeros):
+        total += int(digit) * factor
+        factor = factor + 1 if factor < 7 else 2
+    
+    dv_calculado = 11 - (total % 11)
+    
+    if dv_calculado == 11:
+        dv_calculado = '0'
+    elif dv_calculado == 10:
+        dv_calculado = 'K'
+    
+    if str(dv_calculado) != dv.upper():
+        raise ValidationError("El RUT es inválido.")
+    
+def redirigir_asignar_cita(request, terapeuta_id, paciente_id):
+    return redirect('calendar_asignar_paciente_administrador', terapeuta_id=terapeuta_id, paciente_id=paciente_id)

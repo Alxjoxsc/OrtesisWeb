@@ -1,0 +1,153 @@
+body {
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Mantiene la alineación en la parte superior */
+    height: 100vh;
+    margin: 0; /* Sin márgenes adicionales en el body */
+}
+
+.container {
+    max-width: 700px;
+    height: auto;
+    margin: 0; /* Eliminé el margen superior para acercar el contenido aún más */
+    padding: 20px;
+    background-color: transparent;
+    box-shadow: none;
+}
+
+.header h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+/* Clase base para grupos de 2 hacia abajo */
+.campo {
+    flex: 1 1 45%;
+    text-align: left;
+    min-width: 300px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+select,
+input[type="text"],
+input[type="date"],
+input[type="tel"],
+input[type="email"],
+input[type="number"] {
+    width: 325px;
+    width: 80%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    height: 40px;
+    box-sizing: border-box;
+    margin-right: 25px;
+}
+
+textarea {
+    resize: vertical;
+    height: 140px;
+    width: 87%;
+    border: 1px solid #ccc;
+}
+
+.buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+button {
+    width: 175px;
+    padding: 15px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    margin: 0 10px;
+}
+
+.terapeuta-contenedor,
+.proximacita-contenedor {
+    display: flex;
+    align-items: center;
+    margin-left: 0;
+    flex-wrap: wrap; /* Permitir que los elementos se envuelvan en pantallas más pequeñas */
+}
+
+.proximacita-contenedor,
+.terapeuta-contenedor {
+    display: flex;
+    align-items: center; /* Alinear verticalmente en el centro */
+    margin-left: 0;
+}
+
+.btn-reasignar,
+.btn-reagendar {
+    background-color: #001058;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-size: 14px;
+    width: 100px;
+    cursor: pointer;
+}
+
+/* Media Queries para pantallas más pequeñas */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 2em; /* Hacer el tamaño de la fuente más pequeño en pantallas pequeñas */
+    }
+
+    button {
+        width: 100%; /* Hacer que los botones ocupen el ancho completo en pantallas pequeñas */
+        margin: 10px 0; /* Espaciado vertical entre botones */
+    }
+
+    .campo {
+        flex: 1 1 100%; /* Hacer que cada campo ocupe el 100% del ancho en pantallas pequeñas */
+    }
+}
+
+.cancel {
+    background-color: #FF6161;
+    color: white;
+}
+
+.confirm {
+    background-color: #006A60;
+    color: white;
+}
+
+.btn-regresar {
+    background-color: transparent;
+    color: #000000;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    padding: 0;
+}
