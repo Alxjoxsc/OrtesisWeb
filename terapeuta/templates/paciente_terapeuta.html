@@ -4,6 +4,7 @@
 {% block extra_head %} 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/paciente_terapeuta.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tabla.css' %}">
 {% endblock %}
 
 {% block title %}Pacientes{% endblock %}
@@ -24,44 +25,46 @@
 
 
 {% block content %}
-<div class="container">
-    <!-- Cabecera de la tabla de pacientes -->
-    <div class="titulos-atributos">
-        <h2 class="nombre">Nombre</h2>
-        <h2 class="rut">Rut</h2>
-        <h2 class="edad">Edad</h2>
-        <h2 class="tratamiento">Tratamiento</h2>
-    </div>
-    
-    <!-- Lista de pacientes -->
-    {% if pacientes %}
-    <div class="li-container">
-        <ul id="pacienteList">
-            {% for paciente in pacientes %}
-            <li class="paciente">
-                <div class="paciente-info">
-                    <p class="nombre">{{ paciente.first_name }} {{ paciente.last_name }}</p>
-                    <p class="rut">{{ paciente.rut }}</p>
-                    <p class="edad">{{ paciente.edad }} años</p>
-                    <p class="tratamiento">{{ paciente.patologia }}</p>
-                    <a href="{% url 'historial_paciente' paciente.id %}" class="report-button">
-                        <img src="{% static 'icons/Tabla de reportes.svg' %}" alt="Tabla de reportes" class="report-icon">
-                    </a>
-                    
-                </div>
-            </li>
-            {% empty %}
-            <li>No hay pacientes ingresados.</li>
-            {% endfor %}
-        </ul>
-    </div>
-    {% else %}
-    <!-- Mensaje de no coincidencias -->
-    <div class="no-results">
-        <p>No se encontraron pacientes que coincidan con la búsqueda.</p>
-    </div>
-    {% endif %}
-    
+<div class="table-responsive">
+    <!-- Tabla de pacientes -->
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Rut</th>
+                <th>Edad</th>
+                <th>Tratamiento</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if pacientes %}
+                {% for paciente in pacientes %}
+                    <tr class="paciente">
+                        <td class="inicio-tabla">{{ paciente.first_name }} {{ paciente.last_name }}</td>
+                        <td class="centro-tabla">{{ paciente.rut }}</td>
+                        <td class="centro-tabla">{{ paciente.edad }} años</td>
+                        <td class="centro-tabla">{{ paciente.patologia }}</td>
+                        <td class="final-tabla">
+                            <a href="{% url 'historial_paciente' paciente.id %}" class="report-button">
+                                <img src="{% static 'icons/Tabla de reportes.svg' %}" alt="Tabla de reportes" class="report-icon">
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5">No hay pacientes ingresados.</td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="5" class="no-results">No se encontraron pacientes que coincidan con la búsqueda.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
     <!-- Paginación -->
 {% if total_pacientes > 6 %}
 <div class="pagination">
