@@ -84,7 +84,6 @@
 /* Contenedor del botón de progreso del paciente */
 .progreso-paciente-btn {
     display: flex;
-    flex-direction: column;
     background-color: #ACC6CC;
     border: none;
     color: inherit;
@@ -235,3 +234,108 @@
 .btn-ver-sesiones:hover {
     background-color: #005f6b;
 }
+
+/* Estilos generales para el popup de confirmación */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow: auto;
+}
+
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    margin: auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 50%;
+    max-width: 600px;
+}
+
+.modal-content h2 {
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    margin-left: 50px;
+    font-weight: 400;
+    font-size: 17px;
+    justify-content: space-between;
+    width: 80%;
+}
+
+.label-value {
+    display: grid;
+    grid-template-columns: 200px 1fr; 
+    gap: 10px; 
+}
+
+.label {
+    text-align: left; 
+}
+
+.value {
+    text-align: left;
+}
+
+.motivo-inactivacion {
+    margin-top: 10px;
+}
+
+
+.motivo-inactivacion textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.mensaje-terapeuta{
+    display: flex;
+    text-align: center;
+    font-weight: 500;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: center;
+    gap: 100px;
+}
+
+.confirm-btn, .cancel-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.confirm-btn {
+    background-color: #006A60;
+    color: white;
+}
+
+.cancel-btn {
+    background-color: #FF6161;
+    color: white;
+}
+
+.confirm-btn:hover, .cancel-btn:hover {
+    opacity: 0.9;
+}
+

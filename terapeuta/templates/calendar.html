@@ -85,28 +85,44 @@
             <form id="formEditarCita" method="POST" action="{% url 'editar_cita' %}">
                 {% csrf_token %}
                 <input type="hidden" name="cita_id" id="cita_id"> 
-                <label for="titulo">Título</label><br>  
-                <input type="text" id="titulo" name="titulo" required><br><br>
-                <label for="paciente">Paciente</label><br>
+                <label for="titulo">Título</label>
+                <input type="text" id="titulo" name="titulo" required><br>
+                <label for="paciente">Paciente</label>
                 <select id="paciente" name="paciente">
                     <option value="">Seleccione el paciente que citará</option>
                     {% for paciente in paciente %}
-                        <option value="{{ paciente.id }}">{{ paciente.user.first_name }} {{paciente.user.last_name}}</option> 
+                        <option value="{{ paciente.id }}">{{ paciente.first_name }} {{ paciente.last_name }}</option> 
                     {% endfor %}
-                </select><br><br>
-                <label for="fecha">Fecha</label><br>
-                <input type="date" id="fecha" name="fecha" required><br><br>
-                <label for="hora">Hora</label><br>
-                <texthora for="titulo">Desde </texthora><input type="time" id="hora" name="hora" required><texthora for="titulo"> Hasta </texthora><input type="time" id="hora" name="hora" required><br><br>
-                <label for="sala">Sala</label><br>
-                <input type="text" id="sala" name="sala" required><br><br>
-                <label for="detalle">Detalle</label><br>
-                <input type="text" id="detalle" name="detalle" required><br><br>
+                </select><br>
+                <label for="fecha">Fecha</label>
+                <input type="date" id="fecha" name="fecha" required><br>
+                <label for="hora">Hora</label>
+                <input type="time" id="hora" name="hora" required><texthora for="titulo">
+                <label for="sala">Sala</label>
+                <input type="text" id="sala" name="sala" required><br>
+                <label for="detalle">Detalle</label>
+                <input type="text" id="detalle" name="detalle" required><br>
                 <div class="botones">
                     <button type="button" id="cancelarBtn">Cancelar</button>
-                    <button type="submit" id="confirmarBtn">Confirmar</button>
+                    <button type="submit" id="confirmarBtn">Confirmar Cambios</button>
                 </div>
             </form>
+            <!-- Botón para eliminar cita -->
+            <div class="botones">
+                <button type="button" id="eliminarBtn" style="background-color: #FF0000;">Eliminar Cita</button>
+            </div>
+        </div>
+    </div>
+    <!-- Popup de confirmación de cambios -->
+    <div id="popupConfirmarCambios" class="popup" style="display: none;">
+        <div class="popup-content">
+            <h2>¿Confirmar Cambios?</h2>
+            <hr>
+            <p>Se le enviará una notificación al paciente sobre los cambios en esta cita.</p>
+            <div class="botones">
+                <button type="button" id="cancelarConfirmacionBtn">Cancelar</button>
+                <button type="button" id="confirmarCambiosBtn">Confirmar Cambios</button>
+            </div>
         </div>
     </div>
 
