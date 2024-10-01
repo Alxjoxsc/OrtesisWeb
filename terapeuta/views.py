@@ -100,18 +100,26 @@ def cambiar_estado_paciente(request, id):
     if request.method == "POST":
         try:
             paciente = Paciente.objects.get(id=id)
-            paciente.is_active = False 
+            data = json.loads(request.body)  # Cargar el JSON enviado desde el frontend
+            motivo_desvinculacion = data.get("motivo", "")  # Obtener el motivo del JSON
+            
+            if motivo_desvinculacion.strip() == "":
+                return JsonResponse({"status": "error", "message": "Motivo de inactivación requerido."}, status=400)
+
+            paciente.is_active = False
+            paciente.motivo_desvinculacion = motivo_desvinculacion  # Guardar el motivo de la inactivación
             paciente.save()
-            return JsonResponse({"status": "success", "message": "CAMBIO DE ESTADO EXITOSO"})
+
+            return JsonResponse({"status": "success", "message": "Paciente inactivado correctamente."})
         except Paciente.DoesNotExist:
             return JsonResponse({"status": "error", "message": "Paciente no encontrado"}, status=404)
     return JsonResponse({"status": "error", "message": "Método no permitido"}, status=405)
 
 def historial_paciente_view(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
-    for paciente in Paciente.objects.all():
-        paciente.edad = calcular_edad(paciente.fecha_nacimiento)
+    paciente.edad = calcular_edad(paciente.fecha_nacimiento)
     context = {'paciente': paciente}
+    
     return render(request, 'historial_paciente.html', context)
 
 #-------------------------------------CITAS-------------------------------------

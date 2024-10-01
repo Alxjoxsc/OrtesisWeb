@@ -15,8 +15,27 @@
         </a>
     <div class="contenedor-header">
         <h1>Historial del paciente</h1>
-        <button class="desvincular-btn">Desvincular paciente <i class="fas fa-unlink"></i></button>
+        <button class="desvincular-btn" data-id="{{ paciente.id }}">Desvincular paciente <i class="fas fa-unlink"></i></button>
+        <input type="hidden" id="pacienteId" value="{{ paciente.id }}">
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
     </div>
+    <script type="text/javascript">
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+    </script>
 {% endblock %}
 
 {% block content %}
@@ -144,9 +163,39 @@
                 <button class="btn-ver-sesiones">Ver Sesiones <i class="fas fa-chevron-down"></i></button>
             </div>
         </div>
+        <!-- Modal Popup para confirmar la desvinculación -->
+<div id="desvincularModal" class="modal">
+    <div class="modal-content">
+        <h2>¿Desea pasar a estado inactivo a este paciente?</h2>
+        <div class="modal-body">
+            <p><strong>Nombre:</strong> {{ paciente.first_name }} {{ paciente.last_name }}</p>
+            <p><strong>Rut:</strong> {{ paciente.rut }}</p>
+            <p><strong>Sexo:</strong> {{ paciente.sexo }}</p>
+            <p><strong>Edad:</strong> {{ paciente.edad }}</p>
+            <p><strong>Número de Teléfono:</strong> {{ paciente.telefono }}</p>
+            <p><strong>Correo Electrónico:</strong> {{ paciente.email }}</p>
+            <p><strong>Patología:</strong> {{ paciente.patologia }}</p>
+            <p><strong>Terapeuta a cargo:</strong> {{ terapeuta.nombre }}</p>
+
+            <!-- Campo para ingresar el motivo de la inactivación -->
+            <div class="motivo-inactivacion">
+                <label for="motivo">Motivo de inactivación:</label>
+                <textarea id="motivo" rows="4" placeholder="Ingrese el motivo de inactivación del paciente [máx 1000 caracteres]"></textarea>
+            </div>
+            <p>El paciente podrá ser visualizado en la sección de pacientes inactivos</p>
+        </div>
+
+        <!-- Botones de confirmación y cancelación -->
+        <div class="modal-footer">
+            <button class="cancel-btn" id="cancelarDesvinculacion">Cancelar</button>
+            <button class="confirm-btn" id="confirmarDesvinculacion">Confirmar</button>
+        </div>
     </div>
+</div>
+
 
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'js/historial_paciente.js' %}"></script>
 {% endblock %}

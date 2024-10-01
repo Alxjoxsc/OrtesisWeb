@@ -84,7 +84,6 @@
 /* Contenedor del botón de progreso del paciente */
 .progreso-paciente-btn {
     display: flex;
-    flex-direction: column;
     background-color: #ACC6CC;
     border: none;
     color: inherit;
@@ -235,3 +234,72 @@
 .btn-ver-sesiones:hover {
     background-color: #005f6b;
 }
+
+/* Estilos generales para el popup de confirmación */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow: auto;
+}
+
+.modal-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 50%;
+    max-width: 600px;
+}
+
+.modal-body {
+    margin-bottom: 20px;
+}
+
+.motivo-inactivacion {
+    margin-top: 10px;
+}
+
+.motivo-inactivacion label {
+    font-weight: bold;
+}
+
+.motivo-inactivacion textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+}
+
+.confirm-btn, .cancel-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.confirm-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.cancel-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+.confirm-btn:hover, .cancel-btn:hover {
+    opacity: 0.9;
+}
+
