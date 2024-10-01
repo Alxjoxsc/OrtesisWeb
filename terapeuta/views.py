@@ -153,6 +153,11 @@ def calendar(request):
     print(paciente)
     return render (request, 'calendar.html', {'paciente':paciente})
 
+def calendar_vista_sem(request):
+    paciente = Paciente.objects.all()
+    print(paciente)
+    return render (request, 'calendar_vista_sem.html', {'paciente':paciente})
+
 
 def editar_cita(request):
     if request.method == "POST":

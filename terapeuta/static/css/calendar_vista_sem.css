@@ -1,0 +1,232 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px auto;
+    max-width: 800px;
+}
+
+.header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #00768b;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: white;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 15px;
+    text-align: center;
+}
+
+th {
+    background-color: #008CAB;
+    color: white;
+    padding: 10px;
+}
+
+td {
+    background-color: white;
+    transition: background-color 0.3s;
+}
+
+td.hora {
+    background-color: #f0f0f0;
+    font-weight: bold;
+}
+
+td:hover {
+    background-color: #d1ecf1;
+}
+
+td.sabado, td.domingo {
+    color: red;
+}
+
+td.agendado {
+    position: relative;
+    background-color: #008CAB;
+    color: white;
+}
+
+td.agendado::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: white;
+    border-radius: 50%;
+    top: 10px;
+    right: 10px;
+}
+
+.popup {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+.close {
+    cursor: pointer;
+    color: red;
+    float: right;
+    font-size: 20px;
+}
+
+.nav-button {
+    background-color: #008CAB;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.view-options {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.popup {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+.popup h2 {
+    margin-top: 0;
+    font-size: 20px;
+    text-align: center;
+    color: #000;
+}
+
+.popup label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.popup input[type="text"],
+.popup input[type="date"],
+.popup select,
+.popup textarea {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.popup input[type="time"] {
+    width: calc(50% - 20px);
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.popup .actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 20px;
+}
+
+.popup button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.popup button.cancel {
+    background-color: #f44336;
+    color: white;
+}
+
+.popup button.confirm {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.popup .close {
+    cursor: pointer;
+    color: #333;
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: -10px;
+}
+
+.popup .close:hover {
+    color: #f44336;
+}
+
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+.popup textarea {
+    resize: none;
+    height: 100px;
+}
+
+.popup select, .popup input[type="time"] {
+    margin-right: 10px;
+}
