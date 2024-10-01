@@ -5,8 +5,11 @@
 }
 
 .notification-icon {
+    height: 100%;
+    display: flex;
     position: relative;
-    margin-left: auto;
+    justify-content: flex-end;
+    align-items: flex-start;
 }
 
 .notification-icon img {
