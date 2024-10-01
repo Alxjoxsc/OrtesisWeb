@@ -11,7 +11,7 @@
 <div class="pacientes-header-recepcionista">
     <h1>Pacientes</h1>
     <form method="GET" action="{% url 'recepcionista_pacientes_activos' %}" class="pacientes-busqueda-form">
-        <input type="text" name="search" placeholder="Búsqueda por Nombre, Rut o Tratamiento" class="pacientes-search-input" id="searchInput" value="{{ request.GET.search|default:'' }}" oninput="toggleClearButton()">
+        <input type="text" name="search" placeholder="Búsqueda por Nombre, Rut o Tratamiento" class="pacientes-search-input" id="searchBar" value="{{ request.GET.search|default:'' }}" oninput="toggleClearButton()">
         <img src="{% static 'icons/Lupa.svg' %}" alt="Buscar" class="pacientes-search-icon">
         <button type="button" id="clearButton" class="pacientes-clear-button" onclick="clearSearch()" style="display: {% if request.GET.search %}inline-block{% else %}none{% endif %};">
             Limpiar Filtro

@@ -322,7 +322,11 @@ h1 {
     background-color: #f1f1f1; /* Color de fondo */
     font-weight: bold; /* Hacer el texto más destacado */
 }
-/* Contenedor general de los pacientes */
+
+
+
+
+/* -------------------------- Contenedor general de los pacientes ------------------------------------*/
 .pacientes-container {
     width: 100%;
     margin: 0 auto;
@@ -331,12 +335,13 @@ h1 {
 }
 
 
-.pacientes-header-recepcionista{
+.pacientes-header-recepcionista {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 90px;
     margin-top: 20px;
+    margin-left: 10px;
 }
 
 /* Ajustar el contenedor de la cabecera */
@@ -356,6 +361,7 @@ h1 {
 
 /* Ajustar el tamaño y color de la barra de búsqueda */
 .pacientes-search-input {
+    display: flex;
     width: 500px;
     height: 35px;
     border: 2px solid #d9d9d9;
@@ -369,9 +375,11 @@ h1 {
 
 /* Icono de búsqueda */
 .pacientes-search-icon {
+    position: flex;
+    justify-content: flex-end;
     width: 20px;
     height: 20px;
-    margin-left: 10px;
+    margin-left: -30px;
     cursor: pointer;
 }
 
@@ -382,7 +390,7 @@ h1 {
     background-color: #f5554a;
     color: white;
     border: none;
-    padding: 8px 15px;
+    padding: 5px 10px;
     border-radius: 5px;
     cursor: pointer;
     margin-left: 20px;
@@ -411,7 +419,45 @@ h1 {
     background-color: #4d5876;
 }
 
-/* Botón de filtro (si aplica) */
+/*------------------------------- Media query para HEAD listado terapeuta ----------------------------------*/
+@media (max-width: 768px) {
+    .pacientes-header-recepcionista {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px; 
+    }
+
+    .pacientes-header-recepcionista h1 {
+        font-size: 36px; 
+        margin-bottom: 10px; 
+    }
+
+    .pacientes-busqueda-form {
+        width: 350px; 
+        display: flex;
+        flex-direction: column; 
+        align-items: flex-start; 
+    }
+
+    .pacientes-search-icon {
+        display: none;
+    }
+    
+    .pacientes-search-input {
+        width: 100%;
+        margin-bottom: 10px; 
+    }
+
+    .pacientes-clear-button {
+        margin-left: 0;
+    }
+
+    .pacientes-agregar-paciente-btn {
+        width: 100%; 
+        justify-content: center; 
+    }
+}
+/* -----------------------------------------------------------------------------------*/
 .filtro-btn {
     background-color: #373d58;
     color: white;
