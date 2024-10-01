@@ -21,10 +21,12 @@ def gestion_terapeutas(request):
 def base_admin_view(request):
     return render(request, 'base_admin.html')
 ################### ADMIN PACIENTES ##################
+@role_required('Administrador')
 def admin_pacientes(request):
     pacientes = Paciente.objects.all() 
     return render(request, 'admin_pacientes.html',{'pacientes': pacientes})
 
+@role_required('Administrador')
 def agregar_paciente_admin(request):
     success = False
     if request.method == 'POST':
@@ -42,40 +44,40 @@ def agregar_paciente_admin(request):
         'paciente_form': form,
         'success': success,
     })
-    
+
+@role_required('Administrador')
 def elegir_terapeuta_administrador(request, paciente_id):
     paciente = Paciente.objects.get(id=paciente_id)
     terapeuta = Terapeuta.objects.all()
     return render(request, 'elegir_terapeuta_administrador.html', {'terapeuta': terapeuta, 'paciente': paciente})
 
 def asignar_terapeuta_administrador(request, terapeuta_id, paciente_id):
-    print(paciente_id)
-    print(terapeuta_id)
     paciente = Paciente.objects.get(id=paciente_id)
     terapeuta = Terapeuta.objects.get(id=terapeuta_id)
-    print(paciente)
     
     paciente.terapeuta_id = terapeuta.id
     paciente.save()
     
     return render(request, 'mostrar_paciente_administrador.html', {'paciente': paciente})
 
+@role_required('Administrador')
 def mostrar_paciente_sin_terapeuta(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
     edad = paciente.calcular_edad()
     imc = paciente.calcular_imc()
     cita = Cita.objects.filter(paciente_id=paciente_id).order_by('fecha').last()
-    return render(request, 'mostrar_paciente.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc})
+    return render(request, 'mostrar_paciente_administrador.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc})
 
-
+@role_required('Administrador')
 def mostrar_paciente_con_terapeuta(request, paciente_id, terapeuta_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
     terapeuta = Terapeuta.objects.get(id=terapeuta_id)
     edad = paciente.calcular_edad()
     imc = paciente.calcular_imc()
     cita = Cita.objects.filter(paciente_id=paciente_id).order_by('fecha').last()
-    return render(request, 'mostrar_paciente.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc, 'terapeuta':terapeuta})
+    return render(request, 'mostrar_paciente_administrador.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc, 'terapeuta':terapeuta})
 
+@role_required('Administrador')
 def listar_pacientes_activos(request):
     # Obtener todos los pacientes activos
     pacientes_activos = Paciente.objects.filter(is_active=True)
@@ -83,6 +85,8 @@ def listar_pacientes_activos(request):
         'pacientes': pacientes_activos,
         'estado': 'activos',
     })
+    
+@role_required('Administrador')
 def cambiar_estado_inactivo(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -90,13 +94,15 @@ def cambiar_estado_inactivo(request):
         Paciente.objects.filter(id__in=pacientes_ids).update(is_active=False)
         return JsonResponse({'status': 'success'})
 
+@role_required('Administrador')
 def restaurar_paciente(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         pacientes_ids = data.get('pacientes_ids', [])
         Paciente.objects.filter(id__in=pacientes_ids).update(is_active=True)
         return JsonResponse({'status': 'success'})
-        
+    
+@role_required('Administrador')
 def listar_pacientes_inactivos(request):
     # Obtener todos los pacientes inactivos
     pacientes_inactivos = Paciente.objects.filter(is_active=False)
@@ -105,12 +111,17 @@ def listar_pacientes_inactivos(request):
         'estado': 'inactivos',
     })
 ########################################################
+
+@role_required('Administrador')
 def admin_recepcionistas(request):
     # Lógica para listar o gestionar recepcionistas desde la vista del administrador
     return render(request, 'admin_recepcionistas.html')
+
+@role_required('Administrador')
 def admin_terapeutas(request):
     return render (request,'admin_terapeutas.html')
 
+@role_required('Administrador')
 def logout_view(request):
     # Lógica para cerrar la sesión
     # Puedes usar Django's auth logout
@@ -170,7 +181,10 @@ def comunas_api(request):
 @role_required('Administrador')
 def mostrar_paciente_administrador(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
-    return render(request, 'mostrar_paciente_administrador.html', {'paciente': paciente})
+    edad = paciente.calcular_edad()
+    imc = paciente.calcular_imc()
+    cita = Cita.objects.filter(paciente_id=paciente_id).order_by('fecha').last()
+    return render(request, 'mostrar_paciente_administrador.html', {'paciente': paciente, 'edad': edad, 'imc':imc, 'cita':cita})
 
 @role_required('Administrador')
 def listado_terapeutas(request, paciente_id):
@@ -363,6 +377,7 @@ def validar_rut(rut):
     
     if str(dv_calculado) != dv.upper():
         raise ValidationError("El RUT es inválido.")
-    
+
+@role_required('Administrador')
 def redirigir_asignar_cita(request, terapeuta_id, paciente_id):
     return redirect('calendar_asignar_paciente_administrador', terapeuta_id=terapeuta_id, paciente_id=paciente_id)

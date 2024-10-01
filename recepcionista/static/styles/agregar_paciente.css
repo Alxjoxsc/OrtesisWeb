@@ -106,7 +106,7 @@ form {
 }
 
 .table th {
-    background-color: #001058;
+    background-color: #373D58;
     color: #ffffff;
 }
 
@@ -149,7 +149,7 @@ input[type="checkbox"] {
 
 /* Cambiar el fondo cuando el checkbox está seleccionado */
 input[type="checkbox"]:checked {
-    background-color: #001058;
+    background-color: #373D58;
 }
 
 /* Estilo del checkmark */
@@ -171,7 +171,7 @@ input[type="checkbox"]::after {
 }
 
 .boton-morado{
-    background-color: #001058;
+    background-color: #373D58;
     color: white;
     padding: 0.625rem 1.25rem;
     border: none;
@@ -181,7 +181,7 @@ input[type="checkbox"]::after {
 }
 
 .boton-morado:hover{
-    background-color: #1a2a80;
+    background-color: rgb(70, 26, 128);
     color: white;
 }
 

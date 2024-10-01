@@ -5,7 +5,7 @@
 {% block title %}Gestión de pacientes{% endblock %}
 
 {% block extra_head%}
-<link rel="stylesheet" href="{% static 'styles/agregar_paciente.css' %}">
+<link rel="stylesheet" href="{% static 'styles/agregar_terapeuta.css' %}">
 <link rel="stylesheet" href="{% static 'styles/formularios.css' %}">
 <link rel="stylesheet" href="{% static 'styles/modal.css' %}">
 {% endblock %}
@@ -31,6 +31,7 @@
 <form action="{% url 'agregar_paciente_admin' %}" method="POST" onsubmit="return mostrarMensajeExito()">
     {% csrf_token %}
     <h2> Datos del paciente </h2>
+    <h4> Los campos con (*) son obligatorios </h4>
 
     {% comment %} DATOS DEL paciente COLUMNA IZQUIERDA {% endcomment %}
     <div class="divisor-formulario">
@@ -195,5 +196,58 @@
         mensajeExito.style.display = "none"; // Ocultar el modal
     }
 </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var regionField = document.getElementById("id_region");
+        var provinciaField = document.getElementById("id_provincia");
+        var comunaField = document.getElementById("id_comuna");
+
+        regionField.addEventListener("change", function() {
+            var regionId = this.value;
+            provinciaField.innerHTML = ""; // Limpiar opciones anteriores
+            comunaField.innerHTML = ""; // Limpiar opciones anteriores
+
+            if (regionId) {
+                fetch(`/api/provincias/?region=${regionId}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(provincia => {
+                        var option = document.createElement("option");
+                        option.value = provincia.id;
+                        option.textContent = provincia.nombre;
+                        provinciaField.appendChild(option);
+                    });
+                });
+            }
+        });
+        provinciaField.addEventListener("change", function() {
+            var provinciaId = this.value;
+            comunaField.innerHTML = ""; // Limpiar opciones anteriores
+
+            if (provinciaId) {
+                fetch(`/api/comunas/?provincia=${provinciaId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Actualizar opciones del campo de selección de comuna
+                    data.forEach(comuna => {
+                        var option = document.createElement("option");
+                        option.value = comuna.id;
+                        option.textContent = comuna.nombre;
+                        comunaField.appendChild(option);
+                    });
+                });
+            }
+        });
+    });
+</script>
+<script>
+    document.getElementById("boton-cancelar").addEventListener("click", function(){
+        window.location.href = "{% url 'admin_pacientes' %}";
+    });
+</script>
+{% block extra_js %}
+<script src="{% static 'js/formatear-rut.js' %}"></script>
+<script src="{% static 'js/formatear-telefono.js' %}"></script>
+{% endblock %}
 
 {% endblock %}

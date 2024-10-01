@@ -19,17 +19,20 @@ def agenda(request):
     citas = Cita.objects.all()
     citas_json = []
     for cita in citas:
-        citas_json.append({
-            'id': cita.id,  # Añadimos el ID de la cita
-            'fecha': cita.fecha.strftime('%Y-%m-%d'),
-            'titulo': cita.titulo,
-            'hora': cita.hora.strftime('%H:%M'),
-            'descripcion': cita.detalle,
-            'paciente': {
-                'id': cita.paciente.id,
-                'nombre': f'{cita.paciente.first_name} {cita.paciente.last_name}'
-            }
-        })
+        if cita.paciente and cita.paciente.id and cita.paciente.first_name and cita.paciente.last_name:
+            citas_json.append({
+                'id': cita.id,  # Añadimos el ID de la cita
+                'fecha': cita.fecha.strftime('%Y-%m-%d'),
+                'titulo': cita.titulo,
+                'hora': cita.hora.strftime('%H:%M'),
+                'descripcion': cita.detalle,
+                'paciente': {
+                    'id': cita.paciente.id,
+                    'nombre': f'{cita.paciente.first_name} {cita.paciente.last_name}'
+                }
+            })
+        else:
+            continue
     context = {
         'paciente': Paciente.objects.all(),
         'fechas_citas': json.dumps(citas_json)

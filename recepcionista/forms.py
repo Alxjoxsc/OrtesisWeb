@@ -3,6 +3,14 @@ from terapeuta.models import Paciente
 from autenticacion.models import Region, Provincia, Comuna  # Importamos los modelos de ubicación
 from django.utils import timezone  # Para manejar la fecha y hora actual
 from decimal import Decimal
+from itertools import cycle
+import re
+from datetime import date
+
+def is_valid_email(text):
+        pattern = r'^[a-z][a-z0-9\-\.]+@[a-z]+\.[a-z]{1,3}$'
+
+        return re.search(pattern, text)
 
 class CrearPacienteForm(forms.ModelForm):
 
@@ -14,47 +22,47 @@ class CrearPacienteForm(forms.ModelForm):
 
     rut = forms.CharField(
         max_length=12,
-        label='Rut', 
+        label='Rut (*)', 
         required=True,
         widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ej: XX.XXX.XXX-X'})
     )
 
     first_name = forms.CharField(
         max_length=150, 
-        label='Nombres', 
+        label='Nombres (*)', 
         required=True,
         widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ej: Juan Alberto'})
     )
 
     last_name = forms.CharField(
         max_length=150, 
-        label='Apellidos', 
+        label='Apellidos (*)', 
         required=True,
         widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ej: Pérez González'})
     )
 
     fecha_nacimiento = forms.DateField(
-        label='Fecha de nacimiento', 
+        label='Fecha de nacimiento (*)', 
         required=True,
         widget=forms.DateInput(attrs={'class':'campo-formulario', 'type': 'date'})
     )
 
     sexo = forms.ChoiceField(
         choices=(('Masculino', 'Masculino'), ('Femenino', 'Femenino'), ("Otro", "Otro")), 
-        label='Sexo', 
+        label='Sexo (*)', 
         required=True,
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'})
     )
 
     telefono = forms.CharField(
         max_length=12, 
-        label='Teléfono', 
+        label='Teléfono (*)', 
         required=True,
         widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ej: +56 9 1234 5678'})
     )
 
     email = forms.EmailField(
-        label='Correo electrónico', 
+        label='Correo electrónico (*)', 
         required=True,
         widget=forms.EmailInput(attrs={'class':'campo-formulario','placeholder': 'correodejemplo@ejemplos.com'})
     )
@@ -89,7 +97,7 @@ class CrearPacienteForm(forms.ModelForm):
 
     patologia = forms.CharField(
         max_length=50, 
-        label='Patología', 
+        label='Patología (*)', 
         required=True,
         widget=forms.TextInput(attrs={'class':'campo-formulario', 'placeholder' :'Ingrese la patología del paciente'})
     )
@@ -140,21 +148,21 @@ class CrearPacienteForm(forms.ModelForm):
 
     provincia = forms.ModelChoiceField(
         queryset=Provincia.objects.all(),  # Cargamos todas las provincias
-        label='Provincia',
+        label='Provincia (*)',
         required=True,
         widget=forms.Select(attrs={'class': 'campo-formulario'})
     )
 
     comuna = forms.ModelChoiceField(
         queryset=Comuna.objects.all(),  # Cargamos todas las comunas
-        label='Comuna',
+        label='Comuna (*)',
         required=True,
         widget=forms.Select(attrs={'class': 'campo-formulario'})
     )
 
     calle = forms.CharField(
         max_length=255,
-        label='Calle',
+        label='Calle (*)',
         required=True,
         widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ej: Calle 123'})
     )
@@ -184,35 +192,6 @@ class CrearPacienteForm(forms.ModelForm):
             'comuna',  # Añadido campo comuna
             'calle',  # Añadido campo calle
         ]
-
-    def clean(self):
-        cleaned_data = super().clean()
-
-        # Validación ejemplo: Teléfono
-        telefono = cleaned_data.get('telefono')
-        if telefono and not telefono.startswith('+'):
-            self.add_error('telefono', 'El número de teléfono debe comenzar con un "+" seguido del código de país.')
-
-        # Validación para el campo de peso
-        peso = cleaned_data.get('peso')
-        if peso and peso <= 0:
-            self.add_error('peso', 'El peso debe ser un valor positivo.')
-
-        return cleaned_data
-    
-    def clean_peso(self):
-        peso = self.cleaned_data.get('peso')
-        print(f'Peso original: {peso}')
-        if peso is not None:
-            return Decimal(str(peso).replace(',', '.'))
-        return peso
-
-    def clean_estatura(self):
-        estatura = self.cleaned_data.get('estatura')
-        print(f'Estatura original: {estatura}')
-        if estatura is not None:
-            return Decimal(str(estatura).replace(',', '.'))
-        return estatura
 
     def save(self, commit=True):
         paciente = Paciente.objects.create(
@@ -247,3 +226,116 @@ class CrearPacienteForm(forms.ModelForm):
             paciente.save()
 
         return paciente
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'region' in self.data:
+            try:
+                self.fields['provincia'].queryset = Provincia.objects.filter(region_id=self.data['region'])
+            except (ValueError, TypeError):
+                pass  # Manejo de errores si la región no es válida
+        elif self.instance.pk:
+            self.fields['provincia'].queryset = self.instance.region.provincia_set.all()
+
+        if 'provincia' in self.data:
+            try:
+                self.fields['comuna'].queryset = Comuna.objects.filter(provincia_id=self.data['provincia'])
+            except (ValueError, TypeError):
+                pass  # Manejo de errores si la provincia no es válida
+        elif self.instance.pk:
+            self.fields['comuna'].queryset = self.instance.provincia.comuna_set.all()
+    
+    def clean_rut(self):
+        rut = self.cleaned_data.get('rut')
+
+        # Validación del formato
+        if not re.match(r'^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$', rut):
+            raise forms.ValidationError('El RUT debe estar en el formato XX.XXX.XXX-X.')
+
+        # Se remueve el punto y el guión
+        clean_rut = rut.replace(".", "").replace("-", "")
+
+        # Se extrae la parte numérica y se verifica el dígito
+        num_part = clean_rut[:-1]
+        dv = clean_rut[-1].upper()
+                # Se extrae la parte numérica y se verifica el dígito
+        num_part = clean_rut[:-1]
+        dv = clean_rut[-1].upper()
+
+        # Validación del dígito verificador
+        reversed_digits = map(int, reversed(num_part))
+        factors = cycle(range(2, 8))
+        s = sum(d * f for d, f in zip(reversed_digits, factors))
+        verificador = (-s) % 11
+        verificador = 'K' if verificador == 10 else str(verificador)
+        print("Dígito verificador del formulario:", dv)
+        print("Dígito verificador calculado:", verificador)
+
+        # Validación del dígito verificador
+        if dv != verificador:
+            raise forms.ValidationError('El dígito verificador del RUT no es válido.')
+
+        # Verificar si ya existe otro usuario con este RUT, excluyendo al usuario que estamos editando
+        if Paciente.objects.filter(rut=rut).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError('Ya existe un usuario con este RUT.')
+
+        return rut
+    
+    def clean_peso(self):
+        peso = self.cleaned_data.get('peso')
+        print(f'Peso original: {peso}')
+        if peso is not None:
+            return Decimal(str(peso).replace(',', '.'))
+        return peso
+
+    def clean_estatura(self):
+        estatura = self.cleaned_data.get('estatura')
+        print(f'Estatura original: {estatura}')
+        if estatura is not None:
+            return Decimal(str(estatura).replace(',', '.'))
+        return estatura
+    
+        
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name')
+        # Permitir hasta 3 nombres separados por espacios
+        if not re.match(r'^[a-zA-Z]+( [a-zA-Z]+){0,2}$', first_name):
+            raise forms.ValidationError('El nombre solo puede contener letras y hasta 3 nombres separados por espacios.')
+        
+        return first_name
+    
+    def clean_last_name(self):
+        last_name = self.cleaned_data.get('last_name')
+        # Permitir hasta 2 apellidos separados por un espacio
+        if not re.match(r'^[a-zA-Z]+( [a-zA-Z]+)?$', last_name):
+            raise forms.ValidationError('El apellido solo puede contener letras y hasta 2 apellidos separados por un espacio.')
+        
+        return last_name
+    
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if not is_valid_email(email):
+            raise forms.ValidationError('Por favor, ingrese una dirección de correo electrónico válida.')
+
+        # Verificar si ya existe otro User con este email, excluyendo al User que estamos editando
+        if Paciente.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError('Ya existe un usuario con este correo electrónico.')
+
+        return email
+    
+    def clean_telefono(self):
+        telefono = self.cleaned_data['telefono']
+        # Validar el formato del teléfono con una expresión regular
+        if not re.match(r'^\d{1} \d{4} \d{4}$', telefono):
+            raise forms.ValidationError('El formato del teléfono debe ser: 9 1234 5678')
+        
+        return telefono
+    
+    def clean_fecha_nacimiento(self):
+        fecha_nacimiento = self.cleaned_data['fecha_nacimiento']
+        # Verificar que la fecha de nacimiento sea anterior a la fecha actual
+        if fecha_nacimiento >= date.today():
+            raise forms.ValidationError('La fecha de nacimiento debe ser anterior a la fecha actual.')
+        
+        return fecha_nacimiento
+

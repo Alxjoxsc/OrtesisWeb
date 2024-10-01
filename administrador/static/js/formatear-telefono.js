@@ -6,6 +6,14 @@ document.addEventListener('input', (e) => {
     }
 });
 
+document.addEventListener('input', (e) => {
+    const telefono = document.getElementById('id_telefono_emergencia');
+    if (e.target === telefono) {
+        let telefonoFormateado = formatPhoneNumber(telefono.value);
+        telefono.value = telefonoFormateado;
+    }
+});
+
 function formatPhoneNumber(phoneNumber) {
     // Sacar todos los caracteres que no sean números
     let cleaned = phoneNumber.toString().replace(/\D/g, '');
