@@ -7,22 +7,27 @@
     <link rel="stylesheet" href="{% static 'css/recepcionista.css' %}">
 {% endblock %}
 
-{% block content %}
-<div class="recepcionista-container">
-    <div class="header">
-        <a href="{% url 'agregar_paciente' %}" class="agregar-paciente-btn">
+{% block header %}
+<div class="pacientes-header-recepcionista">
+    <h1>Pacientes</h1>
+    <form method="GET" action="{% url 'recepcionista_pacientes_activos' %}" class="pacientes-busqueda-form">
+        <input type="text" name="search" placeholder="Búsqueda por Nombre, Rut o Tratamiento" class="pacientes-search-input" id="searchInput" value="{{ request.GET.search|default:'' }}" oninput="toggleClearButton()">
+        <img src="{% static 'icons/Lupa.svg' %}" alt="Buscar" class="pacientes-search-icon">
+        <button type="button" id="clearButton" class="pacientes-clear-button" onclick="clearSearch()" style="display: {% if request.GET.search %}inline-block{% else %}none{% endif %};">
+            Limpiar Filtro
+        </button>
+    </form>
+    <div class="pacientes-agregar-paciente">
+        <a href="{% url 'agregar_paciente' %}" class="pacientes-agregar-paciente-btn">
             <span class="icono">+</span> Agregar Paciente
         </a>
     </div>
 </div>
+{% endblock %}
 
-    <form class="busqueda-form">
-        <div class="busqueda-input">
-            <input type="text" class="form-control" id="searchInput" placeholder="Búsqueda por Nombre o Rut" aria-label="Buscar Paciente">
-        </div>
-        <button class="filtro-btn" type="button">Filtrar</button>
-    </form>
 
+{% block content %}
+<div class="recepcionista-container">
     <div class="filtros">
         <button class="btn active" type="button">Activos</button>
         <button class="btn" type="button">Inactivos</button>
@@ -41,11 +46,11 @@
                 </tr>
             </thead>
             <tbody>
-                {% for paciente in paciente %}
+                {% for paciente in pacientes %}
                 <tr>
                     <td>{{ paciente.first_name }} {{ paciente.last_name }}</td>
                     <td>{{ paciente.rut }}</td>
-                    <td><span class="estado-activo">Activo</span></td> <!-- Ajusta el estado si es necesario -->
+                    <td><span class="estado-activo">{{paciente.is_active}}</span></td>
                     <td>
                         {% if paciente.terapeuta %}
                             {{ paciente.terapeuta.user.first_name }} {{ paciente.terapeuta.user.last_name }}
@@ -82,6 +87,7 @@
     </div>
 </div>
 {% endblock %}
+
 {% block extra_js %}
 <script src="{% static 'js/buscar_paciente.js' %}"></script>
 {% endblock %}

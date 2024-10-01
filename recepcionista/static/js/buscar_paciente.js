@@ -1,36 +1,79 @@
-function filtrarPacientes(event) {
-    event.preventDefault();  // Prevenir que el formulario se envíe y recargue la página
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const clearButton = document.getElementById('clearButton');
 
-    const searchInput = document.getElementById('searchInput').value.toLowerCase();
-    const filasPacientes = document.querySelectorAll('tbody tr:not(#no-coincidencias)'); // Excluimos la fila de no coincidencias
+    // Verificar si el campo de búsqueda existe
+    if (searchInput) {
+        // Mostrar u ocultar el botón de limpiar dependiendo del contenido del campo de búsqueda
+        toggleClearButton();
 
-    let bandera = false; // Bandera para saber si hay coincidencias
+        // Asignar evento al botón de limpiar para que borre el texto y haga un submit del formulario
+        clearButton.addEventListener('click', function() {
+            clearSearch();
+        });
 
-    filasPacientes.forEach((fila) => {
-        const nombre_paciente = fila.cells[0].textContent.toLowerCase();
-        const rut_paciente = fila.cells[1].textContent.toLowerCase();
-        
-        if (nombre_paciente.includes(searchInput) || rut_paciente.includes(searchInput)) {
-            fila.style.display = ''; // Mostrar la fila que coincida
-            bandera = true; // Si encontramos un resultado, actualizamos la bandera
+        // Asignar evento para detectar cuando se presiona la tecla Enter y realizar la búsqueda
+        searchInput.addEventListener('keydown', function(event) {
+            detectEnter(event);
+        });
+    } else {
+        console.error('El elemento con el ID searchInput no se encontró.');
+    }
+});
+
+// Función para detectar la tecla Enter y realizar la búsqueda
+function detectEnter(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        searchPacientes();
+    }
+}
+
+// Función para mostrar el botón de limpiar solo si hay texto en el campo de búsqueda
+function toggleClearButton() {
+    const searchInput = document.getElementById('searchInput');
+    const clearButton = document.getElementById('clearButton');
+
+    if (searchInput.value.trim() !== '') {
+        clearButton.style.display = 'inline-block';
+    } else {
+        clearButton.style.display = 'none';
+    }
+}
+
+// Función para limpiar la búsqueda y enviar el formulario para volver a mostrar todos los pacientes
+function clearSearch() {
+    const searchInput = document.getElementById('searchInput');
+    
+    if (searchInput) {
+        searchInput.value = '';  // Limpiar el campo de búsqueda
+        toggleClearButton();  // Ocultar el botón de limpiar
+        searchInput.form.submit();  // Enviar el formulario para recargar la lista completa de pacientes
+    } else {
+        console.error('El elemento con el ID searchInput no se encontró.');
+    }
+}
+
+// Función para buscar pacientes dentro de la lista
+function searchPacientes() {
+    const input = document.getElementById('searchInput').value.toLowerCase();
+    const pacientes = document.querySelectorAll('.paciente');
+    let found = false;
+
+    pacientes.forEach(paciente => {
+        const nombre = paciente.querySelector('.nombre').textContent.toLowerCase();
+        const rut = paciente.querySelector('.rut').textContent.toLowerCase();
+        const tratamiento = paciente.querySelector('.tratamiento').textContent.toLowerCase();
+
+        if (nombre.includes(input) || rut.includes(input) || tratamiento.includes(input)) {
+            paciente.style.display = ''; // Mostrar el paciente
+            found = true;
         } else {
-            fila.style.display = 'none'; // Ocultar la fila que no coincida
+            paciente.style.display = 'none'; // Ocultar el paciente
         }
     });
 
-    // Mostrar el mensaje de error si no hay coincidencias
-    const mensajeError = document.getElementById('no-coincidencias');
-    if (!bandera && searchInput !== '') {
-        mensajeError.style.display = 'table-row';
-    } else {
-        mensajeError.style.display = 'none';
+    if (!found) {
+        console.log('No se encontraron pacientes.');
     }
 }
-
-function verificarEnter(event) {
-    if (event.key === 'Enter') {
-        event.preventDefault(); 
-        filtrarPacientes(event);
-    }
-}
-document.querySelector('.busqueda-input input').addEventListener('keypress', verificarEnter);

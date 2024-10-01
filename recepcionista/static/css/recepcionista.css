@@ -330,47 +330,33 @@ h1 {
     max-width: 1200px;
 }
 
+
+.pacientes-header-recepcionista{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 90px;
+    margin-top: 20px;
+}
+
 /* Ajustar el contenedor de la cabecera */
-.header {
+.pacientes-header-recepcionista h1 {
     display: flex;
-    justify-content: flex-end; /* Alinea el contenido al final del contenedor (derecha) */
-    align-items: center;
-    margin-bottom: 20px;
-    padding: 10px;
-    width: 100%; /* Asegura que el contenedor use todo el ancho */
+    font-weight: 400;
+    margin: 0;
+    font-size: 50px;
+    color: black;
 }
-
-/* Ajustes del botón */
-.agregar-paciente-btn {
-    background-color: #373d58;
-    color: white;
-    padding: 7px 20px;
-    border: none;
-    border-radius: 15px;
-    font-size: 14px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-decoration: none; /* Quita el subrayado */
-}
-
 
 /* Formulario de búsqueda */
-.busqueda-form {
+.pacientes-busqueda-form {
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
-}
-
-.busqueda-input {
-    width: 100%;
-    position: relative;
 }
 
 /* Ajustar el tamaño y color de la barra de búsqueda */
-.busqueda-input input[type="text"] {
-    width: 400px;
+.pacientes-search-input {
+    width: 500px;
     height: 35px;
     border: 2px solid #d9d9d9;
     border-radius: 0px;
@@ -379,6 +365,64 @@ h1 {
     color: black;
     background-color: #f9f9f9;
     font-size: 16px;
+}
+
+/* Icono de búsqueda */
+.pacientes-search-icon {
+    width: 20px;
+    height: 20px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+/* Botón de limpiar búsqueda */
+.pacientes-clear-button {
+    display: flex;
+    gap: 5px;
+    background-color: #f5554a;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 20px;
+    height: auto;
+}
+
+.pacientes-clear-button:hover {
+    background-color: #d32f2f;
+}
+
+/* Estilo para el botón Agregar Paciente */
+.pacientes-agregar-paciente-btn {
+    background-color: #373d58;
+    color: white;
+    padding: 8px 35px;
+    border: none;
+    border-radius: 20px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.pacientes-agregar-paciente-btn:hover {
+    background-color: #4d5876;
+}
+
+/* Botón de filtro (si aplica) */
+.filtro-btn {
+    background-color: #373d58;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 15px;
+    margin-left: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
 
 /* Botón de filtro */
@@ -470,12 +514,4 @@ h1 {
     text-align: center;
     padding: 20px;
     color: #999;
-}
-
-/* Título principal */
-.header h1 {
-    font-size: 36px;
-    font-weight: bold;
-    color: #333;
-    margin: 0;
 }

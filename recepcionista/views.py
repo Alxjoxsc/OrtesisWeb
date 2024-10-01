@@ -8,7 +8,7 @@ from django.utils import timezone
 from .forms import CrearPacienteForm
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
-
+from datetime import date
 
 @role_required('Recepcionista')
 def recepcionista_terapeutas_activos(request):
@@ -27,10 +27,36 @@ def recepcionista_terapeutas_activos(request):
 
     return render(request, 'recepcionista_terapeutas_activos.html', {'terapeuta': terapeuta})
 
+
+def calcular_edad(fecha_nacimiento):
+    hoy = date.today()
+    return hoy.year - fecha_nacimiento.year - ((hoy.month, hoy.day) < (fecha_nacimiento.month, fecha_nacimiento.day))
+
 @role_required('Recepcionista')
 def recepcionista_pacientes_activos(request):
-    paciente = Paciente.objects.all()
-    return render(request, 'recepcionista_pacientes_activos.html', {'paciente': paciente})
+    query = request.GET.get('search')
+    pacientes_list = Paciente.objects.all()
+
+    # Si hay un parámetro de búsqueda, filtrar los pacientes
+    if query:
+        pacientes_list = pacientes_list.filter(
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query) |
+            Q(rut__icontains=query) |
+            Q(patologia__icontains=query)
+        )
+    # Calcular la edad de cada paciente
+    for paciente in pacientes_list:
+        paciente.edad = calcular_edad(paciente.fecha_nacimiento)
+
+    total_pacientes = pacientes_list.count() 
+
+    paginator = Paginator(pacientes_list, 15)
+    page_number = request.GET.get('page') 
+    pacientes = paginator.get_page(page_number) 
+
+    # Renderizar el template con los pacientes y la información de paginación
+    return render(request, 'recepcionista_pacientes_activos.html', {'pacientes': pacientes, 'total_pacientes': total_pacientes})
 
 @role_required('Recepcionista')
 def agregar_paciente(request):
