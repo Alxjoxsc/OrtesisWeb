@@ -164,33 +164,61 @@
             </div>
         </div>
         <!-- Modal Popup para confirmar la desvinculación -->
-<div id="desvincularModal" class="modal">
-    <div class="modal-content">
-        <h2>¿Desea pasar a estado inactivo a este paciente?</h2>
-        <div class="modal-body">
-            <p><strong>Nombre:</strong> {{ paciente.first_name }} {{ paciente.last_name }}</p>
-            <p><strong>Rut:</strong> {{ paciente.rut }}</p>
-            <p><strong>Sexo:</strong> {{ paciente.sexo }}</p>
-            <p><strong>Edad:</strong> {{ paciente.edad }}</p>
-            <p><strong>Número de Teléfono:</strong> {{ paciente.telefono }}</p>
-            <p><strong>Correo Electrónico:</strong> {{ paciente.email }}</p>
-            <p><strong>Patología:</strong> {{ paciente.patologia }}</p>
-            <p><strong>Terapeuta a cargo:</strong> {{ terapeuta.nombre }}</p>
-
-            <!-- Campo para ingresar el motivo de la inactivación -->
-            <div class="motivo-inactivacion">
-                <label for="motivo">Motivo de inactivación:</label>
-                <textarea id="motivo" rows="4" placeholder="Ingrese el motivo de inactivación del paciente [máx 1000 caracteres]"></textarea>
+        <div id="desvincularModal" class="modal">
+            <div class="modal-content">
+                <h2>¿Desea pasar a estado inactivo a este paciente?</h2>
+                <div class="modal-body">
+                    <div class="label-value">
+                        <span class="label">Nombre:</span>
+                        <span class="value">{{ paciente.first_name }} {{ paciente.last_name }}</span>
+                    </div>
+                    <div class="label-value">
+                        <span class="label">Rut:</span>
+                        <span class="value">{{ paciente.rut }}</span>
+                    </div>
+                    <div class="label-value">
+                        <span class="label">Sexo:</span>
+                        <span class="value">{{ paciente.sexo }}</span>
+                    </div>
+                    <div class="label-value">
+                        <span class="label">Edad:</span>
+                        <span class="value">{{ paciente.edad }}</span>
+                    </div>
+                    <div class="label-value">
+                        <span class="label">Número de Teléfono:</span>
+                        <span class="value">{{ paciente.telefono }}</span>
+                    </div>
+                    <div class="label-value">
+                        <span class="label">Correo Electrónico:</span>
+                        <span class="value">{{ paciente.email }}</span>
+                    </div>
+                    <div class="label-value">
+                        <span class="label">Patología:</span>
+                        <span class="value">{{ paciente.patologia }}</span>
+                    </div>
+                    <div class="label-value">
+                        <span class="label">Terapeuta a cargo:</span>
+                        <span class="value">{{ terapeuta.nombre }}</span>
+                    </div>
+        
+                    <!-- Campo para ingresar el motivo de la inactivación -->
+                    <div class="motivo-inactivacion">
+                        <label for="motivo">Motivo de inactivación:</label>
+                        <textarea id="motivo" rows="4" placeholder="Ingrese el motivo de inactivación del paciente [máx 1000 caracteres]"></textarea>
+                    </div>
+                    <div class = "mensaje-terapeuta">
+                        <p>El paciente podrá ser visualizado en la sección de pacientes inactivos</p>
+                    </div>
+                </div>
+        
+                <!-- Botones de confirmación y cancelación -->
+                <div class="modal-footer">
+                    <button class="cancel-btn" id="cancelarDesvinculacion">Cancelar</button>
+                    <button class="confirm-btn" id="confirmarDesvinculacion">Confirmar</button>
+                </div>
             </div>
-            <p>El paciente podrá ser visualizado en la sección de pacientes inactivos</p>
         </div>
-
-        <!-- Botones de confirmación y cancelación -->
-        <div class="modal-footer">
-            <button class="cancel-btn" id="cancelarDesvinculacion">Cancelar</button>
-            <button class="confirm-btn" id="confirmarDesvinculacion">Confirmar</button>
-        </div>
-    </div>
+        
 </div>
 
 

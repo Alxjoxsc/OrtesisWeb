@@ -249,25 +249,54 @@
 }
 
 .modal-content {
+    display: flex;
+    flex-direction: column;
     background-color: white;
-    margin: 10% auto;
+    margin: auto;
     padding: 20px;
     border-radius: 10px;
     width: 50%;
     max-width: 600px;
 }
 
+.modal-content h2 {
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
 .modal-body {
-    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    margin-left: 50px;
+    font-weight: 400;
+    font-size: 17px;
+    justify-content: space-between;
+    width: 80%;
+}
+
+.label-value {
+    display: grid;
+    grid-template-columns: 200px 1fr; 
+    gap: 10px; 
+}
+
+.label {
+    text-align: left; 
+}
+
+.value {
+    text-align: left;
 }
 
 .motivo-inactivacion {
     margin-top: 10px;
 }
 
-.motivo-inactivacion label {
-    font-weight: bold;
-}
 
 .motivo-inactivacion textarea {
     width: 100%;
@@ -276,9 +305,16 @@
     border: 1px solid #ccc;
 }
 
+.mensaje-terapeuta{
+    display: flex;
+    text-align: center;
+    font-weight: 500;
+}
+
 .modal-footer {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    gap: 100px;
 }
 
 .confirm-btn, .cancel-btn {
@@ -290,12 +326,12 @@
 }
 
 .confirm-btn {
-    background-color: #28a745;
+    background-color: #006A60;
     color: white;
 }
 
 .cancel-btn {
-    background-color: #dc3545;
+    background-color: #FF6161;
     color: white;
 }
 
