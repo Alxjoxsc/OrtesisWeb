@@ -273,6 +273,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <p> ${cita.titulo}</p>
                 <p> ${cita.hora}</p>
                 <p> Descripción: ${cita.descripcion}</p>
+                <p> Tipo: ${cita.tipo_cita}</p>
             `;
             popupCitasContent.appendChild(citaElement);
 

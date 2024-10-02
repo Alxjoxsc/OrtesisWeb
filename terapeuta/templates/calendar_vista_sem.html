@@ -25,7 +25,7 @@
         <h2 id="monthYear"></h2>
         <div class="view-options">
             <button id="week-view" class="nav-button">Sem</button>
-            <button id="month-view" class="nav-button">Mes</button>
+            <button id="month-view" class="nav-button" onclick="window.location.href='{% url 'agenda' %}'">Mes</button>
             <button class="nav-button" onclick="window.location.href='{% url 'calendar_vista_sem' %}'">Cambia Vista</button>
         </div>
     </div>
@@ -78,33 +78,13 @@
                 <option value = "Presencial">Presencial</option>
                 <option value = "Online">Online</option>
             </select>
-            <!-- <label><input type="checkbox" id="tipo_cita" name = "tipo_cita" >Cita Online</label> -->
             <div class="botones">
                 <button type="button" id="cancelarBtn">Cancelar</button>
                 <button type="submit" id="confirmarBtn">Confirmar</button>
             </div>
         </form>
     </div>
-
-    <!-- Mostrar Citas -->
-    <div class="overlay" id="citasSemOverlay" onclick="cerrarCitasPopupSem()"></div>
-    <div class="popup" id="citasPopupSem">
-        <span class="close" onclick="cerrarCitasPopupSem()">&times;</span>
-        <h2>Citas Agendadas</h2>
-        <div id="citasContainer">
-            <!-- Las citas se llenarán aquí -->
-        </div>
-    </div>
     
-    <!-- Mostrar Citas -->
-    <div class="overlay" id="citasSemOverlay" onclick="cerrarCitasPopupSem()"></div>
-    <div class="popup" id="citasPopupSem">
-        <span class="close" onclick="cerrarCitasPopupSem()">&times;</span>
-        <h2>Citas Agendadas</h2>
-        <div id="citasContainer">
-            <!-- Las citas se llenarán aquí -->
-        </div>
-    </div>
     <script src="{% static 'js/calendar_vista_sem.js' %}"></script>
 
 </body>

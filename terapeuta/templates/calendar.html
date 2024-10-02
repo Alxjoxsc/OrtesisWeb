@@ -109,7 +109,11 @@
                 <input type="text" id="sala" name="sala" required><br>
                 <label for="detalle">Detalle</label>
                 <input type="text" id="detalle" name="detalle" required><br>
-                <label><input type="checkbox" id="tipo_cita">Cita Online</label>
+                <select id="tipo_cita" name="tipo_cita" required>
+                    <option value = "" disabled selected hidden>Seleccione el tipo de Cita</option>
+                    <option value = "Presencial">Presencial</option>
+                    <option value = "Online">Online</option>
+                </select>
                 <div class="botones">
                     <button type="button" id="cancelarBtn">Cancelar</button>
                     <button type="submit" id="confirmarBtn">Confirmar Cambios</button>
