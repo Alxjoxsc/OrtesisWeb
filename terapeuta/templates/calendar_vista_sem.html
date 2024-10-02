@@ -9,6 +9,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calendario con Popup</title>
     <link rel="stylesheet" href="{% static 'css/calendar_vista_sem.css' %}">
+    <script>
+        // Obtén las citas desde el contexto de Django
+        const citas = JSON.parse('{{ citas|safe }}');
+    </script>
 </head>
 <body>
 
@@ -26,10 +30,10 @@
         </div>
     </div>
 
-    <table>
+    <table id="calendar">
         <thead>
             <tr>
-                <th>Hora</th>
+                <th class="hora">Hora</th>
                 <th>Lunes</th>
                 <th>Martes</th>
                 <th>Miércoles</th>
@@ -40,9 +44,10 @@
             </tr>
         </thead>
         <tbody id="calendar-body">
-            <!-- Generar las filas para las horas -->
+            <!-- Las filas de horas se generarán aquí -->
         </tbody>
     </table>
+    <div id="monthYear"></div>
 
     <div class="overlay" id="overlay" onclick="cerrarPopupSem()"></div>
     <!-- Agendar citas -->
@@ -63,12 +68,17 @@
             <label for="fecha">Fecha:</label>
             <input type="date" id="fecha" name="fecha"required>
             <label for="hora">Hora:</label>
-            <input type="text" id="hora" name="hora" required readonly>
+            <input type="time" id="hora" name="hora" required readonly>
             <label for="sala" class="campo">Sala:</label>
             <input type="text" id="sala" name="sala" required placeholder="Ingrese la sala de la cita">
             <label for="detalle" class="campo">Detalle:</label>
             <input type="text" id="detalle" name="detalle" required placeholder="Ingrese el detalle de la cita">
-            <label><input type="checkbox" id="esOnline">Cita Online</label>
+            <select id="tipo_cita" name="tipo_cita" required>
+                <option value = "" disabled selected hidden>Seleccione el tipo de Cita</option>
+                <option value = "Presencial">Presencial</option>
+                <option value = "Online">Online</option>
+            </select>
+            <!-- <label><input type="checkbox" id="tipo_cita" name = "tipo_cita" >Cita Online</label> -->
             <div class="botones">
                 <button type="button" id="cancelarBtn">Cancelar</button>
                 <button type="submit" id="confirmarBtn">Confirmar</button>
@@ -85,7 +95,16 @@
             <!-- Las citas se llenarán aquí -->
         </div>
     </div>
-
+    
+    <!-- Mostrar Citas -->
+    <div class="overlay" id="citasSemOverlay" onclick="cerrarCitasPopupSem()"></div>
+    <div class="popup" id="citasPopupSem">
+        <span class="close" onclick="cerrarCitasPopupSem()">&times;</span>
+        <h2>Citas Agendadas</h2>
+        <div id="citasContainer">
+            <!-- Las citas se llenarán aquí -->
+        </div>
+    </div>
     <script src="{% static 'js/calendar_vista_sem.js' %}"></script>
 
 </body>

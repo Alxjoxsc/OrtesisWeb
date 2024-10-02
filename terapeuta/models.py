@@ -121,6 +121,7 @@ class Cita(models.Model):
     hora = models.TimeField()
     sala = models.CharField(max_length=50)
     detalle = models.CharField(max_length=100)
+    tipo_cita = models.CharField(max_length=50, default="Presencial", choices=(("Presencial", "Presencial"), ("Online", "Online")))
     def __str__(self):
         terapeuta_nombre = f"{self.terapeuta.user.first_name} {self.terapeuta.user.last_name}" if self.terapeuta else "Sin terapeuta"
         paciente_nombre = f"{self.paciente.user.first_name} {self.paciente.user.last_name}" if self.paciente else "Sin paciente"

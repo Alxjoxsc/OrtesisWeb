@@ -10,6 +10,7 @@ from django.db.models import Q
 from .models import Paciente
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404
+from datetime import date, timedelta
 
 @role_required('Terapeuta')
 
@@ -25,6 +26,7 @@ def agenda(request):
             'titulo': cita.titulo,
             'hora': cita.hora.strftime('%H:%M'),
             'descripcion': cita.detalle,
+            'tipo_cita':cita.tipo_cita,
             'paciente': {
                 'id': cita.paciente.id,
                 'nombre': f'{cita.paciente.first_name} {cita.paciente.last_name}'
@@ -48,6 +50,8 @@ def obtener_fechas_citas(request):
                 'titulo': cita.titulo,
                 'hora': cita.hora.strftime('%H:%M'),
                 'descripcion': cita.detalle,
+                'tipo_cita':cita.tipo_cita,
+                
                 'paciente': {
                     'id': cita.paciente.id,
                     'nombre': f'{cita.paciente.first_name} {cita.paciente.last_name}'
@@ -129,6 +133,7 @@ def agendar_cita(request):
             hora = request.POST['hora']
             sala = request.POST['sala']
             detalle = request.POST['detalle']
+            tipo_cita = request.POST['tipo_cita']
         
             terapeuta_instance = Terapeuta.objects.get(id=terapeuta_id)
             
@@ -141,7 +146,8 @@ def agendar_cita(request):
                 fecha = fecha,
                 hora = hora,
                 sala = sala,
-                detalle = detalle
+                detalle = detalle,
+                tipo_cita = tipo_cita
             )
             cita.save()
             
@@ -154,9 +160,25 @@ def calendar(request):
     return render (request, 'calendar.html', {'paciente':paciente})
 
 def calendar_vista_sem(request):
-    paciente = Paciente.objects.all()
-    print(paciente)
-    return render (request, 'calendar_vista_sem.html', {'paciente':paciente})
+    # Obtener todas las citas de la semana actual
+    current_week_start = date.today() - timedelta(days=date.today().weekday())  # Lunes de esta semana
+    current_week_end = current_week_start + timedelta(days=6)  # Domingo de esta semana
+
+    citas = Cita.objects.filter(fecha__range=[current_week_start, current_week_end])
+    citas_json = [{
+        'fecha': cita.fecha.strftime('%Y-%m-%d'),
+        'hora': cita.hora.strftime('%H:%M'),
+        'paciente_id': cita.paciente.id,
+        'titulo': cita.titulo,
+        'tipo_cita':cita.tipo_cita
+    } for cita in citas]
+
+    context = {
+        'paciente': Paciente.objects.all(),
+        'citas': json.dumps(citas_json)  # Envía las citas al frontend
+    }
+    return render(request, 'calendar_vista_sem.html', context)
+
 
 
 def editar_cita(request):
@@ -169,6 +191,7 @@ def editar_cita(request):
         cita.hora = request.POST["hora"]
         cita.sala = request.POST["sala"]
         cita.detalle = request.POST["detalle"]
+        cita.tipo_cita = request.POST["tipo_cita"]
         cita.save()
         return redirect("agenda")
     return render(request, "editar_cita.html")
