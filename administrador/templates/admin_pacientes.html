@@ -3,6 +3,7 @@
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/listar_pacientes_administrador.css' %}">
 <link rel="stylesheet" href="{% static 'css/tabla.css' %}">
+<link rel="stylesheet" href="{% static 'styles/modal.css' %}">
 {% endblock %}
 
 {% block title %}Pacientes{% endblock %}
@@ -74,13 +75,13 @@
                     </a>
                     {% if estado == 'activos' %}
                     <a href="#" class="btn btn-outline-danger btn-sm" title="Pasar a estado inactivo" 
-                        onclick="mostrarPopUpInactivar('{{ paciente.id }}', '{{ paciente.first_name }} {{ paciente.last_name }}')">
+                        onclick="mostrarPopUpInactivar('{{ paciente.id }}', '{{ paciente.first_name }} {{ paciente.last_name }}', '{{ paciente.rut }}')">
                         <img src="{% static 'icons/DeleteUser.svg' %}" alt="Inactivar" />
                     </a>
                     {% elif estado == 'inactivos' %}
                     <a href="#" class="btn btn-outline-danger btn-sm" title="Restaurar a estado activo" 
                         onclick="mostrarPopUpRestaurar('{{ paciente.id }}', '{{ paciente.first_name }} {{ paciente.last_name }}')">
-                        <img src="{% static 'icons/more.svg' %}" alt="Restaurar" />
+                        <img src="{% static 'icons/restore.svg' %}" alt="Restaurar" />
                     </a>
                     {% endif %}
                 </td>
@@ -98,12 +99,14 @@
 </div>
 
 <div id="popupModal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <span class="close-button" onclick="cerrarPopUp()">&times;</span>
+    <div class="contenido-modal">
+        <span class="close" onclick="cerrarPopUp()">&times;</span>
         <h2 id="popup-titulo"></h2>
         <p id="popup-mensaje"></p>
-        <button id="confirmButton" onclick="confirmarCambioEstado()">Confirmar</button>
-        <button class="cancel-button" onclick="cerrarPopUp()">Cancelar</button>
+        <div class="botones-modal">
+            <button class="boton-cancelar" onclick="cerrarPopUp()">Cancelar</button>
+            <button class="boton-confirmar" id="confirmButton" onclick="confirmarCambioEstado()">Confirmar</button>
+        </div>
     </div>
 </div>
 {% endblock %}

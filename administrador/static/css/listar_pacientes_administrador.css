@@ -7,14 +7,14 @@
 .header{
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
 }
 .contenedor-header {
     display: flex;
-    flex-flow: row nowrap;
+    flex-flow: row wrap;
     align-items: center;
     justify-content: flex-start;
-    gap: 40px;
+    gap: 20px;
     width: 100%;
 }
 
@@ -90,7 +90,6 @@
     border: none;
     border-radius: 5px;
     padding: 5px 15px;
-    margin-left: 10px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -155,22 +154,25 @@
     align-items: center;
     gap: 5px;
 }
+
+.final-tabla {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: row;
+}
+
+.final-tabla a img{
+    width: 50px;
+    height: 50px;
+}
 /* Botones de acciones en la tabla */
 .table .btn {
-    padding: 5px 10px;
-    font-size: 12px;
-    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 17px;
     cursor: pointer;
-}
-
-.table .btn-outline-primary {
-    color: #373d58;
-    border: 1px solid #373d58;
-}
-
-.table .btn-outline-secondary {
-    color: #6c757d;
-    border: 1px solid #6c757d;
 }
 
 /* Mensaje para cuando no hay pacientes */
@@ -180,36 +182,76 @@
     color: #999;
 }
 
-.modal {
-    display: none; /* Inicialmente oculto */
-    position: fixed; /* Fijado en la pantalla */
-    z-index: 1; /* Asegúrate de que esté sobre otros elementos */
-    left: 0;
-    top: 0;
-    width: 100%; /* Ocupa todo el ancho de la pantalla */
-    height: 100%; /* Ocupa todo el alto de la pantalla */
-    background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro con transparencia */
-}
-
-.modal-content {
-    background-color: #fff;
-    margin: 15% auto; /* Centrado vertical */
+.contenido-modal {
+    display: flex;
     padding: 20px;
-    border: 1px solid #888;
-    width: 80%; /* Ancho del modal */
-    max-width: 500px; /* Ancho máximo */
+    background-color: #fefefe;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+    justify-content: center;
     text-align: center;
+    border-radius: 0.625rem;
+    width: 34.375rem;
+    height: 15.625rem;
+    margin: auto; /* Centrar horizontalmente */
+    position: absolute; /* Centrar verticalmente */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
-.close-button {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
+.botones-modal {
+    display: flex;
+    gap: 1.25rem;
+    margin-top: 1.25rem;
 }
 
-.close-button:hover,
-.close-button:focus {
-    color: black;
+.boton-cancelar {
+    background-color: #FF6161;
+    color: white;
+    padding: 0.625rem 1.875rem;
+    border: none;
+    border-radius: 3.125rem;
+    font-size: 1rem;
     cursor: pointer;
+}
+
+.boton-confirmar {
+    background-color: #006A60;
+    color: white;
+    padding: 0.625rem 1.875rem;
+    border: none;
+    border-radius: 3.125rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.boton-cancelar:hover {
+    background-color: #FF7D7D;
+}
+
+.boton-confirmar:hover {
+    background-color: #008F85;
+}
+
+@media screen and (max-width: 1200px){
+    .final-tabla a img {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media screen and (max-width: 768px){
+    .final-tabla a img {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+@media screen and (max-width: 600px){
+    .final-tabla a img {
+        width: 25px;
+        height: 25px;
+    }
 }
