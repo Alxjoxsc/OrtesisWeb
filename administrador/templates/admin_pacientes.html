@@ -1,106 +1,119 @@
 {% extends 'administrador_base.html' %}
 {% load static %}
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/administrador.css' %}">
+<link rel="stylesheet" href="{% static 'css/listar_pacientes_administrador.css' %}">
+<link rel="stylesheet" href="{% static 'css/tabla.css' %}">
 {% endblock %}
-{% block content %}
-<div class="pacientes-container mt-4">
-    <div class="header">
-        <h1 class="fw-bold">Pacientes</h1>
-        <a href="{% url 'agregar_paciente_admin' %}" class="agregar-paciente-btn">
-            <i class="bi bi-plus-circle me-2"></i> Agregar Paciente
-        </a>
-    </div>
+
+{% block title %}Pacientes{% endblock %}
+
+{% block header %}
+<div class="contenedor-header">
+    <h1>Pacientes</h1>
 
     <form class="busqueda-form">
         <div class="busqueda-input">
             <input type="text" class="form-control" id="searchInput" placeholder="Búsqueda por Nombre o Rut" aria-label="Buscar Paciente">
         </div>
-        <button class="filtro-btn" type="button">Filtrar</button>
     </form>
+</div>
+<button id="boton-agregar-paciente" >Agregar Paciente<img src="{% static 'icons/plus.svg' %}"></button>
+{% endblock %}
 
+{% block content %}
+
+<div class="contenedor-superior">
     <div class="filtros mt-3">
         <a href="{% url 'listar_pacientes_activos' %}" class="btn {% if estado == 'activos' %}active{% endif %}" type="button">Activos</a>
         <a href="{% url 'listar_pacientes_inactivos' %}" class="btn {% if estado == 'inactivos' %}active{% endif %}" type="button">Inactivos</a>
     </div>
 
-    <div class="mt-3">
-        {% if estado == 'activos' %}
-            <button id="inactivar-btn" class="btn btn-warning" disabled>Pasar a estado inactivo</button>
-        {% elif estado == 'inactivos' %}
-            <button id="restaurar-btn" class="btn btn-success" disabled>Restaurar seleccionados</button>
-        {% endif %}
-    </div>
-    
-    <div class="table-responsive mt-3">
-        <table class="table align-middle mb-0">
-            <thead class="table-light">
-                <tr>
-                    <th><input type="checkbox" id="select-all"></th>
-                    <th>Nombre</th>
-                    <th>Rut</th>
-                    <th>Estado</th>
-                    <th>Terapeuta</th>
-                    <th>Fecha de Ingreso</th>
-                    <th class="text-end">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for paciente in pacientes %}
-                <tr>
-                    <td><input type="checkbox" class="paciente-checkbox" value="{{ paciente.id }}"></td>
-                    <td>{{ paciente.first_name }} {{ paciente.last_name }}</td>
-                    <td>{{ paciente.rut }}</td>
-                    <td>
-                        <span class="badge {% if paciente.is_active %}bg-success{% else %}bg-secondary{% endif %}">
-                            {% if paciente.is_active %}Activo{% else %}Inactivo{% endif %}
-                        </span>
-                    </td>
-                    <td>{% if paciente.terapeuta %}{{ paciente.terapeuta.nombre }}{% else %}Sin terapeuta{% endif %}</td>
-                    <td>{{ paciente.date_joined }}</td>
-                    <td class="text-end">
-                        <a href="{% url 'mostrar_paciente_administrador' paciente.id %}" class="btn btn-outline-danger btn-sm" title="Ver detalle paciente" 
-                           onclick="mostrarPopUp('{{ paciente.id }}', '{{ paciente.first_name }} {{ paciente.last_name }}', '{{ paciente.rut }}', '{{ paciente.patologia }}')">
-                            <img src="{% static 'icons/Detalle.svg' %}" alt="Ver Detalle" />
-                        </a>
-                        {% if estado == 'activos' %}
-                        <a href="#" class="btn btn-outline-danger btn-sm" title="Pasar a estado inactivo" 
-                           onclick="mostrarPopUpInactivar('{{ paciente.id }}', '{{ paciente.first_name }} {{ paciente.last_name }}')">
-                            <img src="{% static 'icons/DeleteUser.svg' %}" alt="Inactivar" />
-                        </a>
-                        {% elif estado == 'inactivos' %}
-                        <a href="#" class="btn btn-outline-danger btn-sm" title="Restaurar a estado activo" 
-                           onclick="mostrarPopUpRestaurar('{{ paciente.id }}', '{{ paciente.first_name }} {{ paciente.last_name }}')">
-                            <img src="{% static 'icons/more.svg' %}" alt="Restaurar" />
-                        </a>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="7" class="table-empty">No hay pacientes registrados.</td>
-                </tr>
-                {% endfor %}
-                <tr id="no-coincidencias" style="display: none;">
-                    <td colspan="7" class="table-empty">No se encontraron coincidencias.</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <button class="filtro-btn" type="button">Filtrar</button>
+</div>
 
-    <div id="popupModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <span class="close-button" onclick="cerrarPopUp()">&times;</span>
-            <h2 id="popup-titulo"></h2>
-            <p id="popup-mensaje"></p>
-            <button id="confirmButton" onclick="confirmarCambioEstado()">Confirmar</button>
-            <button class="cancel-button" onclick="cerrarPopUp()">Cancelar</button>
-        </div>
+<div class="mt-3">
+    {% if estado == 'activos' %}
+        <button id="inactivar-btn" class="btn btn-warning" disabled>Pasar a estado inactivo</button>
+    {% elif estado == 'inactivos' %}
+        <button id="restaurar-btn" class="btn btn-success" disabled>Restaurar seleccionados</button>
+    {% endif %}
+</div>
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="select-all"></th>
+                <th>Nombre</th>
+                <th>Rut</th>
+                <th>Estado</th>
+                <th>Terapeuta</th>
+                <th>Fecha de Ingreso</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for paciente in pacientes %}
+            <tr>
+                <td class="inicio-tabla"><input type="checkbox" class="paciente-checkbox" value="{{ paciente.id }}"></td>
+                <td class="centro-tabla">{{ paciente.first_name }} {{ paciente.last_name }}</td>
+                <td class="centro-tabla">{{ paciente.rut }}</td>
+                <td class="centro-tabla">
+                    <span class="badge {% if paciente.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                        {% if paciente.is_active %}Activo{% else %}Inactivo{% endif %}
+                    </span>
+                </td>
+                <td class="centro-tabla">{% if paciente.terapeuta %}{{ paciente.terapeuta.nombre }}{% else %}Sin terapeuta{% endif %}</td>
+                <td class="centro-tabla">{{ paciente.date_joined }}</td>
+                <td class="final-tabla">
+                    <a href="{% url 'mostrar_paciente_administrador' paciente.id %}" class="btn btn-outline-danger btn-sm" title="Ver detalle paciente" 
+                        onclick="mostrarPopUp('{{ paciente.id }}', '{{ paciente.first_name }} {{ paciente.last_name }}', '{{ paciente.rut }}', '{{ paciente.patologia }}')">
+                        <img src="{% static 'icons/Detalle.svg' %}" alt="Ver Detalle" />
+                    </a>
+                    {% if estado == 'activos' %}
+                    <a href="#" class="btn btn-outline-danger btn-sm" title="Pasar a estado inactivo" 
+                        onclick="mostrarPopUpInactivar('{{ paciente.id }}', '{{ paciente.first_name }} {{ paciente.last_name }}')">
+                        <img src="{% static 'icons/DeleteUser.svg' %}" alt="Inactivar" />
+                    </a>
+                    {% elif estado == 'inactivos' %}
+                    <a href="#" class="btn btn-outline-danger btn-sm" title="Restaurar a estado activo" 
+                        onclick="mostrarPopUpRestaurar('{{ paciente.id }}', '{{ paciente.first_name }} {{ paciente.last_name }}')">
+                        <img src="{% static 'icons/more.svg' %}" alt="Restaurar" />
+                    </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="table-empty">No hay pacientes registrados.</td>
+            </tr>
+            {% endfor %}
+            <tr id="no-coincidencias" style="display: none;">
+                <td colspan="7" class="table-empty">No se encontraron coincidencias.</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="popupModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-button" onclick="cerrarPopUp()">&times;</span>
+        <h2 id="popup-titulo"></h2>
+        <p id="popup-mensaje"></p>
+        <button id="confirmButton" onclick="confirmarCambioEstado()">Confirmar</button>
+        <button class="cancel-button" onclick="cerrarPopUp()">Cancelar</button>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
+
+<script>
+    document.getElementById("boton-agregar-paciente").addEventListener("click", function(){
+        window.location.href = "{% url 'agregar_paciente_admin' %}";
+    });
+</script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const checkboxes = document.querySelectorAll('.paciente-checkbox');
