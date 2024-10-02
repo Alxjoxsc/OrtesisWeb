@@ -74,7 +74,7 @@ def calcular_edad(fecha_nacimiento):
 #-------------------------------------PACIENTES-------------------------------------
 def pacientes_view(request):
     query = request.GET.get('search')  # Obtiene el parámetro de búsqueda desde el GET
-    pacientes_list = Paciente.objects.all()
+    pacientes_list = Paciente.objects.filter(is_active=True)
 
     # Si hay una búsqueda, filtrar los pacientes
     if query:
