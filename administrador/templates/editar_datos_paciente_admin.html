@@ -1,137 +1,249 @@
-{% extends 'base_admin.html' %}
+{% extends 'administrador_base.html' %}
+
 {% load static %}
+
+{% block title %}Editar Paciente{% endblock %}
+
+{% block extra_head%}
+<link rel="stylesheet" href="{% static 'css/editar_datos_paciente_admin.css' %}">
+<link rel="stylesheet" href="{% static 'styles/formularios.css' %}">
+<link rel="stylesheet" href="{% static 'styles/modal.css' %}">
+{% endblock %}
+
+{% block header %}
+<a href="{% url 'mostrar_paciente_administrador' paciente.id %}">
+    <img src="{% static 'icons/Volver-atras.svg' %}" alt="">
+</a>
+<h1>Editar paciente</h1>
+{% endblock %}
+
 {% block content %}
-<head>
-    <link rel="stylesheet" href="{% static 'css/editar_datos_paciente_admin.css' %}">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-    $(document).ready(function() {
-        {% if messages %}
-            var mensajesDjango = [];
-            {% for message in messages %}
-                mensajesDjango.push("{{ message|escapejs }}");
-            {% endfor %}
-            mensajesDjango.forEach(function(mensaje) {
-                alert(mensaje);
-            });
-        {% endif %}
-        $('form').on('submit', function(e) {
-            e.preventDefault();    
-            $.ajax({
-                type: 'POST',
-                url: $(this).attr('action'),
-                data: $(this).serialize(),
-                success: function(response) {
-                    if (response.success) {
-                        alert('Cambios guardados exitosamente.');
-                        window.location.href = response.redirect_url;
-                    } else {
-                        alert('Error: ' + response.error);
-                    }
-                },
-                error: function() {
-                    alert('Hubo un ERROR al Enviar los Datos.');
-                }
-            });
-        });
-    });
-    </script>
-</head>
-<body>
-    <form method="POST" action="{% url 'editar_datos_paciente_admin' paciente.id %}">
-        {% csrf_token %}
+<!-- Contenedor para el mensaje de éxito -->
+<div id="mensaje-exito" class="modal">
+    <div class="contenido-modal-exito">
+        <img src="{% static 'icons/Exito.svg' %}" alt="Éxito">
+        <p>¡paciente agregado con éxito!</p>
+        <button class="boton-continuar" onclick="cerrarModal()">Continuar</button>
+    </div>
+</div>
 
-        <div class="container">
-            <button class="btn-regresar" onclick="window.location.href=this.dataset.url" data-url="{% url 'mostrar_paciente_administrador' paciente.id %}">
-                &larr;
-            </button>
-            <div class="header">
-                <h1>Editar Paciente</h1>
+<form method="POST" action="{% url 'editar_datos_paciente_admin' paciente.id %}" onsubmit="return mostrarMensajeExito()">
+    {% csrf_token %}
+    <h2> Datos del paciente</h2>
+    <h4> Los campos con (*) son obligatorios </h4>
+    
+    {% comment %} DATOS DEL paciente COLUMNA IZQUIERDA {% endcomment %}
+    <div class="divisor-formulario">
+        <div class="datos-columna-izquierda">
+            
+            <!-- Campo RUT -->
+            <div class="form-group">
+                <label for="{{ paciente_form.rut.id_for_label }}">{{ paciente_form.rut.label }}</label>
+                {{ paciente_form.rut }}
+                <div class="error">{{ paciente_form.rut.errors }}</div>
+            </div>
+            
+            <!-- Campo Nombre -->
+            <div class="form-group">
+                <label for="{{ paciente_form.first_name.id_for_label }}">{{ paciente_form.first_name.label }}</label>
+                {{ paciente_form.first_name }}
+                <div class="error">{{ paciente_form.first_name.errors }}</div>
+            </div>
+            
+            <!-- Campo Apellido -->
+            <div class="form-group">
+                <label for="{{ paciente_form.last_name.id_for_label }}">{{ paciente_form.last_name.label }}</label>
+                {{ paciente_form.last_name }}
+                <div class="error">{{ paciente_form.last_name.errors }}</div>
+            </div>
+            
+            <!-- Patologia -->
+            <div class="form-group">
+                <label for="{{ paciente_form.patologia.id_for_label }}">{{ paciente_form.patologia.label }}</label>
+                {{ paciente_form.patologia }}
+                <div class="error">{{ paciente_form.patologia.errors }}</div>
+            </div>
+            
+            <!-- Campo Sexo -->
+            <div class="form-group">
+                <label for="{{ paciente_form.sexo.id_for_label }}">{{ paciente_form.sexo.label }}</label>
+                {{ paciente_form.sexo }}
+                <div class="error">{{ paciente_form.sexo.errors }}</div>
+            </div>
+            
+            <!-- Campo Peso -->
+            <div class="form-group">
+                <label for="{{ paciente_form.peso.id_for_label }}">{{ paciente_form.peso.label }}</label>
+                {{ paciente_form.peso }}
+                <div class="error">{{ paciente_form.peso.errors }}</div>
+            </div>
+            
+            <!-- Campo Estatura -->
+            <div class="form-group">
+                <label for="{{ paciente_form.estatura.id_for_label }}">{{ paciente_form.estatura.label }}</label>
+                {{ paciente_form.estatura }}
+                <div class="error">{{ paciente_form.estatura.errors }}</div>
+            </div>
+            
+            <!-- Historial Médico -->
+            <div class="form-group">
+                <label for="{{ paciente_form.historial_medico.id_for_label }}">{{ paciente_form.historial_medico.label }}</label>
+                {{ paciente_form.historial_medico }}
+                <div class="error">{{ paciente_form.historial_medico.errors }}</div>
+            </div>
+            
+            <!-- Medicamentos -->
+            <div class="form-group">
+                <label for="{{ paciente_form.medicamentos.id_for_label }}">{{ paciente_form.medicamentos.label }}</label>
+                {{ paciente_form.medicamentos }}
+                <div class="error">{{ paciente_form.medicamentos.errors }}</div>
             </div>
 
+            <!-- Alergias -->
             <div class="form-group">
-                <div class="campo campo-nombres">
-                    <label for="nombres">Nombres:</label>
-                    <input type="text" id="nombres" name="nombres" value="{{ paciente.first_name }}" required>
-                </div>
-                <div class="campo campo-apellidos">
-                    <label for="apellidos">Apellidos:</label>
-                    <input type="text" id="apellidos" name="apellidos" value="{{ paciente.last_name }}" required>
-                </div>
+                <label for="{{ paciente_form.alergia.id_for_label }}">{{ paciente_form.alergia.label }}</label>
+                {{ paciente_form.alergia }}
+                <div class="error">{{ paciente_form.alergia.errors }}</div>
             </div>
-            
-            <div class="form-group">
-                <div class="campo campo-rut">
-                    <label for="rut">RUT:</label>
-                    <input type="text" id="rut" name="rut" value="{{ paciente.rut }}" required>
-                </div>
-                <div class="campo campo-proximaCita">
-                    <label for="proximaCita">Próxima Cita:</label>
-                    <div class="proximacita-contenedor">
-                        <input type="date" id="proximaCita" name="proximaCita" value="{{ fecha_cita|date:'Y-m-d' }}" readonly>
-                        {% if terapeuta_asignado %}
-                        <button type="button" class="btn-reagendar" onclick="window.location.href=this.dataset.url" data-url="{% url 'redirigir_asignar_cita' terapeuta_asignado paciente.id %}">
-                            Reagendar
-                        </button>
-                        {% else %}
-                        <button type="button" class="btn-reagendar" disabled>
-                            Reagendar
-                        </button>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <div class="campo campo-telefono">
-                    <label for="telefono">Número de Teléfono:</label>
-                    <input type="tel" id="telefono" name="telefono" value="{{ paciente.telefono }}" required>
-                </div>
-                <div class="campo campo-correo">
-                    <label for="correo">Correo Electrónico:</label>
-                    <input type="email" id="correo" name="correo" value="{{ paciente.email }}" required>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <div class="campo campo-sexo">
-                    <label for="sexo">Sexo:</label>
-                    <select id="sexo" name="sexo" required>
-                        <option value="masculino" {% if paciente.sexo|lower == "masculino" or paciente.sexo|lower == "m" %}selected{% endif %}>Masculino</option>
-                        <option value="femenino" {% if paciente.sexo|lower == "femenino" or paciente.sexo|lower == "f" %}selected{% endif %}>Femenino</option>
-                        <option value="otro" {% if paciente.sexo|lower == "otro" or paciente.sexo|lower == "o" %}selected{% endif %}>Otro</option>
-                    </select>
-                </div>
-                <div class="campo campo-fecha_nacimiento">
-                    <label for="fecha_nacimiento">Fecha de Nacimiento:</label>
-                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="{{ paciente.fecha_nacimiento|date:'Y-m-d' }}" required>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <div class="campo campo-patologia">
-                    <label for="patologia">Patología:</label>
-                    <input type="text" id="patologia" name="patologia" value="{{ paciente.patologia }}" required>
-                </div>
-                <div class="campo campo-terapeuta">
-                    <label for="terapeuta">Terapeuta a Cargo:</label>
-                    <div class="terapeuta-contenedor">
-                        <input type="text" id="terapeuta" name="terapeuta" value="{% if paciente.terapeuta %}{{paciente.terapeuta.user.first_name}} {% else %} Sin Terapeuta {% endif %}" readonly>
-                        <button type="button" class="btn-reasignar" onclick="window.location.href=this.dataset.url" data-url="{% url 'listado_terapeutas' paciente.id %}">
-                            Reasignar
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <label for="descripcion">Descripción de la Patología:</label>
-            <textarea id="descripcion" name="descripcion" rows="4" required>{{ paciente.historial_medico }}</textarea>
-            
-            <div class="buttons">
-                <button type="button" onclick="window.location.href=this.dataset.url" class="cancel" data-url="{% url 'mostrar_paciente_administrador' paciente.id %}">Cancelar</button>
-                <button type="submit" class="confirm">Confirmar Cambios</button>
-            </div>
+
         </div>
-    </form>
-</body>
+
+        {% comment %} DATOS DEL paciente COLUMNA DERECHA {% endcomment %}
+
+        <div class="datos-columna-derecha">
+
+            <!-- Campo Fecha de Nacimiento -->
+            <div class="form-group">
+                <label for="{{ paciente_form.fecha_nacimiento.id_for_label }}">{{ paciente_form.fecha_nacimiento.label }}</label>
+                {{ paciente_form.fecha_nacimiento }}
+                <div class="error">{{ paciente_form.fecha_nacimiento.errors }}</div>
+            </div>
+            <!-- Campo Email -->
+            <div class="form-group">
+                <label for="{{ paciente_form.email.id_for_label }}">{{ paciente_form.email.label }}</label>
+                {{ paciente_form.email }}
+                <div class="error">{{ paciente_form.email.errors }}</div>
+            </div>
+
+            <!-- Campo Teléfono -->
+            <div class="form-group">
+                <label for="{{ paciente_form.telefono.id_for_label }}">{{ paciente_form.telefono.label }}</label>
+                {{ paciente_form.telefono }}
+                <div class="error">{{ paciente_form.telefono.errors }}</div>
+            </div>
+
+            <!-- Contacto Emergencia -->
+            <div class="form-group">
+                <label for="{{ paciente_form.contacto_emergencia.id_for_label }}">{{ paciente_form.contacto_emergencia.label }}</label>
+                {{ paciente_form.contacto_emergencia }}
+                <div class="error">{{ paciente_form.contacto_emergencia.errors }}</div>
+            </div>
+
+            <!-- Telefono Emergencia -->
+            <div class="form-group">
+                <label for="{{ paciente_form.telefono_emergencia.id_for_label }}">{{ paciente_form.telefono_emergencia.label }}</label>
+                {{ paciente_form.telefono_emergencia }}
+                <div class="error">{{ paciente_form.telefono_emergencia.errors }}</div>
+            </div>
+
+            <!-- Campo Dirección -->
+            <div class="form-group">
+                <label for="{{ paciente_form.region.id_for_label }}">{{ paciente_form.region.label }}</label>
+                {{ paciente_form.region }}
+                <div class="error">{{ paciente_form.region.errors }}</div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ paciente_form.provincia.id_for_label }}">{{ paciente_form.provincia.label }}</label>
+                {{ paciente_form.provincia }}
+                <div class="error">{{ paciente_form.provincia.errors }}</div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ paciente_form.comuna.id_for_label }}">{{ paciente_form.comuna.label }}</label>
+                {{ paciente_form.comuna }}
+                <div class="error">{{ paciente_form.comuna.errors }}</div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ paciente_form.calle.id_for_label }}">{{ paciente_form.calle.label }}</label>
+                {{ paciente_form.calle }}
+                <div class="error">{{ paciente_form.calle.errors }}</div>
+            </div>    
+        </div>
+    </div>
+    <div class="contenedor-botones">
+        <button class="boton-cancelar" id="boton-cancelar">Cancelar</button>
+        <button class="boton-azul" type="submit">Confirmar Cambios</button>
+    </div>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Mostrar el modal si 'success' es verdadero
+    {% if success %}
+    var mensajeExito = document.getElementById("mensaje-exito");
+    mensajeExito.style.display = "block"; // Mostrar el modal
+    {% endif %}
+});
+// Función para cerrar el modal
+function cerrarModal() {
+    var mensajeExito = document.getElementById("mensaje-exito");
+    mensajeExito.style.display = "none"; // Ocultar el modal
+    }
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var regionField = document.getElementById("id_region");
+    var provinciaField = document.getElementById("id_provincia");
+    var comunaField = document.getElementById("id_comuna");
+    
+    regionField.addEventListener("change", function() {
+        var regionId = this.value;
+        provinciaField.innerHTML = ""; // Limpiar opciones anteriores
+        comunaField.innerHTML = ""; // Limpiar opciones anteriores
+        if (regionId) {
+            fetch(`/api/provincias/?region=${regionId}`)
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(provincia => {
+                    var option = document.createElement("option");
+                    option.value = provincia.id;
+                    option.textContent = provincia.nombre;
+                    provinciaField.appendChild(option);
+                });
+            });
+        }
+    });
+    provinciaField.addEventListener("change", function() {
+        var provinciaId = this.value;
+        comunaField.innerHTML = ""; // Limpiar opciones anteriores
+        if (provinciaId) {
+            fetch(`/api/comunas/?provincia=${provinciaId}`)
+            .then(response => response.json())
+            .then(data => {
+                // Actualizar opciones del campo de selección de comuna
+                data.forEach(comuna => {
+                    var option = document.createElement("option");
+                    option.value = comuna.id;
+                    option.textContent = comuna.nombre;
+                    comunaField.appendChild(option);
+                });
+            });
+        }
+    });
+});
+</script>
+<script>
+document.getElementById("boton-cancelar").addEventListener("click", function(){
+    window.location.href = "{% url 'admin_pacientes' %}";
+});
+</script>
+{% block extra_js %}
+<script src="{% static 'js/formatear-rut.js' %}"></script>
+<script src="{% static 'js/formatear-telefono.js' %}"></script>
+
+{% endblock %}
+
 {% endblock %}
