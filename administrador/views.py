@@ -3,8 +3,7 @@ import re
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 from autenticacion.decorators import role_required
-from .forms import CrearTerapeutaForm, HorarioFormSet, CrearPacienteForm
-from .forms_editar import EditarPacienteForm
+from .forms import CrearTerapeutaForm, HorarioFormSet, CrearPacienteForm, EditarPacienteForm
 from autenticacion.models import Provincia, Comuna
 from django.http import JsonResponse
 from terapeuta.models import Paciente, Terapeuta, Cita, Horario
@@ -12,7 +11,7 @@ from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
-from django.urls import reverse
+from django.contrib import messages
 
 # Create your views here.
 @role_required('Administrador')
@@ -276,15 +275,13 @@ def editar_datos_paciente_admin(request, paciente_id, terapeuta=None):
     if request.method == 'POST':
         form = EditarPacienteForm(request.POST, instance=paciente)
         if form.is_valid():
-            form.save()  # Guarda el paciente automáticamente si el formulario es válido
+            form.save()
+            print("Datos guardados exitosamente.")  # Agrega esta línea# Guarda el paciente automáticamente si el formulario es válido
+            messages.success(request,'Datos Guardados Exitosamente')
             return redirect('listar_pacientes_activos')
-        else:
-            print(form.errors)  # Manejo de errores si es necesario
+
     
     else:
-        # Aquí imprimes el valor de la fecha de nacimiento para verificar que se esté cargando correctamente
-        print(paciente.fecha_nacimiento)
-        
         # Pasar la instancia del paciente para rellenar los campos, incluyendo fecha_nacimiento
         form = EditarPacienteForm(instance=paciente)
 
@@ -296,8 +293,6 @@ def editar_datos_paciente_admin(request, paciente_id, terapeuta=None):
         'fecha_cita': fecha_cita,
         'paciente_form': form
     })
-
-
 
 @role_required('Administrador')
 def redirigir_asignar_cita(request, terapeuta_id, paciente_id):
