@@ -314,6 +314,7 @@ def editar_datos_paciente_admin(request, paciente_id, terapeuta=None):
             paciente.alergias = alergias
             
             #datos lado izquierdo
+            print(paciente.fecha_nacimiento)
             paciente.fecha_nacimiento = fecha_nacimiento
             paciente.email = correo    
             paciente.telefono = telefono
@@ -331,7 +332,7 @@ def editar_datos_paciente_admin(request, paciente_id, terapeuta=None):
             print("Error al guardar el paciente:", e)
     
     else:
-        form = CrearPacienteForm(instance=paciente)
+        form = EditarPacienteForm(instance=paciente)
         
     # Renderizar la plantilla
     return render(request, 'editar_datos_paciente_admin.html', {

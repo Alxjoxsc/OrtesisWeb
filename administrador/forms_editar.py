@@ -478,7 +478,7 @@ class EditarPacienteForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class':'campo-formulario', 'placeholder' :'Ingrese la patología del paciente'})
     )
 
-    alergia = forms.CharField(
+    alergias = forms.CharField(
         max_length=255, 
         label='Alergias', 
         required=False,
@@ -507,7 +507,7 @@ class EditarPacienteForm(forms.ModelForm):
         widget=forms.NumberInput(attrs={'class':'campo-formulario', 'placeholder': 'Ej: 70.50'})
     )
 
-    estatura = forms.DecimalField(
+    altura = forms.DecimalField(
         max_digits=4,  # Máximo 4 dígitos en total (ej. 1.75 o 175.0)
         decimal_places=2,  # 2 decimales
         label='Estatura (m)',
@@ -558,47 +558,23 @@ class EditarPacienteForm(forms.ModelForm):
             'historial_medico', 
             'medicamentos', 
             'patologia', 
-            'alergia', 
+            'alergias', 
             'dispositivo_ortesis', 
             'actividad_fisica', 
             'peso', 
-            'estatura', 
-            'region',  # Añadido campo región
-            'provincia',  # Añadido campo provincia
-            'comuna',  # Añadido campo comuna
-            'calle',  # Añadido campo calle
+            'altura', 
+            'region',  
+            'provincia',  
+            'comuna',  
+            'calle',  
         ]
-        
-        def save(self, commit=True):
-            if self.instance.pk:  # Si estamos editando un paciente existente
-                # Actualizar los campos del paciente
-                self.instance.rut = self.cleaned_data['rut']
-                self.instance.first_name = self.cleaned_data['first_name']
-                self.instance.last_name = self.cleaned_data['last_name']
-                self.instance.fecha_nacimiento = self.cleaned_data['fecha_nacimiento']
-                self.instance.sexo = self.cleaned_data['sexo']
-                self.instance.telefono = self.cleaned_data['telefono']
-                self.instance.email = self.cleaned_data['email']
-                self.instance.contacto_emergencia = self.cleaned_data['contacto_emergencia']
-                self.instance.telefono_emergencia = self.cleaned_data['telefono_emergencia']
-                self.instance.historial_medico = self.cleaned_data['historial_medico']
-                self.instance.medicamentos = self.cleaned_data['medicamentos']
-                self.instance.patologia = self.cleaned_data['patologia']
-                self.instance.alergias = self.cleaned_data['alergia']
-                self.instance.dispositivo_ortesis = self.cleaned_data['dispositivo_ortesis']
-                self.instance.actividad_fisica = self.cleaned_data['actividad_fisica']
-                self.instance.peso = self.cleaned_data['peso']
-                self.instance.altura = self.cleaned_data['estatura']
-                self.instance.region = self.cleaned_data['region']
-                self.instance.provincia = self.cleaned_data['provincia']
-                self.instance.comuna = self.cleaned_data['comuna']
-                self.instance.calle = self.cleaned_data['calle']
-                # Otros campos que necesites actualizar...
-                # # Crear o actualizar
-                if commit:
-                    self.instance.save()
 
-                return self.instance
+    def save(self, commit=True):
+        paciente = super().save(commit=False)  # Obtén una instancia del paciente sin guardar
+        # Aquí puedes hacer otras modificaciones a la instancia si es necesario
+        if commit:
+            paciente.save()  # Guarda la instancia en la base de datos
+        return paciente
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -661,12 +637,12 @@ class EditarPacienteForm(forms.ModelForm):
             return Decimal(str(peso).replace(',', '.'))
         return peso
 
-    def clean_estatura(self):
-        estatura = self.cleaned_data.get('estatura')
-        print(f'Estatura original: {estatura}')
-        if estatura is not None:
-            return Decimal(str(estatura).replace(',', '.'))
-        return estatura
+    def clean_altura(self):
+        altura = self.cleaned_data.get('altura')
+        print(f'Estatura original: {altura}')
+        if altura is not None:
+            return Decimal(str(altura).replace(',', '.'))
+        return altura
     
         
     def clean_first_name(self):

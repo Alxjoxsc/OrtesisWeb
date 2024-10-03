@@ -479,7 +479,7 @@ class CrearPacienteForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class':'campo-formulario', 'placeholder' :'Ingrese la patología del paciente'})
     )
 
-    alergia = forms.CharField(
+    alergias = forms.CharField(
         max_length=255, 
         label='Alergias', 
         required=False,
@@ -508,7 +508,7 @@ class CrearPacienteForm(forms.ModelForm):
         widget=forms.NumberInput(attrs={'class':'campo-formulario', 'placeholder': 'Ej: 70.50'})
     )
 
-    estatura = forms.DecimalField(
+    altura = forms.DecimalField(
         max_digits=4,  # Máximo 4 dígitos en total (ej. 1.75 o 175.0)
         decimal_places=2,  # 2 decimales
         label='Estatura (m)',
@@ -559,11 +559,11 @@ class CrearPacienteForm(forms.ModelForm):
             'historial_medico', 
             'medicamentos', 
             'patologia', 
-            'alergia', 
+            'alergias', 
             'dispositivo_ortesis', 
             'actividad_fisica', 
             'peso', 
-            'estatura', 
+            'altura', 
             'region',  # Añadido campo región
             'provincia',  # Añadido campo provincia
             'comuna',  # Añadido campo comuna
@@ -584,11 +584,11 @@ class CrearPacienteForm(forms.ModelForm):
             historial_medico=self.cleaned_data['historial_medico'],
             medicamentos=self.cleaned_data['medicamentos'],
             patologia=self.cleaned_data['patologia'],
-            alergias=self.cleaned_data['alergia'],
+            alergias=self.cleaned_data['alergias'],
             dispositivo_ortesis=self.cleaned_data['dispositivo_ortesis'],
             actividad_fisica=self.cleaned_data['actividad_fisica'],
             peso=self.cleaned_data['peso'],
-            altura=self.cleaned_data['estatura'],
+            altura=self.cleaned_data['altura'],
             region=self.cleaned_data['region'],
             provincia=self.cleaned_data['provincia'],
             comuna=self.cleaned_data['comuna'],
@@ -665,12 +665,12 @@ class CrearPacienteForm(forms.ModelForm):
             return Decimal(str(peso).replace(',', '.'))
         return peso
 
-    def clean_estatura(self):
-        estatura = self.cleaned_data.get('estatura')
-        print(f'Estatura original: {estatura}')
-        if estatura is not None:
-            return Decimal(str(estatura).replace(',', '.'))
-        return estatura
+    def clean_altura(self):
+        altura = self.cleaned_data.get('altura')
+        print(f'Estatura original: {altura}')
+        if altura is not None:
+            return Decimal(str(altura).replace(',', '.'))
+        return altura
     
         
     def clean_first_name(self):
