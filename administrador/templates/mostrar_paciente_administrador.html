@@ -4,62 +4,69 @@
 
 <link rel="stylesheet" type="text/css" href="{% static 'styles/mostrar_paciente.css' %}">
 
-<div class="container-paciente">
-    <div class="back-arrow" onclick="window.location.href='{% url 'listar_pacientes_activos' %}';">
-        &#8592; Regresar
-    </div>
+<header>
+<a href="{% url 'admin_pacientes' %}">
+    <img src="{% static 'icons/Volver-atras.svg' %}" alt="">
+</a>
+<h1>Información Paciente</h1>
+</header>
 
-    <h1>Información Paciente</h1>
+<div class="container-paciente">
     
     <div class="card-paciente">
-        <div class="datos-paciente">
-            <div class="columna">
-                <p><strong>Nombre:</strong> {{ paciente.first_name }} {{ paciente.last_name }}</p>
-                <p><strong>Rut:</strong> {{ paciente.rut }}</p>
-                <p><strong>Estado:</strong> 
-                    {% if paciente.is_active %}
-                        Activo <span class="estado-activo"></span>
-                    {% else %}
-                        Inactivo
-                    {% endif %}
-                </p>
-                <p><strong>Edad:</strong> {{ edad }}</p>
-                <p><strong>Sexo:</strong> {{ paciente.sexo }}</p>
-                <p><strong>Número de teléfono:</strong> {{ paciente.telefono }}</p>
-                <p><strong>Correo Electrónico:</strong> {{ paciente.email }}</p>
-                <p><strong>Patología:</strong> {{ paciente.patologia }}</p>
-                <p><strong>Dirección:</strong> {{ paciente.calle }}, {{ paciente.comuna}}, {{ paciente.provincia}}, {{ paciente.region}}</p>
-                <p><strong>Peso:</strong> {{ paciente.peso|default:"Sin peso ingresado" }}</p>
-                <p><strong>Altura:</strong> {{ paciente.altura|default:"Sin altura ingresada" }}</p>
-                <p><strong>IMC:</strong> {{ imc|default:"Sin IMC ingresado" }}</p>
-                <p><strong>Historial médico:</strong> {{ paciente.historial_medico|default:"Sin historial médico" }}</p>
-                <p><strong>Medicamentos:</strong> {{ paciente.medicamentos|default:"Sin medicamentos ingresados" }}</p>
-                <p><strong>Alergias:</strong> {{ paciente.alergias|default:"Sin alergias" }}</p>
-                <p><strong>Progreso:</strong> {{ paciente.progreso|default:"Sin progreso ingresado" }}</p>
-                {% if not paciente.is_active %}
-                    <p><strong>Motivo de desvinculación:</strong> {{ paciente.motivo_desvinculacion|default:"Sin motivo de desvinculación ingresado" }}</p>
+        <div class="columna izquierda">
+            <p><strong>Nombre:</strong><br> <span>{{ paciente.first_name }} {{ paciente.last_name }}</span></p>
+            <p><strong>Sexo:</strong><br> <span>{{ paciente.sexo }}</span></p>
+            <p><strong>Peso:</strong><br> <span>{{ paciente.peso|default:"Sin peso ingresado" }}</span></p>
+            <p><strong>IMC:</strong><br> <span>{{ imc|default:"Sin IMC ingresado" }}</span></p>
+            <p><strong>Medicamentos:</strong><br> <span>{{ paciente.medicamentos|default:"Sin medicamentos ingresados" }}</span></p>
+            <p><strong>Estado:</strong><br> <span>
+                {% if paciente.is_active %}
+                    Activo <span class="estado-activo"></span>
+                {% else %}
+                    Inactivo
                 {% endif %}
-                <p><strong>Dispositivo Órtesis:</strong> {{ paciente.dispositivo_ortesis|default:"Sin dispositivo de órtesis ingresado" }}</p>
-                <p><strong>Actividad física:</strong> {{ paciente.actividad_fisica|default:"Sin actividad física ingresada" }}</p>
-                <p><strong>Próxima Cita:</strong> 
-                    {% if cita %}
-                        {{ cita.fecha }}
-                    {% else %}
-                        Sin cita asignada
-                    {% endif %}
-                </p>                
-                <p><strong>Terapeuta a Cargo:</strong> {{ paciente.terapeuta.user.first_name }} {{ paciente.terapeuta.user.last_name|default:"Sin terapeuta asignado" }}</p>
-            </div>
-        </div>
-        
-        <div class="footer-card">
-            <button class="btn" onclick="window.location.href='{% url 'elegir_terapeuta_administrador' paciente.id %}'">Asignar Terapeuta</button>
+            </span>
+            </p>
+            <p><strong>Número de teléfono:</strong><br> <span>{{ paciente.telefono }}</span></p>
+            <p><strong>Patología:</strong><br> <span>{{ paciente.patologia }}</span></p>
+            <p><strong>Dispositivo Órtesis:</strong> {{ paciente.dispositivo_ortesis|default:"Sin dispositivo de órtesis ingresado" }}</p>
+            <p><strong>Próxima Cita:</strong> 
+                {% if cita %}
+                    {{ cita.fecha }}
+                {% else %}
+                    Sin cita asignada
+                {% endif %}
+            </p>
             {% if paciente.terapeuta_id %}
-                <button class="btn" onclick="window.location.href='{% url 'calendar_asignar_paciente_administrador' paciente.id paciente.terapeuta_id %}'">Asignar Cita</button>
+            <button class="btn" onclick="window.location.href='{% url 'calendar_asignar_paciente_administrador' paciente.id paciente.terapeuta_id %}'">Asignar Cita</button>
             {% else %}
                 <button class="btn" disabled title="No se puede asignar cita sin terapeuta">Asignar Cita</button>
+            {% endif %} 
+
+        </div>
+        <div class="columna derecha">
+            <p><strong>Rut:</strong><br> <span>{{ paciente.rut }}</span></p>
+            <p><strong>Edad:</strong><br> <span>{{ edad }}</span></p>
+            <p><strong>Altura:</strong><br> <span>{{ paciente.altura|default:"Sin altura ingresada" }}</span></p>
+            <p><strong>Historial médico:</strong><br> <span>{{ paciente.historial_medico|default:"Sin historial médico" }}</span></p>
+            <p><strong>Alergias:</strong><br> <span>{{ paciente.alergias|default:"Sin alergias" }}</span></p>
+            <p><strong>Correo Electrónico:</strong><br> <span>{{ paciente.email }}</span></p>
+            <!--<p><strong>Dirección:</strong><br> <span>{{ paciente.calle }}, {{ paciente.comuna }}, {{ paciente.provincia }}, {{ paciente.region }}</span></p>-->
+            <p><strong>Progreso:</strong><br> <span>{{ paciente.progreso|default:"Sin progreso ingresado" }}</span></p>
+            <p><strong>Actividad física:</strong> {{ paciente.actividad_fisica|default:"Sin actividad física ingresada" }}</p>
+            <p><strong>Terapeuta a Cargo:</strong><br>
+                <span class="terapeuta-info">{{ paciente.terapeuta.user.first_name }} {{ paciente.terapeuta.user.last_name|default:"Sin terapeuta asignado" }}</span>
+                <button class="btn" onclick="window.location.href='{% url 'elegir_terapeuta_administrador' paciente.id %}'">Asignar Terapeuta</button>
+            </p>
+            {% if not paciente.is_active %}
+                <p><strong>Motivo de desvinculación:</strong> {{ paciente.motivo_desvinculacion|default:"Sin motivo de desvinculación ingresado" }}</p>
             {% endif %}
-            <button class="btn" onclick="window.location.href='{% url 'editar_datos_paciente_admin' paciente.id %}'">Editar Datos</button>
+        </div>
+    </div>
+    
+        
+        <div class="footer-card">
         </div>
     </div>
 </div>

@@ -1,90 +1,94 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+.header {
+    display: flex;
+    width: 50%;
+    flex-flow: column nowrap;
+    align-items: flex-start; 
+}
+
+h1{
+    font-weight: normal;
+    font-size: 3rem;
+}
+
+h2{
+    font-weight: normal;
+    width: 18.75rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 0.125rem solid #000;
+    align-self: center;
+    text-align: center;
 }
 
 .container-paciente {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #fff;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    overflow: auto; /* Para permitir scrollbar si es necesario */
+    width: 80%; /* Cambia a un tamaño más pequeño, por ejemplo, 80% */
+    min-width: 1000px; /* Opcional: establece un ancho máximo */
+    padding: 0.8rem;
+    margin: 0.3125rem auto; /* Margen automático en los lados para centrar */
+    box-sizing: border-box;
+    background-color: #001058;
+    border-radius: 0.4rem; /* Descomenta si quieres bordes redondeados */
 }
 
-.back-arrow {
-    cursor: pointer;
-    color: #001058;
-    font-size: 18px;
-    margin-bottom: 20px;
-}
-
-h1 {
-    text-align: center;
-    color: #333;
-}
 
 .card-paciente {
     display: flex;
-    flex-direction: column;
-    padding: 20px;
-}
-
-.datos-paciente {
-    margin-bottom: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 15px;
-    background-color: #fafafa;
+    justify-content: center; /* Centra el contenido si es necesario */
+    color: white;
+    display: flex;
+    width: 100%;
 }
 
 .columna {
-    display: flex;
-    flex-direction: column;
+    width: 50%; /* Cada columna toma la mitad del ancho */
+    padding: 10px;
+}
+
+.columna p {
+    margin-bottom: 30px; /* Espacio entre los elementos */
+    padding: 5px; /* Espaciado interno del texto en cada párrafo */
+    font-size: 24px;
+    font-family: 'Jost', sans-serif;
+    
+}
+
+p strong{
+    font-weight: normal;
+}
+
+p span{
+    font-weight: normal;
 }
 
 strong {
-    color: #555;
+    display: inline-block;
+    margin-bottom: 10px; /* Agrega un espacio entre el nombre del elemento y el resultado */
 }
 
-.estado-activo {
-    color: green; /* Color para el estado activo */
-    font-weight: bold;
-    margin-left: 5px;
+.izquierda {
+    text-align: left; /* Alineación a la izquierda, si es necesario */
 }
 
-.footer-card {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
+.derecha {
+    text-align: left; /* Alineación a la derecha */
 }
 
 .btn {
-    padding: 10px 15px;
-    background-color: #001058;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+    background-color: white;
+    color: #001058;
+    padding: 10px 20px; /* Espaciado interno (vertical y horizontal) */
+    border: none; /* Sin borde */
+    border-radius: 5px; /* Bordes redondeados */
+    font-size: 16px; /* Tamaño de la fuente */
+    cursor: pointer; /* Cambia el cursor a un puntero */
+    transition: background-color 0.3s ease; /* Transición suave para el cambio de color */
 }
 
 .btn:hover {
-    background-color: #0056b3;
+    background-color: rgb(36, 0, 179); /* Color de fondo al pasar el mouse */
 }
 
-@media (max-width: 600px) {
-    .container-paciente {
-        padding: 10px;
-    }
-    
-    .btn {
-        width: 100%;
-        margin-top: 10px;
-    }
-}
-.btn:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
+.terapeuta-info {
+    margin-right: 10px; /* Espacio entre el texto y el botón */
+    display: flex; /* Activa flexbox para el párrafo */
+    align-items: center; /* Alinea verticalmente los elementos al centro */
 }
