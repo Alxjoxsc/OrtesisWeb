@@ -115,9 +115,9 @@
             <!-- Campo Fecha de Nacimiento -->
             <div class="form-group">
                 <label for="{{ paciente_form.fecha_nacimiento.id_for_label }}">{{ paciente_form.fecha_nacimiento.label }}</label>
-                {{ paciente_form.fecha_nacimiento }}
+                <input type="date" id="{{ paciente_form.fecha_nacimiento.id_for_label }}" name="fecha_nacimiento" value="{{ paciente_form.fecha_nacimiento.value|date:'Y-m-d' }}">
                 <div class="error">{{ paciente_form.fecha_nacimiento.errors }}</div>
-            </div>
+            </div>         
             <!-- Campo Email -->
             <div class="form-group">
                 <label for="{{ paciente_form.email.id_for_label }}">{{ paciente_form.email.label }}</label>

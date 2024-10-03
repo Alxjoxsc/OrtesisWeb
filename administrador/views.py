@@ -219,6 +219,7 @@ def agendar_cita_administrador(request):
         hora = request.POST['hora']
         sala = request.POST['sala']
         detalle = request.POST['detalle']
+        
     
         terapeuta_instance = Terapeuta.objects.get(id=terapeuta_id)
         
@@ -270,78 +271,33 @@ def editar_datos_paciente_admin(request, paciente_id, terapeuta=None):
 
     # Obtener la última cita del paciente
     ultima_cita = Cita.objects.filter(paciente=paciente).order_by('-fecha', '-hora').first()
-    fecha_cita = ultima_cita.fecha if ultima_cita else None  # Obtener la fecha de la última cita
+    fecha_cita = ultima_cita.fecha if ultima_cita else None
     
     if request.method == 'POST':
-        
-        # Obtener datos del formulario lado derecho
-        rut = request.POST.get('rut')
-        nombres = request.POST.get('nombres')
-        apellidos = request.POST.get('apellidos')
-        patologia = request.POST.get('patologia')
-        sexo = request.POST.get('sexo')
-        peso = request.POST.get('peso')
-        altura = request.POST.get('altura')
-        historial_medico = request.POST.get('historial_medico')
-        medicamentos = request.POST.get('medicamentos')
-        alergias = request.POST.get('alergias')
-        
-        # Obtener datos del formulario lado izquierdo
-        fecha_nacimiento = request.POST.get('fecha_nacimiento')
-        correo = request.POST.get('correo')
-        telefono = request.POST.get('telefono')
-        contacto_emergencia = request.POST.get('contacto_emergencia')
-        telefono_emergencia = request.POST.get('telefono_emergencia')
-        region = request.POST.get('region')
-        provincia = request.POST.get('provincia')
-        comuna = request.POST.get('comuna')
-        calle = request.POST.get('calle') 
         form = EditarPacienteForm(request.POST, instance=paciente)
-        
-        try:
-            # Si la validación es exitosa, guardar los cambios
-            
-            #datos lado derecho
-            paciente.rut = rut
-            paciente.first_name = nombres
-            paciente.last_name = apellidos
-            paciente.patologia = patologia
-            paciente.sexo = sexo
-            paciente.peso = peso
-            paciente.altura = altura
-            paciente.historial_medico = historial_medico
-            paciente.medicamentos = medicamentos
-            paciente.alergias = alergias
-            
-            #datos lado izquierdo
-            print(paciente.fecha_nacimiento)
-            paciente.fecha_nacimiento = fecha_nacimiento
-            paciente.email = correo    
-            paciente.telefono = telefono
-            paciente.contacto_emergencia = contacto_emergencia
-            paciente.telefono_emergencia = telefono_emergencia
-            paciente.region = region
-            paciente.provincia = provincia
-            paciente.comuna = comuna
-            paciente.calle = calle
-
-        except ValidationError as ve:
-            pass
-
-        except Exception as e:
-            print("Error al guardar el paciente:", e)
+        if form.is_valid():
+            form.save()  # Guarda el paciente automáticamente si el formulario es válido
+            return redirect('listar_pacientes_activos')
+        else:
+            print(form.errors)  # Manejo de errores si es necesario
     
     else:
-        form = EditarPacienteForm(instance=paciente)
+        # Aquí imprimes el valor de la fecha de nacimiento para verificar que se esté cargando correctamente
+        print(paciente.fecha_nacimiento)
         
+        # Pasar la instancia del paciente para rellenar los campos, incluyendo fecha_nacimiento
+        form = EditarPacienteForm(instance=paciente)
+
     # Renderizar la plantilla
     return render(request, 'editar_datos_paciente_admin.html', {
         'paciente': paciente,
-        'terapeutas': terapeutas,  # Pasar la lista de terapeutas a la plantilla
-        'terapeuta_asignado': paciente.terapeuta.id if paciente.terapeuta else None,  # Terapeuta actual
-        'fecha_cita': fecha_cita,  # Pasar la fecha de la última cita al contexto
+        'terapeutas': terapeutas,
+        'terapeuta_asignado': paciente.terapeuta.id if paciente.terapeuta else None,
+        'fecha_cita': fecha_cita,
         'paciente_form': form
     })
+
+
 
 @role_required('Administrador')
 def redirigir_asignar_cita(request, terapeuta_id, paciente_id):

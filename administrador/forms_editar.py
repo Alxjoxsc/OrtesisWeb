@@ -13,7 +13,6 @@ from datetime import date
 from django.conf import settings
 from terapeuta.models import Paciente
 from decimal import Decimal
-
 def is_valid_email(text):
         pattern = r'^[a-z][a-z0-9\-\.]+@[a-z]+\.[a-z]{1,3}$'
 
