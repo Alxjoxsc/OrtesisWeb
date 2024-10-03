@@ -8,14 +8,14 @@
 <a href="{% url 'admin_pacientes' %}">
     <img src="{% static 'icons/Volver-atras.svg' %}" alt="">
 </a>
-<h1>Información Paciente</h1>
+<h1>Información Paciente {{paciente.first_name}} {{paciente.last_name}}</h1>
 </header>
 
 <div class="container-paciente">
     
     <div class="card-paciente">
         <div class="columna izquierda">
-            <p><strong>Nombre:</strong><br> <span>{{ paciente.first_name }} {{ paciente.last_name }}</span></p>
+            <p><strong>Rut:</strong><br> <span>{{ paciente.rut }}</span></p>
             <p><strong>Sexo:</strong><br> <span>{{ paciente.sexo }}</span></p>
             <p><strong>Peso:</strong><br> <span>{{ paciente.peso|default:"Sin peso ingresado" }}</span></p>
             <p><strong>IMC:</strong><br> <span>{{ imc|default:"Sin IMC ingresado" }}</span></p>
@@ -46,7 +46,6 @@
 
         </div>
         <div class="columna derecha">
-            <p><strong>Rut:</strong><br> <span>{{ paciente.rut }}</span></p>
             <p><strong>Edad:</strong><br> <span>{{ edad }}</span></p>
             <p><strong>Altura:</strong><br> <span>{{ paciente.altura|default:"Sin altura ingresada" }}</span></p>
             <p><strong>Historial médico:</strong><br> <span>{{ paciente.historial_medico|default:"Sin historial médico" }}</span></p>
