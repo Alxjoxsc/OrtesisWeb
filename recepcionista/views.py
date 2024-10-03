@@ -1,3 +1,5 @@
+import json
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from terapeuta.models import Terapeuta, Paciente, Cita
 from autenticacion.models import Profile
@@ -32,10 +34,12 @@ def calcular_edad(fecha_nacimiento):
     hoy = date.today()
     return hoy.year - fecha_nacimiento.year - ((hoy.month, hoy.day) < (fecha_nacimiento.month, fecha_nacimiento.day))
 
+###################################     PACIENTES     ###################################
+
 @role_required('Recepcionista')
 def recepcionista_pacientes_activos(request):
     query = request.GET.get('search')
-    pacientes_list = Paciente.objects.all()
+    pacientes_list = Paciente.objects.filter(is_active=True)
 
     # Si hay un parámetro de búsqueda, filtrar los pacientes
     if query:
@@ -45,18 +49,64 @@ def recepcionista_pacientes_activos(request):
             Q(rut__icontains=query) |
             Q(patologia__icontains=query)
         )
+
     # Calcular la edad de cada paciente
     for paciente in pacientes_list:
         paciente.edad = calcular_edad(paciente.fecha_nacimiento)
 
-    total_pacientes = pacientes_list.count() 
+    total_pacientes = pacientes_list.count()
 
     paginator = Paginator(pacientes_list, 15)
     page_number = request.GET.get('page') 
-    pacientes = paginator.get_page(page_number) 
+    pacientes = paginator.get_page(page_number)
 
     # Renderizar el template con los pacientes y la información de paginación
-    return render(request, 'recepcionista_pacientes_activos.html', {'pacientes': pacientes, 'total_pacientes': total_pacientes})
+    return render(request, 'recepcionista_pacientes.html', {'pacientes': pacientes, 'total_pacientes': total_pacientes, 'estado': 'activos'})
+
+@role_required('Recepcionista')
+def recepcionista_pacientes_inactivos(request):
+    query = request.GET.get('search')
+    pacientes_list = Paciente.objects.filter(is_active=False)
+
+    # Si hay un parámetro de búsqueda, filtrar los pacientes
+    if query:
+        pacientes_list = pacientes_list.filter(
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query) |
+            Q(rut__icontains=query) |
+            Q(patologia__icontains=query)
+        )
+
+    # Calcular la edad de cada paciente
+    for paciente in pacientes_list:
+        paciente.edad = calcular_edad(paciente.fecha_nacimiento)
+
+    total_pacientes = pacientes_list.count()
+
+    paginator = Paginator(pacientes_list, 15)
+    page_number = request.GET.get('page') 
+    pacientes = paginator.get_page(page_number)
+
+    # Renderizar el template con los pacientes y la información de paginación
+    return render(request, 'recepcionista_pacientes.html', {'pacientes': pacientes, 'total_pacientes': total_pacientes, 'estado': 'inactivos'})
+
+
+@role_required('Recepcionista')
+def recepcionista_cambiar_estado_inactivo(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        pacientes_ids = data.get('pacientes_ids', [])
+        Paciente.objects.filter(id__in=pacientes_ids).update(is_active=False)
+        return JsonResponse({'status': 'success'})
+
+@role_required('Recepcionista')
+def recepcionista_restaurar_paciente(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        pacientes_ids = data.get('pacientes_ids', [])
+        Paciente.objects.filter(id__in=pacientes_ids).update(is_active=True)
+        return JsonResponse({'status': 'success'})
+
 
 @role_required('Recepcionista')
 def agregar_paciente(request):
