@@ -4,9 +4,8 @@
 
 {% block title %}Editar Paciente{% endblock %}
 
-{% block extra_head%}
+{% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/editar_datos_paciente_admin.css' %}">
-<link rel="stylesheet" href="{% static 'styles/modal.css' %}">
 {% endblock %}
 
 {% block header %}
@@ -17,14 +16,6 @@
 {% endblock %}
 
 {% block content %}
-<!-- Contenedor para el mensaje de éxito -->
-<div id="mensaje-exito" class="modal">
-    <div class="contenido-modal-exito">
-        <img src="{% static 'icons/Exito.svg' %}" alt="Éxito">
-        <p>¡paciente agregado con éxito!</p>
-        <button class="boton-continuar" onclick="cerrarModal()">Continuar</button>
-    </div>
-</div>
 
 <form method="POST" action="{% url 'editar_datos_paciente_admin' paciente.id %}" onsubmit="return mostrarMensajeExito()">
     {% csrf_token %}
@@ -34,7 +25,6 @@
     {% comment %} DATOS DEL paciente COLUMNA IZQUIERDA {% endcomment %}
     <div class="divisor-formulario">
         <div class="datos-columna-izquierda">
-            
             <!-- Campo RUT -->
             <div class="form-group">
                 <label for="{{ paciente_form.rut.id_for_label }}">{{ paciente_form.rut.label }}</label>
@@ -169,6 +159,7 @@
                 {{ paciente_form.calle }}
                 <div class="error">{{ paciente_form.calle.errors }}</div>
             </div>
+
             <div class="form-group">
                 <label for="terapeuta">Terapeuta Asignado (*)</label>
                 <div class="input-container">
@@ -179,77 +170,61 @@
         </div>
     </div>
     <div class="contenedor-botones">
-        <button class="boton-cancelar" id="boton-cancelar">Cancelar</button>
+        <button type="button" class="boton-cancelar" id="boton-cancelar">Cancelar</button>
         <button class="boton-azul" type="submit">Confirmar Cambios</button>
     </div>
 </form>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Mostrar el modal si 'success' es verdadero
-    {% if success %}
-    var mensajeExito = document.getElementById("mensaje-exito");
-    mensajeExito.style.display = "block"; // Mostrar el modal
-    {% endif %}
-});
-// Función para cerrar el modal
-function cerrarModal() {
-    var mensajeExito = document.getElementById("mensaje-exito");
-    mensajeExito.style.display = "none"; // Ocultar el modal
+    function mostrarMensajeExito() {
+        alert('¡Cambios Guardados Exitosamente!');
+        return true; // Permitir que el formulario se envíe
     }
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    var regionField = document.getElementById("id_region");
-    var provinciaField = document.getElementById("id_provincia");
-    var comunaField = document.getElementById("id_comuna");
     
-    regionField.addEventListener("change", function() {
-        var regionId = this.value;
-        provinciaField.innerHTML = ""; // Limpiar opciones anteriores
-        comunaField.innerHTML = ""; // Limpiar opciones anteriores
-        if (regionId) {
-            fetch(`/api/provincias/?region=${regionId}`)
-            .then(response => response.json())
-            .then(data => {
-                data.forEach(provincia => {
-                    var option = document.createElement("option");
-                    option.value = provincia.id;
-                    option.textContent = provincia.nombre;
-                    provinciaField.appendChild(option);
-                });
-            });
-        }
+    document.getElementById("boton-cancelar").addEventListener("click", function(){
+        window.location.href = "{% url 'admin_pacientes' %}";
     });
-    provinciaField.addEventListener("change", function() {
-        var provinciaId = this.value;
-        comunaField.innerHTML = ""; // Limpiar opciones anteriores
-        if (provinciaId) {
-            fetch(`/api/comunas/?provincia=${provinciaId}`)
-            .then(response => response.json())
-            .then(data => {
-                // Actualizar opciones del campo de selección de comuna
-                data.forEach(comuna => {
-                    var option = document.createElement("option");
-                    option.value = comuna.id;
-                    option.textContent = comuna.nombre;
-                    comunaField.appendChild(option);
+
+    document.addEventListener("DOMContentLoaded", function() {
+        var regionField = document.getElementById("id_region");
+        var provinciaField = document.getElementById("id_provincia");
+        var comunaField = document.getElementById("id_comuna");
+        
+        regionField.addEventListener("change", function() {
+            var regionId = this.value;
+            provinciaField.innerHTML = ""; // Limpiar opciones anteriores
+            comunaField.innerHTML = ""; // Limpiar opciones anteriores
+            if (regionId) {
+                fetch(`/api/provincias/?region=${regionId}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(provincia => {
+                        var option = document.createElement("option");
+                        option.value = provincia.id;
+                        option.textContent = provincia.nombre;
+                        provinciaField.appendChild(option);
+                    });
                 });
-            });
-        }
+            }
+        });
+        provinciaField.addEventListener("change", function() {
+            var provinciaId = this.value;
+            comunaField.innerHTML = ""; // Limpiar opciones anteriores
+            if (provinciaId) {
+                fetch(`/api/comunas/?provincia=${provinciaId}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(comuna => {
+                        var option = document.createElement("option");
+                        option.value = comuna.id;
+                        option.textContent = comuna.nombre;
+                        comunaField.appendChild(option);
+                    });
+                });
+            }
+        });
     });
-});
 </script>
-<script>
-document.getElementById("boton-cancelar").addEventListener("click", function(){
-    window.location.href = "{% url 'admin_pacientes' %}";
-});
-</script>
-{% block extra_js %}
 <script src="{% static 'js/formatear-rut.js' %}"></script>
 <script src="{% static 'js/formatear-telefono.js' %}"></script>
-
-{% endblock %}
-
 {% endblock %}

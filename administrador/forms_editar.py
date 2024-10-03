@@ -399,7 +399,7 @@ class EditarPacienteForm(forms.ModelForm):
         max_length=12,
         label='Rut (*)', 
         required=True,
-        widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': Paciente.rut})
+        widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ej: XX.XXX.XXX-X'})
     )
 
     first_name = forms.CharField(
