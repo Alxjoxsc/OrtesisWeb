@@ -1,7 +1,7 @@
-{% extends 'administrador_base.html' %}
+{% extends 'recepcionista_base.html' %}
 {% load static %}
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/listar_pacientes_administrador.css' %}">
+<link rel="stylesheet" href="{% static 'css/listar_pacientes_recepcionista.css' %}">
 <link rel="stylesheet" href="{% static 'css/tabla.css' %}">
 <link rel="stylesheet" href="{% static 'styles/modal.css' %}">
 {% endblock %}
@@ -11,14 +11,19 @@
 {% block header %}
 <div class="contenedor-header">
     <h1>Pacientes</h1>
-
-    <form class="busqueda-form">
-        <div class="busqueda-input">
-            <input type="text" class="form-control" id="searchInput" placeholder="Búsqueda por Nombre o Rut" aria-label="Buscar Paciente">
-        </div>
+    <form method="GET" action="{% url 'recepcionista_pacientes_activos' %}" class="pacientes-busqueda-form">
+        <input type="text" name="search" placeholder="Búsqueda por Nombre, Rut o Tratamiento" class="pacientes-search-input" id="searchBar" value="{{ request.GET.search|default:'' }}" oninput="toggleClearButton()">
+        <img src="{% static 'icons/Lupa.svg' %}" alt="Buscar" class="pacientes-search-icon">
+        <button type="button" id="clearButton" class="pacientes-clear-button" onclick="clearSearch()" style="display: {% if request.GET.search %}inline-block{% else %}none{% endif %};">
+            Limpiar Filtro
+        </button>
     </form>
 </div>
-<button id="boton-agregar-paciente">Agregar Paciente<img src="{% static 'icons/plus.svg' %}"></button>
+<div class="pacientes-agregar-paciente">
+    <a href="{% url 'agregar_paciente' %}" class="pacientes-agregar-paciente-btn">
+        Agregar Paciente<img src="{% static 'icons/plus.svg' %}">
+    </a>
+</div>
 {% endblock %}
 
 {% block content %}
@@ -26,8 +31,8 @@
 <div class="contenedor-superior">
 
     <div class="filtros">
-        <a href="{% url 'listar_pacientes_activos' %}" class="btn-{% if estado == 'activos' %}active{% endif %}" type="button">Activos</a>
-        <a href="{% url 'listar_pacientes_inactivos' %}" class="btn-{% if estado == 'inactivos' %}active{% endif %}" type="button">Inactivos</a>
+        <a href="{% url 'recepcionista_pacientes_activos' %}" class="btn-{% if estado == 'activos' %}active{% endif %}" type="button">Activos</a>
+        <a href="{% url 'recepcionista_pacientes_inactivos' %}" class="btn-{% if estado == 'inactivos' %}active{% endif %}" type="button">Inactivos</a>
     </div>
 
     <div class="seleccion-estados">
@@ -112,12 +117,6 @@
 {% endblock %}
 
 {% block extra_js %}
-
-<script>
-    document.getElementById("boton-agregar-paciente").addEventListener("click", function(){
-        window.location.href = "{% url 'agregar_paciente_admin' %}";
-    });
-</script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
