@@ -13,13 +13,6 @@ body {
     overflow: auto; /* Para permitir scrollbar si es necesario */
 }
 
-.back-arrow {
-    cursor: pointer;
-    color: #001058;
-    font-size: 18px;
-    margin-bottom: 20px;
-}
-
 h1 {
     text-align: center;
     color: #333;
@@ -87,4 +80,32 @@ strong {
 .btn:disabled {
     background-color: #ccc;
     cursor: not-allowed;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+}
+
+.back-arrow {
+    cursor: pointer;
+    color: #001058;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.edit-icon {
+    cursor: pointer;
+    color: white;
+    font-size: 18px;
+    margin-bottom: 20px;
+    background-color: #001058;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
 }

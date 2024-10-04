@@ -1,0 +1,257 @@
+.main-content {
+    margin: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.header{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+.contenedor-header {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 20px;
+    width: 100%;
+}
+
+.contenedor-header h1 {
+    font-size: 48px;
+    color: black;
+    font-weight: 500;
+}
+
+/* Formulario de búsqueda */
+.busqueda-form {
+    display: flex;
+    align-items: center;
+}
+
+.busqueda-input {
+    width: 100%;
+    position: relative;
+}
+
+/* Ajustar el tamaño y color de la barra de búsqueda */
+.busqueda-input input[type="text"] {
+    width: 400px;
+    height: 35px;
+    border: 2px solid #d9d9d9;
+    border-radius: 0px;
+    padding: 5px 10px;
+    outline: none;
+    color: black;
+    background-color: #f9f9f9;
+    font-size: 16px;
+}
+
+#boton-agregar-paciente {
+    background-color: #001058;
+    color: #fff;
+    border: none;
+    padding: 3px 20px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 500;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-wrap: nowrap;
+}
+
+#boton-agregar-paciente img {
+    width: 34px;
+    height: 34px;
+}
+
+#boton-agregar-paciente:hover {
+    background-color: #002080; /* Un color ligeramente más claro para el hover */
+}
+
+.contenedor-superior{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 0 10px 0 10px;
+}
+
+/* Botón de filtro */
+.filtro-btn {
+    background-color: #001058;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Estilo para los filtros de Activos/Inactivos */
+.filtros {
+    display: flex;
+    gap: 10px;
+}
+
+.filtros a{
+    text-decoration: none;
+    font-weight: 400;
+    padding: 5px 10px 5px 10px;
+    color: white;
+    border-radius: 5px;
+    background-color: rgba(55, 61, 88, 0.5);
+}
+
+.filtros .btn-active {
+    background-color: #001058;
+}
+
+.filtros .btn-inactive {
+    background-color: rgba(55, 61, 88, 0.5);
+}
+
+.filtros .btn-active:hover {
+    background-color: #002080;
+}
+
+.filtros a:hover {
+    background-color: rgba(55, 61, 88, 0.7);
+}
+
+#inactivar-btn:enabled, #restaurar-btn:enabled {
+    background-color: #001058;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#inactivar-btn:enabled:hover, #restaurar-btn:enabled:hover {
+    background-color: #002080;
+}
+
+#inactivar-btn:disabled, #restaurar-btn:disabled {
+    background-color: #cccccc;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 15px;
+    cursor: not-allowed;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.final-tabla {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: row;
+}
+
+.final-tabla a img{
+    width: 50px;
+    height: 50px;
+}
+/* Botones de acciones en la tabla */
+.table .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 17px;
+    cursor: pointer;
+}
+
+/* Mensaje para cuando no hay pacientes */
+.table-empty {
+    text-align: center;
+    padding: 20px;
+    color: #999;
+}
+
+.contenido-modal {
+    display: flex;
+    padding: 20px;
+    background-color: #fefefe;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 0.625rem;
+    width: 34.375rem;
+    height: 15.625rem;
+    margin: auto; /* Centrar horizontalmente */
+    position: absolute; /* Centrar verticalmente */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.botones-modal {
+    display: flex;
+    gap: 1.25rem;
+    margin-top: 1.25rem;
+}
+
+.boton-cancelar {
+    background-color: #FF6161;
+    color: white;
+    padding: 0.625rem 1.875rem;
+    border: none;
+    border-radius: 3.125rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.boton-confirmar {
+    background-color: #006A60;
+    color: white;
+    padding: 0.625rem 1.875rem;
+    border: none;
+    border-radius: 3.125rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.boton-cancelar:hover {
+    background-color: #FF7D7D;
+}
+
+.boton-confirmar:hover {
+    background-color: #008F85;
+}
+
+@media screen and (max-width: 1200px){
+    .final-tabla a img {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media screen and (max-width: 768px){
+    .final-tabla a img {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+@media screen and (max-width: 600px){
+    .final-tabla a img {
+        width: 25px;
+        height: 25px;
+    }
+}
