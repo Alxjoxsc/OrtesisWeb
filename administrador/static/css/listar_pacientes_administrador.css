@@ -235,6 +235,14 @@
     background-color: #008F85;
 }
 
+/*Círculos Verde y Amarillo*/
+.img-activo{
+    width: 15px;
+    height: 15px;
+    padding-top: 3px;
+    margin-left: 10px;
+}
+
 @media screen and (max-width: 1200px){
     .final-tabla a img {
         width: 40px;

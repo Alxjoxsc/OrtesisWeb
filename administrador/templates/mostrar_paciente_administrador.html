@@ -89,16 +89,140 @@
     </div>
 </div>
 
+<div id="popupModal" class="modal" style="display: none;">
+    <div class="contenido-modal">
+        <span class="close" onclick="cerrarPopUp()">&times;</span>
+        <h2 id="popup-titulo"></h2>
+        <p id="popup-mensaje"></p>
+        <div class="botones-modal">
+            <button class="boton-cancelar" onclick="cerrarPopUp()">Cancelar</button>
+            <button class="boton-confirmar" id="confirmButton" onclick="confirmarCambioEstado()">Confirmar</button>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
-
+{% block extra_js %}
 <script>
-    window.mostrarPopUpRestaurar = function(id, nombre) {
-        document.getElementById('popup-titulo').textContent = `Restaurar paciente`;
-        document.getElementById('popup-mensaje').textContent = `¿Está seguro de que desea restaurar a ${nombre}?`;
-        document.getElementById('popupModal').style.display = 'block';
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkboxes = document.querySelectorAll('.paciente-checkbox');
+        const selectAllCheckbox = document.getElementById('select-all');
+        const inactivarBtn = document.getElementById('inactivar-btn');
+        const restaurarBtn = document.getElementById('restaurar-btn');
+
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', function() {
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+                updateButtonsState();
+            });
+        }
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateButtonsState);
+        });
+
+        function updateButtonsState() {
+            const selectedCheckboxes = Array.from(checkboxes).filter(checkbox => checkbox.checked);
+            
+            if (inactivarBtn) {
+                inactivarBtn.disabled = selectedCheckboxes.length === 0 || !selectedCheckboxes.some(checkbox => {
+                    const badge = checkbox.closest('tr').querySelector('td:nth-child(4) .badge');
+                    return badge.textContent.trim() === 'Activo';
+                });
+            }
+
+            if (restaurarBtn) {
+                restaurarBtn.disabled = selectedCheckboxes.length === 0 || !selectedCheckboxes.some(checkbox => {
+                    const badge = checkbox.closest('tr').querySelector('td:nth-child(4) .badge');
+                    return badge.textContent.trim() === 'Inactivo';
+                });
+            }
+        }
+
+        if (inactivarBtn) {
+            inactivarBtn.addEventListener('click', function() {
+                mostrarPopUpCambioEstado('inactivo');
+            });
+        }
+
+        if (restaurarBtn) {
+            restaurarBtn.addEventListener('click', function() {
+                mostrarPopUpCambioEstado('activo');
+            });
+        }
+
+        // Pop-up para varios pacientes
+        window.mostrarPopUpCambioEstado = function(estado) {
+            const selectedCheckboxes = Array.from(checkboxes).filter(cb => cb.checked);
+            const cantidadSeleccionados = selectedCheckboxes.length;
+            const titulo = estado === 'inactivo' ? 'Cambiar a estado inactivo' : 'Restaurar a estado activo';
+            const mensaje = estado === 'inactivo' 
+                ? `¿Desea cambiar a estado inactivo a ${cantidadSeleccionados} pacientes? Los pacientes podrán ser visualizados y reactivados en la sección de inactivos.`
+                : `¿Desea restaurar a estado activo a ${cantidadSeleccionados} pacientes? Los pacientes podrán ser visualizados en la sección de activos y se considerarán como pacientes en tratamiento.`;
+
+            document.getElementById('popup-titulo').textContent = titulo;
+            document.getElementById('popup-mensaje').textContent = mensaje;
+            document.getElementById('popupModal').style.display = 'block';
+
+            document.getElementById('confirmButton').setAttribute('data-estado', estado);
+            document.getElementById('confirmButton').setAttribute('data-ids', JSON.stringify(selectedCheckboxes.map(cb => cb.value)));
+        };
+
+        // Pop-up individual para un paciente
+        window.mostrarPopUpInactivar = function(pacienteId, nombre, rut) {
+            const titulo = `Cambiar a estado inactivo a ${nombre}`;
+            const mensaje = `¿Está seguro de que desea inactivar al paciente ${nombre} (${rut})? Este paciente podrá ser reactivado en la sección de inactivos.`;
+
+            document.getElementById('popup-titulo').textContent = titulo;
+            document.getElementById('popup-mensaje').textContent = mensaje;
+            document.getElementById('popupModal').style.display = 'block';
+
+            document.getElementById('confirmButton').setAttribute('data-estado', 'inactivo');
+            document.getElementById('confirmButton').setAttribute('data-ids', JSON.stringify([pacienteId]));
+        };
+        window.mostrarPopUpRestaurar = function(id, nombre) {
+            document.getElementById('popup-titulo').textContent = `Restaurar paciente`;
+            document.getElementById('popup-mensaje').textContent = `¿Está seguro de que desea restaurar a ${nombre}?`;
+            document.getElementById('popupModal').style.display = 'block';
+        
+            document.getElementById('confirmButton').setAttribute('data-estado', 'activo');
+            document.getElementById('confirmButton').setAttribute('data-ids', JSON.stringify([id]));
+        };
+
+        window.cerrarPopUp = function() {
+            document.getElementById('popupModal').style.display = 'none';
+        };
+
+        window.confirmarCambioEstado = function() {
+            const estado = document.getElementById('confirmButton').getAttribute('data-estado');
+            const selectedIds = JSON.parse(document.getElementById('confirmButton').getAttribute('data-ids'));
+
+            const url = estado === 'inactivo' ? "{% url 'cambiar_estado_inactivo' %}" : "{% url 'restaurar_paciente' %}";
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({ pacientes_ids: selectedIds })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    location.reload();
+                } else {
+                    alert(`Error al ${estado === 'inactivo' ? 'inactivar' : 'restaurar'} los pacientes.`);
+                }
+            });
+
+            cerrarPopUp();
+        };
+    });
     
-        document.getElementById('confirmButton').setAttribute('data-estado', 'activo');
-        document.getElementById('confirmButton').setAttribute('data-ids', JSON.stringify([id]));
-    };
 </script>
+<script src="{% static 'js/admin_buscador_paciente.js' %}"></script>
+{% endblock %}
