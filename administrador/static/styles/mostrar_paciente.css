@@ -179,8 +179,7 @@ strong {
 }
 
 .btn-reactivar:hover {
-    background-color: #001058; /* Color de fondo al pasar el mouse */
-    color: white;
+    background-color: rgb(235, 234, 234); /* Color de fondo al pasar el mouse */
 }
 
 .footer-container {
@@ -190,6 +189,59 @@ strong {
     text-align: left; /* Alineación del texto al centro */
 }
 
+
+.contenido-modal {
+    display: flex;
+    padding: 20px;
+    background-color: #fefefe;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 0.625rem;
+    width: 34.375rem;
+    height: 15.625rem;
+    margin: auto; /* Centrar horizontalmente */
+    position: absolute; /* Centrar verticalmente */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.botones-modal {
+    display: flex;
+    gap: 1.25rem;
+    margin-top: 1.25rem;
+}
+
+.boton-cancelar {
+    background-color: #FF6161;
+    color: white;
+    padding: 0.625rem 1.875rem;
+    border: none;
+    border-radius: 3.125rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.boton-confirmar {
+    background-color: #006A60;
+    color: white;
+    padding: 0.625rem 1.875rem;
+    border: none;
+    border-radius: 3.125rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.boton-cancelar:hover {
+    background-color: #FF7D7D;
+}
+
+.boton-confirmar:hover {
+    background-color: #008F85;
+}
 
 @media screen and (max-width:1200px){
     .columna p{
