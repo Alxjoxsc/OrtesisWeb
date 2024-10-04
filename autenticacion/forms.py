@@ -2,49 +2,11 @@ import re
 from itertools import cycle
 from django import forms
 from django.core.exceptions import ValidationError
-from django.contrib.auth.models import User
-from django.contrib.auth.forms import SetPasswordForm
-from .models import Profile
 
 class RutLoginForm(forms.Form):
     rut = forms.CharField(max_length=12, label="RUT")
     password = forms.CharField(widget=forms.PasswordInput, label="Contraseña")
     remember_me = forms.BooleanField(required=False, label="Recordarme")
-
-class SendMailForm(forms.Form):
-    email = forms.EmailField(
-        label='Correo electrónico',
-        widget=forms.EmailInput(attrs={
-            'placeholder': 'Ingresa tu correo electrónico',
-            'class': 'input-password_reset'  # Aquí puedes añadir clases CSS
-        })
-    )
-
-    def clean_email(self):
-        email = self.cleaned_data.get('email')  # Obtener el correo del formulario
-        # Verificar si existe un usuario con el correo ingresado
-        if not User.objects.filter(email=email).exists():
-            raise forms.ValidationError("No existe ningún usuario con este correo.")
-        return email
-
-class PasswordResetForm(forms.Form):
-    new_password1 = forms.CharField(
-        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'placeholder': 'Nueva contraseña'}),
-        label='',  # Eliminar el label ya que se reemplaza por el placeholder
-        help_text='Ingrese una nueva contraseña',
-    )
-    new_password2 = forms.CharField(
-        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'placeholder': 'Confirmar contraseña'}),
-        label='',  # Eliminar el label ya que se reemplaza por el placeholder
-        help_text='Repita la nueva contraseña',
-    )
-
-    def clean_new_password2(self):
-        password1 = self.cleaned_data.get('new_password1')
-        password2 = self.cleaned_data.get('new_password2')
-        if password1 and password2 and password1 != password2:
-            raise forms.ValidationError('Las contraseñas no coinciden.')
-        return password2
     
     def clean_rut(self):
         rut = self.cleaned_data.get('rut')
@@ -71,3 +33,58 @@ class PasswordResetForm(forms.Form):
         if dv != verificador:
             raise forms.ValidationError('El dígito verificador del RUT no es válido.')
         return rut
+
+
+#----------------------------Formulario de recuperar contrasena----------------------------
+class PasswordResetForm(forms.Form):
+    email = forms.EmailField(label="Correo electrónico", max_length=254)
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        # Validar que el correo tenga un dominio correcto
+        email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_regex, email):
+            raise ValidationError("El correo electrónico no es válido. Asegúrate de que tenga un formato correcto, como example@domain.com")
+        return email
+    
+
+class SetNewPasswordForm(forms.Form):
+    new_password = forms.CharField(
+        label="Nueva contraseña",
+        widget=forms.PasswordInput,
+        min_length=8,
+        help_text="La contraseña debe tener al menos 8 caracteres, incluir un número, una letra, y un carácter especial (!@#$%^&*.,)."
+    )
+    confirm_password = forms.CharField(
+        label="Confirmar nueva contraseña",
+        widget=forms.PasswordInput,
+        min_length=8
+    )
+
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super(SetNewPasswordForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password = cleaned_data.get('new_password')
+        confirm_password = cleaned_data.get('confirm_password')
+
+        # Validar que las contraseñas coincidan
+        if new_password and confirm_password and new_password != confirm_password:
+            raise ValidationError("Las contraseñas no coinciden. Por favor, intenta de nuevo.")
+        return cleaned_data
+
+    def clean_new_password(self):
+        new_password = self.cleaned_data.get('new_password')
+        
+        # Validar que la nueva contraseña no sea igual a la contraseña anterior
+        if self.user.check_password(new_password):
+            raise ValidationError("La nueva contraseña no puede ser igual a la contraseña anterior.")
+        
+        # Validar que la contraseña tenga al menos un carácter especial, un número y una letra
+        password_regex = r'^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*.,]).{8,}$'
+        if not re.match(password_regex, new_password):
+            raise ValidationError("La contraseña debe contener al menos un carácter especial, un número y una letra.")
+        
+        return new_password

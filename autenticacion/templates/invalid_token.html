@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="{% static 'css/normalize.css' %}" />
     <link
       rel="stylesheet"
-      href="{% static 'styles/password-reset/password_reset_complete.css' %}"
+      href="{% static 'styles/password-reset/invalid_token.css' %}"
     />
   </head>
   <body class="contenedor">
@@ -32,23 +32,23 @@
       class="logo-top-right"
     />
 
-    <!-- Contenedor de confirmación de correo enviado -->
     <div class="contenedor-central">
+      <h2>Token inválido o expirado</h2>
       <img
-        src="{% static 'images/comprobado-480.svg' %}"
+        src="{% static 'images/sad_icon.svg' %}"
         alt="Descripción de la imagen"
         class="imagen-central"
       />
       <p>
-        Contraseña restablecida exitosamente. Ahora puedes iniciar sesión con tu
-        nueva contraseña.
+        El enlace para restablecer tu contraseña no es válido o ha expirado. Por
+        favor, solicita un nuevo enlace.
       </p>
       <button
         type="button"
         class="btn"
-        onclick="window.location.href='{% url 'login' %}'"
+        onclick="window.location.href='{% url 'password_reset' %}'"
       >
-        Volver al inicio
+        Volver a solicitar enlace
       </button>
     </div>
   </body>

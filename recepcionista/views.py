@@ -7,10 +7,11 @@ from autenticacion.decorators import role_required
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.utils import timezone
-from .forms import CrearPacienteForm
+from .forms import CrearPacienteForm, EditarPacienteForm
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import date
+from django.contrib import messages
 
 @role_required('Recepcionista')
 def recepcionista_terapeutas_activos(request):
@@ -308,3 +309,37 @@ def mostrar_paciente_con_terapeuta(request, paciente_id, terapeuta_id):
     cita = Cita.objects.filter(paciente_id=paciente_id).order_by('fecha').last()
     return render(request, 'mostrar_paciente.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc, 'terapeuta':terapeuta})
 
+
+@role_required('Recepcionista')
+def editar_datos_paciente_recepcionista(request, paciente_id, terapeuta=None):
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+    
+    # Obtener la lista de terapeutas
+    terapeutas = Terapeuta.objects.all()
+
+    # Obtener la última cita del paciente
+    ultima_cita = Cita.objects.filter(paciente=paciente).order_by('-fecha', '-hora').first()
+    fecha_cita = ultima_cita.fecha if ultima_cita else None
+    
+    if request.method == 'POST':
+        form = EditarPacienteForm(request.POST, instance=paciente)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Datos guardados exitosamente.')
+            # Redirigir a la misma página con un parámetro de éxito en la URL
+            return redirect('editar_datos_paciente_recepcionista', paciente_id=paciente_id)
+
+
+    
+    else:
+        # Pasar la instancia del paciente para rellenar los campos, incluyendo fecha_nacimiento
+        form = EditarPacienteForm(instance=paciente)
+
+    # Renderizar la plantilla
+    return render(request, 'editar_datos_paciente_recepcionista.html', {
+        'paciente': paciente,
+        'terapeutas': terapeutas,
+        'terapeuta_asignado': paciente.terapeuta.id if paciente.terapeuta else None,
+        'fecha_cita': fecha_cita,
+        'paciente_form': form
+    })

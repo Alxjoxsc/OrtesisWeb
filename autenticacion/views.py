@@ -1,23 +1,14 @@
-from django.contrib.auth import logout
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+import uuid
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import Group
-from .forms import RutLoginForm, SetPasswordForm
 from django.contrib.auth.forms import SetPasswordForm
-from django.contrib.auth.views import PasswordResetConfirmView
-from django.urls import reverse_lazy
-from django.shortcuts import render
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic.edit import FormView
-from .forms import SendMailForm, SetPasswordForm
 from django.contrib.auth.models import Group, User
 from django.core.mail import send_mail
-from django.views import View
-from .forms import RutLoginForm
-from django.contrib.auth.tokens import default_token_generator
-from django.utils.http import urlsafe_base64_decode
-from django.utils.encoding import force_str  # Cambiado de force_text a force_str para Django 3.x+
+from django.shortcuts import render, redirect
+from django.urls import reverse
+from .forms import RutLoginForm, PasswordResetForm, SetNewPasswordForm
+from .models import PasswordResetToken
 
 
 # AUTENTICACION DE USUARIOS #
@@ -104,36 +95,82 @@ def logout_usuario(request):
 def acceso_denegado(request):
     return render(request, 'acceso_denegado.html', {'message': 'No tienes permisos para acceder a esta página'})
 
-# VISTAS DE RECUPERACIÓN DE CONTRASEÑA #
+##--------------------------------------------RECUPERAR CONTRASENA--------------------------------------------##
+# views.py
 
-class CustomPasswordResetConfirmView(PasswordResetConfirmView):
-    form_class = SetPasswordForm
-    success_url = reverse_lazy('password_reset_complete')
 
-    def dispatch(self, *args, **kwargs):
-        # Validar si el token es válido o si ya fue utilizado
-        try:
-            uid = force_str(urlsafe_base64_decode(self.kwargs['uidb64']))
-            user = User.objects.get(pk=uid)
-            if not default_token_generator.check_token(user, self.kwargs['token']):
-                # Redirigir a acceso_denegado si el token es inválido o ya fue utilizado
-                return redirect('acceso_denegado')
-        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-            # Redirigir a acceso_denegado si algo sale mal (por ejemplo, usuario no encontrado)
-            return redirect('acceso_denegado')
-
-        # Si el token es válido, continuar con la vista normal
-        return super().dispatch(*args, **kwargs)
-
-class SendMailConfirmView(View):
-    def get(self, request):
-        form = SendMailForm()
-        return render(request, 'password_reset_form.html', {'form': form})
-
-    def post(self, request):
-        form = SendMailForm(request.POST)
+# Solicitud de restablecimiento de contraseña
+def password_reset_request(request):
+    if request.method == "POST":
+        form = PasswordResetForm(request.POST)
         if form.is_valid():
-            # Lógica para enviar el correo
-            # ...
-            return render(request, 'password_reset_done.html')
-        return render(request, 'password_reset_form.html', {'form': form})
+            email = form.cleaned_data['email']
+            try:
+                user = User.objects.get(email=email)
+                # Generar un token único
+                token = str(uuid.uuid4())
+                # Crear y guardar el token en la base de datos
+                PasswordResetToken.objects.create(user=user, token=token)
+
+                # Construir la URL de restablecimiento de contraseña
+                reset_url = request.build_absolute_uri(
+                    reverse('password_reset_confirm', kwargs={'token': token})
+                )
+
+                send_mail(
+                    'Restablecimiento de contraseña',
+                    f'Ha recibido este correo electrónico porque ha solicitado restablecer su contraseña en "OrtesisWeb".\n'
+                    f'Por favor, dirijase al siguiente enlace para reestablecer su contraseña: {reset_url}\n'
+                    f'\nSu nombre de usuario, en caso de que lo haya olvidado: 20.404.729-4\n'
+                    '¡Gracias por usar nuestro sitio!',
+                    'noreply@example.com',
+                    [email],
+                    fail_silently=False,
+                )
+                return redirect('password_reset_done')
+            except User.DoesNotExist:
+                form.add_error('email', 'No existe una cuenta con este correo electrónico')
+    else:
+        form = PasswordResetForm()
+
+    return render(request, 'password_reset_form.html', {'form': form})
+
+# Confirmación del restablecimiento de contraseña
+def password_reset_confirm(request, token):
+    try:
+        reset_token = PasswordResetToken.objects.get(token=token)
+        if not reset_token.is_valid():
+            return render(request, 'invalid_token.html')  # Token expirado
+
+        if request.method == 'POST':
+            form = SetPasswordForm(reset_token.user, request.POST)
+            if form.is_valid():
+                form.save()  # Actualizar la contraseña del usuario
+                reset_token.delete()  # Eliminar el token después de usarlo
+                return redirect('password_reset_complete')
+        else:
+            form = SetPasswordForm(reset_token.user)
+
+        return render(request, 'password_reset_confirm.html', {'form': form})
+    except PasswordResetToken.DoesNotExist:
+        return render(request, 'invalid_token.html')  # Token inválido
+    
+def password_reset_complete(request):
+    if request.method == 'POST':
+        form = SetNewPasswordForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            request.user.set_password(form.cleaned_data['new_password'])
+            request.user.save()
+            messages.success(request, 'Tu contraseña ha sido cambiada exitosamente.')
+            return redirect('login')
+    else:
+        form = SetNewPasswordForm(user=request.user)
+    
+    return render(request, 'password_reset_complete.html', {'form': form})
+
+
+def invalid_token(request):
+    return render(request, 'invalid_token.html')
+
+def password_reset_done(request):
+    return render(request, 'password_reset_done.html')
