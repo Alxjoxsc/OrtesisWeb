@@ -25,12 +25,13 @@
     display: flex;
     align-items: center;
     position: relative;
+    margin-left: -450px;
 }
 
 /* Ajustar el tamaño y color de la barra de búsqueda */
 .busqueda-input input[type="text"] {
     width: 425px;
-    height: 18.5px;
+    height: 36px;
     border: 2px solid #d9d9d9;
     border-radius: 0px;
     padding: 5px 10px;
@@ -123,7 +124,7 @@
 /* Estilo para la cabecera de la lista */
 .header-lista {
     display: grid;
-    grid-template-columns: 0.15fr 0.15fr 0.15fr 0.15fr 0.15fr 0.15fr;
+    grid-template-columns: 150px 120px 160px 200px 150px 150px;
     padding: 10px;
     background-color: #ffffff;
     font-weight: bold;
@@ -135,7 +136,7 @@
 /* Estilo para cada terapeuta */
 .terapeuta-card {
     display: grid;
-    grid-template-columns: 0.15fr 0.15fr 0.15fr 0.15fr 0.25fr 0.15fr;
+    grid-template-columns: 150px 120px 160px 200px 150px 150px;
     padding: 15px;
     background-color: #fff;
     margin-bottom: 5px;
@@ -151,7 +152,7 @@
 .terapeuta-card .estado-activo::after {
     content: '•';
     color: #26bc00;
-    margin-left: 15px;
+    margin-left: 5px;
     font-size: 40px;
     vertical-align: middle;
 }
@@ -175,11 +176,11 @@
 
 /* Mejorar el aspecto del título */
 .header h2 {
-    font-size: 40px;
-    font-weight: bold;
-    color: #000000;
-    margin-bottom: 40px;
-    text-align: center; /* Alinear el título al centro */
+    font-family: Jost;
+    font-size: 64px;
+    font-weight: 400;
+    line-height: 92.48px;
+    text-align: left;
 }
 
 .paginacion {
@@ -362,15 +363,38 @@ h1 {
 /* Ajustar el tamaño y color de la barra de búsqueda */
 .pacientes-search-input {
     display: flex;
+    align-items: center;
+    position: relative;
     width: 500px;
     height: 35px;
     border: 2px solid #d9d9d9;
-    border-radius: 0px;
+    border-radius: 8px;
     padding: 5px 10px;
     outline: none;
     color: black;
-    background-color: #f9f9f9;
-    font-size: 16px;
+    background-color: #d9d9d9;
+}
+.pacientes-search-input input[type="text"] {
+    width: calc(100% - 40px);
+    height: 35px;
+    border: none;
+    padding: 5px 10px;
+    outline: none;
+    color: black;
+    background-color: transparent;
+}
+.pacientes-search-input .search-button {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+.pacientes-search-input .search-button img {
+    width: 20px;
+    height: 20px;
 }
 
 /* Icono de búsqueda */
@@ -455,6 +479,35 @@ h1 {
     .pacientes-agregar-paciente-btn {
         width: 100%; 
         justify-content: center; 
+    }
+    .header {
+        flex-direction: column; /* Apila los elementos verticalmente */
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .busqueda-input input[type="text"] {
+        width: 100%; /* Asegura que la barra de búsqueda ocupe todo el ancho disponible */
+    }
+    .terapeuta-card {
+        grid-template-columns: 110px 110px 90px 150px 100px 100px; /* Ajusta el ancho de las columnas en pantallas más pequeñas */
+    }
+    .header-lista {
+        grid-template-columns: 110px 110px 90px 150px 100px 100px; /* Ajusta el ancho de las columnas en pantallas más pequeñas */
+    }
+    .pacientes-busqueda-form2 {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+    }
+    .pacientes-search-input2 {
+        width: 100%; /* Asegura que el input de búsqueda ocupe todo el ancho disponible */
+        margin-bottom: 10px; /* Añadir un poco de espacio debajo del input en pantallas pequeñas */
+    }
+    .pacientes-search-input2 input[type="text"] {
+        width: 100%; /* El input ocupa el 100% del ancho en pantallas pequeñas */
+    }
+    .pacientes-search-input2 .search-button2 {
+        right: 10px; /* Mantiene el botón alineado correctamente */
     }
 }
 /* -----------------------------------------------------------------------------------*/
@@ -560,4 +613,87 @@ h1 {
     text-align: center;
     padding: 20px;
     color: #999;
+}
+
+.header {
+    display: flex;
+    justify-content: flex-start; /* Alinea los elementos hacia la izquierda */
+    align-items: center; /* Alinea verticalmente los elementos */
+    gap: 20px; /* Espacio entre el título y la barra de búsqueda */
+    flex-wrap: wrap; /* Permite que los elementos se ajusten cuando la pantalla se reduzca */
+    margin-bottom: 20px;
+}
+.busqueda-form {
+    display: flex;
+    align-items: center;
+    flex-grow: 1; /* Esto hará que la barra de búsqueda use el espacio disponible */
+    max-width: 500px; /* Define un tamaño máximo para la barra de búsqueda */
+}
+.busqueda-input input[type="text"] {
+    width: 100%; /* Asegura que la barra de búsqueda ocupe todo el espacio disponible */
+    height: 35px;
+    border: 2px solid #d9d9d9;
+    border-radius: 8px;
+    padding: 5px 10px;
+    outline: none;
+    color: black;
+    background-color: #d9d9d9;
+}
+.filtro-btn {
+    margin-left: auto; /* Esto empuja el botón de filtro hacia la derecha */
+}
+/* Formulario de búsqueda - Estilo base */
+.pacientes-busqueda-form2 {
+    display: flex;
+    align-items: center;
+}
+/* Ajustar el tamaño y color de la barra de búsqueda */
+.pacientes-search-input2 {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 500px;
+    height: 35px;
+    border: 2px solid #d9d9d9;
+    border-radius: 0px;
+    padding: 5px 10px;
+    outline: none;
+    color: black;
+    background-color: #d9d9d9;
+}
+.pacientes-search-input2 input[type="text"] {
+    width: calc(100% - 40px);
+    height: 35px;
+    border: none;
+    padding: 5px 10px;
+    outline: none;
+    color: black;
+    background-color: transparent;
+}
+.pacientes-search-input2 .search-button2 {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+.pacientes-search-input2 .search-button2 img {
+    width: 20px;
+    height: 20px;
+}
+/* Botón de búsqueda con ícono */
+.search-button2 {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.search-button2 img {
+    width: 20px;
+    height: 20px;
 }

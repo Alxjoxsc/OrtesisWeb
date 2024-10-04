@@ -1,72 +1,65 @@
-{% extends 'base_recepcionista.html' %}
+{% extends 'recepcionista_base.html' %}
 {% load static %}
 
-{% block content %}
-<div class="recepcionista-container">  
-    <div class="header">
-        <h2>Terapeutas</h2>
-        <form id="busqueda-form" method="get" action="{% url 'recepcionista_terapeutas_activos' %}" class="busqueda-form">
-            <div class="busqueda-input">
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/listar_pacientes_recepcionista.css' %}">
+<link rel="stylesheet" href="{% static 'css/tabla.css' %}">
+<link rel="stylesheet" href="{% static 'styles/modal.css' %}">
+{% endblock %}
+{% block title %}Terapeutas{% endblock %}
+{% block header %}
+<div class="contenedor-header">
+    <h1>Terapeutas</h1>
+    <form method="GET" action="{% url 'recepcionista_terapeutas_activos' %}" class="pacientes-busqueda-form2" id="busqueda-form">
+        <div class="pacientes-search-input2">
                 <input id="busqueda" type="text" name="q" placeholder="Búsqueda por Nombre o Rut" value="{{ request.GET.q }}">
-                <button type="submit" class="search-button">
-                    <img src="{% static 'icons/Search.svg' %}" alt="Buscar" />
-                </button>
-            </div>
-            
-        </form>
-            <div class="dropdown">
-                <button type="button" class="filtro-btn">
-                    Filtrar <span class="flecha">▼</span>
-                </button>
-                <div class="dropdown-content">
-                    <label class="dropdown-label">
-                        <input type="radio" name="orden" value="fecha_contratacion" class="hidden-input"> Fecha de Ingreso
-                    </label>
-                    <label class="dropdown-label">
-                        <input type="radio" name="orden" value="especialidad" class="hidden-input"> Especialidad
-                    </label>
-                </div>
-            </div>
-        </form>                
-    </div>
-    <div class="header_right">
+            <button type="submit" class="search-button2">
+                <img src="{% static 'icons/Search.svg' %}" alt="Buscar" />
+            </button>
+        </div>
+
+    </form>
+    <div class="dropdown">
         <button type="button" class="filtro-btn">
             Filtrar <span class="flecha">▼</span>
         </button>
         <div class="dropdown-content">
-            <label>
-                <input type="checkbox" name="filtro" value="fecha_ingreso"> Fecha de Ingreso
+            <label class="dropdown-label">
+                <input type="radio" name="orden" value="fecha_contratacion" class="hidden-input"> Fecha de Ingreso
             </label>
-            <label>
-                <input type="checkbox" name="filtro" value="especialidad"> Especialidad
+            <label class="dropdown-label">
+                <input type="radio" name="orden" value="especialidad" class="hidden-input"> Especialidad
             </label>
         </div>
     </div>
-
+</div>
+{% endblock %}
+{% block content %}
 
     <!-- Encabezado de la lista de terapeutas -->
     <div class="lista-terapeutas">
-        <div class="header-lista">
-            <span><strong>Nombre</strong></span>
-            <span><strong>Rut</strong></span>
-            <span><strong>Estado</strong></span>
-            <span><strong>Especialidad</strong></span>
-            <span><strong>Fecha de Ingreso</strong></span>
-        </div>
-        
+    <div class="header-lista">
+        <span><strong>Nombre</strong></span>
+        <span><strong>Rut</strong></span>
+        <span><strong>Estado</strong></span>
+        <span><strong>Especialidad</strong></span>
+        <span><strong>Fecha de Ingreso</strong></span>
+    </div>
+
         <!-- Lista de terapeutas -->
-{% for terapeuta in terapeutas %}
-<div class="terapeuta-card">
-    <span>{{ terapeuta.user.first_name }} {{ terapeuta.user.last_name }}</span>
-    <span>{{ terapeuta.user.profile.rut }}</span>
-    <span class="estado-activo">{{"Activo"}}</span>
-    <span>{{ terapeuta.especialidad }}</span>
+    {% for terapeuta in terapeutas %}
+    <div class="terapeuta-card">
+        <span>{{ terapeuta.user.first_name }} {{ terapeuta.user.last_name }}</span>
+        <span>{{ terapeuta.user.profile.rut }}</span>
+        <span class="estado-activo">{{"Activo"}}</span>
+        <span>{{ terapeuta.especialidad }}</span>
     <span>{{ terapeuta.fecha_contratacion|date:"d/m/Y" }}</span> <!-- Aquí se aplica el formato -->
-    <img src="{% static 'icons/terapeuta.svg' %}" alt="Icono terapeuta" class="terapeuta-imagen">
+        <img src="{% static 'icons/terapeuta.svg' %}" alt="Icono terapeuta" class="terapeuta-imagen">
+    </div>
+    {% empty %}
+    <p>No se encontraron terapeutas activos.</p>
+    {% endfor %}
 </div>
-{% empty %}
-<p>No se encontraron terapeutas activos.</p>
-{% endfor %}
 
 <!-- Controles de paginación -->
 <div class="paginacion">
@@ -84,7 +77,9 @@
         {% endif %}
     </div>
 </div>
+{% endblock %}
 
+{% block extra_js %}
 <script>
     document.getElementById('busqueda').addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
