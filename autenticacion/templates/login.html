@@ -1,79 +1,103 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Inicio de Sesión</title>
     <!--     Fuente JOST    -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
     <!--     Estilos CSS    -->
-    <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
-    <link rel="stylesheet" href="{% static 'styles/login.css' %}">
-</head>
-<body class="contenedor">
-
+    <link rel="stylesheet" href="{% static 'css/normalize.css' %}" />
+    <link rel="stylesheet" href="{% static 'styles/login.css' %}" />
+  </head>
+  <body class="contenedor">
     <!-- Logos -->
-    <img src="{% static 'images/logo_universidad_blanco.svg' %}" alt="Logo Universidad Autónoma" class="logo-top-left">
-    <img src="{% static 'images/logo_hospital_blanco.svg' %}" alt="Logo Hospital" class="logo-top-right">
+    <img
+      src="{% static 'images/logo_universidad_blanco.svg' %}"
+      alt="Logo Universidad Autónoma"
+      class="logo-top-left"
+    />
+    <img
+      src="{% static 'images/logo_hospital_blanco.svg' %}"
+      alt="Logo Hospital"
+      class="logo-top-right"
+    />
 
     <!-- Contenedor de login -->
     <div class="login-contenedor">
-        <h2>Bienvenido/a</h2>
+      <h2>Bienvenido/a</h2>
 
-        <!-- Mensaje de error -->
-        {% if error %}
-            <div class="mensaje-error">
-                <p>{{ error }}</p>
-            </div>
-        {% endif %}
+      <!-- Mensaje de error -->
+      {% if error %}
+      <div class="mensaje-error">
+        <p>{{ error }}</p>
+      </div>
+      {% endif %}
 
-        <!-- Formulario de inicio de sesión -->
-        <form method="POST" action="{% url 'login' %}">
-            {% csrf_token %}
-            {{ form.non_field_errors }}
-            
-            <div class="inputs-contenedor">
-                <!-- Input para el RUT -->
-                <div class="input-login">
-                    <input type="text" name="rut" id="id_rut" placeholder="Ingrese su RUT" required>
-                    <img src="{% static 'icons/icono_usuario.svg' %}" alt="Usuario">
-                    <div class="mensaje-error-input">
-                        {{ form.rut.errors }}
-                    </div>
-                </div>
+      <!-- Formulario de inicio de sesión -->
+      <form method="POST" action="{% url 'login' %}">
+        {% csrf_token %} {{ form.non_field_errors }}
 
-                <!-- Input para la contraseña -->
-                <div class="input-login">
-                    {{ form.password.errors }}
-                    <input type="password" name="password" placeholder="Contraseña" required>
-                    <img src="{% static 'icons/icono_password.svg' %}" alt="Contraseña">
-                </div>
+        <div class="inputs-contenedor">
+          <!-- Input para el RUT -->
+          <div class="input-login">
+            <input
+              type="text"
+              name="rut"
+              id="id_rut"
+              placeholder="Ingrese su RUT"
+              required
+            />
+            <img src="{% static 'icons/icono_usuario.svg' %}" alt="Usuario" />
+            <div class="mensaje-error-input">{{ form.rut.errors }}</div>
+          </div>
 
-                <!-- Opciones adicionales -->
-                <div class="acciones">
-                    <label class="custom-checkbox-label">
-                        <input type="checkbox" name="remember_me">
-                        <span class="custom-checkbox"></span> Recuérdame
-                    </label>
-                    <a href="{% url 'password_reset' %}">¿Olvidaste tu contraseña?</a>
-                </div>
+          <!-- Input para la contraseña -->
+          <div class="input-login">
+            {{ form.password.errors }}
+            <input
+              type="password"
+              name="password"
+              placeholder="Contraseña"
+              required
+            />
+            <img
+              src="{% static 'icons/icono_password.svg' %}"
+              alt="Contraseña"
+            />
+          </div>
 
-                <!-- Botón de inicio de sesión -->
-                <button type="submit" class="btn">Iniciar sesión</button>
-            </div>
-        </form>
-        
-        <div class="iconos-inferiores">
-            <img src="{% static 'icons/ortesis1.svg' %}" alt="Icono Ortesis">
-            <img src="{% static 'icons/ortesis2.svg' %}" alt="Icono Ortesis">
-            <img src="{% static 'icons/ortesis3.svg' %}" alt="Icono Ortesis" class="ortesis3">
+          <!-- Opciones adicionales -->
+          <div class="acciones">
+            <label class="custom-checkbox-label">
+              <input type="checkbox" name="remember_me" />
+              <span class="custom-checkbox"></span> Recuérdame
+            </label>
+            <a href="{% url 'password_reset' %}">¿Olvidaste tu contraseña?</a>
+          </div>
+
+          <!-- Botón de inicio de sesión -->
+          <button type="submit" class="btn">Iniciar sesión</button>
         </div>
+      </form>
+
+      <div class="iconos-inferiores">
+        <img src="{% static 'icons/ortesis1.svg' %}" alt="Icono Ortesis" />
+        <img src="{% static 'icons/ortesis2.svg' %}" alt="Icono Ortesis" />
+        <img
+          src="{% static 'icons/ortesis3.svg' %}"
+          alt="Icono Ortesis"
+          class="ortesis3"
+        />
+      </div>
     </div>
-</body>
+  </body>
 
-<script src="{% static 'js/formatear-rut.js' %}"></script>
-
+  <script src="{% static 'js/formatear-rut.js' %}"></script>
 </html>
