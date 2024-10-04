@@ -120,19 +120,19 @@ strong {
 .btn {
     background-color: white;
     color: #001058;
-    padding: 7px 15px;
+    padding: 5px 15px;
     border: none;
-    border-radius: 5px;
+    border-radius: 10px;
     font-size: 16px;
     font-weight:bold;
     cursor: pointer;
     margin: 20px;
     margin-top: 15px;
-    transition: 0.1s;
+    transition: 0.15s;
 }
 
 .btn:hover {
-    background-color: #001058; /* Color de fondo al pasar el mouse */
+    background-color: #001c97; /* Color de fondo al pasar el mouse */
     color: white;
 }
 
@@ -140,6 +140,15 @@ strong {
     background-color: #ccc;
     cursor: not-allowed;
 }
+
+.btn-reactivar {
+    position: absolute; /* Permite colocar el ícono en una posición específica */
+    top: 10px; /* Ajusta la distancia desde la parte superior */
+    right: 10px; /* Ajusta la distancia desde la parte derecha */
+    cursor: pointer;
+    text-decoration: none;
+}
+
 
 .terapeuta-info {
     margin-right: 10px;
@@ -157,29 +166,6 @@ strong {
 .icon {
     width: 24px;
     height: 24px;
-}
-
-.btn-reactivar {
-    position: absolute; /* Permite colocar el ícono en una posición específica */
-    top: 10px; /* Ajusta la distancia desde la parte superior */
-    right: 10px; /* Ajusta la distancia desde la parte derecha */
-    cursor: pointer;
-    background-color: white;
-    color: #001058;
-    padding: 7px 15px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    font-weight:bold;
-    cursor: pointer;
-    margin: 20px;
-    margin-top: 15px;
-    transition: 0.1s;
-    text-decoration: none;
-}
-
-.btn-reactivar:hover {
-    background-color: rgb(235, 234, 234); /* Color de fondo al pasar el mouse */
 }
 
 .footer-container {

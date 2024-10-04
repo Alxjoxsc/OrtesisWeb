@@ -109,13 +109,6 @@ class CrearPacienteForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ingrese las alergias del Paciente'})
     )
 
-    dispositivo_ortesis = forms.CharField(
-        max_length=255, 
-        label='Dispositivo Órtesis', 
-        required=False,
-        widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ingrese el dispositivo de órtesis a utilizar'})
-    )
-
     actividad_fisica = forms.ChoiceField(
         choices=ACTIVIDAD_FISICA_CHOICES,
         label='Actividad Física',
@@ -183,7 +176,6 @@ class CrearPacienteForm(forms.ModelForm):
             'medicamentos', 
             'patologia', 
             'alergia', 
-            'dispositivo_ortesis', 
             'actividad_fisica', 
             'peso', 
             'estatura', 
@@ -208,7 +200,6 @@ class CrearPacienteForm(forms.ModelForm):
             medicamentos=self.cleaned_data['medicamentos'],
             patologia=self.cleaned_data['patologia'],
             alergias=self.cleaned_data['alergia'],
-            dispositivo_ortesis=self.cleaned_data['dispositivo_ortesis'],
             actividad_fisica=self.cleaned_data['actividad_fisica'],
             peso=self.cleaned_data['peso'],
             altura=self.cleaned_data['estatura'],

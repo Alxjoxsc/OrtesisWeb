@@ -493,13 +493,6 @@ class CrearPacienteForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ingrese las alergias del Paciente'})
     )
 
-    dispositivo_ortesis = forms.CharField(
-        max_length=255, 
-        label='Dispositivo Órtesis', 
-        required=False,
-        widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ingrese el dispositivo de órtesis a utilizar'})
-    )
-
     actividad_fisica = forms.ChoiceField(
         choices=ACTIVIDAD_FISICA_CHOICES,
         label='Actividad Física',
@@ -567,7 +560,6 @@ class CrearPacienteForm(forms.ModelForm):
             'patologia', 
             'descripcion_patologia',
             'alergias', 
-            'dispositivo_ortesis', 
             'actividad_fisica', 
             'peso', 
             'altura', 
@@ -592,7 +584,6 @@ class CrearPacienteForm(forms.ModelForm):
             patologia=self.cleaned_data['patologia'],
             descripcion_patologia=self.cleaned_data['descripcion_patologia'],
             alergias=self.cleaned_data['alergias'],
-            dispositivo_ortesis=self.cleaned_data['dispositivo_ortesis'],
             actividad_fisica=self.cleaned_data['actividad_fisica'],
             peso=self.cleaned_data['peso'],
             altura=self.cleaned_data['altura'],
@@ -826,12 +817,6 @@ class EditarPacienteForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ingrese las alergias del Paciente'})
     )
 
-    dispositivo_ortesis = forms.CharField(
-        max_length=255, 
-        label='Dispositivo Órtesis', 
-        required=False,
-        widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ingrese el dispositivo de órtesis a utilizar'})
-    )
 
     actividad_fisica = forms.ChoiceField(
         choices=ACTIVIDAD_FISICA_CHOICES,
@@ -900,7 +885,6 @@ class EditarPacienteForm(forms.ModelForm):
             'medicamentos', 
             'patologia', 
             'alergias', 
-            'dispositivo_ortesis', 
             'actividad_fisica', 
             'peso', 
             'altura', 

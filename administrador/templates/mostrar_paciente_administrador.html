@@ -27,7 +27,7 @@
                 <img src="{% static 'icons/lapiz.svg' %}" class="icon">
             </div>
         {% else %}
-        <a href="#" class="btn-reactivar" title="Restaurar a estado activo" 
+        <a href="#" class="btn btn-reactivar" title="Restaurar a estado activo" 
             onclick="mostrarPopUpRestaurar('{{ paciente.id }}', '{{ paciente.first_name }} {{ paciente.last_name }}')">
             Reactivar Paciente
         </a> 
@@ -49,7 +49,7 @@
             </span>
             </p>
             {% if not paciente.is_active %}
-                <p><strong>Motivo de desvinculación:</strong><br><span> {{ paciente.motivo_desvinculacion|default:"Sin motivo de desvinculación ingresado" }}</span></p>
+                <p><strong>Motivo de desvinculación:</strong><br><span class="campo-formulario" readonly> {{ paciente.motivo_desvinculacion|default:"Sin motivo de desvinculación ingresado" }}</span></p>
             {% endif %}
             {% if paciente.is_active %}
                 {% if paciente.terapeuta %}
@@ -65,12 +65,16 @@
                 {% endif %}
                 <p><strong>Terapeuta a Cargo:</strong><br>
                     <span class="terapeuta-info">{{ paciente.terapeuta.user.first_name }} {{ paciente.terapeuta.user.last_name|default:"Sin terapeuta asignado" }}
-                    <button class="btn" onclick="window.location.href='{% url 'elegir_terapeuta_administrador' paciente.id %}'">Asignar Terapeuta</button></span>
+                    {% if paciente.terapeuta%}
+                        <button class="btn" onclick="window.location.href='{% url 'elegir_terapeuta_administrador' paciente.id %}'">Reasignar Terapeuta</button></span>
+                    {% else %}
+                        <button class="btn" onclick="window.location.href='{% url 'elegir_terapeuta_administrador' paciente.id %}'">Asignar Terapeuta</button></span>
+                    {% endif %}
                 </p>
             {% else %}
-
-            <p><strong>Atendido por el terapeuta:</strong><br><span>{{paciente.terapeuta}}</span></strong>
-
+                {% if paciente.terapeuta%}
+                    <p><strong>Atendido por el terapeuta:</strong><br><span>{{paciente.terapeuta.user.first_name}} {{paciente.terapeuta.user.last_name}}</span></strong>
+                {% endif %}
             {% endif %}
 
         </div>

@@ -39,7 +39,6 @@
                 {% if not paciente.is_active %}
                     <p><strong>Motivo de desvinculación:</strong> {{ paciente.motivo_desvinculacion|default:"Sin motivo de desvinculación ingresado" }}</p>
                 {% endif %}
-                <p><strong>Dispositivo Órtesis:</strong> {{ paciente.dispositivo_ortesis|default:"Sin dispositivo de órtesis ingresado" }}</p>
                 <p><strong>Actividad física:</strong> {{ paciente.actividad_fisica|default:"Sin actividad física ingresada" }}</p>
                 <p><strong>Próxima Cita:</strong> 
                     {% if cita %}

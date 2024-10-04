@@ -254,7 +254,6 @@ def formulario_agregar_paciente(request):
         patologia = request.POST.get('patologia', None)
         alergias = request.POST.get('alergias', None)
         progreso = request.POST.get('progreso', None)
-        dispositivo_ortesis = request.POST.get('dispositivo_ortesis', None)
         actividad_fisica = request.POST.get('actividad_fisica', None)
         peso = request.POST.get('peso', None)
         altura = request.POST.get('altura', None)
@@ -280,7 +279,6 @@ def formulario_agregar_paciente(request):
             patologia=patologia,
             alergias=alergias,
             progreso=progreso,
-            dispositivo_ortesis=dispositivo_ortesis,
             actividad_fisica=actividad_fisica,
             peso=peso,
             altura=altura,
