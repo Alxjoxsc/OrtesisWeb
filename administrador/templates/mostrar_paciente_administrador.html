@@ -14,9 +14,16 @@
 
 <div class="container-paciente">
     <div class="card-paciente">
-        <div class="icon-container" onclick="window.location.href='{% url 'editar_datos_paciente_admin' paciente.id %}'">
-            <img src="{% static 'icons/lapiz.svg' %}" class="icon">
-        </div>
+        {% if paciente.is_active %}
+            <div class="icon-container" onclick="window.location.href='{% url 'editar_datos_paciente_admin' paciente.id %}'">
+                <img src="{% static 'icons/lapiz.svg' %}" class="icon">
+            </div>
+        {% else %}
+        <a href="#" class="btn-reactivar" title="Restaurar a estado activo" 
+            onclick="mostrarPopUpRestaurar('{{ paciente.id }}', '{{ paciente.first_name }} {{ paciente.last_name }}')">
+            Reactivar Paciente
+        </a> 
+        {% endif %}
         <div class="columna izquierda">
             <p><strong>Rut:</strong><br> <span>{{ paciente.rut }}</span></p>
             <p><strong>Fecha de Ingreso:</strong><br><span>{{paciente.date_joined}}</span></p>
@@ -29,29 +36,34 @@
                 {% if paciente.is_active %}
                     Activo <span class="estado-activo"> <img class = "img-activo" src="{% static "icons/activo.svg" %}"></span>
                 {% else %}
-                    Inactivo
+                    Inactivo <span class="estado-activo"> <img class = "img-activo" src="{% static "icons/inactivo.svg" %}"></span>
                 {% endif %}
             </span>
             </p>
             {% if not paciente.is_active %}
                 <p><strong>Motivo de desvinculación:</strong><br><span> {{ paciente.motivo_desvinculacion|default:"Sin motivo de desvinculación ingresado" }}</span></p>
             {% endif %}
-            <p><strong>Próxima Cita:</strong><br><span> 
-                {% if cita %}
-                    {{ cita.fecha }}
-                {% else %}
-                    Sin cita asignada
+            {% if paciente.is_active %}
+                {% if paciente.terapeuta %}
+                    <p><strong>Próxima Cita:</strong><br><span> 
+                        {% if cita %}
+                            {{ cita.fecha }}
+                            <button class="btn" onclick="window.location.href='{% url 'calendar_asignar_paciente_administrador' paciente.id paciente.terapeuta_id %}'">Reasignar Cita</button>
+                        {% else %}
+                            Sin cita asignada
+                            <button class="btn" onclick="window.location.href='{% url 'calendar_asignar_paciente_administrador' paciente.id paciente.terapeuta_id %}'">Asignar Cita</button>
+                        {% endif %}
+                    </span></p>
                 {% endif %}
-            {% if paciente.terapeuta_id %}
-            <button class="btn" onclick="window.location.href='{% url 'calendar_asignar_paciente_administrador' paciente.id paciente.terapeuta_id %}'">Asignar Cita</button>
+                <p><strong>Terapeuta a Cargo:</strong><br>
+                    <span class="terapeuta-info">{{ paciente.terapeuta.user.first_name }} {{ paciente.terapeuta.user.last_name|default:"Sin terapeuta asignado" }}
+                    <button class="btn" onclick="window.location.href='{% url 'elegir_terapeuta_administrador' paciente.id %}'">Asignar Terapeuta</button></span>
+                </p>
             {% else %}
-                <button class="btn" disabled title="No se puede asignar cita sin terapeuta">Asignar Cita</button>
+
+            <p><strong>Atendido por el terapeuta:</strong><br><span>{{paciente.terapeuta}}</span></strong>
+
             {% endif %}
-            </span></p>
-            <p><strong>Terapeuta a Cargo:</strong><br>
-                <span class="terapeuta-info">{{ paciente.terapeuta.user.first_name }} {{ paciente.terapeuta.user.last_name|default:"Sin terapeuta asignado" }}
-                <button class="btn" onclick="window.location.href='{% url 'elegir_terapeuta_administrador' paciente.id %}'">Asignar Terapeuta</button></span>
-            </p>
 
         </div>
         <div class="columna derecha">
@@ -78,3 +90,15 @@
 </div>
 
 {% endblock %}
+
+
+<script>
+    window.mostrarPopUpRestaurar = function(id, nombre) {
+        document.getElementById('popup-titulo').textContent = `Restaurar paciente`;
+        document.getElementById('popup-mensaje').textContent = `¿Está seguro de que desea restaurar a ${nombre}?`;
+        document.getElementById('popupModal').style.display = 'block';
+    
+        document.getElementById('confirmButton').setAttribute('data-estado', 'activo');
+        document.getElementById('confirmButton').setAttribute('data-ids', JSON.stringify([id]));
+    };
+</script>
