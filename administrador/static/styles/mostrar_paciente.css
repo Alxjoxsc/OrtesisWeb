@@ -6,12 +6,17 @@
 }
 
 .main-content{
-    margin: 20px;
+    margin: 30px;
+}
+
+.back-arrow{
+    margin: -20px;
 }
 
 h1{
     font-weight: normal;
     font-size: 3rem;
+    margin-top: 0;
 }
 
 h2{
@@ -24,56 +29,77 @@ h2{
 }
 
 .container-paciente {
-    width: 100%; /* Cambia a un tamaño más pequeño, por ejemplo, 80% */
-    /*max-width: 1150px; /* Opcional: establece un ancho máximo */
+    width: 100%;
     padding: 0.8rem;
-    /*margin: 0.3125rem auto; /* Margen automático en los lados para centrar */
-    box-sizing: border-box;
     background-color: #001058;
-    border-radius: 0.4rem; /* Descomenta si quieres bordes redondeados */
+    border-radius: 0.4rem;
+    box-sizing: border-box;
+    position: relative; /* Asegura que el contenedor tenga un contexto de posición */
+
 }
 
 
 .card-paciente {
     display: flex;
     flex-flow: row nowrap;
-    justify-content: center; /* Centra el contenido si es necesario */
+    justify-content: center;
     color: white;
-    display: flex;
     width: 100%;
+    position: relative; /* Esto permite que el ícono se posicione dentro de este contenedor */
 }
 
 .columna {
-    width: 50%; /* Cada columna toma la mitad del ancho */
+    width: 50%;
     padding: 10px;
     display: flex;
     flex-direction: column;
-    align-items: start;
 }
 
 .columna p {
-    margin-bottom: 30px; /* Espacio entre los elementos */
-    padding: 5px; /* Espaciado interno del texto en cada párrafo */
+    margin-bottom: 30px;
     font-size: 24px;
     font-family: 'Jost', sans-serif;
-    
 }
 
 p strong{
-    font-weight: normal;
+    font-weight:550;
 }
 
 p span{
-    font-weight: normal;
+    font-size: 21px;
+    font-weight: 400;
     display: flex;
     align-items: center;
-    margin-left: 8px;
 }
 
-span img{
+.campo-formulario {
+    background-color: white;
+    color: black;
+    border-radius: 5px;
+    padding: 15px;
+    font-size: 18px;
+    width: 90%;
+    height: 150px;
+    text-align: left; /* Alinea el texto a la izquierda */
+    display: block; /* Asegúrate de que sea un bloque */
+    box-sizing: border-box; /* Incluye el padding en el ancho y alto */
+    overflow: auto; /* Asegúrate de que el texto se ajuste correctamente */
+    resize: none; /* Evita que el usuario cambie el tamaño del textarea, si lo deseas */
+}
+
+
+.img-activo{
     width: 15px;
     height: 15px;
     padding-top: 3px;
+    margin-left: 10px;
+}
+
+.img-terapeuta{
+    width: 35px;
+    height: 35px;
+    padding-top: 3px;
+    fill: #001058;
 }
 
 strong {
@@ -83,32 +109,63 @@ strong {
 
 .izquierda {
     text-align: left; /* Alineación a la izquierda, si es necesario */
+    padding-right: 30px ;
 }
 
 .derecha {
     text-align: left; /* Alineación a la derecha */
 }
 
+
 .btn {
     background-color: white;
     color: #001058;
-    padding: 10px 20px; /* Espaciado interno (vertical y horizontal) */
-    border: none; /* Sin borde */
-    border-radius: 5px; /* Bordes redondeados */
-    font-size: 16px; /* Tamaño de la fuente */
-    cursor: pointer; /* Cambia el cursor a un puntero */
-    transition: background-color 0.3s ease; /* Transición suave para el cambio de color */
+    padding: 7px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight:bold;
+    cursor: pointer;
+    margin: 20px;
+    margin-top: 15px;
+    transition: 0.1s;
 }
 
 .btn:hover {
-    background-color: rgb(36, 0, 179); /* Color de fondo al pasar el mouse */
+    background-color: #001058; /* Color de fondo al pasar el mouse */
+    color: white;
+}
+
+.btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
 }
 
 .terapeuta-info {
-    margin-right: 10px; /* Espacio entre el texto y el botón */
-    display: flex; /* Activa flexbox para el párrafo */
-    align-items: center; /* Alinea verticalmente los elementos al centro */
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
 }
+
+.icon-container {
+    position: absolute; /* Permite colocar el ícono en una posición específica */
+    top: 10px; /* Ajusta la distancia desde la parte superior */
+    right: 10px; /* Ajusta la distancia desde la parte derecha */
+    cursor: pointer;
+}
+
+.icon {
+    width: 24px;
+    height: 24px;
+}
+
+.footer-container {
+    padding: 1rem; /* Espaciado interno */
+    background-color: #001058; /* Color de fondo del footer */
+    color: white; /* Color del texto */
+    text-align: left; /* Alineación del texto al centro */
+}
+
 
 @media screen and (max-width:1200px){
     .columna p{
@@ -121,5 +178,33 @@ strong {
     .card-paciente{
         flex-direction: column;
         justify-content: center;
+        width: 100%;
     }
+
+    .izquierda{
+        width: 100%;
+    }
+    .derecha{
+        width: 100%;
+    }
+
+    .campo-formulario {
+        background-color: white;
+        color: black;
+        border-radius: 5px;
+        padding: 15px;
+        font-size: 18px;
+        width: 100%; /* Ahora ocupa el 100% del ancho del contenedor */
+        height: 150px;
+        text-align: left;
+        display: block;
+        box-sizing: border-box; /* Asegura que padding y border se incluyan en el ancho */
+        overflow: auto;
+        resize: none;
+    }
+
+    h1{
+        font-size: 2rem;
+    }
+    
 }

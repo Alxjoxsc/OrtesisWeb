@@ -1,153 +1,270 @@
-body {
-    overflow: hidden;
-    font-family: Arial, sans-serif;
+.header {
     display: flex;
-    justify-content: center;
-    align-items: flex-start; /* Mantiene la alineación en la parte superior */
-    height: 100vh;
-    margin: 0; /* Sin márgenes adicionales en el body */
+    width: 100%;
+    flex-flow: column nowrap;
+    align-items: flex-start; 
 }
 
-.container {
-    max-width: 700px;
-    height: auto;
-    margin: 0; /* Eliminé el margen superior para acercar el contenido aún más */
-    padding: 20px;
-    background-color: transparent;
-    box-shadow: none;
-}
-
-.header h1 {
-    font-size: 2.5em;
-    margin-bottom: 20px;
-    text-align: left;
-}
-
-.form {
+.main-content {
+    margin: 1rem;
     display: flex;
     flex-direction: column;
 }
 
-.form-group {
+.contenido-modal-exito {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    margin-bottom: 15px;
+    background-color: #fefefe;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 0.625rem;
+    width: 18.75rem;
+    height: 14.0625rem;
+    margin: auto; /* Centrar horizontalmente */
+    position: absolute; /* Centrar verticalmente */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
-/* Clase base para grupos de 2 hacia abajo */
-.campo {
-    flex: 1 1 45%;
+.contenido-modal-exito img{
+    width: 75px;
+    height: 75px;
+}
+
+.contenido-modal-exito p{
+    font-size: 1.25rem;
+}
+
+.boton-continuar{
+    background-color: rgba(76, 175, 80, 0.9608);
+    color: white;
+    padding: 0.625rem 1.25rem;
+    border: none;
+    border-radius: 3.125rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+h1{
+    font-weight: normal;
+    font-size: 3rem;
+}
+
+h2{
+    font-weight: normal;
+    width: 18.75rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 0.125rem solid #000;
+    align-self: center;
+    text-align: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.divisor-formulario {
+    display: flex;
+    width: 100%;
+    flex-flow: row wrap;
+}
+
+.datos-columna-izquierda{
+    border-right: 0.0625rem solid #ccc;
+    padding-right: 2rem;
+    width: 50%;
+}
+
+.datos-columna-derecha{
+    padding-left: 1.9375rem;
+    width: 50%;
+}
+
+.form-group {
+    margin: 0.3125rem;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 1em;
     text-align: left;
-    min-width: 300px;
 }
 
-label {
+.table th, .table td {
+    padding: 12px 15px;
+    border: 1px solid #dddddd;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+}
+
+.table th {
+    background-color: #001058;
+    color: #ffffff;
+}
+
+.table .columna-eliminar{
+    width: 10%;
+}
+
+.table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.table tr:hover {
+    background-color: #f1f1f1;
+}
+
+.table label {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
 }
 
-select,
-input[type="text"],
-input[type="date"],
-input[type="tel"],
-input[type="email"],
-input[type="number"] {
-    width: 325px;
-    width: 80%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    height: 40px;
-    box-sizing: border-box;
-    margin-right: 25px;
+input[type="checkbox"] {
+    /* Ajustar el tamaño */
+    width: 20px;
+    height: 20  px;
+    /* Crear bordes redondeados */
+    border-radius: 50%;
+    /* Color del borde */
+    border: 2px solid #ccc;
+    /* Color de fondo inicial */
+    background-color: transparent;
+    /* Ocultar la apariencia predeterminada del checkbox */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    /* Transición suave para el cambio de fondo */
+    transition: background-color 0.3s ease;
+    cursor: pointer; /* Cambia el cursor al pasar sobre el checkbox */
 }
 
-textarea {
-    resize: vertical;
-    height: 140px;
-    width: 87%;
-    border: 1px solid #ccc;
+/* Cambiar el fondo cuando el checkbox está seleccionado */
+input[type="checkbox"]:checked {
+    background-color: #001058;
 }
 
-.buttons {
+/* Estilo del checkmark */
+input[type="checkbox"]::after {
+    content: "";
+    display: block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%; /* Bordes redondeados*/
+}
+
+.contenedor-botones {
+    width: 18.75rem;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-button {
-    width: 175px;
-    padding: 15px;
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    margin: 0 10px;
-}
-
-.terapeuta-contenedor,
-.proximacita-contenedor {
-    display: flex;
+    justify-content: space-between;
     align-items: center;
-    margin-left: 0;
-    flex-wrap: wrap; /* Permitir que los elementos se envuelvan en pantallas más pequeñas */
+    align-self: center;
+    margin: 1.25rem 0 1.25rem 0;
 }
 
-.proximacita-contenedor,
-.terapeuta-contenedor {
-    display: flex;
-    align-items: center; /* Alinear verticalmente en el centro */
-    margin-left: 0;
-}
-
-.btn-reasignar,
-.btn-reagendar {
+.boton-azul{
     background-color: #001058;
     color: white;
+    padding: 0.625rem 1.25rem;
     border: none;
-    border-radius: 10px;
-    padding: 8px 10px;
-    font-size: 14px;
-    width: 100px;
+    border-radius: 3.125rem;
+    font-size: 1rem;
     cursor: pointer;
 }
 
-/* Media Queries para pantallas más pequeñas */
-@media (max-width: 768px) {
-    .header h1 {
-        font-size: 2em; /* Hacer el tamaño de la fuente más pequeño en pantallas pequeñas */
-    }
-
-    button {
-        width: 100%; /* Hacer que los botones ocupen el ancho completo en pantallas pequeñas */
-        margin: 10px 0; /* Espaciado vertical entre botones */
-    }
-
-    .campo {
-        flex: 1 1 100%; /* Hacer que cada campo ocupe el 100% del ancho en pantallas pequeñas */
-    }
-}
-
-.cancel {
-    background-color: #FF6161;
+.boton-azul:hover{
+    background-color: #1a2a80;
     color: white;
 }
 
-.confirm {
-    background-color: #006A60;
+.boton-cancelar{
+    background-color: #7a7a7a;
     color: white;
-}
-
-.btn-regresar {
-    background-color: transparent;
-    color: #000000;
+    padding: 0.625rem 1.25rem;
     border: none;
-    font-size: 24px;
+    border-radius: 3.125rem;
+    font-size: 1rem;
     cursor: pointer;
-    margin-bottom: 5px;
-    display: flex;
-    align-items: center;
-    padding: 0;
 }
+
+.boton-cancelar:hover{
+    background-color: #5f5f5f;
+    color: white;
+}
+
+@media screen and (max-width: 768px) {
+    .divisor-formulario {
+        flex-direction: column;
+    }
+
+    .datos-columna-izquierda{
+        border-right: none;
+        padding-right: 0;
+        width: 100%;
+    }
+
+    .datos-columna-derecha{
+        padding-left: 0;
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 600px){
+    html{
+        font-size: 12px;
+    }
+}
+/* Estilos para campos de formulario */
+.campo-formulario {
+    width: 100%;
+    padding: 0.5rem;
+    margin: 0.3125rem 0;
+    box-sizing: border-box;
+    border: 0.0625rem solid #ccc;
+    border-radius: 0.25rem;
+}
+
+/* Estilos para selecciones */
+.seleccion {
+    width: 100%;
+    padding: 0.5rem;
+    margin: 0.3125rem 0;
+    box-sizing: border-box;
+    border: 0.0625rem solid #ccc;
+    border-radius: 0.25rem;
+    background-color: #f8f8f8; /* Color de fondo */
+}
+
+/* Estilos para textarea */
+textarea.campo-formulario {
+    height: 6.25rem;
+}
+
+.form-check-input {
+    margin-top: 0.25rem;
+}
+
+.errorlist{
+    color: #d40909;
+    font-size: 0.875rem;
+    margin-top: 0.1563rem;
+    margin-bottom: 0.1563rem;
+    list-style: none;
+}
+input[type="date"] {
+    width: 100%;
+    padding: 0.5rem;
+    margin: 0.3125rem 0;
+    box-sizing: border-box;
+    border: 0.0625rem solid #ccc;
+    border-radius: 0.25rem;
+}
+

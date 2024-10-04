@@ -3,34 +3,39 @@
 {% block content %}
 
 <link rel="stylesheet" type="text/css" href="{% static 'styles/mostrar_paciente.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <header>
-<a href="{% url 'admin_pacientes' %}">
+<a class="back-arrow" href="{% url 'admin_pacientes' %}">
     <img src="{% static 'icons/Volver-atras.svg' %}" alt="">
 </a>
-<h1>Información Paciente {{paciente.first_name}} {{paciente.last_name}}</h1>
-</header>
+<h1>Paciente {{paciente.first_name}} {{paciente.last_name}}</h1>
+</header>  
 
 <div class="container-paciente">
-    
     <div class="card-paciente">
+        <div class="icon-container" onclick="window.location.href='{% url 'editar_datos_paciente_admin' paciente.id %}'">
+            <img src="{% static 'icons/lapiz.svg' %}" class="icon">
+        </div>
         <div class="columna izquierda">
             <p><strong>Rut:</strong><br> <span>{{ paciente.rut }}</span></p>
-            <p><strong>Sexo:</strong><br> <span>{{ paciente.sexo }}</span></p>
-            <p><strong>Peso:</strong><br> <span>{{ paciente.peso|default:"Sin peso ingresado" }}</span></p>
-            <p><strong>IMC:</strong><br> <span>{{ imc|default:"Sin IMC ingresado" }}</span></p>
-            <p><strong>Medicamentos:</strong><br> <span>{{ paciente.medicamentos|default:"Sin medicamentos ingresados" }}</span></p>
+            <p><strong>Fecha de Ingreso:</strong><br><span>{{paciente.date_joined}}</span></p>
+            <p><strong>Correo Electrónico:</strong><br> <span>{{ paciente.email }}</span></p>
+            <p><strong>Número de teléfono:</strong><br> <span>{{ paciente.telefono }}</span></p>
+            <p><strong>Dirección:</strong><br> <span>{{ paciente.calle }}, {{ paciente.comuna }}, {{ paciente.provincia }}, {{ paciente.region }}</span></p>
+            <p><strong>Contacto de emergencia:</strong><br> <span>{{ paciente.contacto_emergencia }}</span></p>
+            <p><strong>Número contacto de emergencia:</strong><br> <span>{{ paciente.telefono_emergencia }}</span></p>
             <p><strong>Estado:</strong><br> <span>
                 {% if paciente.is_active %}
-                    Activo <span class="estado-activo"> <img src="{% static "icons/activo.svg" %}"></span>
+                    Activo <span class="estado-activo"> <img class = "img-activo" src="{% static "icons/activo.svg" %}"></span>
                 {% else %}
                     Inactivo
                 {% endif %}
             </span>
             </p>
-            <p><strong>Número de teléfono:</strong><br> <span>{{ paciente.telefono }}</span></p>
-            <p><strong>Patología:</strong><br> <span>{{ paciente.patologia }}</span></p>
-            <p><strong>Dispositivo Órtesis:</strong><br><span>{{ paciente.dispositivo_ortesis|default:"Sin dispositivo de órtesis ingresado" }}</span></p>
+            {% if not paciente.is_active %}
+                <p><strong>Motivo de desvinculación:</strong><br><span> {{ paciente.motivo_desvinculacion|default:"Sin motivo de desvinculación ingresado" }}</span></p>
+            {% endif %}
             <p><strong>Próxima Cita:</strong><br><span> 
                 {% if cita %}
                     {{ cita.fecha }}
@@ -41,31 +46,33 @@
             <button class="btn" onclick="window.location.href='{% url 'calendar_asignar_paciente_administrador' paciente.id paciente.terapeuta_id %}'">Asignar Cita</button>
             {% else %}
                 <button class="btn" disabled title="No se puede asignar cita sin terapeuta">Asignar Cita</button>
-            {% endif %} 
+            {% endif %}
             </span></p>
-
-        </div>
-        <div class="columna derecha">
-            <p><strong>Edad:</strong><br> <span>{{ edad }}</span></p>
-            <p><strong>Altura:</strong><br> <span>{{ paciente.altura|default:"Sin altura ingresada" }}</span></p>
-            <p><strong>Historial médico:</strong><br> <span>{{ paciente.historial_medico|default:"Sin historial médico" }}</span></p>
-            <p><strong>Alergias:</strong><br> <span>{{ paciente.alergias|default:"Sin alergias" }}</span></p>
-            <p><strong>Correo Electrónico:</strong><br> <span>{{ paciente.email }}</span></p>
-            <p><strong>Dirección:</strong><br> <span>{{ paciente.calle }}, {{ paciente.comuna }}, {{ paciente.provincia }}, {{ paciente.region }}</span></p>
-            <p><strong>Progreso:</strong><br> <span>{{ paciente.progreso|default:"Sin progreso ingresado" }}</span></p>
-            <p><strong>Actividad física:</strong><br><span>{{ paciente.actividad_fisica|default:"Sin actividad física ingresada" }}</span></p>
             <p><strong>Terapeuta a Cargo:</strong><br>
                 <span class="terapeuta-info">{{ paciente.terapeuta.user.first_name }} {{ paciente.terapeuta.user.last_name|default:"Sin terapeuta asignado" }}
                 <button class="btn" onclick="window.location.href='{% url 'elegir_terapeuta_administrador' paciente.id %}'">Asignar Terapeuta</button></span>
             </p>
-            {% if not paciente.is_active %}
-                <p><strong>Motivo de desvinculación:</strong><br><span> {{ paciente.motivo_desvinculacion|default:"Sin motivo de desvinculación ingresado" }}</span></p>
-            {% endif %}
+
         </div>
-    </div>
-    
-        
-        <div class="footer-card">
+        <div class="columna derecha">
+            <p><strong>Edad:</strong><br> <span>{{ edad }}</span></p>
+            <p><strong>Sexo:</strong><br> <span>{{ paciente.sexo }}</span></p>
+            <p><strong>Altura:</strong><br> <span>{{ paciente.altura|default:"Sin altura ingresada" }}</span></p>
+            <p><strong>Peso:</strong><br> <span>{{ paciente.peso|default:"Sin peso ingresado" }}</span></p>
+            <p><strong>IMC:</strong><br> <span>{{ imc|default:"Sin IMC ingresado" }}</span></p>
+            <p><strong>Actividad física:</strong><br><span>{{ paciente.actividad_fisica|default:"Sin actividad física ingresada" }}</span></p>
+            <p><strong>Alergias:</strong><br> <span>{{ paciente.alergias|default:"Sin alergias" }}</span></p>
+            <p><strong>Medicamentos:</strong><br> <span>{{ paciente.medicamentos|default:"Sin medicamentos ingresados" }}</span></p>
+            <p><strong>Patología:</strong><br> <span>{{ paciente.patologia }}</span></p>
+            <p><strong>Descripción de la patología</strong><br>
+                <span name="descripcion_patologia" class="campo-formulario" readonly>
+                    {% if paciente.descripcion_patologia %}
+                        {{ paciente.descripcion_patologia }}
+                    {% else %}
+                        Sin descripción de la patología
+                    {% endif %}
+                </span>
+            </p>
         </div>
     </div>
 </div>

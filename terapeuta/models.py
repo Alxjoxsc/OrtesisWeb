@@ -46,19 +46,14 @@ class Paciente(models.Model):
     email = models.CharField(max_length=254, null=True, blank=True)
     contacto_emergencia = models.CharField(max_length=100, null=True, blank=True)
     telefono_emergencia = models.CharField(max_length=12, null=True, blank=True)
-    historial_medico = models.TextField(null=True, blank=True)
-    medicamentos = models.CharField(max_length=500, null=True, blank=True)
     patologia = models.CharField(max_length=100, null=True, blank=True)
+    descripcion_patologia = models.TextField(null=True, blank=True)
+    medicamentos = models.CharField(max_length=500, null=True, blank=True)
     alergias = models.CharField(max_length=100, null=True, blank=True)
-    
-    # Campos adicionales que se pueden dejar vacíos
-    progreso = models.TextField(null=True, blank=True)  
     motivo_desvinculacion = models.CharField(
         max_length=500,
         null=True, blank=True
     )
-
-    dispositivo_ortesis = models.CharField(max_length=100, null=True, blank=True)
     actividad_fisica = models.CharField(
         max_length=100,
         choices=(
