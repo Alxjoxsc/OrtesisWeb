@@ -1032,3 +1032,28 @@ class EditarPacienteForm(forms.ModelForm):
             raise forms.ValidationError('La fecha de nacimiento debe ser anterior a la fecha actual.')
         
         return fecha_nacimiento
+    
+    def clean_alergias(self):
+        alergias = self.cleaned_data.get('alergias')
+        # Permitir múltiples palabras con letras, acentos, espacios y la letra ñ
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$', alergias):
+            raise forms.ValidationError('Las alergias solo pueden contener letras (incluyendo acentos y ñ) y espacios.')
+        
+        return alergias  
+    
+    def clean_contacto_emergencia(self):
+        contacto_emergencia = self.cleaned_data.get('contacto_emergencia')
+        # Permitir letras, acentos, espacios y la letra ñ para nombres
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', contacto_emergencia):
+            raise forms.ValidationError('El contacto de emergencia solo puede contener letras (incluyendo acentos y ñ) y espacios.')
+        
+        return contacto_emergencia
+    
+    def clean_patologia(self):
+        patologia = self.cleaned_data.get('patologia')
+        # Permitir letras, acentos, espacios y la letra ñ
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', patologia):
+            raise forms.ValidationError('La patología solo puede contener letras (incluyendo acentos y ñ) y espacios.')
+        
+        return patologia
+    

@@ -276,9 +276,10 @@ def editar_datos_paciente_admin(request, paciente_id, terapeuta=None):
         form = EditarPacienteForm(request.POST, instance=paciente)
         if form.is_valid():
             form.save()
-            print("Datos guardados exitosamente.")  # Agrega esta línea# Guarda el paciente automáticamente si el formulario es válido
-            messages.success(request,'Datos Guardados Exitosamente')
-            return redirect('listar_pacientes_activos')
+            messages.success(request, 'Datos guardados exitosamente.')
+            # Redirigir a la misma página con un parámetro de éxito en la URL
+            return redirect('editar_datos_paciente_admin', paciente_id=paciente_id)
+
 
     
     else:
