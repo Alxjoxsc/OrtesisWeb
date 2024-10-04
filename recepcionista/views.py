@@ -140,7 +140,7 @@ def asignar_terapeuta(request, terapeuta_id, paciente_id):
     paciente.terapeuta_id = terapeuta.id
     paciente.save()
     
-    return render(request, 'mostrar_paciente.html', {'paciente': paciente})
+    return render(request, 'mostrar_paciente_recepcionista.html', {'paciente': paciente})
 
 
 @role_required('Recepcionista')
@@ -233,7 +233,7 @@ def agendar_cita_recepcionista(request):
         paciente_instance.save()
         
         return redirect('mostrar_paciente_con_terapeuta', paciente_instance.id, terapeuta_instance.id)
-    return render(request, 'mostrar_paciente.html', {'paciente': paciente_instance})
+    return render(request, 'mostrar_paciente_recepcionista.html', {'paciente': paciente_instance})
 
     
 def formulario_agregar_paciente(request):
@@ -298,7 +298,7 @@ def mostrar_paciente_sin_terapeuta(request, paciente_id):
     edad = paciente.calcular_edad()
     imc = paciente.calcular_imc()
     cita = Cita.objects.filter(paciente_id=paciente_id).order_by('fecha').last()
-    return render(request, 'mostrar_paciente.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc})
+    return render(request, 'mostrar_paciente_recepcionista.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc})
 
 
 def mostrar_paciente_con_terapeuta(request, paciente_id, terapeuta_id):
@@ -307,7 +307,15 @@ def mostrar_paciente_con_terapeuta(request, paciente_id, terapeuta_id):
     edad = paciente.calcular_edad()
     imc = paciente.calcular_imc()
     cita = Cita.objects.filter(paciente_id=paciente_id).order_by('fecha').last()
-    return render(request, 'mostrar_paciente.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc, 'terapeuta':terapeuta})
+    return render(request, 'mostrar_paciente_recepcionista.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc, 'terapeuta':terapeuta})
+
+@role_required('Administrador')
+def mostrar_paciente_recepcionista(request, paciente_id):
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+    edad = paciente.calcular_edad()
+    imc = paciente.calcular_imc()
+    cita = Cita.objects.filter(paciente_id=paciente_id).order_by('fecha').last()
+    return render(request, 'mostrar_paciente_recepcionista.html', {'paciente': paciente, 'edad': edad, 'imc':imc, 'cita':cita})
 
 
 @role_required('Recepcionista')

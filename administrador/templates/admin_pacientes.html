@@ -63,7 +63,7 @@
                 <td class="centro-tabla">{{ paciente.rut }}</td>
                 <td class="centro-tabla">
                     <span class="badge {% if paciente.is_active %}bg-success{% else %}bg-secondary{% endif %}">
-                        {% if paciente.is_active %}Activo {% else %}Inactivo{% endif %}
+                        {% if paciente.is_active %}Activo <img class = "img-activo" src="{% static "icons/activo.svg" %}"> {% else %}Inactivo <img class = "img-activo" src="{% static "icons/inactivo.svg" %}"> {% endif %}
                     </span>
                 </td>
                 <td class="centro-tabla">{% if paciente.terapeuta %}{{ paciente.terapeuta.user.first_name }} {{ paciente.terapeuta.user.last_name }}{% else %}Sin terapeuta{% endif %}</td>

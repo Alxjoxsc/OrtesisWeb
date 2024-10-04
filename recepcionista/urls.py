@@ -14,6 +14,7 @@ urlpatterns = [
     #path('asignar_terapeuta_paciente', views.asignar_terapeuta_paciente, name ='asignar_terapeuta_paciente'),
     path('calendar_asignar_paciente/<int:paciente_id>//<int:terapeuta_id>/', views.calendar_asignar_paciente, name='calendar_asignar_paciente'),
     path('formulario_agregar_paciente', views.formulario_agregar_paciente, name='formulario_agregar_paciente'),
+    path('mostrar_paciente_recepcionista/<int:paciente_id>/', views.mostrar_paciente_recepcionista, name='mostrar_paciente_recepcionista'),
     path('mostrar_paciente_con_terapeuta/<int:paciente_id>//<int:terapeuta_id>/', views.mostrar_paciente_con_terapeuta, name='mostrar_paciente_con_terapeuta'),
     path('mostrar_paciente_sin_terapeuta/<int:paciente_id>/', views.mostrar_paciente_sin_terapeuta, name='mostrar_paciente_sin_terapeuta'),
     path('editar_datos_paciente_recepcionista/<int:paciente_id>', views.editar_datos_paciente_recepcionista, name='editar_datos_paciente_recepcionista')

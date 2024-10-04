@@ -6,12 +6,12 @@
 
 {% block extra_head%}
 <link rel="stylesheet" href="{% static 'styles/agregar_paciente.css' %}">
-<link rel="stylesheet" href="{% static 'styles/formularios.css' %}">
+<link rel="stylesheet" href="{% static 'css/formularios.css' %}">
 <link rel="stylesheet" href="{% static 'styles/modal.css' %}">
 {% endblock %}
 
 {% block header %}
-<a href="{% url 'recepcionista_pacientes_activos' %}">
+<a href="{% url 'listar_pacientes_activos' %}">
     <img src="{% static 'icons/Volver-atras.svg' %}" alt="">
 </a>
 <h1>Agregar paciente</h1>
@@ -65,6 +65,13 @@
                 <div class="error">{{ paciente_form.patologia.errors }}</div>
             </div>
 
+            <!-- Descripcion patologia -->
+            <div class="form-group">
+                <label for="{{ paciente_form.descripcion_patologia.id_for_label }}">{{ paciente_form.descripcion_patologia.label }}</label>
+                {{ paciente_form.descripcion_patologia }}
+                <div class="error">{{ paciente_form.descripcion_patologia.errors }}</div>
+            </div>
+
             <!-- Campo Sexo -->
             <div class="form-group">
                 <label for="{{ paciente_form.sexo.id_for_label }}">{{ paciente_form.sexo.label }}</label>
@@ -81,16 +88,9 @@
 
             <!-- Campo Estatura -->
             <div class="form-group">
-                <label for="{{ paciente_form.estatura.id_for_label }}">{{ paciente_form.estatura.label }}</label>
-                {{ paciente_form.estatura }}
-                <div class="error">{{ paciente_form.estatura.errors }}</div>
-            </div>
-
-            <!-- Historial Médico -->
-            <div class="form-group">
-                <label for="{{ paciente_form.historial_medico.id_for_label }}">{{ paciente_form.historial_medico.label }}</label>
-                {{ paciente_form.historial_medico }}
-                <div class="error">{{ paciente_form.historial_medico.errors }}</div>
+                <label for="{{ paciente_form.altura.id_for_label }}">{{ paciente_form.altura.label }}</label>
+                {{ paciente_form.altura }}
+                <div class="error">{{ paciente_form.altura.errors }}</div>
             </div>
 
             <!-- Medicamentos -->
@@ -102,9 +102,9 @@
 
             <!-- Alergias -->
             <div class="form-group">
-                <label for="{{ paciente_form.alergia.id_for_label }}">{{ paciente_form.alergia.label }}</label>
-                {{ paciente_form.alergia }}
-                <div class="error">{{ paciente_form.alergia.errors }}</div>
+                <label for="{{ paciente_form.alergias.id_for_label }}">{{ paciente_form.alergias.label }}</label>
+                {{ paciente_form.alergias }}
+                <div class="error">{{ paciente_form.alergias.errors }}</div>
             </div>
 
         </div>
@@ -242,7 +242,7 @@
 </script>
 <script>
     document.getElementById("boton-cancelar").addEventListener("click", function(){
-        window.location.href = "{% url 'admin_pacientes' %}";
+        window.location.href = "{% url 'listar_pacientes_activos' %}";
     });
 </script>
 {% block extra_js %}
