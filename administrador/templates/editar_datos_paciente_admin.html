@@ -96,7 +96,7 @@
                 {{ paciente_form.alergias }}
                 <div class="error">{{ paciente_form.alergias.errors }}</div>
             </div>
-
+            <!-- Terapeuta asinado -->
             <div class="form-group">
                 <label for="terapeuta">Terapeuta Asignado</label>
                 <div class="input-container">
@@ -113,10 +113,12 @@
 
             <!-- Campo Fecha de Nacimiento -->
             <div class="form-group">
-                <label for="{{ paciente_form.fecha_nacimiento.id_for_label }}">{{ paciente_form.fecha_nacimiento.label }}</label>
-                <input type="date" id="{{ paciente_form.fecha_nacimiento.id_for_label }}" name="fecha_nacimiento" value="{{ paciente_form.fecha_nacimiento.value|date:'Y-m-d' }}">
-                <div class="error">{{ paciente_form.fecha_nacimiento.errors }}</div>
-            </div>         
+                <label for="fecha_nacimiento">Fecha de nacimiento:</label>
+                <div class="fecha_nacimiento">
+                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="{{ paciente.fecha_nacimiento|date:'Y-m-d' }}" readonly>
+                </div>
+            </div>
+
             <!-- Campo Email -->
             <div class="form-group">
                 <label for="{{ paciente_form.email.id_for_label }}">{{ paciente_form.email.label }}</label>
@@ -170,7 +172,7 @@
                 <div class="error">{{ paciente_form.calle.errors }}</div>
             </div>
 
-            <div class="campo campo-proximaCita">
+            <div class="form-group">
                 <label for="proximaCita">Próxima Cita:</label>
                 <div class="proximacita-contenedor">
                     <input type="date" id="proximaCita" name="proximaCita" value="{{ fecha_cita|date:'Y-m-d' }}" readonly>
@@ -256,5 +258,7 @@
 </script>
 <script src="{% static 'js/formatear-rut.js' %}"></script>
 <script src="{% static 'js/formatear-telefono.js' %}"></script>
+<script src="{% static 'js/formatear-altura.js' %}"></script>
+<script src="{% static 'js/valida-peso-altura.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 {% endblock %}
