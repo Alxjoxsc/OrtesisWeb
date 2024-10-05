@@ -97,16 +97,45 @@ def recepcionista_cambiar_estado_inactivo(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         pacientes_ids = data.get('pacientes_ids', [])
-        Paciente.objects.filter(id__in=pacientes_ids).update(is_active=False)
-        return JsonResponse({'status': 'success'})
+        
+        # Obtener el queryset de los pacientes antes de actualizar su estado
+        pacientes = Paciente.objects.filter(id__in=pacientes_ids)
+        
+        # Eliminar todas las citas de los pacientes afectados
+        Cita.objects.filter(paciente__in=pacientes).delete()
+        
+        # Cambiar el estado de los pacientes a inactivo
+        pacientes.update(is_active=False)
+        
+        # Ahora tienes las instancias de los pacientes afectados
+        pacientes_afectados = list(pacientes)  # Puedes usarlas para lo que necesites
+        
+        return JsonResponse({
+            'status': 'success',
+            'pacientes_afectados': [paciente.id for paciente in pacientes_afectados]
+        })
+
+
 
 @role_required('Recepcionista')
 def recepcionista_restaurar_paciente(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         pacientes_ids = data.get('pacientes_ids', [])
-        Paciente.objects.filter(id__in=pacientes_ids).update(is_active=True)
-        return JsonResponse({'status': 'success'})
+        
+        # Obtener el queryset de los pacientes a restaurar
+        pacientes = Paciente.objects.filter(id__in=pacientes_ids)
+        
+        # Desasignar el terapeuta (poniendo terapeuta_id a None)
+        pacientes.update(terapeuta_id=None)
+        
+        # Restaurar el estado de los pacientes a activo
+        pacientes.update(is_active=True)
+        
+        return JsonResponse({
+            'status': 'success',
+            'pacientes_restaurados': [paciente.id for paciente in pacientes]
+        })
 
 
 @role_required('Recepcionista')
