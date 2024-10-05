@@ -32,7 +32,7 @@
         <div class="popup-content">
             <span class="close" id="closePopup">&times;</span>
             <h2>Agendar Cita <span id="fechaSeleccionada"></span></h2>
-            <form id="formCita" method="POST" action="{% url 'agendar_cita_administrador' %}">
+            <form id="formCita" method="POST" action="{% url 'agendar_cita_administrador' paciente.id terapeuta.id %}">
                 {% csrf_token %}
                 <label for="titulo" class="campo">Título:</label>
                 <input type="text" id="titulo" name="titulo" required placeholder="Ingrese el título de la cita">

@@ -211,7 +211,7 @@
 
 
     document.getElementById("boton-cancelar").addEventListener("click", function(){
-        window.location.href = "{% url 'admin_pacientes' %}";
+        window.location.href = "{% url 'mostrar_paciente_administrador' paciente.id %}";
     });
 
     document.addEventListener("DOMContentLoaded", function() {

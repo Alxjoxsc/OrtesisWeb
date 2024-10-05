@@ -209,56 +209,39 @@ def calendar_asignar_paciente_administrador(request, paciente_id, terapeuta_id):
     return render(request, 'calendar_asignar_paciente_administrador.html', {'horario_terapeuta': horario_terapeuta, 'cita': cita,
                                                               'paciente':paciente, 'terapeuta':terapeuta})
 @role_required('Administrador')
-def agendar_cita_administrador(request):
+def agendar_cita_administrador(request, paciente_id, terapeuta_id):
+    terapeuta_instance = get_object_or_404(Terapeuta, id=terapeuta_id)
+    paciente_instance = get_object_or_404(Paciente, id=paciente_id)
+
     if request.method == 'POST':
         titulo = request.POST['titulo']
-        terapeuta_id = request.POST['terapeuta']
-        paciente_id = request.POST['paciente']
         fecha = request.POST['fecha']
         hora = request.POST['hora']
         sala = request.POST['sala']
         detalle = request.POST['detalle']
-        
-    
-        terapeuta_instance = Terapeuta.objects.get(id=terapeuta_id)
-        
-        paciente_instance = Paciente.objects.get(id=paciente_id)
-        try:
-            # Intentar obtener una cita existente para el paciente y el terapeuta
-            cita = Cita.objects.filter(paciente=paciente_instance, terapeuta=terapeuta_instance).latest('fecha')
 
-            # Si existe, actualizar los campos
-            cita.titulo = titulo
-            cita.fecha = fecha
-            cita.hora = hora
-            cita.sala = sala
-            cita.detalle = detalle
-            mensaje = "Cita actualizada exitosamente."
+        # Obtener todas las citas existentes del paciente con ese terapeuta
+        citas_existentes = Cita.objects.filter(paciente=paciente_instance, terapeuta=terapeuta_instance)
 
-        except ObjectDoesNotExist:
-            # Si no existe, crear una nueva cita
-            cita = Cita(
-                terapeuta=terapeuta_instance,
-                paciente=paciente_instance,
-                titulo=titulo,
-                fecha=fecha,
-                hora=hora,
-                sala=sala,
-                detalle=detalle
-            )
-            mensaje = "Nueva cita creada exitosamente."
-    
-            # Guardar los cambios (ya sea la nueva cita o la cita actualizada)
-            cita.save()
-        
-        #Guardar la asignación del terapeuta al paciente
-        
-        paciente_instance.terapeuta_id = terapeuta_instance.id
-        paciente_instance.save()
-        
-        #Guardar la asignación del terapeuta al paciente
-        
+        # Eliminar todas las citas anteriores (si existen)
+        citas_existentes.delete()
+
+        # Crear una nueva cita
+        cita = Cita(
+            terapeuta=terapeuta_instance,
+            paciente=paciente_instance,
+            titulo=titulo,
+            fecha=fecha,
+            hora=hora,
+            sala=sala,
+            detalle=detalle
+        )
+        cita.save()
+
+        mensaje = "Cita creada y citas anteriores eliminadas exitosamente."
+
         return redirect('mostrar_paciente_administrador', paciente_instance.id)
+
     return render(request, 'mostrar_paciente_administrador.html', {'paciente': paciente_instance})
 
 @role_required('Administrador')

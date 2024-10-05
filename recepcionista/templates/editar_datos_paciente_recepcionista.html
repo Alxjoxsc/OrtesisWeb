@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block header %}
-<a href="{% url 'recepcionista_pacientes_activos' %}">
+<a href="{% url 'mostrar_paciente_recepcionista' paciente.id %}">
     <img src="{% static 'icons/Volver-atras.svg' %}" alt="">
 </a>
 <h1>Editar paciente</h1>
@@ -54,6 +54,13 @@
                 {{ paciente_form.patologia }}
                 <div class="error">{{ paciente_form.patologia.errors }}</div>
             </div>
+
+            <!-- Descripcion patologia -->
+            <div class="form-group">
+                <label for="{{ paciente_form.descripcion_patologia.id_for_label }}">{{ paciente_form.descripcion_patologia.label }}</label>
+                {{ paciente_form.descripcion_patologia }}
+                <div class="error">{{ paciente_form.descripcion_patologia.errors }}</div>
+            </div>
             
             <!-- Campo Sexo -->
             <div class="form-group">
@@ -76,13 +83,6 @@
                 <div class="error">{{ paciente_form.altura.errors }}</div>
             </div>
             
-            <!-- Historial Médico -->
-            <div class="form-group">
-                <label for="{{ paciente_form.historial_medico.id_for_label }}">{{ paciente_form.historial_medico.label }}</label>
-                {{ paciente_form.historial_medico }}
-                <div class="error">{{ paciente_form.historial_medico.errors }}</div>
-            </div>
-            
             <!-- Medicamentos -->
             <div class="form-group">
                 <label for="{{ paciente_form.medicamentos.id_for_label }}">{{ paciente_form.medicamentos.label }}</label>
@@ -101,7 +101,7 @@
                 <label for="terapeuta">Terapeuta Asignado</label>
                 <div class="input-container">
                     <input type="text" id="terapeuta" name="terapeuta" class="campo-formulario" required readonly value="{{ paciente.terapeuta|default:'Sin terapeuta' }}">
-                    <button type="button" class="boton-azul" data-url="{% url 'elegir_terapeuta' paciente.id%}" onclick="window.location.href=this.getAttribute('data-url')">Reasignar</button>
+                    <button type="button" class="boton-azul" data-url="{% url 'elegir_terapeuta' paciente.id %}" onclick="window.location.href=this.getAttribute('data-url')">Reasignar</button>
                 </div>
             </div>
 
@@ -175,7 +175,7 @@
                 <div class="proximacita-contenedor">
                     <input type="date" id="proximaCita" name="proximaCita" value="{{ fecha_cita|date:'Y-m-d' }}" readonly>
                     {% if terapeuta_asignado %}
-                    <button type="button" class="boton-azul" onclick="window.location.href=this.dataset.url" data-url="{% url 'calendar_asignar_paciente' paciente.id terapeuta_asignado  %}">
+                    <button type="button" class="boton-azul" onclick="window.location.href=this.dataset.url" data-url="{% url 'redirigir_asignar_cita' paciente.id terapeuta_asignado  %}">
                         Reagendar
                     </button>
                     {% else %}
@@ -211,7 +211,7 @@
 
 
     document.getElementById("boton-cancelar").addEventListener("click", function(){
-        window.location.href = "{% url 'recepcionista_pacientes_activos' %}";
+        window.location.href = "{% url 'mostrar_paciente_recepcionista' paciente.id %}";
     });
 
     document.addEventListener("DOMContentLoaded", function() {
