@@ -51,13 +51,21 @@ def elegir_terapeuta_administrador(request, paciente_id):
     terapeuta = Terapeuta.objects.all()
     return render(request, 'elegir_terapeuta_administrador.html', {'terapeuta': terapeuta, 'paciente': paciente})
 
+@role_required('Administrador')
 def asignar_terapeuta_administrador(request, terapeuta_id, paciente_id):
-    paciente = Paciente.objects.get(id=paciente_id)
-    terapeuta = Terapeuta.objects.get(id=terapeuta_id)
-    
-    paciente.terapeuta_id = terapeuta.id
+    # Obtener el paciente y el terapeuta, manejando el caso en que no existan
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+    terapeuta = get_object_or_404(Terapeuta, id=terapeuta_id)
+
+    # Obtener y eliminar todas las citas existentes del paciente
+    citas_existentes = Cita.objects.filter(paciente=paciente)
+    citas_existentes.delete()
+
+    # Asignar el terapeuta al paciente
+    paciente.terapeuta = terapeuta
     paciente.save()
-    
+
+    # Redirigir a la página de mostrar paciente
     return render(request, 'mostrar_paciente_administrador.html', {'paciente': paciente})
 
 @role_required('Administrador')
@@ -183,8 +191,18 @@ def mostrar_paciente_administrador(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
     edad = paciente.calcular_edad()
     imc = paciente.calcular_imc()
-    cita = Cita.objects.filter(paciente_id=paciente_id).order_by('fecha').last()
-    return render(request, 'mostrar_paciente_administrador.html', {'paciente': paciente, 'edad': edad, 'imc':imc, 'cita':cita})
+
+    try:
+        cita = Cita.objects.get(paciente_id=paciente_id)
+    except Cita.DoesNotExist:
+        cita = None  # Asigna None si no existe la cita
+
+    return render(request, 'mostrar_paciente_administrador.html', {
+        'paciente': paciente,
+        'edad': edad,
+        'imc': imc,
+        'cita': cita  # Envía la cita o None si no existe
+    })
 
 @role_required('Administrador')
 def listado_terapeutas(request, paciente_id):
@@ -221,7 +239,7 @@ def agendar_cita_administrador(request, paciente_id, terapeuta_id):
         detalle = request.POST['detalle']
 
         # Obtener todas las citas existentes del paciente con ese terapeuta
-        citas_existentes = Cita.objects.filter(paciente=paciente_instance, terapeuta=terapeuta_instance)
+        citas_existentes = Cita.objects.filter(paciente=paciente_instance)
 
         # Eliminar todas las citas anteriores (si existen)
         citas_existentes.delete()
