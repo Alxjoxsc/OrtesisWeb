@@ -155,16 +155,23 @@
     gap: 5px;
 }
 
+input[type="checkbox"] {
+    cursor: pointer;
+    margin: 0 20px;
+}
+
 .final-tabla {
     display: flex;
     justify-content: space-around;
     align-items: center;
     flex-direction: row;
+    max-height: 100%;
+    width: auto;
 }
 
 .final-tabla a img{
-    width: 50px;
-    height: 50px;
+    width: auto;
+    max-height: 100%;
 }
 /* Botones de acciones en la tabla */
 .table .btn {
@@ -233,25 +240,4 @@
 
 .boton-confirmar:hover {
     background-color: #008F85;
-}
-
-@media screen and (max-width: 1200px){
-    .final-tabla a img {
-        width: 40px;
-        height: 40px;
-    }
-}
-
-@media screen and (max-width: 768px){
-    .final-tabla a img {
-        width: 30px;
-        height: 30px;
-    }
-}
-
-@media screen and (max-width: 600px){
-    .final-tabla a img {
-        width: 25px;
-        height: 25px;
-    }
 }
