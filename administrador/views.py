@@ -32,7 +32,6 @@ def agregar_paciente_admin(request):
     if request.method == 'POST':
         form = CrearPacienteForm(request.POST)
         if form.is_valid():
-            form.save()
             # Guarda el nuevo paciente y almacena el objeto en 'paciente'
             paciente = form.save()  # Esto devuelve el objeto paciente creado
             success = True
