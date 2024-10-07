@@ -1,8 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 from autenticacion.models import Profile
-from datetime import timedelta
+from datetime import timedelta, date
 from django.utils import timezone
+from autenticacion.models import Region, Provincia, Comuna  # Importamos los modelos de ubicación
 
 class Terapeuta(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
@@ -19,21 +20,6 @@ class Terapeuta(models.Model):
 
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}"
-
-from django.db import models
-from terapeuta.models import Terapeuta
-from django.utils import timezone  # Para obtener la fecha y hora actuales
-
-from django.db import models
-from terapeuta.models import Terapeuta
-from autenticacion.models import Region, Provincia, Comuna  # Importamos los modelos de ubicación
-from django.utils import timezone  # Para manejar la fecha y hora actual
-
-from django.db import models
-from terapeuta.models import Terapeuta
-from autenticacion.models import Region, Provincia, Comuna  # Importamos los modelos de ubicación
-from django.utils import timezone  # Para manejar la fecha y hora actual
-from datetime import date  # Para calcular la edad
 
 class Paciente(models.Model):
     terapeuta = models.ForeignKey(Terapeuta, on_delete=models.CASCADE, null=True, blank=True)
@@ -104,10 +90,6 @@ class Paciente(models.Model):
 
         return edad
 
-
-
-
-
 class Cita(models.Model):
     terapeuta = models.ForeignKey(Terapeuta, on_delete=models.CASCADE, null=True, blank=True)
     paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, null=True, blank=True)
@@ -144,13 +126,17 @@ class Sesion(models.Model):
     hora_final = models.TimeField()
     fecha = models.DateField()
     duracion = models.IntegerField()
-    corriente = models.DecimalField(max_digits=5, decimal_places=2)
     observaciones = models.CharField(max_length=500)
 
     def __str__(self):
         terapeuta_nombre = f"{self.rutina.terapeuta.user.first_name} {self.rutina.terapeuta.user.last_name}" if self.rutina and self.rutina.terapeuta else "Sin terapeuta"
         paciente_nombre = f"{self.rutina.paciente.user.first_name} {self.rutina.paciente.user.last_name}" if self.rutina and self.rutina.paciente else "Sin paciente"
         return f"{terapeuta_nombre} - {paciente_nombre}"
+    
+class Corriente(models.Model):
+    sesion = models.ForeignKey(Sesion, related_name='corriente', on_delete=models.CASCADE, null=True, blank=True)
+    corriente = models.FloatField()
+    hora = models.DateTimeField(auto_now=True)
 
 class Horario(models.Model):
     terapeuta = models.ForeignKey(Terapeuta, on_delete=models.CASCADE, null=True, blank=True)
