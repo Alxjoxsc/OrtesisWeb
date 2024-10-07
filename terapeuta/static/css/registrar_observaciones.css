@@ -1,0 +1,318 @@
+/* Estilos para el contenedor principal */
+.contenedor-header {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    padding: 20px;
+    gap: 20px;
+}
+
+/* Estilos para el botón de volver atrás */
+.volver-atras {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+}
+
+/* Estilos para la barra de búsqueda */
+.barra-busqueda {
+    position: relative;
+    display: inline-block;
+    width: 100%; /* Cambia a 100% para ocupar todo el espacio disponible */
+    max-width: 800px; /* Opcional: limita el tamaño máximo */
+}
+
+/* Estilos para el input de búsqueda */
+.busca-observaciones {
+    width: 100%; /* Cambia a 100% para que se adapte a la barra */
+    padding: 10px 40px 10px 30px; /* Espacio para la lupa */
+    font-size: 16px;
+    color: #000000; /* Color del texto */
+    background-color: #F0F0F0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    text-align: left;
+}
+
+/* Estilos para el ícono de la lupa */
+.lupa-icono {
+    position: absolute;
+    right: 15px; /* Ajusta según sea necesario */
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none; /* Para que los clics vayan al input */
+    font-size: 16px; /* Ajusta el tamaño según tus preferencias */
+    color: #000000; /* Color de la lupa */
+}
+
+/* Estilos para el título de observaciones */
+.titulo-observaciones {
+    margin-top: 30px;
+    font-size: 64px;
+    color: #000000;
+    font-weight: 400;
+    margin-bottom: 25px;
+}
+
+/* Estilos para el contenedor de observaciones */
+.observaciones-container {
+    padding: 20px;
+    margin-left: 20px;
+}
+
+/* Estilos para las tarjetas de observación */
+.observacion-card {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin: 25px 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+/* Estilos para la fecha y eliminar */
+.fecha-y-eliminar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Estilos para el texto dentro de las tarjetas */
+.observacion-card p {
+    font-size: 18px;
+    color: #000000;
+    line-height: 1.75;
+    margin: 0;
+    margin-right: auto;
+}
+
+/* Estilos para los encabezados de observaciones */
+.observaciones-container h2 {
+    font-size: 32px;
+    font-weight: 400;
+    color: #000000;
+    margin: 0;
+    text-align: left;
+    padding: 0;
+}
+
+/* Estilos para los encabezados de las tarjetas de observación */
+.observacion-card h3 {
+    margin: 0 0px 10px;
+    background-color: #008CAB;
+    font-weight: 400;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+/* Estilos para el encabezado de paciente */
+.header-paciente {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Estilos para el botón de añadir */
+.btn-anadir {
+    background-color: #D9D9D9;
+    color: #000000;
+    border: none;
+    border-radius: 25px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+/* Estilos para el ícono de suma */
+.signo-plus {
+    background-color: black;
+    color: #D9D9D9;
+    padding: 5px 10px;
+    border-radius: 50%;
+    margin-left: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+/* Estilos para los iconos */
+.iconos {
+    display: flex;
+    gap: 10px;
+}
+
+/* Estilos para eliminar y editar observaciones */
+.eliminar-observacion,
+.editar-observacion {
+    color: #008CAB;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+/* Estilos para el popup */
+.popup {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Estilos para el contenido del popup */
+.popup-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80%;
+    overflow-y: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilos para el contenedor de botones en el popup */
+.boton-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 20px;
+}
+
+/* Estilos para el botón de cerrar */
+.close-btn {
+    color: #000000;
+    float: right;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+/* Estilos para el título del popup */
+#popup-title {
+    margin: 0 0 10px;
+    font-size: 18px;
+}
+
+/* Estilos para el textarea */
+textarea {
+    width: 100%;
+    height: 175px;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: none;
+}
+
+/* Estilos para los botones de submit y cancelar */
+.btn-submit,
+.btn-cancel {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.btn-submit {
+    background-color: #006A60;
+    color: white;
+}
+
+.btn-cancel {
+    background-color: #FF6161;
+    color: white;
+}
+
+/* Estilos responsive */
+@media (max-width: 1400px) and (max-height: 953px) {
+    .contenedor-header {
+        flex-direction: column;
+        align-items: flex-start; 
+        padding: 10px; 
+    }
+
+    .volver-atras {
+        position: static;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+
+    .busca-observaciones {
+        width: 100%;
+        margin-top: 10px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .contenedor-header {
+        flex-direction: column; 
+        align-items: flex-start;
+        padding: 10px; 
+    }
+
+    .volver-atras {
+        position: static;
+        margin-bottom: 10px;
+        display: flex; 
+        align-items: center;
+        width: 100%; 
+    }
+
+    .busca-observaciones {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .titulo-observaciones {
+        font-size: 40px; 
+        margin-top: 15px;
+    }
+
+    .observaciones-container {
+        margin-left: 0;
+    }
+
+    .header-paciente {
+        flex-direction: column;
+        align-items: flex-start; 
+        margin-bottom: 10px;
+    }
+
+    .btn-anadir {
+        margin-top: 10px;
+    }
+
+    .observacion-card {
+        margin: 15px 0;
+    }
+
+    .observacion-card h3 {
+        font-size: 20px;
+    }
+
+    .observacion-card p {
+        font-size: 16px;
+    }
+
+    .eliminar-observacion,
+    .editar-observacion {
+        font-size: 18px; 
+    }
+}

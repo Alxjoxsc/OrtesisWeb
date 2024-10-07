@@ -165,3 +165,11 @@ class Horario(models.Model):
 
     def __str__(self):
         return f"{self.terapeuta.user.first_name} {self.terapeuta.user.last_name} - {self.dia}"
+      
+class Observacion(models.Model):
+    paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, related_name='observaciones')
+    fecha = models.DateField(auto_now_add=True)
+    contenido = models.TextField()
+
+    def __str__(self):
+        return f"{self.paciente.first_name} {self.paciente.last_name}"

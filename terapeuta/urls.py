@@ -12,4 +12,8 @@ urlpatterns = [
     path("obtener-fechas-citas/", views.obtener_fechas_citas, name="obtener_fechas_citas"),
     path('historial-paciente/<int:paciente_id>/', views.historial_paciente_view, name='historial_paciente'),
     path('eliminar-cita/<int:cita_id>/', views.eliminar_cita, name='eliminar_cita'),
+    path('observaciones/<int:paciente_id>/', views.observaciones_paciente, name='observaciones_paciente'),
+    path('paciente/<int:paciente_id>/agregar_observacion/', views.agregar_observacion, name='agregar_observacion'),
+    path('editar-observacion/<int:observacion_id>/', views.editar_observacion, name='editar_observacion'),
+    path('eliminar_observacion/<int:observacion_id>/', eliminar_observacion, name='eliminar_observacion'),
 ]
