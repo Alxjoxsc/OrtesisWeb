@@ -1,0 +1,24 @@
+{% extends 'terapeuta_base.html' %}
+{% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/grafico_progreso_paciente.css' %}">
+{% endblock %}
+
+{% block title %}Progreso del paciente{% endblock %}
+
+{% block header %}
+
+{% endblock %}
+
+{% block content %}
+    <div id="chart" class="chart"></div>
+{% endblock %}
+
+{% block extra_js %}
+    <!--                    Apache Echarts                  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.1.0/echarts.min.js"></script>
+
+    <!--                    JS Personalizado                    -->
+    <script src="{% static 'js/grafico_progreso_paciente.js' %}"></script>
+{% endblock %}
+

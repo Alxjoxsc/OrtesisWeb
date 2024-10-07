@@ -1,3 +1,4 @@
+from random import randrange
 from django.shortcuts import render, redirect
 from autenticacion.decorators import role_required
 from .models import Cita, Terapeuta, Paciente
@@ -188,3 +189,35 @@ def eliminar_cita(request, cita_id):
         except Cita.DoesNotExist:
             return JsonResponse({'error': 'Cita no encontrada.'}, status=404)
     return JsonResponse({'error': 'Método no permitido.'}, status=405)
+
+################################################### GRÁFICOS PACIENTES ###################################################
+
+def grafico_progreso_paciente(request):
+    return render(request, 'grafico_progreso_paciente.html')
+
+def obtener_grafico_progreso_paciente(request):
+    
+    serie=[]
+    counter = 0
+    
+    while counter < 7:
+        serie.append(randrange(100, 400))
+        counter += 1
+
+    chart = {
+        'xAxis': {
+                'type': 'category',
+                'data': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            },
+        'yAxis': {
+                'type': 'value'
+            },
+        'series': [
+                {
+                'data': serie,
+                'type': 'line'
+                }
+            ]
+    }
+
+    return JsonResponse(chart)
