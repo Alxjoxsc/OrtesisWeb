@@ -1,0 +1,105 @@
+{% extends 'terapeuta_base.html' %}
+{% load static %}
+
+{% block extra_head %} 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/registrar_observaciones.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+{% endblock %}
+{% block title %}Observaciones{% endblock %}
+
+{% block header %}
+
+<div class="contenedor-header">
+    <a href="{% url 'historial_paciente' paciente.id %}" class="volver-atras">
+        <img src="{% static 'icons/Volver-atras.svg' %}" alt="Volver">
+    </a>
+    <div class="barra-busqueda">
+        <input type="text" class="busca-observaciones" placeholder="Buscar observaciones...">
+        <span class="lupa-icono"><i class="fas fa-search"></i></span>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block content %}
+<div class="observaciones-container">
+    
+    <div class="header-paciente">
+        <div class= "titulos">
+            <h1 class="titulo-observaciones">Observaciones</h1>
+            <h2>{{ paciente.first_name }} {{ paciente.last_name }}</h2>
+        </div>
+        <button class="btn-anadir">Añadir Observación<span class="signo-plus">+</span></button>
+    </div>
+
+    <div class="observaciones-list">
+        {% if observaciones %}
+            {% for observacion in observaciones %}
+            <div class="observacion-card">
+                <div class="fecha-y-eliminar">
+                    <h3>Fecha: {{ observacion.fecha|date:"d/m/Y" }}</h3>
+                    <div class="iconos">
+                        <i class="fas fa-pencil-alt editar-observacion" data-id="{{ observacion.id }}" title="Editar observación"></i>
+                        <i class="fas fa-trash eliminar-observacion" data-id="{{ observacion.id }}" title="Eliminar observación"></i>
+                    </div>
+                </div>
+                <p>{{ observacion.contenido }}</p>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No hay observaciones registradas para este paciente.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- popup de agregar observaciones -->
+<div id="popup" class="popup">
+    <div class="popup-content">
+        <span class="close-btn" id="close-popup">&times;</span>
+        <h2 id="popup-title">Fecha: {{ fecha_actual }}</h2>
+        <form id="observacion-form" method="post" action="{% url 'agregar_observacion' paciente.id %}">
+            {% csrf_token %}
+            <textarea id="contenido-observacion" name="contenido" placeholder="Escribe tu observación aquí..." required></textarea>
+            <div class="boton-container">
+                <button type="button" class="btn-cancel" id="btn-cancelar">Cancelar</button>
+                <button type="submit" class="btn-submit">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Popup para editar observación -->
+<div id="edit-popup" class="popup">
+    <div class="popup-content">
+        <span class="close-btn" id="close-edit-popup">&times;</span>
+        <h2 id="edit-popup-title">Editar Observación {{fecha_actual}}</h2>
+        <form id="edit-observacion-form" method="post">
+            {% csrf_token %}
+            <textarea id="edit-contenido-observacion" name="contenido" placeholder="Escribe tu observación aquí..." required></textarea>
+            <div class="boton-container">
+                <button type="button" class="btn-cancel" id="cancel-edit">Cancelar</button>
+                <button type="submit" class="btn-submit">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Popup para confirmar eliminación -->
+<div id="popup-eliminar" class="popup">
+    <div class="popup-content">
+        <span class="close-btn" id="close-popup-eliminar">&times;</span>
+        <h2>Confirmar Eliminación</h2>
+        <p>¿Está seguro de que desea eliminar esta observación?</p>
+        <div class="boton-container">
+            <button id="cancelar-eliminar" class="btn-cancel">Cancelar</button>
+            <button id="confirmar-eliminar" class="btn-submit">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/registrar_observaciones.js' %}"></script>
+{% endblock %}
