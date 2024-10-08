@@ -74,41 +74,54 @@
     <button class="btn-modificar-rutina">Modificar rutina actual <i class="fas fa-edit"></i></button>
   </div>
 
-  <div class="contenedor-rutinas">
-    <ul>
-        <li class="rutina-card">
-            <div class="rutina-header">
-                <h3>Rutina Actual</h3>
-            </div>
-            <div class="rutina-contenido">
-                <div class="rutina-info">
-                    <p>Sesiones Realizadas: 2 de 8</p>
-                    <p>Frecuencia de Sesiones: 1 cada 2 días</p>
-                    <p>Fecha de Inicio: 21/03/2024</p>
-                </div>
-                <div class="rutina-detalles">
-                    <div class="detalle">
-                        <p>Ángulo Inicial: 35°</p>
-                    </div>
-                    <div class="detalle">
-                        <p>Ángulo Final: 90°</p>
-                    </div>
-                    <div class="detalle">
-                        <p>Velocidad: XX</p>
-                    </div>
-                    <div class="detalle">
-                        <p>Repeticiones: 12</p>
-                    </div>
-                </div>
-                <div class="rutina-estado">
-                    <p>Estado: En Proceso</p>
-                    <button class="btn-ver-sesiones">Ver Sesiones <i class="fas fa-chevron-down"></i></button>
-                </div>
-            </div>
-        </li>
-        <!-- Aquí puedes agregar más elementos de rutina si es necesario -->
-    </ul>
-</div>
+ <!-- Aquí comienza la sección de rutinas -->
+ {% if rutinas %}
+ <div class="contenedor-rutinas">
+   <ul>
+     {% for rutina in rutinas %}
+       <li class="rutina-card">
+         <div class="rutina-header">
+           {% if forloop.first %}
+             <h3>Rutina Actual</h3>
+           {% elif forloop.counter == 2 %}
+             <h3>Rutina Anterior</h3>
+           {% else %}
+             <h3>{{ rutina.fecha_inicio|date:"d/m/Y" }}</h3>
+           {% endif %}
+         </div>
+         <div class="rutina-contenido">
+           <div class="rutina-info">
+             <p>Sesiones Realizadas: {{ rutina.sesiones_realizadas }} de {{ rutina.cantidad_sesiones }}</p>
+             <p>Frecuencia de Sesiones: 1 cada {{ rutina.frecuencia_cantidad }} {{ rutina.frecuencia_tipo }}</p>
+             <p>Fecha de Inicio: {{ rutina.fecha_inicio|date:"d/m/Y" }}</p>
+           </div>
+           <div class="rutina-detalles">
+             <div class="detalle">
+               <p>Ángulo Inicial: {{ rutina.angulo_inicial }}°</p>
+             </div>
+             <div class="detalle">
+               <p>Ángulo Final: {{ rutina.angulo_final }}°</p>
+             </div>
+             <div class="detalle">
+               <p>Velocidad: {{ rutina.velocidad }}</p>
+             </div>
+             <div class="detalle">
+               <p>Repeticiones: {{ rutina.repeticiones }}</p>
+             </div>
+           </div>
+           <div class="rutina-estado">
+             <p>Estado: {{ rutina.estado }}</p>
+             <button class="btn-ver-sesiones">Ver Sesiones <i class="fas fa-chevron-down"></i></button>
+           </div>
+         </div>
+       </li>
+     {% endfor %}
+   </ul>
+ </div>
+{% else %}
+ <p>Aún no hay rutinas para este paciente.</p>
+{% endif %}
+
  <!-- Modal Popup para confirmar la desvinculación -->
 <div id="desvincularModal" class="modal modal-desvincular">
     <div class="modal-content">

@@ -34,6 +34,44 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+     // Manejar el envío del formulario de nueva rutina
+    if (nuevaRutinaForm) {
+        nuevaRutinaForm.addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevenir el envío por defecto del formulario
+
+            const pacienteId = document.getElementById('pacienteId').value;
+
+            // Obtener los datos del formulario
+            const formData = new FormData(nuevaRutinaForm);
+
+            // Enviar los datos al backend usando fetch
+            fetch(`/paciente/${pacienteId}/crear_rutina/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken, // Asegúrate de que csrftoken está definido
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Rutina creada exitosamente.');
+                    // Puedes actualizar la página o la lista de rutinas aquí
+                    window.location.reload();
+                } else {
+                    alert('Error al crear la rutina: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error al crear la rutina:', error);
+                alert('Ocurrió un error al crear la rutina.');
+            });
+
+            // Ocultar el modal después de enviar los datos
+            nuevaRutinaModal.style.display = 'none';
+        });
+    }
+
     // Confirmar y enviar motivo de inactivación
     if (confirmarBtn) {
         confirmarBtn.addEventListener("click", function () {
