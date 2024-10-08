@@ -287,7 +287,8 @@
 .btn-ver-sesiones:hover {
     background-color: #005f6b;
 }
-/* Estilos generales para el popup de confirmación */
+
+/* Estilos generales para todos los popups de confirmación */
 .modal {
     display: none;
     position: fixed;
@@ -333,22 +334,17 @@
 
 .label-value {
     display: grid;
-    grid-template-columns: 200px 1fr; 
-    gap: 10px; 
+    grid-template-columns: 200px 1fr;
+    gap: 10px;
 }
 
-.label {
-    text-align: left; 
-}
-
-.value {
+.label, .value {
     text-align: left;
 }
 
 .motivo-inactivacion {
     margin-top: 10px;
 }
-
 
 .motivo-inactivacion textarea {
     width: 100%;
@@ -357,7 +353,7 @@
     border: 1px solid #ccc;
 }
 
-.mensaje-terapeuta{
+.mensaje-terapeuta {
     display: flex;
     text-align: center;
     font-weight: 500;
@@ -369,6 +365,7 @@
     gap: 100px;
 }
 
+/* Botones generales para todos los modals */
 .confirm-btn, .cancel-btn {
     padding: 10px 20px;
     border: none;
@@ -391,3 +388,60 @@
     opacity: 0.9;
 }
 
+/* Estilos específicos para el formulario Nueva Rutina */
+#nuevaRutinaForm {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#nuevaRutinaForm label {
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+#nuevaRutinaForm input[type="date"],
+#nuevaRutinaForm input[type="number"],
+#nuevaRutinaForm input[type="text"],
+#nuevaRutinaForm select {
+    background-color: #ebeaea;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.frecuencia-inputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.frecuencia-inputs input[type="number"] {
+    width: 60px;
+}
+
+.frecuencia-inputs select {
+    width: auto;
+    padding: 10px;
+}
+
+.configuracion-ortesis {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+.configuracion-ortesis .detalle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.configuracion-ortesis input[type="number"] {
+    width: 80px;
+    text-align: center;
+}
