@@ -54,6 +54,13 @@
                 {{ paciente_form.patologia }}
                 <div class="error">{{ paciente_form.patologia.errors }}</div>
             </div>
+
+            <!-- Descripcion patologia -->
+            <div class="form-group">
+                <label for="{{ paciente_form.descripcion_patologia.id_for_label }}">{{ paciente_form.descripcion_patologia.label }}</label>
+                {{ paciente_form.descripcion_patologia }}
+                <div class="error">{{ paciente_form.descripcion_patologia.errors }}</div>
+            </div>
             
             <!-- Campo Sexo -->
             <div class="form-group">
@@ -74,13 +81,6 @@
                 <label for="{{ paciente_form.altura.id_for_label }}">{{ paciente_form.altura.label }}</label>
                 {{ paciente_form.altura }}
                 <div class="error">{{ paciente_form.altura.errors }}</div>
-            </div>
-            
-            <!-- Historial Médico -->
-            <div class="form-group">
-                <label for="{{ paciente_form.historial_medico.id_for_label }}">{{ paciente_form.historial_medico.label }}</label>
-                {{ paciente_form.historial_medico }}
-                <div class="error">{{ paciente_form.historial_medico.errors }}</div>
             </div>
             
             <!-- Medicamentos -->
@@ -213,7 +213,7 @@
 
 
     document.getElementById("boton-cancelar").addEventListener("click", function(){
-        window.location.href = "{% url 'admin_pacientes' %}";
+        window.location.href = "{% url 'mostrar_paciente_administrador' paciente.id %}";
     });
 
     document.addEventListener("DOMContentLoaded", function() {
