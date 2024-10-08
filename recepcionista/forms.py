@@ -58,7 +58,7 @@ class CrearPacienteForm(forms.ModelForm):
         max_length=12, 
         label='Teléfono (*)', 
         required=True,
-        widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ej: +56 9 1234 5678'})
+        widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ej: 9 1234 5678'})
     )
 
     email = forms.EmailField(
@@ -78,14 +78,7 @@ class CrearPacienteForm(forms.ModelForm):
         max_length=12, 
         label='Teléfono Emergencia', 
         required=False,
-        widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ej: +56 9 1234 5678'})
-    )
-
-    historial_medico = forms.CharField(
-        max_length=100, 
-        label='Historial Médico', 
-        required=False,
-        widget=forms.TextInput(attrs={'class':'campo-formulario', 'placeholder' :'Ingrese el historial médico del paciente'})
+        widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ej: 9 1234 5678'})
     )
 
     medicamentos = forms.CharField(
@@ -101,19 +94,26 @@ class CrearPacienteForm(forms.ModelForm):
         required=True,
         widget=forms.TextInput(attrs={'class':'campo-formulario', 'placeholder' :'Ingrese la patología del paciente'})
     )
+    
+    descripcion_patologia = forms.CharField(
+        label='Descripción de la Patología (*)',
+        max_length=1000,  # Limita la longitud del texto a 1000 caracteres
+        required=True,  # Campo obligatorio
+        widget=forms.Textarea(  # Se usa el widget Textarea
+            attrs={
+                'class': 'campo-formulario',  # Clase CSS personalizada
+                'placeholder': 'Ingrese una descripción de la patología del paciente',  # Texto de marcador
+                'rows': 5,  # Opcional: Número de líneas visibles en el textarea
+                'cols': 50,  # Opcional: Número de caracteres visibles por línea
+            }
+        )
+    )
 
     alergias = forms.CharField(
         max_length=255, 
         label='Alergias', 
         required=False,
         widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ingrese las alergias del Paciente'})
-    )
-
-    dispositivo_ortesis = forms.CharField(
-        max_length=255, 
-        label='Dispositivo Órtesis', 
-        required=False,
-        widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ingrese el dispositivo de órtesis a utilizar'})
     )
 
     actividad_fisica = forms.ChoiceField(
@@ -179,11 +179,10 @@ class CrearPacienteForm(forms.ModelForm):
             'email', 
             'contacto_emergencia', 
             'telefono_emergencia', 
-            'historial_medico', 
             'medicamentos', 
             'patologia', 
+            'descripcion_patologia',
             'alergias', 
-            'dispositivo_ortesis', 
             'actividad_fisica', 
             'peso', 
             'altura', 
@@ -204,11 +203,10 @@ class CrearPacienteForm(forms.ModelForm):
             email=self.cleaned_data['email'],
             contacto_emergencia=self.cleaned_data['contacto_emergencia'],
             telefono_emergencia=self.cleaned_data['telefono_emergencia'],
-            historial_medico=self.cleaned_data['historial_medico'],
             medicamentos=self.cleaned_data['medicamentos'],
             patologia=self.cleaned_data['patologia'],
+            descripcion_patologia=self.cleaned_data['descripcion_patologia'],
             alergias=self.cleaned_data['alergias'],
-            dispositivo_ortesis=self.cleaned_data['dispositivo_ortesis'],
             actividad_fisica=self.cleaned_data['actividad_fisica'],
             peso=self.cleaned_data['peso'],
             altura=self.cleaned_data['altura'],
@@ -216,7 +214,6 @@ class CrearPacienteForm(forms.ModelForm):
             provincia=self.cleaned_data['provincia'],
             comuna=self.cleaned_data['comuna'],
             calle=self.cleaned_data['calle'],  # Calle agregada manualmente
-            progreso='',
             motivo_desvinculacion='',
             date_joined=timezone.now(),
             is_active=True
@@ -402,13 +399,6 @@ class EditarPacienteForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ej: 9 1234 5678'})
     )
 
-    historial_medico = forms.CharField(
-        max_length=100, 
-        label='Historial Médico', 
-        required=False,
-        widget=forms.TextInput(attrs={'class':'campo-formulario', 'placeholder' :'Ingrese el historial médico del paciente'})
-    )
-
     medicamentos = forms.CharField(
         max_length=255, 
         label='Medicamentos', 
@@ -422,6 +412,20 @@ class EditarPacienteForm(forms.ModelForm):
         required=True,
         widget=forms.TextInput(attrs={'class':'campo-formulario', 'placeholder' :'Ingrese la patología del paciente'})
     )
+    
+    descripcion_patologia = forms.CharField(
+        label='Descripción de la Patología (*)',
+        max_length=1000,  # Limita la longitud del texto a 1000 caracteres
+        required=True,  # Campo obligatorio
+        widget=forms.Textarea(  # Se usa el widget Textarea
+            attrs={
+                'class': 'campo-formulario',  # Clase CSS personalizada
+                'placeholder': 'Ingrese una descripción de la patología del paciente',  # Texto de marcador
+                'rows': 5,  # Opcional: Número de líneas visibles en el textarea
+                'cols': 50,  # Opcional: Número de caracteres visibles por línea
+            }
+        )
+    )
 
     alergias = forms.CharField(
         max_length=255, 
@@ -430,12 +434,6 @@ class EditarPacienteForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ingrese las alergias del Paciente'})
     )
 
-    dispositivo_ortesis = forms.CharField(
-        max_length=255, 
-        label='Dispositivo Órtesis', 
-        required=False,
-        widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ingrese el dispositivo de órtesis a utilizar'})
-    )
 
     actividad_fisica = forms.ChoiceField(
         choices=ACTIVIDAD_FISICA_CHOICES,
@@ -499,11 +497,10 @@ class EditarPacienteForm(forms.ModelForm):
             'email', 
             'contacto_emergencia', 
             'telefono_emergencia', 
-            'historial_medico', 
+            'descripcion_patologia',
             'medicamentos', 
             'patologia', 
             'alergias', 
-            'dispositivo_ortesis', 
             'actividad_fisica', 
             'peso', 
             'altura', 

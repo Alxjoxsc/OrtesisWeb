@@ -1,19 +1,19 @@
-{% extends 'administrador_base.html' %}
+{% extends 'recepcionista_base.html' %}
 {% load static %}
 {% block content %}
 
-<link rel="stylesheet" type="text/css" href="{% static 'styles/mostrar_paciente_administrador.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'styles/mostrar_paciente.css' %}">
 <link rel="stylesheet" href="{% static 'styles/modal.css' %}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <header>
 
 {% if paciente.is_active%}
-    <a class="back-arrow" href="{% url 'listar_pacientes_activos' %}">
+    <a class="back-arrow" href="{% url 'recepcionista_pacientes_activos' %}">
         <img src="{% static 'icons/Volver-atras.svg' %}" alt="">
     </a>
 {% else %}
-    <a class="back-arrow" href="{% url 'listar_pacientes_inactivos' %}">
+    <a class="back-arrow" href="{% url 'recepcionista_pacientes_inactivos' %}">
         <img src="{% static 'icons/Volver-atras.svg' %}" alt="">
     </a>
 {% endif %}
@@ -23,7 +23,7 @@
 <div class="container-paciente">
     <div class="card-paciente">
         {% if paciente.is_active %}
-            <div class="icon-container" onclick="window.location.href='{% url 'editar_datos_paciente_admin' paciente.id %}'">
+            <div class="icon-container" onclick="window.location.href='{% url 'editar_datos_paciente_recepcionista' paciente.id %}'">
                 <img src="{% static 'icons/lapiz.svg' %}" class="icon">
             </div>
         {% else %}
@@ -56,19 +56,19 @@
                     <p><strong>Próxima Cita:</strong><br><span> 
                         {% if cita %}
                             {{ cita.fecha }}
-                            <button class="btn" onclick="window.location.href='{% url 'calendar_asignar_paciente_administrador' paciente.id paciente.terapeuta_id %}'">Reasignar Cita</button>
+                            <button class="btn" onclick="window.location.href='{% url 'calendar_asignar_paciente' paciente.id paciente.terapeuta_id %}'">Reasignar Cita</button>
                         {% else %}
                             Sin cita asignada
-                            <button class="btn" onclick="window.location.href='{% url 'calendar_asignar_paciente_administrador' paciente.id paciente.terapeuta_id %}'">Asignar Cita</button>
+                            <button class="btn" onclick="window.location.href='{% url 'calendar_asignar_paciente' paciente.id paciente.terapeuta_id %}'">Asignar Cita</button>
                         {% endif %}
                     </span></p>
                 {% endif %}
                 <p><strong>Terapeuta a Cargo:</strong><br>
                     <span class="terapeuta-info">{{ paciente.terapeuta.user.first_name }} {{ paciente.terapeuta.user.last_name|default:"Sin terapeuta asignado" }}
                     {% if paciente.terapeuta%}
-                        <button class="btn" onclick="window.location.href='{% url 'elegir_terapeuta_administrador' paciente.id %}'">Reasignar Terapeuta</button></span>
+                        <button class="btn" onclick="window.location.href='{% url 'elegir_terapeuta' paciente.id %}'">Reasignar Terapeuta</button></span>
                     {% else %}
-                        <button class="btn" onclick="window.location.href='{% url 'elegir_terapeuta_administrador' paciente.id %}'">Asignar Terapeuta</button></span>
+                        <button class="btn" onclick="window.location.href='{% url 'elegir_terapeuta' paciente.id %}'">Asignar Terapeuta</button></span>
                     {% endif %}
                 </p>
             {% else %}
@@ -169,7 +169,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    window.location.href = "{% url 'listar_pacientes_activos' %}";
+                    window.location.href = "{% url 'recepcionista_pacientes_activos' %}";
                 } else {
                     alert(`Error al ${estado === 'inactivo' ? 'inactivar' : 'restaurar'} los pacientes.`);
                 }

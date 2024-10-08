@@ -241,3 +241,32 @@ input[type="checkbox"] {
 .boton-confirmar:hover {
     background-color: #008F85;
 }
+
+/*Círculos Verde y Amarillo*/
+.img-activo{
+    width: 15px;
+    height: 15px;
+    padding-top: 3px;
+    margin-left: 10px;
+}
+
+@media screen and (max-width: 1200px){
+    .final-tabla a img {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media screen and (max-width: 768px){
+    .final-tabla a img {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+@media screen and (max-width: 600px){
+    .final-tabla a img {
+        width: 25px;
+        height: 25px;
+    }
+}
