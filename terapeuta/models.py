@@ -126,6 +126,10 @@ class Sesion(models.Model):
     hora_final = models.TimeField()
     fecha = models.DateField()
     duracion = models.IntegerField()
+    angulo_min = models.IntegerField(null=True, blank=True)
+    angulo_max = models.IntegerField(null=True, blank=True)
+    velocidad = models.IntegerField(null=True, blank=True)
+    repeticiones = models.IntegerField(null=True, blank=True)
     observaciones = models.CharField(max_length=500)
 
     def __str__(self):
