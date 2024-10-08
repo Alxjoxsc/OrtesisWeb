@@ -97,14 +97,6 @@
                 <div class="error">{{ paciente_form.alergias.errors }}</div>
             </div>
 
-            <div class="form-group">
-                <label for="terapeuta">Terapeuta Asignado</label>
-                <div class="input-container">
-                    <input type="text" id="terapeuta" name="terapeuta" class="campo-formulario" required readonly value="{{ paciente.terapeuta|default:'Sin terapeuta' }}">
-                    <button type="button" class="boton-azul" data-url="{% url 'elegir_terapeuta_administrador' paciente.id %}" onclick="window.location.href=this.getAttribute('data-url')">Reasignar</button>
-                </div>
-            </div>
-
         </div>
 
         {% comment %} DATOS DEL paciente COLUMNA DERECHA {% endcomment %}
@@ -168,23 +160,7 @@
                 <label for="{{ paciente_form.calle.id_for_label }}">{{ paciente_form.calle.label }}</label>
                 {{ paciente_form.calle }}
                 <div class="error">{{ paciente_form.calle.errors }}</div>
-            </div>
-
-            <div class="campo campo-proximaCita">
-                <label for="proximaCita">Próxima Cita:</label>
-                <div class="proximacita-contenedor">
-                    <input type="date" id="proximaCita" name="proximaCita" value="{{ fecha_cita|date:'Y-m-d' }}" readonly>
-                    {% if terapeuta_asignado %}
-                    <button type="button" class="boton-azul" onclick="window.location.href=this.dataset.url" data-url="{% url 'redirigir_asignar_cita' paciente.id terapeuta_asignado  %}">
-                        Reagendar
-                    </button>
-                    {% else %}
-                    <button type="button" class="boton-azul" disabled>
-                        Reagendar
-                    </button>
-                    {% endif %}
-                </div>
-            </div>            
+            </div>           
         </div>
     </div>
     <div class="contenedor-botones">

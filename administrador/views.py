@@ -267,10 +267,6 @@ def editar_datos_paciente_admin(request, paciente_id, terapeuta=None):
     
     # Obtener la lista de terapeutas
     terapeutas = Terapeuta.objects.all()
-
-    # Obtener la última cita del paciente
-    ultima_cita = Cita.objects.filter(paciente=paciente).order_by('-fecha', '-hora').first()
-    fecha_cita = ultima_cita.fecha if ultima_cita else None
     
     if request.method == 'POST':
         form = EditarPacienteForm(request.POST, instance=paciente)
@@ -291,7 +287,6 @@ def editar_datos_paciente_admin(request, paciente_id, terapeuta=None):
         'paciente': paciente,
         'terapeutas': terapeutas,
         'terapeuta_asignado': paciente.terapeuta.id if paciente.terapeuta else None,
-        'fecha_cita': fecha_cita,
         'paciente_form': form
     })
 
