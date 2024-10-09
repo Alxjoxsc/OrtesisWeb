@@ -1,229 +1,227 @@
 {% extends 'terapeuta_base.html' %}
 {% load static %}
 
-{% block extra_head %} 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/historial_paciente.css' %}">
+{% block extra_head %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+  <link rel="stylesheet" href="{% static 'css/historial_paciente.css' %}" />
 {% endblock %}
 
-{% block title %}Historial del paciente{% endblock %}
+{% block title %}
+  Historial del paciente
+{% endblock %}
 
 {% block header %}
-        <!-- Botón para volver -->
-        <a href="{% url 'paciente_terapeuta' %}" class="back-button">
-            <i class="fas fa-arrow-left"></i>
-        </a>
-    <div class="contenedor-header">
-        <h1>Historial del paciente</h1>
-        <button class="desvincular-btn" data-id="{{ paciente.id }}">Desvincular paciente <i class="fas fa-unlink"></i></button>
-        <input type="hidden" id="pacienteId" value="{{ paciente.id }}">
-        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-    </div>
-    <script type="text/javascript">
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
+  <!-- Botón para volver -->
+  <a href="{% url 'paciente_terapeuta' %}" class="back-button"><i class="fas fa-arrow-left"></i></a>
+  <div class="contenedor-header">
+    <h1>Historial del paciente</h1>
+    <button class="desvincular-btn" data-id="{{ paciente.id }}">Desvincular paciente <i class="fas fa-unlink"></i></button>
+    <input type="hidden" id="pacienteId" value="{{ paciente.id }}" />
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
+  </div>
+  <script type="text/javascript">
+    function getCookie(name) {
+      let cookieValue = null
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';')
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim()
+          if (cookie.substring(0, name.length + 1) === name + '=') {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
+            break
+          }
         }
-        const csrftoken = getCookie('csrftoken');
-    </script>
+      }
+      return cookieValue
+    }
+    const csrftoken = getCookie('csrftoken')
+  </script>
 {% endblock %}
 
 {% block content %}
-<div class="contenedor-principal">
+  <div class="contenedor-principal">
     <!-- Sección superior con info del paciente y progreso -->
     <div class="contenedor-superior">
-        <div class="info-paciente">
-            <h2>{{ paciente.first_name }} {{ paciente.last_name }} | {{ paciente.rut }}</h2>
-            <div class="info-detalle">
-                <p>Edad: {{paciente.edad}}</p>
-                <p>Patología: {{paciente.patologia}}</p>
-            </div>
+      <div class="info-paciente">
+        <h2>{{ paciente.first_name }} {{ paciente.last_name }} | {{ paciente.rut }}</h2>
+        <div class="info-detalle">
+          <p>Edad: {{ paciente.edad }}</p>
+          <p>Patología: {{ paciente.patologia }}</p>
         </div>
-        <button class="progreso-paciente-btn" onclick="#">
-            <div class="progreso-paciente-content">
-                <h3>PROGRESO DEL PACIENTE</h3>
-                <span class="progreso-icono">
-                    <i class="fas fa-chart-bar"></i>
-                </span>
-            </div>
-        </button>
+      </div>
+      <button class="progreso-paciente-btn" onclick="#">
+        <div class="progreso-paciente-content">
+          <h3>PROGRESO DEL PACIENTE</h3>
+          <span class="progreso-icono"><i class="fas fa-chart-bar"></i></span>
+        </div>
+      </button>
     </div>
 
     <div class="contenedor-inferior">
-        <div class="info-cita">
-            <p>Próxima Cita: 30/08 <i class="fas fa-calendar-alt"></i></p>
-        </div>
-        <div class="acciones-paciente">
-            <button class="btn-observaciones">Observaciones</button>
-            <button class="btn-añadir-rutina"><i class="fas fa-plus"></i> Añadir Rutina</button>
-        </div>
+      <div class="info-cita">
+        <p>
+          Próxima Cita: 30/08 <i class="fas fa-calendar-alt"></i>
+        </p>
+      </div>
+      <div class="acciones-paciente">
+        <button class="btn-observaciones">Observaciones</button>
+        <button class="btn-añadir-rutina"><i class="fas fa-plus"></i> Añadir Rutina</button>
+      </div>
     </div>
-</div>
+  </div>
 
-    <div class="acciones-paciente">  
-        <button class="btn-modificar-rutina"><i class="fas fa-edit"></i> Modificar rutina actual</button>
-    </div>
+  <div class="modificar-rutina">
+    <button class="btn-modificar-rutina">Modificar rutina actual <i class="fas fa-edit"></i></button>
+  </div>
 
+ <!-- Aquí comienza la sección de rutinas -->
+  {% if rutinas %}
     <div class="contenedor-rutinas">
-        <div class="rutina-card">
+      <ul>
+        {% for rutina in rutinas %}
+          <li class="rutina-card">
             <div class="rutina-header">
+              {% if forloop.first %}
                 <h3>Rutina Actual</h3>
-                <p>Fecha de Inicio: 21/03/2024</p>
+              {% elif forloop.counter == 2 %}
+                <h3>Rutina Anterior</h3>
+              {% else %}
+                <h3>{{ rutina.fecha_inicio|date:"d/m/Y" }}</h3>
+              {% endif %}
             </div>
-            <div class="rutina-info">
-                <p>Sesiones Realizadas: 2 de 8</p>
-                <p>Frecuencia de Sesiones: 1 cada 2 días</p>
-            </div>
-            <div class="rutina-detalles">
+            <div class="rutina-contenido">
+              <div class="rutina-info">
+                <p>Sesiones Realizadas: {{ rutina.sesiones_realizadas }} de {{ rutina.cantidad_sesiones }}</p>
+                <p>Frecuencia de Sesiones: 1 cada {{ rutina.frecuencia_cantidad }} {{ rutina.frecuencia_tipo }}</p>
+                <p>Fecha de Inicio: {{ rutina.fecha_inicio|date:"d/m/Y" }}</p>
+              </div>
+              <div class="rutina-detalles">
                 <div class="detalle">
-                    <p>Ángulo Inicial: 35°</p>
+                  <p>Ángulo Inicial: {{ rutina.angulo_inicial }}°</p>
                 </div>
                 <div class="detalle">
-                    <p>Ángulo Final: 90°</p>
+                  <p>Ángulo Final: {{ rutina.angulo_final }}°</p>
                 </div>
                 <div class="detalle">
-                    <p>Velocidad: XX</p>
+                  <p>Velocidad: {{ rutina.velocidad }}</p>
                 </div>
                 <div class="detalle">
-                    <p>Repeticiones: 12</p>
+                  <p>Repeticiones: {{ rutina.repeticiones }}</p>
                 </div>
-            </div>
-            <div class="rutina-estado">
-                <p>Estado: En Proceso</p>
+              </div>
+              <div class="rutina-estado">
+                <p>Estado: {{ rutina.estado }}</p>
                 <button class="btn-ver-sesiones">Ver Sesiones <i class="fas fa-chevron-down"></i></button>
+              </div>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% else %}
+    <p>Aún no hay rutinas para este paciente.</p>
+  {% endif %}
+ <!-- Modal Popup para confirmar la desvinculación -->
+<div id="desvincularModal" class="modal modal-desvincular">
+    <div class="modal-content">
+        <span class="close" id="cerrarDesvincular">&times;</span>
+        <h2>¿Desea pasar a estado inactivo a este paciente?</h2>
+        <div class="modal-body">
+            <div class="label-value">
+                <span class="label">Nombre:</span>
+                <span class="value">{{ paciente.first_name }} {{ paciente.last_name }}</span>
+            </div>
+            <div class="label-value">
+                <span class="label">Rut:</span>
+                <span class="value">{{ paciente.rut }}</span>
+            </div>
+            <div class="label-value">
+                <span class="label">Sexo:</span>
+                <span class="value">{{ paciente.sexo }}</span>
+            </div>
+            <div class="label-value">
+                <span class="label">Edad:</span>
+                <span class="value">{{ paciente.edad }}</span>
+            </div>
+            <div class="label-value">
+                <span class="label">Número de Teléfono:</span>
+                <span class="value">{{ paciente.telefono }}</span>
+            </div>
+            <div class="label-value">
+                <span class="label">Correo Electrónico:</span>
+                <span class="value">{{ paciente.email }}</span>
+            </div>
+            <div class="label-value">
+                <span class="label">Patología:</span>
+                <span class="value">{{ paciente.patologia }}</span>
+            </div>
+            <div class="label-value">
+                <span class="label">Terapeuta a cargo:</span>
+                <span class="value">{{ terapeuta.nombre }}</span>
+            </div>
+
+            <!-- Campo para ingresar el motivo de la inactivación -->
+            <div class="motivo-inactivacion">
+                <label for="motivo">Motivo de inactivación:</label>
+                <textarea id="motivo" rows="4" placeholder="Ingrese el motivo de inactivación del paciente [máx 1000 caracteres]"></textarea>
+            </div>
+            <div class="mensaje-terapeuta">
+                <p>El paciente podrá ser visualizado en la sección de pacientes inactivos</p>
             </div>
         </div>
 
-        <!-- Rutina anterior 1 -->
-        <div class="rutina-card">
-            <div class="rutina-header">
-                <h3>Rutina #03</h3>
-                <p>Fecha de Inicio: 01/03/2024</p>
-            </div>
-            <div class="rutina-info">
-                <p>Sesiones Realizadas: 6 de 8</p>
-                <p>Frecuencia de Sesiones: 1 cada 2 días</p>
-            </div>
-            <div class="rutina-detalles">
-                <div class="detalle">
-                    <p>Ángulo Inicial: 45°</p>
-                </div>
-                <div class="detalle">
-                    <p>Ángulo Final: 80°</p>
-                </div>
-                <div class="detalle">
-                    <p>Velocidad: XX</p>
-                </div>
-                <div class="detalle">
-                    <p>Repeticiones: 12</p>
-                </div>
-            </div>
-            <div class="rutina-estado">
-                <p>Estado: Incompleta</p>
-                <button class="btn-ver-sesiones">Ver Sesiones <i class="fas fa-chevron-down"></i></button>
-            </div>
+        <!-- Botones de confirmación y cancelación -->
+        <div class="modal-footer">
+            <button class="cancel-btn" id="cancelarDesvinculacion">Cancelar</button>
+            <button class="confirm-btn" id="confirmarDesvinculacion">Confirmar</button>
         </div>
-
-        <!-- Rutina anterior 2 -->
-        <div class="rutina-card">
-            <div class="rutina-header">
-                <h3>Rutina #02</h3>
-                <p>Fecha de Inicio: 21/02/2024</p>
-            </div>
-            <div class="rutina-info">
-                <p>Sesiones Realizadas: 8 de 8</p>
-                <p>Frecuencia de Sesiones: 1 cada 2 días</p>
-            </div>
-            <div class="rutina-detalles">
-                <div class="detalle">
-                    <p>Ángulo Inicial: 45°</p>
-                </div>
-                <div class="detalle">
-                    <p>Ángulo Final: 70°</p>
-                </div>
-                <div class="detalle">
-                    <p>Velocidad: XX</p>
-                </div>
-                <div class="detalle">
-                    <p>Repeticiones: 12</p>
-                </div>
-            </div>
-            <div class="rutina-estado">
-                <p>Estado: Completa</p>
-                <button class="btn-ver-sesiones">Ver Sesiones <i class="fas fa-chevron-down"></i></button>
-            </div>
-        </div>
-        <!-- Modal Popup para confirmar la desvinculación -->
-        <div id="desvincularModal" class="modal">
-            <div class="modal-content">
-                <h2>¿Desea pasar a estado inactivo a este paciente?</h2>
-                <div class="modal-body">
-                    <div class="label-value">
-                        <span class="label">Nombre:</span>
-                        <span class="value">{{ paciente.first_name }} {{ paciente.last_name }}</span>
-                    </div>
-                    <div class="label-value">
-                        <span class="label">Rut:</span>
-                        <span class="value">{{ paciente.rut }}</span>
-                    </div>
-                    <div class="label-value">
-                        <span class="label">Sexo:</span>
-                        <span class="value">{{ paciente.sexo }}</span>
-                    </div>
-                    <div class="label-value">
-                        <span class="label">Edad:</span>
-                        <span class="value">{{ paciente.edad }}</span>
-                    </div>
-                    <div class="label-value">
-                        <span class="label">Número de Teléfono:</span>
-                        <span class="value">{{ paciente.telefono }}</span>
-                    </div>
-                    <div class="label-value">
-                        <span class="label">Correo Electrónico:</span>
-                        <span class="value">{{ paciente.email }}</span>
-                    </div>
-                    <div class="label-value">
-                        <span class="label">Patología:</span>
-                        <span class="value">{{ paciente.patologia }}</span>
-                    </div>
-                    <div class="label-value">
-                        <span class="label">Terapeuta a cargo:</span>
-                        <span class="value">{{ terapeuta.nombre }}</span>
-                    </div>
-        
-                    <!-- Campo para ingresar el motivo de la inactivación -->
-                    <div class="motivo-inactivacion">
-                        <label for="motivo">Motivo de inactivación:</label>
-                        <textarea id="motivo" rows="4" placeholder="Ingrese el motivo de inactivación del paciente [máx 1000 caracteres]"></textarea>
-                    </div>
-                    <div class = "mensaje-terapeuta">
-                        <p>El paciente podrá ser visualizado en la sección de pacientes inactivos</p>
-                    </div>
-                </div>
-        
-                <!-- Botones de confirmación y cancelación -->
-                <div class="modal-footer">
-                    <button class="cancel-btn" id="cancelarDesvinculacion">Cancelar</button>
-                    <button class="confirm-btn" id="confirmarDesvinculacion">Confirmar</button>
-                </div>
-            </div>
-        </div>
-        
+    </div>
 </div>
 
+<!-- Modal Popup para añadir nueva rutina -->
+<div id="nuevaRutinaModal" class="modal modal-nueva-rutina">
+    <div class="modal-content">
+        <span class="close" id="cerrarNuevaRutina">&times;</span>
+        <h2>Nueva Rutina</h2>
+        <form id="nuevaRutinaForm">
+            {% csrf_token %}
+            <label for="fecha_inicio">Fecha de Inicio</label>
+            <input type="date" id="fecha_inicio" name="fecha_inicio" required>
+
+            <label for="cantidad_sesiones">Cantidad de Sesiones</label>
+            <input type="number" id="cantidad_sesiones" name="cantidad_sesiones" required>
+
+            <label for="repeticiones">Repeticiones por Sesión</label>
+            <input type="number" id="repeticiones" name="repeticiones" required>
+
+            <label for="frecuencia_sesiones">Frecuencia de Sesiones</label>
+            <div class="frecuencia-inputs">
+                <input type="number" id="frecuencia_cantidad" name="frecuencia_cantidad" required>
+                <select id="frecuencia_tipo" name="frecuencia_tipo">
+                    <option value="dias">días</option>
+                    <option value="semanas">semanas</option>
+                </select>
+            </div>
+
+            <label for="angulo_inicial">Ángulo Inicial</label>
+            <input type="number" id="angulo_inicial" name="angulo_inicial" required>
+
+            <label for="angulo_final">Ángulo Final</label>
+            <input type="number" id="angulo_final" name="angulo_final" required>
+
+            <label for="velocidad">Velocidad</label>
+            <input type="text" id="velocidad" name="velocidad" required>
+
+            <div class="modal-footer">
+                <button type="button" class="cancel-btn" id="cancelarNuevaRutina">Cancelar</button>
+                <button type="submit" class="confirm-btn">Confirmar</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/historial_paciente.js' %}"></script>
+  <script src="{% static 'js/historial_paciente.js' %}"></script>
 {% endblock %}

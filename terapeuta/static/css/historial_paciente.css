@@ -12,6 +12,7 @@
     color: #008CAB;
     transition: color 0.3s ease;
 }
+
 .contenedor-header h1 {
     display: flex;
     margin: 0;
@@ -44,14 +45,13 @@
 
 /* -------------------CONTENEDOR PRINCIPAL------------------- */
 .contenedor-principal {
-    Width: 98.5%;
+    width: 95%;
     display: flex;
     flex-direction: column;
     background-color: #D9D9D9;
     border-top-right-radius: 50px;
     padding: 25px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    margin: 10px 10px;
+    margin: 0 auto;
 }
 
 /* Contenedor superior que incluye información y progreso */
@@ -119,6 +119,7 @@
 
 /* -------------------CONTENEDOR INFERIOR------------------- */
 .contenedor-inferior {
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -131,102 +132,158 @@
     color: #000000;
 }
 
-.info-cita i {
-    color: #008CAB;
-}
-
-.acciones-paciente {
-    display: flex;
-    gap: 10px;
-}
-
 /* Botones */
-.btn-observaciones, .btn-añadir-rutina {
+.btn-observaciones,
+.btn-añadir-rutina {
     margin-top: 10px;
+    margin-right: 15px;
     padding: 10px 15px;
     border: none;
     background-color: #ffffff;
     color: #000000;
-    font-size:16px;
+    font-size: 16px;
     cursor: pointer;
     border-radius: 50px;
     width: 164px;
     gap: 10px;
 }
 
-.btn-observaciones:hover, .btn-añadir-rutina:hover {
+.btn-observaciones:hover,
+.btn-añadir-rutina:hover {
     background-color: #008CAB;
     color: #ffffff;
 }
 
+.info-cita i {
+    color: #008CAB;
+}
+
+/* -------- Boton Modificar Rutina --------------- */
+
+.modificar-rutina {
+    display: flex;
+    flex-direction: row-reverse;
+    margin: 15px 30px;
+    gap: 10px;
+}
+
+.btn-modificar-rutina {
+    background-color: #008CAB;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
 /* -------------------CONTENEDOR RUTINAS------------------- */
 .contenedor-rutinas {
-    margin: 10px 10px;
+    width: 95%;
+    margin: 20px auto;
     display: flex;
     flex-direction: column;
-    gap: 20px;
 }
 
 .rutina-card {
-    background-color: white;
-    border-radius: 10px;
+    background-color: #ffffff;
+    border-radius: 15px;
     padding: 20px;
     border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+    list-style: none;
+    margin-bottom: 20px;
+}
+
+.rutina-card:hover {
+    transform: translateY(-5px);
+}
+
+.rutina-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .rutina-header h3 {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
+    font-size: 22px;
+    font-weight: 600;
+    color: #008cab;
 }
 
 .rutina-header p {
-    font-size: 14px;
+    font-size: 16px;
     color: #666;
+}
+
+.rutina-contenido {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    align-items: center;
+    gap: 20px;
 }
 
 .rutina-info {
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
-    margin-bottom: 20px;
-    font-size: 14px;
+    height: 100%;
+    font-size: 15px;
     color: #333;
 }
 
+.rutina-info p {
+    margin: 0;
+}
+
 .rutina-detalles {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
     gap: 10px;
-    margin-bottom: 10px;
+    justify-items: center;
+    align-items: center;
 }
 
 .detalle {
-    background-color: #E0F7FA;
+    width: 100%;
+    background-color: #e0f7fa;
     padding: 10px;
-    border-radius: 8px;
-    font-size: 14px;
+    border-radius: 10px;
+    font-size: 15px;
     text-align: center;
-    flex-basis: 24%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .rutina-estado {
     display: flex;
+    flex-direction: column;
+    align-items: flex-end;
     justify-content: space-between;
-    align-items: center;
+    height: 100%;
+    gap: 10px;
+    margin-right: 20px;
 }
 
 .rutina-estado p {
-    font-size: 14px;
+    width: 80%;
+    font-size: 16px;
     color: #666;
+    font-weight: 500;
 }
 
 .btn-ver-sesiones {
-    background-color: #008CAB;
+    width: 80%;
+    background-color: #008cab;
     color: white;
     border: none;
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 14px;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 15px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
@@ -235,7 +292,7 @@
     background-color: #005f6b;
 }
 
-/* Estilos generales para el popup de confirmación */
+/* Estilos generales para todos los popups de confirmación */
 .modal {
     display: none;
     position: fixed;
@@ -257,6 +314,10 @@
     border-radius: 10px;
     width: 50%;
     max-width: 600px;
+    /* Aseguramos que ambos modales tengan el mismo tamaño */
+    min-width: 500px;
+    max-height: 80%;
+    overflow-y: auto;
 }
 
 .modal-content h2 {
@@ -281,14 +342,11 @@
 
 .label-value {
     display: grid;
-    grid-template-columns: 200px 1fr; 
-    gap: 10px; 
+    grid-template-columns: 200px 1fr;
+    gap: 10px;
 }
 
-.label {
-    text-align: left; 
-}
-
+.label,
 .value {
     text-align: left;
 }
@@ -297,7 +355,6 @@
     margin-top: 10px;
 }
 
-
 .motivo-inactivacion textarea {
     width: 100%;
     padding: 10px;
@@ -305,7 +362,7 @@
     border: 1px solid #ccc;
 }
 
-.mensaje-terapeuta{
+.mensaje-terapeuta {
     display: flex;
     text-align: center;
     font-weight: 500;
@@ -317,12 +374,15 @@
     gap: 100px;
 }
 
-.confirm-btn, .cancel-btn {
+/* Botones generales para todos los modals */
+.confirm-btn,
+.cancel-btn {
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
+    margin-top: 10px;
 }
 
 .confirm-btn {
@@ -335,7 +395,96 @@
     color: white;
 }
 
-.confirm-btn:hover, .cancel-btn:hover {
+.confirm-btn:hover,
+.cancel-btn:hover {
     opacity: 0.9;
 }
 
+/* Estilos específicos para el formulario Nueva Rutina */
+#nuevaRutinaForm {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#nuevaRutinaForm label {
+    font-weight: 500;
+    margin-bottom: 0px;
+}
+
+#nuevaRutinaForm input[type="date"],
+#nuevaRutinaForm input[type="number"],
+#nuevaRutinaForm input[type="text"],
+#nuevaRutinaForm select {
+    background-color: #ebeaea;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.frecuencia-inputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.frecuencia-inputs input[type="number"] {
+    width: 60px;
+}
+
+.frecuencia-inputs select {
+    width: auto;
+    padding: 10px;
+}
+
+.configuracion-ortesis {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+.configuracion-ortesis .detalle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.configuracion-ortesis input[type="number"] {
+    width: 80px;
+    text-align: center;
+}
+
+
+#desvincularModal .modal-content{
+    width: 50%;
+    max-width: 600px;
+    min-width: 500px;
+    max-height: 80%;
+    overflow-y: auto;
+}
+
+
+#desvincularModal .modal-body{
+    width: 80%;
+    overflow-y: auto;
+}
+
+#nuevaRutinaModal .modal-content {
+    display: flex;
+    width: 50%;
+    max-width: 300px;
+    max-height: 90%;
+    overflow-y: auto;
+}
+
+#nuevaRutinaModal form {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin: 0 auto;
+    width: 80%;
+}

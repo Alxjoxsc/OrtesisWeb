@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from autenticacion.decorators import role_required
-from .models import Cita, Terapeuta, Paciente
+from .models import Cita, Terapeuta, Paciente, Rutina
 from django.http import HttpResponse
 from django.core.paginator import Paginator
 from datetime import date
@@ -120,9 +120,13 @@ def cambiar_estado_paciente(request, id):
 
 def historial_paciente_view(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
+    terapeuta = get_object_or_404(Terapeuta, user=request.user)
     paciente.edad = calcular_edad(paciente.fecha_nacimiento)
-    context = {'paciente': paciente}
-    
+    rutinas = Rutina.objects.filter(paciente=paciente).order_by('-fecha_inicio')
+    context = {'paciente': paciente,
+               'terapeuta': terapeuta,
+               'rutinas': rutinas,
+                }
     return render(request, 'historial_paciente.html', context)
 
 #-------------------------------------CITAS-------------------------------------
@@ -188,3 +192,49 @@ def eliminar_cita(request, cita_id):
         except Cita.DoesNotExist:
             return JsonResponse({'error': 'Cita no encontrada.'}, status=404)
     return JsonResponse({'error': 'Método no permitido.'}, status=405)
+
+#-------------------------------------RUTINAS-------------------------------------
+
+def crear_rutina(request, paciente_id):
+    if request.method == 'POST':
+        # Obtener los datos del formulario
+        fecha_inicio = request.POST.get('fecha_inicio')
+        cantidad_sesiones = request.POST.get('cantidad_sesiones')
+        repeticiones = request.POST.get('repeticiones')
+        frecuencia_cantidad = request.POST.get('frecuencia_cantidad')
+        frecuencia_tipo = request.POST.get('frecuencia_tipo')
+        angulo_inicial = request.POST.get('angulo_inicial')
+        angulo_final = request.POST.get('angulo_final')
+        velocidad = request.POST.get('velocidad')
+
+        try:
+            paciente = get_object_or_404(Paciente, id=paciente_id)
+            terapeuta = get_object_or_404(Terapeuta, user=request.user)
+
+            # Calcular la fecha de término
+            from datetime import datetime, timedelta
+
+            fecha_inicio_date = datetime.strptime(fecha_inicio, '%Y-%m-%d').date()
+            frecuencia_dias = int(frecuencia_cantidad) * (7 if frecuencia_tipo == 'semanas' else 1)
+            total_duracion = (int(cantidad_sesiones) - 1) * frecuencia_dias
+            fecha_termino_date = fecha_inicio_date + timedelta(days=total_duracion)
+
+            # Crear la nueva rutina
+            nueva_rutina = Rutina.objects.create(
+                terapeuta=terapeuta,
+                paciente=paciente,
+                fecha_inicio=fecha_inicio_date,
+                fecha_termino=fecha_termino_date,
+                angulo_inicial=angulo_inicial,
+                angulo_final=angulo_final,
+                repeticiones=repeticiones,
+                velocidad=velocidad,
+                descripcion='',  # Puedes ajustar este campo si es necesario
+            )
+
+            return JsonResponse({'status': 'success'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Método no permitido'})
