@@ -156,6 +156,7 @@ def agregar_paciente(request):
 def elegir_terapeuta(request, id):
     paciente = Paciente.objects.get(id=id)
     terapeuta = Terapeuta.objects.all()
+    print(terapeuta)
     return render(request, 'elegir_terapeuta.html', {'terapeuta': terapeuta, 'paciente': paciente})
 
 @role_required('Recepcionista')

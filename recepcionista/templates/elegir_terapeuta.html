@@ -1,79 +1,84 @@
 {% extends 'recepcionista_base.html' %}
 {% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/asignar_terapeuta.css' %}">
+<link rel="stylesheet" href="{% static 'css/tabla.css' %}">
+<link rel="stylesheet" href="{% static 'styles/modal.css' %}">
+{% endblock %}
+
+{% block title %}Asignar Terapeuta{% endblock %}
+
+{% block header %}
+<div class="contenedor-header">
+    <h1>Asignar Terapeuta</h1>
+    <!--CAMBIAR POR EL BUSCADOR DE Terapeuta-->
+    <form method="GET" action="{% url 'recepcionista_pacientes_activos' %}" class="pacientes-busqueda-form">
+        <input type="text" name="search" placeholder="Búsqueda por Nombre, Rut o Tratamiento" class="pacientes-search-input" id="searchBar" value="{{ request.GET.search|default:'' }}" oninput="toggleClearButton()">
+        <img src="{% static 'icons/Lupa.svg' %}" alt="Buscar" class="pacientes-search-icon">
+        <button type="button" id="clearButton" class="pacientes-clear-button" onclick="clearSearch()" style="display: {% if request.GET.search %}inline-block{% else %}none{% endif %};">
+            Limpiar Filtro
+        </button>
+    </form>
+    <h3>Seleccione el terapeuta a asignar para el paciente {{paciente.first_name}} {{paciente.last_name}}</h3>
+</div>
+{% endblock %}
 
 {% block content %}
 
-<link rel="stylesheet" href="{% static 'css/recepcionista.css' %}">
-<div class="recepcionista-container">  
-    <div class="header">
-        <h2>Asignar Terapeuta</h2>
-        <form method="get" action="{% url 'recepcionista_terapeutas_activos' %}" class="busqueda-form">
-            <div class="busqueda-input">
-                <input type="text" name="q" placeholder="Búsqueda por Nombre o Rut" value="{{ request.GET.q }}">
-            </div>
-        </form>
-    </div>
-
-    <div class="header_right">
-        <button type="button" class="filtro-btn">
-            Filtrar <span class="flecha">▼</span>
-        </button>
-        <div class="dropdown-content">
-            <label>
-                <input type="checkbox" name="filtro" value="fecha_ingreso"> Fecha de Ingreso
-            </label>
-            <label>
-                <input type="checkbox" name="filtro" value="especialidad"> Especialidad
-            </label>
-        </div>
-    </div>
-
-    <!-- Encabezado de la lista de terapeutas -->
-    <div class="lista-terapeutas">
-        <div class="header-lista">
-            <span><strong>Nombre</strong></span>
-            <span><strong>Rut</strong></span>
-            <span><strong>Disponibilidad</strong></span>
-            <span><strong>Especialidad</strong></span>
-            <span><strong>Fecha de Ingreso</strong></span>
-        </div>
-        
-        <!-- Lista de terapeutas -->
-        {% for terapeuta in terapeuta %}
-        {% with url='asignar_terapeuta' %}
-            {% with paciente_id=paciente.id %}
-                {% with terapeuta_id=terapeuta.id %}
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Rut</th>
+                <th>Disponibilidad</th>
+                <th>Especialidad</th>
+                <th>Fecha de Ingreso</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for terapeuta in terapeuta %}
+                <tr>
+                    <td class="centro-tabla">{{ terapeuta.user.first_name }} {{ terapeuta.user.last_name }}</td>
+                    <td class="centro-tabla">{{ terapeuta.user.profile.rut }}</td>
+                    <td class="centro-tabla">{{ terapeuta.disponibilidad }}</td>
+                    <td class="centro-tabla">{{ terapeuta.especialidad }}</td>
+                    <td class="centro-tabla">{{ terapeuta.fecha_ingreso }}</td>
+                    <td class="final-tabla">
                         <a href="javascript:void(0);" 
-                            title="Pasar a estado inactivo"
-                            onclick="mostrarPopUpAsignarTerapeuta('{{ paciente.id }}', '{{ paciente.first_name }} {{ paciente.last_name }}', '{{ paciente.rut}}', '{{terapeuta.user.first_name}} {{terapeuta.user.last_name}}', '{% url url paciente_id terapeuta_id %}')">
-                                <div class="terapeuta-card">
-                                    <span>{{ terapeuta.user.first_name }} {{ terapeuta.user.last_name }}</span>
-                                    <span>{{ terapeuta.user.profile.rut }}</span>
-                                    <span class="disponibilidad-disponible">{{ terapeuta.disponibilidad }}</span>
-                                    <span>{{ terapeuta.especialidad }}</span>
-                                    <span>{{ terapeuta.fecha_ingreso }}</span>
-                                    <img src="{% static 'icons/terapeuta.svg' %}" alt="Icono terapeuta">
-                                </div>
+                            title="Asignar terapeuta a {{paciente.first_name}} {{paciente.last_name}}"
+                            onclick="mostrarPopUpAsignarTerapeuta('{{ paciente.id }}', '{{ paciente.first_name }}', '{{ paciente.last_name }}', '{{ terapeuta.id }}', '{{ terapeuta.user.first_name }}', '{{ terapeuta.user.last_name }}', '{% url 'asignar_terapeuta' paciente.id terapeuta.id %}')">
+                            <img src="{% static 'icons/terapeuta.svg' %}" class="terapeuta-icono" alt="Icono terapeuta">
                         </a>
-                        {% endwith %}
-                {% endwith %}
-            {% endwith %}
-        {% empty %}
-            <p>No se encontraron terapeutas activos.</p>
-        {% endfor %}
-
-    </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="7" class="table-empty">No hay terapeutas registrados.</td>
+                </tr>
+            {% endfor %}
+            <tr id="no-coincidencias" style="display: none;">
+                <td colspan="7" class="table-empty">No se encontraron coincidencias.</td>
+            </tr>
+        </tbody>        
+    </table>
 </div>
 
-<div id="popupModal" style="display:none;">
-    <div class="popup-content">
-        <h3 id="popup-titulo"></h3>
+<!-- Modal Popup de Confirmación -->
+<div id="popupModal" class="modal" style="display: none;">
+    <div class="contenido-modal">
+        <span class="close" onclick="cerrarPopUp()">&times;</span>
+        <h2 id="popup-titulo">Asignar Terapeuta al Paciente</h2>
         <p id="popup-mensaje"></p>
-        <button id="confirmButton">Confirmar</button>
-        <button onclick="document.getElementById('popupModal').style.display='none'">Cancelar</button>
+        <div class="botones-modal">
+            <button class="boton-cancelar" onclick="cerrarPopUp()">Cancelar</button>
+            <button class="boton-confirmar" id="confirmButton">Confirmar</button>
+        </div>
     </div>
 </div>
 
+{% endblock %}
 
-<script src="{% static 'js/popup.js' %}">
+{% block extra_js %}
+<script src="{% static 'js/asignar_terapeuta.js' %}"></script>
 {% endblock %}
