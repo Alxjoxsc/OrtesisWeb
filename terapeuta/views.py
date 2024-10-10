@@ -248,3 +248,15 @@ def perfil(request):
     }
     
     return render(request, 'perfil.html', context)
+
+def editar_perfil(request, pk):
+    terapeuta = get_object_or_404(Terapeuta, pk=pk)
+    if request.method == 'POST':
+        nueva_presentacion = request.POST.get('presentacion')
+        nuevo_correo = request.POST.get('correo_contacto')
+        
+        terapeuta.presentacion = nueva_presentacion
+        terapeuta.correo_contacto = nuevo_correo
+        terapeuta.save()
+        
+        return redirect('perfil')

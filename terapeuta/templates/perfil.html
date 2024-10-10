@@ -18,7 +18,7 @@
         <div class="presentation">
             <h2>
                 Presentación
-                <i class="fas fa-pencil-alt edit-icon presentation-edit-icon"></i>
+                <i class="fas fa-pencil-alt edit-icon presentation-edit-icon" onclick="openPopup('edit-profile-popup')"></i>
             </h2>
             <p>{{ terapeuta.presentacion }}</p>
         </div>
@@ -30,24 +30,53 @@
         </svg>
 
         <div class="contact-info">
-            <h2>Contacto</h2>
+            <h2>Contactos</h2>
 
             <div class="contact-item">
                 <i class="fas fa-envelope"></i>
                 <p>{{ terapeuta.correo_contacto }}</p> 
-                <i class="fas fa-pencil-alt edit-icon"></i>
+                <i class="fas fa-pencil-alt edit-icon" onclick="openPopup('edit-profile-popup')"></i>
             </div>
-            <!-- <div class="contact-item">
-                <i class="fas fa-phone phone-icon"></i>
-                <p>{{ terapeuta.telefono }}</p>
-                <i class="fas fa-pencil-alt edit-icon"></i>
-            </div>
-            <div class="contact-item">
-                <i class="fas fa-globe"></i>
-                <p>{{ terapeuta.pagina_web }}</p>
-                <i class="fas fa-pencil-alt edit-icon"></i>
-            </div> -->
         </div>
     </div>
 </div>
+
+<!-- Popup de Ediciones -->
+<div id="edit-profile-popup" class="popup">
+    <div class="popup-content">
+        <span class="close" onclick="closePopup('edit-profile-popup')">&times;</span>
+        <h1 class="popup-title">Editar datos</h1>
+
+        <form id="edit-profile-form" method="POST" action="{% url 'editar_perfil' terapeuta.id %}">
+            {% csrf_token %}
+            
+            <!-- Sección para editar la presentación -->
+            <h2 class="popup-subtitle">Presentación</h2>
+            <textarea id="presentacion" name="presentacion" rows="4">{{ terapeuta.presentacion }}</textarea>
+            
+            <!-- Sección para editar los contactos -->
+            <h3 class="popup-subtitle">Contactos</h3>
+            
+            <div class="contact-inputs">
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" name="correo_contacto" placeholder="Correo Electrónico" value="{{ terapeuta.correo_contacto }}">
+                </div>
+            <div class="popup-actions">
+                <button type="button" class="cancel-btn" onclick="closePopup('edit-profile-popup')">Cancelar</button>
+                <button type="submit" class="confirm-btn">Confirmar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openPopup(popupId) {
+    document.getElementById(popupId).style.display = 'flex';
+}
+function closePopup(popupId) {
+    document.getElementById(popupId).style.display = 'none';
+}
+</script>
+
 {% endblock %}
