@@ -238,3 +238,13 @@ def crear_rutina(request, paciente_id):
 
     else:
         return JsonResponse({'status': 'error', 'message': 'Método no permitido'})
+    
+def perfil(request):
+    
+    terapeuta = get_object_or_404(Terapeuta, user=request.user)
+    
+    context = {
+        'terapeuta': terapeuta,
+    }
+    
+    return render(request, 'perfil.html', context)
