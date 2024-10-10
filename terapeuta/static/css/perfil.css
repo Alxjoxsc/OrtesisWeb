@@ -25,7 +25,8 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: flex-start;
+    margin-left: 50px;
     margin-top: 20px;
 }
 
@@ -109,6 +110,7 @@
 /* Estilos para el logo SVG */
 .svg-logo {
     transform: scale(4);
+    margin-left: 250px;
     width: 100px;
     height: 50px;
     fill: #008CAB;

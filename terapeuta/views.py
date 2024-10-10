@@ -10,6 +10,9 @@ from django.db.models import Q
 from .models import Paciente
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404
+from django.core.exceptions import ValidationError
+from django.contrib import messages
+import re
 
 @role_required('Terapeuta')
 
@@ -254,9 +257,32 @@ def editar_perfil(request, pk):
     if request.method == 'POST':
         nueva_presentacion = request.POST.get('presentacion')
         nuevo_correo = request.POST.get('correo_contacto')
-        
-        terapeuta.presentacion = nueva_presentacion
-        terapeuta.correo_contacto = nuevo_correo
-        terapeuta.save()
-        
-        return redirect('perfil')
+
+        try:
+            # Validar el correo
+            validar_correo(nuevo_correo)
+
+            # Verificar si el correo ya está en uso por otro terapeuta
+            if Terapeuta.objects.filter(correo_contacto=nuevo_correo).exclude(pk=terapeuta.pk).exists():
+                messages.error(request, 'El correo ya está en uso por otro terapeuta.')
+            else:
+                terapeuta.presentacion = nueva_presentacion
+                terapeuta.correo_contacto = nuevo_correo
+                terapeuta.save()
+
+                messages.success(request, 'Perfil actualizado correctamente.')
+                return redirect('perfil')
+
+        except ValidationError as e:
+            messages.error(request, str(e))
+
+    context = {
+        'terapeuta': terapeuta,
+    }
+    return render(request, 'perfil.html', context)
+    
+def validar_correo(correo):
+    # Expresión regular para validar el formato del correo
+    patron = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    if not re.match(patron, correo):
+        raise ValidationError("Introduzca una dirección de correo electrónico válida.")
