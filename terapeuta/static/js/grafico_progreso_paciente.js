@@ -10,7 +10,8 @@ const getOptionChart = async(paciente_id) => {
         // Verificar si la respuesta contiene un mensaje de error
         if (data.mensaje) {
             // Mostrar mensaje en lugar del gráfico
-            document.getElementById("chart").innerHTML = `<p>${data.mensaje}</p>`;
+            document.getElementById("chart").innerHTML = `<div class="contenedor-mensaje"><p>${data.mensaje}</p></div>`;
+            document.getElementById("chart_velocidad").innerHTML = `<div class="contenedor-mensaje"><p>${data.mensaje}</p></div>`;
             return null; // No continuar con la configuración del gráfico
         }
 

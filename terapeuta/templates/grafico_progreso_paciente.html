@@ -8,7 +8,12 @@
 {% block title %}Progreso del paciente{% endblock %}
 
 {% block header %}
-<h1>Progreso del Paciente</h1>
+<div class="contenedor-header">
+    <a href="{% url 'historial_paciente' paciente.id %}">
+        <img src="{% static 'icons/Volver-atras.svg' %}" alt="">
+    </a>
+    <h1>Progreso del Paciente</h1>
+</div>
 {% endblock %}
 
 {% block content %}

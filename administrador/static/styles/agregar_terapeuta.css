@@ -48,6 +48,19 @@
     cursor: pointer;
 }
 
+.contenedor-header {
+    display: flex;
+    flex-direction: column;
+}
+
+.contenedor-header a img {
+    margin: 1rem 0 0 1rem;
+}
+
+.contenedor-header a img:hover {
+    filter: brightness(0) saturate(100%) invert(32%) sepia(91%) saturate(1826%) hue-rotate(166deg) brightness(91%) contrast(101%);
+}
+
 h1{
     font-weight: normal;
     font-size: 3rem;
