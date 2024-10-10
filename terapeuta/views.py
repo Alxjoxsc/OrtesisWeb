@@ -8,7 +8,7 @@ from datetime import date
 from django.http import JsonResponse
 import json
 from django.db.models import Q
-from .models import Paciente
+from .models import Paciente, Rutina, Sesion
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404
 
@@ -192,32 +192,103 @@ def eliminar_cita(request, cita_id):
 
 ################################################### GRÁFICOS PACIENTES ###################################################
 
-def grafico_progreso_paciente(request):
-    return render(request, 'grafico_progreso_paciente.html')
+def grafico_progreso_paciente(request, paciente_id):
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+    return render(request, 'grafico_progreso_paciente.html', {'paciente': paciente})
 
-def obtener_grafico_progreso_paciente(request):
+def obtener_grafico_progreso_paciente(request, paciente_id):
+    paciente = get_object_or_404(Paciente, id=paciente_id)
     
-    serie=[]
-    counter = 0
-    
-    while counter < 7:
-        serie.append(randrange(100, 400))
-        counter += 1
+    # Obtener la rutina activa del paciente
+    rutina_actual = Rutina.objects.filter(paciente=paciente).order_by('-fecha_inicio').first()
 
+    # Si no hay rutina activa, devolver un mensaje
+    if rutina_actual is None:
+        return JsonResponse({'mensaje': 'El paciente no tiene ninguna rutina activa.'}, status=200)
+
+    # Obtener todas las sesiones de la rutina actual
+    sesiones = Sesion.objects.filter(rutina=rutina_actual).order_by('fecha')
+
+    # Listas para almacenar las fechas, ángulos y velocidades de las sesiones
+    fechas = []
+    angulos_min = []
+    angulos_max = []
+    velocidades = []  # Lista para almacenar las velocidades
+
+    # Extraer datos de cada sesión
+    for sesion in sesiones:
+        fechas.append(sesion.fecha.strftime('%Y-%m-%d'))  # Convertir la fecha a string
+        angulos_min.append(sesion.angulo_min)
+        angulos_max.append(sesion.angulo_max)
+        velocidades.append(sesion.velocidad)  # Asumiendo que cada sesión tiene un campo 'velocidad'
+
+    # Crear el objeto de configuración del gráfico en formato JSON
     chart = {
         'xAxis': {
-                'type': 'category',
-                'data': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-            },
+            'type': 'category',
+            'data': fechas,  # Fechas de las sesiones
+        },
         'yAxis': {
-                'type': 'value'
-            },
+            'type': 'value',
+            'name': 'Ángulo (grados)'  # Etiqueta del eje Y para los ángulos
+        },
         'series': [
-                {
-                'data': serie,
-                'type': 'line'
+            {
+                'name': 'Ángulo Mínimo',
+                'data': angulos_min,
+                'type': 'line',  # Gráfico de línea para ángulos mínimos
+                'itemStyle': {
+                    'color': '#FF7F50'  # Color personalizado
                 }
-            ]
+            },
+            {
+                'name': 'Ángulo Máximo',
+                'data': angulos_max,
+                'type': 'line',  # Gráfico de línea para ángulos máximos
+                'itemStyle': {
+                    'color': '#87CEFA'  # Color personalizado
+                }
+            }
+        ],
+        'tooltip': {
+            'trigger': 'axis',
+            'formatter': '{b}<br />Mín: {c0}°<br />Máx: {c1}°',  # Formato compacto
+        },
+        'legend': {
+            'data': ['Ángulo Mínimo', 'Ángulo Máximo'],  # Leyenda del gráfico
+            'top': '5%'  # Asegura que la leyenda se vea bien en pantallas pequeñas
+        }
     }
 
-    return JsonResponse(chart)
+    # Crear un segundo objeto para el gráfico de velocidad
+    chart_velocidad = {
+        'xAxis': {
+            'type': 'category',
+            'data': fechas,  # Fechas de las sesiones
+        },
+        'yAxis': {
+            'type': 'value',
+            'name': 'Velocidad (m/s)'  # Etiqueta del eje Y para la velocidad
+        },
+        'series': [
+            {
+                'name': 'Velocidad',
+                'data': velocidades,
+                'type': 'line',  # Gráfico de línea para la velocidad
+                'itemStyle': {
+                    'color': '#32CD32'  # Color personalizado para velocidad
+                }
+            }
+        ],
+        'tooltip': {
+            'trigger': 'axis',
+            'formatter': '{b}<br />v: {c} m/s'  # Formato del tooltip para velocidad
+        },
+        'legend': {
+            'data': ['Velocidad']  # Leyenda del gráfico de velocidad
+        }
+    }
+
+    # Devolver ambos gráficos en la respuesta
+    return JsonResponse({'chart': chart, 'chart_velocidad': chart_velocidad})
+

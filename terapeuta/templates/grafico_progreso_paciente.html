@@ -1,17 +1,25 @@
 {% extends 'terapeuta_base.html' %}
 {% load static %}
 {% block extra_head %}
+<!--        Estilos Personalizados      -->
 <link rel="stylesheet" href="{% static 'css/grafico_progreso_paciente.css' %}">
 {% endblock %}
 
 {% block title %}Progreso del paciente{% endblock %}
 
 {% block header %}
-
+<h1>Progreso del Paciente</h1>
 {% endblock %}
 
 {% block content %}
-    <div id="chart" class="chart"></div>
+    <h2>{{ paciente.first_name }} {{ paciente.last_name }} | {{ paciente.rut }}</h2>
+    <div class="contenedor-graficos">
+        <!-- Contenedor para el gráfico de ángulos -->
+        <div id="chart" class="chart" data-paciente-id="{{ paciente.id }}"></div>
+
+        <!-- Contenedor para el gráfico de velocidad -->
+        <div id="chart_velocidad" class="chart"></div>
+    </div>
 {% endblock %}
 
 {% block extra_js %}

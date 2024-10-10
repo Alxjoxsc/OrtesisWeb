@@ -49,7 +49,7 @@
                 <p>Patología: {{paciente.patologia}}</p>
             </div>
         </div>
-        <button class="progreso-paciente-btn" onclick="#">
+        <button class="progreso-paciente-btn" onclick="redirigirAGrafico({{ paciente.id }})">
             <div class="progreso-paciente-content">
                 <h3>PROGRESO DEL PACIENTE</h3>
                 <span class="progreso-icono">
@@ -226,4 +226,10 @@
 
 {% block extra_js %}
 <script src="{% static 'js/historial_paciente.js' %}"></script>
+<script type="text/javascript">
+    function redirigirAGrafico(paciente_id) {
+        const url = `/grafico_progreso_paciente/${paciente_id}/`;
+        window.location.href = url;
+    }
+</script>
 {% endblock %}
