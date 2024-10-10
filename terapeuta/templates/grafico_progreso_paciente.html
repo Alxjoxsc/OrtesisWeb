@@ -1,0 +1,37 @@
+{% extends 'terapeuta_base.html' %}
+{% load static %}
+{% block extra_head %}
+<!--        Estilos Personalizados      -->
+<link rel="stylesheet" href="{% static 'css/grafico_progreso_paciente.css' %}">
+{% endblock %}
+
+{% block title %}Progreso del paciente{% endblock %}
+
+{% block header %}
+<div class="contenedor-header">
+    <a href="{% url 'historial_paciente' paciente.id %}">
+        <img src="{% static 'icons/Volver-atras.svg' %}" alt="">
+    </a>
+    <h1>Progreso del Paciente</h1>
+</div>
+{% endblock %}
+
+{% block content %}
+    <h2>{{ paciente.first_name }} {{ paciente.last_name }} | {{ paciente.rut }}</h2>
+    <div class="contenedor-graficos">
+        <!-- Contenedor para el gráfico de ángulos -->
+        <div id="chart" class="chart" data-paciente-id="{{ paciente.id }}"></div>
+
+        <!-- Contenedor para el gráfico de velocidad -->
+        <div id="chart_velocidad" class="chart"></div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <!--                    Apache Echarts                  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.1.0/echarts.min.js"></script>
+
+    <!--                    JS Personalizado                    -->
+    <script src="{% static 'js/grafico_progreso_paciente.js' %}"></script>
+{% endblock %}
+

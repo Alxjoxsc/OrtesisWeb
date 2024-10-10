@@ -12,10 +12,12 @@
 {% endblock %}
 
 {% block header %}
-<a href="{% url 'gestion_terapeutas' %}">
-    <img src="{% static 'icons/Volver-atras.svg' %}" alt="">
-</a>
-<h1>Agregar terapeuta</h1>
+<div class="contenedor-header">
+    <a href="{% url 'gestion_terapeutas' %}">
+        <img src="{% static 'icons/Volver-atras.svg' %}" alt="">
+    </a>
+    <h1>Agregar terapeuta</h1>
+</div>
 {% endblock %}
 
 {% block content %}
