@@ -48,7 +48,7 @@
                         <a href="javascript:void(0);" 
                             title="Asignar terapeuta a {{paciente.first_name}} {{paciente.last_name}}"
                             onclick="mostrarPopUpAsignarTerapeuta('{{ paciente.id }}', '{{ paciente.first_name }}', '{{ paciente.last_name }}', '{{ terapeuta.id }}', '{{ terapeuta.user.first_name }}', '{{ terapeuta.user.last_name }}', '{% url 'asignar_terapeuta' paciente.id terapeuta.id %}')">
-                            <img src="{% static 'icons/terapeuta.svg' %}" class="terapeuta-icono" alt="Icono terapeuta">
+                            <img src="{% static 'icons/terapeuta_morado.svg' %}" class="terapeuta-icono" alt="Icono terapeuta">
                         </a>
                     </td>
                 </tr>
