@@ -9,7 +9,6 @@ class Terapeuta(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     especialidad = models.CharField(max_length=100)
     fecha_ingreso = models.DateField(default=timezone.now)
-    estado = models.CharField(max_length=10, choices=[('Activo', 'Activo'), ('Inactivo', 'Inactivo')], default='Activo')
     disponibilidad = models.CharField(max_length=30, choices=[('Disponible', 'Disponible'), ('Medianamente Disponible', 'Medianamente Disponible'), ('No Disponible', 'No Disponible')], default='Disponible')
     horas_trabajadas = models.FloatField(default=0)
     fecha_contratacion = models.DateField()
