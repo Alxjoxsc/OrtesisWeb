@@ -8,7 +8,7 @@ from datetime import date
 from django.http import JsonResponse
 import json
 from django.db.models import Q
-from .models import Paciente, Rutina, Sesion
+from .models import Paciente, Rutina, Sesion, Corriente
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404
 
@@ -123,12 +123,68 @@ def historial_paciente_view(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
     terapeuta = get_object_or_404(Terapeuta, user=request.user)
     paciente.edad = calcular_edad(paciente.fecha_nacimiento)
+    
+    # Obtiene las rutinas del paciente, ordenadas por fecha de inicio
     rutinas = Rutina.objects.filter(paciente=paciente).order_by('-fecha_inicio')
-    context = {'paciente': paciente,
-               'terapeuta': terapeuta,
-               'rutinas': rutinas,
-                }
+
+    # Obtener las sesiones relacionadas con cada rutina
+    for rutina in rutinas:
+        # Obtiene las últimas dos sesiones de la rutina, ordenadas por fecha de sesión
+        rutina.ultimas_sesiones = Sesion.objects.filter(rutina=rutina).order_by('-fecha')[:2]
+
+    context = {
+        'paciente': paciente,
+        'terapeuta': terapeuta,
+        'rutinas': rutinas,
+    }
     return render(request, 'historial_paciente.html', context)
+
+def obtener_grafico_sesion_paciente(request, sesion_id):
+    sesion = get_object_or_404(Sesion, id=sesion_id)
+    
+    # Obtener todas las corrientes de la sesion
+    corrientes = Corriente.objects.filter(sesion=sesion).order_by('hora')
+
+    # Listas para almacenar las horas y corrientes de las sesiones
+    horas = []
+    corrientes_data = []  # Cambié el nombre para no sobrescribir
+
+    # Extraer datos de cada corriente
+    for corriente in corrientes:
+        horas.append(corriente.hora.strftime('%H:%M'))  # Convertir la hora a string
+        corrientes_data.append(corriente.corriente)  # Asumiendo que cada corriente tiene un campo 'valor'
+
+    chart = {
+        'xAxis': {
+            'type': 'category',
+            'data': horas,  # Horas de las corrientes
+        },
+        'yAxis': {
+            'type': 'value',
+            'name': 'Corriente (mA)'  # Etiqueta del eje Y para las corrientes
+        },
+        'series': [
+            {
+                'name': 'Corriente',
+                'data': corrientes_data,
+                'type': 'line',  # Gráfico de línea para corrientes
+                'itemStyle': {
+                    'color': '#FF7F50'  # Color personalizado
+                }
+            }
+        ],
+        'tooltip': {
+            'trigger': 'axis',
+            'formatter': '{b}<br />Corriente: {c} mA',  # Formato del tooltip
+        },
+        'legend': {
+            'data': ['Corriente'],
+            'top': '5%'  # Asegura que la leyenda se vea bien en pantallas pequeñas
+        }
+    }
+
+    return JsonResponse({'chart': chart})
+
 
 #-------------------------------------CITAS-------------------------------------
 @role_required('Terapeuta')

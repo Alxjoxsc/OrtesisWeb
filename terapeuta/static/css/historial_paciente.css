@@ -488,3 +488,74 @@
     margin: 0 auto;
     width: 80%;
 }
+
+/* Estilos para menu desplegable de sesiones */
+.contenedor-sesiones {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+}
+
+.sesion-card {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+}
+
+.sesion-card h4 {
+    margin: 0 0 5px;
+} 
+
+.sesion-grafico-btn {
+    background-color: #008CAB;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.sesion-grafico-btn:hover {
+    background-color: #005f6b;
+}
+
+.contenido-modal {
+    display: flex;
+    padding: 20px;
+    background-color: #fefefe;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 0.625rem;
+    width: 900px;
+    height: 400px;
+    margin: auto; /* Centrar horizontalmente */
+    position: absolute; /* Centrar verticalmente */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.close {
+    position: absolute;
+    top: 7.5px; /* Ajusta la distancia desde la parte superior del modal */
+    right: 22.5px; /* Ajusta la distancia desde la parte derecha del modal */
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 2;
+}
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}

@@ -116,12 +116,38 @@
               </div>
             </div>
           </li>
+          <!-- Contenedor de las sesiones, dentro del ciclo de rutinas -->
+          <div class="contenedor-sesiones" style="display: none;">
+            {% for sesion in rutina.ultimas_sesiones %}
+              <div class="sesion-card">
+                <h4>Sesión {{ forloop.counter }}</h4>
+                <p>Fecha: {{ sesion.fecha|date:"d/m/Y" }}</p>
+                <p>Duración: {{ sesion.duracion }} minutos</p>
+                <p>Estado: {{ sesion.estado }}</p>
+                <button class="sesion-grafico-btn" data-id="{{ sesion.id }}" onclick="enviarIdSesion({{ sesion.id }})">Ver gráfico</button>
+              </div>
+            {% empty %}
+              <p>No hay sesiones registradas para esta rutina.</p>
+            {% endfor %}
+          </div>
         {% endfor %}
       </ul>
+
     </div>
   {% else %}
     <p>Aún no hay rutinas para este paciente.</p>
   {% endif %}
+
+<<!-- Modal PopUp para gráfico de las sesiones-->
+<div id="popupModal" class="modal" style="display: none;">
+  <div class="contenido-modal">
+    <span class="close">&times;</span>
+    <h2 id="popup-titulo">Gráfico de Corriente vs Tiempo</h2>
+    <div id="chart_sesion" style="width: 100%; height: 400px;"></div>
+  </div>
+</div>
+
+
  <!-- Modal Popup para confirmar la desvinculación -->
 <div id="desvincularModal" class="modal modal-desvincular">
     <div class="modal-content">
@@ -224,12 +250,129 @@
 {% endblock %}
 
 {% block extra_js %}
+<!--                    Apache Echarts                  -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.1.0/echarts.min.js"></script>
 <script src="{% static 'js/historial_paciente.js' %}"></script>
+<script srt="{% static 'js/grafico_sesion.js' %}"></script>
 <script type="text/javascript">
     function redirigirAGrafico(paciente_id) {
         const url = `/grafico_progreso_paciente/${paciente_id}/`;
         window.location.href = url;
     }
 </script>
-  <script src="{% static 'js/historial_paciente.js' %}"></script>
+ <script src="{% static 'js/historial_paciente.js' %}"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Obtener todos los botones con la clase "btn-ver-sesiones"
+    const botones = document.querySelectorAll('.btn-ver-sesiones');
+  
+    botones.forEach(function(boton) {
+      boton.addEventListener('click', function() {
+        // Encontrar el contenedor de sesiones correspondiente
+        const contenedorSesiones = document.querySelector('.contenedor-sesiones');
+  
+        // Mostrar u ocultar el contenedor de sesiones
+        if (contenedorSesiones.style.display === 'none' || contenedorSesiones.style.display === '') {
+          contenedorSesiones.style.display = 'block';
+        } else {
+          contenedorSesiones.style.display = 'none';
+        }
+  
+        // Cambiar el icono de la flecha hacia arriba o hacia abajo
+        const icono = this.querySelector('i');
+        if (contenedorSesiones.style.display === 'block') {
+          icono.classList.remove('fa-chevron-down');
+          icono.classList.add('fa-chevron-up');
+        } else {
+          icono.classList.remove('fa-chevron-up');
+          icono.classList.add('fa-chevron-down');
+        }
+      });
+    });
+  });
+  
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const sesionGraficoBtns = document.querySelectorAll('#sesion-grafico');
+    const popupModal = document.getElementById('popupModal');
+
+    sesionGraficoBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        popupModal.style.display = 'block';
+      });
+    });
+
+    // Close the modal when the user clicks on <span> (x)
+    const closeBtn = document.querySelector('#popupModal .close');
+    closeBtn.addEventListener('click', function() {
+      popupModal.style.display = 'none';
+    });
+
+    // Close the modal when the user clicks anywhere outside of the modal
+    window.addEventListener('click', function(event) {
+      if (event.target == popupModal) {
+        popupModal.style.display = 'none';
+      }
+    });
+  });
+</script>
+
+<script>
+  let chartSesion;
+
+  // Función para obtener el gráfico de una sesión específica
+  const getOptionChartSesion = async(sesionId) => {
+      try {
+          const response = await fetch(`/obtener_grafico_sesion_paciente/${sesionId}/`);
+          return await response.json();
+      } catch (ex) {
+          alert("Error al obtener los datos del gráfico: " + ex);
+      }
+  };
+  
+  // Función para inicializar el gráfico de la sesión en el modal
+  const initChartSesion = async(sesionId) => {
+      const chartData = await getOptionChartSesion(sesionId);
+      if (!chartData) return;
+  
+      // Inicializar el gráfico solo si hay datos válidos
+      const chartContainer = document.getElementById("chart_sesion");
+      if (!chartSesion) {
+          chartSesion = echarts.init(chartContainer);
+      }
+      chartSesion.setOption(chartData.chart);
+      chartSesion.resize();
+  };
+  
+  // Función para mostrar el modal y cargar el gráfico
+  const enviarIdSesion = async(sesionId) => {
+      const modal = document.getElementById("popupModal");
+      modal.style.display = "block";  // Mostrar el modal
+  
+      // Inicializar el gráfico
+      await initChartSesion(sesionId);
+  };
+  
+  // Cerrar el modal cuando el usuario haga clic en "x"
+  document.querySelector(".close").onclick = () => {
+      document.getElementById("popupModal").style.display = "none";
+  };
+  
+  // Cerrar el modal cuando el usuario haga clic fuera de él
+  window.onclick = (event) => {
+      const modal = document.getElementById("popupModal");
+      if (event.target == modal) {
+          modal.style.display = "none";
+      }
+  };
+  
+  // Redimensionar el gráfico cuando la ventana cambie de tamaño
+  window.addEventListener('resize', () => {
+      if (chartSesion) chartSesion.resize();
+  });
+  
+  
+</script>
 {% endblock %}
