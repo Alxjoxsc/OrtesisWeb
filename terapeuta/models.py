@@ -130,6 +130,7 @@ class Sesion(models.Model):
     velocidad = models.IntegerField(null=True, blank=True)
     repeticiones = models.IntegerField(null=True, blank=True)
     observaciones = models.CharField(max_length=500)
+    estado = models.CharField(max_length=50, default="Pendiente", choices=(("Pendiente", "Pendiente"), ("Realizada", "Realizada")))
 
     def __str__(self):
         terapeuta_nombre = f"{self.rutina.terapeuta.user.first_name} {self.rutina.terapeuta.user.last_name}" if self.rutina and self.rutina.terapeuta else "Sin terapeuta"
