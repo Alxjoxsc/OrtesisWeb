@@ -56,24 +56,30 @@
 
 /* Contenedor superior que incluye información y progreso */
 .contenedor-superior {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: 1fr auto; /* Dos columnas: flexible y autoajustada */
+    grid-template-rows: auto auto;    /* Dos filas */
+    grid-template-areas:
+        "nombre progreso"
+        "detalles progreso";          /* Áreas definidas */
+    gap: 10px;
     margin-bottom: 10px;
     margin-right: 15px;
 }
 
 /* Información del paciente */
-.info-paciente {
-    flex-grow: 1;
+.nombre-paciente {
+    grid-area: nombre;
 }
 
-.info-paciente h2 {
+.nombre-paciente h2 {
     font-size: 35px;
     font-weight: 400;
+    margin: 0;
 }
 
-.info-detalle {
+.detalles-paciente {
+    grid-area: detalles;
     display: flex;
     gap: 50px;
     font-size: 25px;
@@ -81,13 +87,15 @@
     margin-top: 15px;
 }
 
-/* Contenedor del botón de progreso del paciente */
+/* Botón de progreso del paciente */
 .progreso-paciente-btn {
+    grid-area: progreso;
+    align-self: center; /* Centrar verticalmente en el espacio disponible */
     display: flex;
     background-color: #ACC6CC;
     border: none;
     color: inherit;
-    padding: 40px 40px;
+    padding: 40px;
     border-bottom-left-radius: 50px;
     border-top-right-radius: 50px;
     cursor: pointer;
