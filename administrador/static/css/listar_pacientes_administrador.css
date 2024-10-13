@@ -47,6 +47,23 @@
     background-color: #f9f9f9;
     font-size: 16px;
 }
+.clear-button {
+    display: flex;
+    gap: 5px;
+    background-color: #f5554a;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 20px;
+    height: auto;
+}
+
+.clear-button:hover {
+    background-color: #d32f2f;
+}
+
 
 #boton-agregar-paciente {
     background-color: #001058;
