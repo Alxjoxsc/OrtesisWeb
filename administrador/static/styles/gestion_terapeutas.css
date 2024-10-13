@@ -1,3 +1,59 @@
+
+.contenedor-header {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 40px;
+    width: 100%;
+}
+
+.contenedor-header h1 {
+    font-size: 48px;
+    color: black;
+    font-weight: 500;
+}
+
+/* Formulario de búsqueda */
+.busqueda-form {
+    display: flex;
+    align-items: center;
+}
+
+.busqueda-input {
+    width: 100%;
+    position: relative;
+}
+
+/* Ajustar el tamaño y color de la barra de búsqueda */
+.busqueda-input input[type="text"] {
+    width: 450px;
+    height: 35px;
+    border: 2px solid #d9d9d9;
+    border-radius: 0px;
+    padding: 5px 10px;
+    outline: none;
+    color: black;
+    background-color: #f9f9f9;
+    font-size: 16px;
+}
+.clear-button {
+    display: flex;
+    background-color: #f5554a;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+    height: auto;
+}
+
+.clear-button:hover {
+    background-color: #d32f2f;
+}
+
+
 .contenedor-boton {
     display: flex;
     margin-bottom: 20px;

@@ -5,18 +5,35 @@
 {% block title %}Gestión de terapeutas{% endblock %}
 
 {% block extra_head%}
-
     <link rel="stylesheet" href="{% static 'styles/gestion_terapeutas.css' %}">
-
 {% endblock %}
 
+{% block header %}
+<div class="contenedor-header">
+    <h1>Terapeutas</h1>
+    <form class="busqueda-form">
+        <div class="busqueda-input">
+            <input type="text" class="form-control" id="searchInput" placeholder="Búsqueda por Nombre o Rut" aria-label="Buscar Terapeuta">
+            <button type="button" id="clearButton" class="clear-button" style="display: none;">Limpiar Filtro</button>
+        </div>
+    </form>
+    <button id="boton-agregar-terapeuta">Agregar Terapeuta
+        <img src="{% static 'icons/plus.svg' %}" alt="Agregar">
+    </button>
+</div>
+<script>
+    document.getElementById("boton-agregar-terapeuta").addEventListener("click", function(){
+        window.location.href = "{% url 'agregar_terapeuta' %}";
+    });
+</script>
+{% endblock %}
+
+
 {% block content %}
-    <div class="contenedor-boton">
-        <button id="boton-agregar-terapeuta" >Agregar Terapeuta<img src="{% static 'icons/plus.svg' %}"></button>
-    </div>
-    <script>
-        document.getElementById("boton-agregar-terapeuta").addEventListener("click", function(){
-            window.location.href = "{% url 'agregar_terapeuta' %}";
-        });
-    </script>
+{% endblock %}
+
+
+
+{% block extra_js %}
+<script src="{% static 'js/admin_buscador_terapeuta.js' %}"></script>
 {% endblock %}
