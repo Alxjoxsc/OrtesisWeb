@@ -11,6 +11,7 @@ from django.db.models import Q
 from .models import Paciente, Rutina, Sesion, Corriente
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
 
 @role_required('Terapeuta')
 
@@ -119,25 +120,36 @@ def cambiar_estado_paciente(request, id):
             return JsonResponse({"status": "error", "message": "Paciente no encontrado"}, status=404)
     return JsonResponse({"status": "error", "message": "Método no permitido"}, status=405)
 
+@login_required
 def historial_paciente_view(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
-    terapeuta = get_object_or_404(Terapeuta, user=request.user)
     paciente.edad = calcular_edad(paciente.fecha_nacimiento)
-    
-    # Obtiene las rutinas del paciente, ordenadas por fecha de inicio
-    rutinas = Rutina.objects.filter(paciente=paciente).order_by('-fecha_inicio')
 
-    # Obtener las sesiones relacionadas con cada rutina
-    for rutina in rutinas:
-        # Obtiene las últimas dos sesiones de la rutina, ordenadas por fecha de sesión
-        rutina.ultimas_sesiones = Sesion.objects.filter(rutina=rutina).order_by('-fecha')[:2]
+    # Intentar obtener el Terapeuta asociado al usuario
+    try:
+        terapeuta = Terapeuta.objects.get(user=request.user)
+    except Terapeuta.DoesNotExist:
+        terapeuta = None
 
-    context = {
-        'paciente': paciente,
-        'terapeuta': terapeuta,
-        'rutinas': rutinas,
-    }
-    return render(request, 'historial_paciente.html', context)
+    # Verificar si el usuario es terapeuta o superusuario
+    if terapeuta or request.user.is_superuser:
+        # Obtiene las rutinas del paciente, ordenadas por fecha de inicio
+        rutinas = Rutina.objects.filter(paciente=paciente).order_by('-fecha_inicio')
+
+        # Obtener las sesiones relacionadas con cada rutina
+        for rutina in rutinas:
+            # Obtiene las últimas dos sesiones de la rutina, ordenadas por fecha de sesión
+            rutina.ultimas_sesiones = Sesion.objects.filter(rutina=rutina).order_by('-fecha')[:2]
+
+        context = {
+            'paciente': paciente,
+            'terapeuta': terapeuta,
+            'rutinas': rutinas,
+        }
+        return render(request, 'historial_paciente.html', context)
+    else:
+        # Si el usuario no es terapeuta ni superusuario, mostrar mensaje de error o redirigir
+        return render(request, 'error.html', {'mensaje': 'No tienes permiso para acceder a esta página.'})
 
 def obtener_grafico_sesion_paciente(request, sesion_id):
     sesion = get_object_or_404(Sesion, id=sesion_id)
