@@ -74,8 +74,10 @@
   </div>
 
   <div class="modificar-rutina">
-    <button class="btn-modificar-rutina">Modificar rutina actual <i class="fas fa-edit"></i></button>
-  </div>
+    <button id="editarRutinaBtn" class="btn-modificar-rutina" data-rutina-id="{{ rutinas.0.id }}">
+        Modificar rutina actual <i class="fas fa-edit"></i>
+    </button>
+</div>
 
  <!-- Aquí comienza la sección de rutinas -->
   {% if rutinas %}
@@ -227,6 +229,7 @@
             <div class="frecuencia-inputs">
                 <input type="number" id="frecuencia_cantidad" name="frecuencia_cantidad" required>
                 <select id="frecuencia_tipo" name="frecuencia_tipo">
+                  <p>cada</p>
                     <option value="dias">días</option>
                     <option value="semanas">semanas</option>
                 </select>
@@ -247,6 +250,48 @@
             </div>
         </form>
     </div>
+</div>
+
+<!-- Modal Popup para editar rutina actual -->
+<div id="editarRutinaModal" class="modal modal-editar-rutina">
+  <div class="modal-content">
+      <span class="close" id="cerrarEditarRutina">&times;</span>
+      <h2>Editar Rutina</h2>
+      <form id="editarRutinaForm">
+          {% csrf_token %}
+          <label for="edit_fecha_inicio">Fecha de Inicio</label>
+          <input type="date" id="edit_fecha_inicio" name="fecha_inicio" required>
+
+          <label for="edit_cantidad_sesiones">Cantidad de Sesiones</label>
+          <input type="number" id="edit_cantidad_sesiones" name="cantidad_sesiones" required>
+
+          <label for="edit_repeticiones">Repeticiones por Sesión</label>
+          <input type="number" id="edit_repeticiones" name="repeticiones" required>
+
+          <label for="edit_frecuencia_sesiones">Frecuencia de Sesiones</label>
+          <div class="frecuencia-inputs">
+              <input type="number" id="edit_frecuencia_cantidad" name="frecuencia_cantidad" required>
+              <select id="edit_frecuencia_tipo" name="frecuencia_tipo">
+                  <option value="dias">días</option>
+                  <option value="semanas">semanas</option>
+              </select>
+          </div>
+
+          <label for="edit_angulo_inicial">Ángulo Inicial</label>
+          <input type="number" id="edit_angulo_inicial" name="angulo_inicial" required>
+
+          <label for="edit_angulo_final">Ángulo Final</label>
+          <input type="number" id="edit_angulo_final" name="angulo_final" required>
+
+          <label for="edit_velocidad">Velocidad</label>
+          <input type="text" id="edit_velocidad" name="velocidad" required>
+
+          <div class="modal-footer">
+              <button type="button" class="cancel-btn" id="cancelarEditarRutina">Cancelar</button>
+              <button type="submit" class="confirm-btn">Guardar Cambios</button>
+          </div>
+      </form>
+  </div>
 </div>
 
 {% endblock %}

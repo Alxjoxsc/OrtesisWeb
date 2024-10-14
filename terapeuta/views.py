@@ -409,3 +409,62 @@ def crear_rutina(request, paciente_id):
 
     else:
         return JsonResponse({'status': 'error', 'message': 'Método no permitido'})
+    
+def obtener_datos_rutina(request, rutina_id):
+    try:
+        rutina = Rutina.objects.get(id=rutina_id)
+        data = {
+            'status': 'success',
+            'rutina': {
+                'fecha_inicio': rutina.fecha_inicio.strftime('%Y-%m-%d'),
+                'angulo_inicial': rutina.angulo_inicial,
+                'angulo_final': rutina.angulo_final,
+                'repeticiones': rutina.repeticiones,
+                'velocidad': rutina.velocidad,
+                # Agrega otros campos que sí existan en el modelo
+            }
+        }
+        return JsonResponse(data)
+    except Rutina.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Rutina no encontrada'}, status=404)
+
+
+@login_required
+def editar_rutina(request, rutina_id):
+    if request.method == 'POST':
+        try:
+            rutina = Rutina.objects.get(id=rutina_id)
+
+            # Obtener y validar los datos
+            fecha_inicio_str = request.POST.get('fecha_inicio')
+            angulo_inicial_str = request.POST.get('angulo_inicial')
+            angulo_final_str = request.POST.get('angulo_final')
+            velocidad_str = request.POST.get('velocidad')
+            repeticiones_str = request.POST.get('repeticiones')
+
+            # Convertir a los tipos correctos
+            from datetime import datetime
+            rutina.fecha_inicio = datetime.strptime(fecha_inicio_str, '%Y-%m-%d').date()
+            rutina.angulo_inicial = int(angulo_inicial_str)
+            rutina.angulo_final = int(angulo_final_str)
+            rutina.velocidad = int(velocidad_str)
+            rutina.repeticiones = int(repeticiones_str)
+
+            # Recalcular fecha de término si es necesario
+            # Aquí puedes agregar lógica para fecha_termino
+
+            rutina.save()
+
+            return JsonResponse({'status': 'success'})
+        except ValueError as e:
+            print("Error de conversión:", e)
+            return JsonResponse({'status': 'error', 'message': 'Datos inválidos: ' + str(e)}, status=400)
+        except Rutina.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Rutina no encontrada'}, status=404)
+        except Exception as e:
+            print("Error al actualizar la rutina:", e)
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
+
+

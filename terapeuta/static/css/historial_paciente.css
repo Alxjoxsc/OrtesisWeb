@@ -567,3 +567,80 @@
     text-decoration: none;
     cursor: pointer;
 }
+
+/* Estilos específicos para el formulario Editar Rutina */
+#editarRutinaForm {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#editarRutinaForm label {
+    font-weight: 500;
+    margin-bottom: 0px;
+}
+
+#editarRutinaForm input[type="date"],
+#editarRutinaForm input[type="number"],
+#editarRutinaForm input[type="text"],
+#editarRutinaForm select {
+    background-color: #ebeaea;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#editarRutinaForm .frecuencia-inputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#editarRutinaForm .frecuencia-inputs input[type="number"] {
+    width: 60px;
+}
+
+#editarRutinaForm .frecuencia-inputs select {
+    width: auto;
+    padding: 10px;
+}
+
+#editarRutinaForm .configuracion-ortesis {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+#editarRutinaForm .configuracion-ortesis .detalle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+#editarRutinaForm .configuracion-ortesis input[type="number"] {
+    width: 80px;
+    text-align: center;
+}
+
+/* Ajustes para el modal de Editar Rutina */
+#editarRutinaModal .modal-content {
+    display: flex;
+    width: 50%;
+    max-width: 600px;
+    min-width: 500px;
+    max-height: 90%;
+    overflow-y: auto;
+    margin: 0 auto; /* Centrar el modal */
+}
+
+#editarRutinaModal form {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin: 0 auto;
+    width: 80%;
+}
