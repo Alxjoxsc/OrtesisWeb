@@ -2,6 +2,7 @@ from random import randrange
 from django.shortcuts import render, redirect
 from autenticacion.decorators import role_required
 from .models import Cita, Terapeuta, Paciente, Rutina
+from .models import Cita, Terapeuta, Paciente, Observacion
 from django.http import HttpResponse
 from django.core.paginator import Paginator
 from datetime import date
@@ -12,6 +13,8 @@ from .models import Paciente, Rutina, Sesion, Corriente
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.utils.timezone import now
+from django.utils import timezone
 
 @role_required('Terapeuta')
 
@@ -468,3 +471,60 @@ def editar_rutina(request, rutina_id):
         return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
 
 
+def observaciones_paciente(request, paciente_id):
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+    
+    # Obtener las observaciones relacionadas con el paciente, ordenadas por fecha
+    observaciones = Observacion.objects.filter(paciente=paciente).order_by('-fecha')
+    context = {
+        'paciente': paciente,
+        'observaciones': observaciones,
+        'fecha_actual': now().strftime('%d/%m/%Y')
+    }
+
+    return render(request, 'registrar_observaciones.html', context)
+
+@role_required('Terapeuta')
+def agregar_observacion(request, paciente_id):
+    if request.user.is_authenticated:
+        user_id = request.user.id
+        terapeuta = Terapeuta.objects.get(user_id=user_id)
+        
+        if request.method == 'POST':
+            contenido = request.POST['contenido']
+            paciente = get_object_or_404(Paciente, id=paciente_id)
+            
+            # Crear una nueva observación
+            nueva_observacion = Observacion(
+                paciente=paciente,
+                contenido=contenido,
+                fecha=timezone.now()
+            )
+            nueva_observacion.save()
+
+            return redirect('observaciones_paciente', paciente_id=paciente.id)
+
+    return redirect('historial_paciente', paciente_id=paciente_id)
+
+@role_required('Terapeuta')
+def editar_observacion(request, observacion_id):
+    observacion = get_object_or_404(Observacion, id=observacion_id)
+    
+    if request.method == 'POST':
+        contenido = request.POST['contenido']
+        observacion.contenido = contenido
+        observacion.save()
+        
+        return redirect('observaciones_paciente', paciente_id=observacion.paciente.id)
+
+    return render(request, 'editar_observacion.html', {'observacion': observacion})
+
+@role_required('Terapeuta')
+def eliminar_observacion(request, observacion_id):
+    if request.method == 'POST':
+        observacion = get_object_or_404(Observacion, id=observacion_id)
+        observacion.delete()
+        
+        return JsonResponse({'success': True})
+    
+    return JsonResponse({'error': 'Método no permitido'}, status=405)

@@ -18,4 +18,8 @@ urlpatterns = [
     path('obtener_grafico_sesion_paciente/<int:sesion_id>/', views.obtener_grafico_sesion_paciente, name='obtener_grafico_sesion_paciente'),
     path('rutina/<int:rutina_id>/datos/', views.obtener_datos_rutina, name='obtener_datos_rutina'),
     path('rutina/<int:rutina_id>/editar/', views.editar_rutina, name='editar_rutina'),
+    path('observaciones/<int:paciente_id>/', views.observaciones_paciente, name='observaciones_paciente'),
+    path('paciente/<int:paciente_id>/agregar_observacion/', views.agregar_observacion, name='agregar_observacion'),
+    path('editar-observacion/<int:observacion_id>/', views.editar_observacion, name='editar_observacion'),
+    path('eliminar_observacion/<int:observacion_id>/', eliminar_observacion, name='eliminar_observacion'),
 ]
