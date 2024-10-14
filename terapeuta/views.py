@@ -194,6 +194,7 @@ def obtener_grafico_sesion_paciente(request, sesion_id):
         },
         'legend': {
             'data': ['Corriente'],
+            'selectedMode': False,   # Deshabilitar interacción para ocultar la línea
             'top': '5%'  # Asegura que la leyenda se vea bien en pantallas pequeñas
         }
     }
@@ -360,7 +361,8 @@ def obtener_grafico_progreso_paciente(request, paciente_id):
             'formatter': '{b}<br />v: {c} m/s'  # Formato del tooltip para velocidad
         },
         'legend': {
-            'data': ['Velocidad']  # Leyenda del gráfico de velocidad
+            'data': ['Velocidad'],  # Leyenda del gráfico de velocidad
+            'selectedMode': False   # Deshabilitar interacción para ocultar la línea
         }
     }
 
