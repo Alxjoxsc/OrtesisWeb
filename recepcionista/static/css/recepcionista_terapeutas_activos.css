@@ -1,0 +1,221 @@
+/* Estilos generales */
+.main-content {
+    margin: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Estilos del encabezado */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.contenedor-header {
+    display: flex;
+    justify-content: space-between; /* Cambiado para empujar los elementos a los extremos */
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    margin-top: 30px;
+    margin-bottom: 50px;
+}
+
+.contenedor-header h1 {
+    font-size: 48px;
+    color: black;
+    font-weight: 500;
+    margin: 0; /* Asegúrate de que no haya margen en el h1 */
+}
+
+/* Estilos del formulario de búsqueda */
+.terapeutas-busqueda-form {
+    display: flex;
+    align-items: center;
+}
+
+/* Ajustar el tamaño y color de la barra de búsqueda */
+.terapeutas-search-input {
+    display: flex;
+    width: 500px;
+    height: 35px;
+    border: 2px solid #d9d9d9;
+    border-radius: 0px;
+    padding: 5px 10px;
+    outline: none;
+    color: black;
+    background-color: #D9D9D9;
+    font-size: 16px;
+}
+
+/* Icono de búsqueda */
+.terapeutas-search-icon {
+    position: flex;
+    justify-content: flex-end;
+    width: 20px;
+    height: 20px;
+    margin-left: -30px;
+    cursor: pointer;
+}
+
+/* Botón de limpiar búsqueda */
+.terapeutas-clear-button {
+    display: flex;
+    gap: 5px;
+    background-color: #f5554a;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 20px;
+    height: auto;
+}
+
+.terapeutas-clear-button:hover {
+    background-color: #d32f2f;
+}
+
+/* Contenedor superior */
+.contenedor-superior {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 0 10px 0 10px;
+}
+
+/* Estilos del botón de filtro */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.filtro-btn {
+    background-color: #373d58;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-right: 70px; /* Para empujar el botón hacia la derecha */
+}
+
+/* Estilos del contenido del menú desplegable (oculto por defecto) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    border: 1.5px solid black;
+    border-radius: 7px;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    padding: 0; /* Asegúrate de que no haya padding adicional */
+}
+
+/* Agregar este estilo para eliminar los puntos de la lista */
+.dropdown-content li {
+    list-style-type: none; /* Elimina los puntos de la lista */
+    margin: 0; /* Elimina el margin por defecto */
+}
+
+/* Estilos de los enlaces dentro del menú */
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    display: block;
+    text-decoration: none; /* Asegúrate de que no haya subrayado */
+}
+
+/* Cambiar el color de fondo de los enlaces al pasar el cursor */
+.dropdown-content a:hover {
+    background-color: #D9D9D9;
+}
+
+/* Mostrar el menú cuando se hace clic */
+.show {
+    display: block;
+}
+
+/* Estilos de la tabla final */
+.final-tabla {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: row;
+    max-height: 100%;
+    width: auto;
+}
+
+.doctor-logo {
+    cursor: pointer;
+}
+
+/* Mensaje para cuando no hay terapeutas */
+.table-empty {
+    text-align: center;
+    padding: 20px;
+    color: #999;
+}
+
+/* Estilos del contenido del modal */
+.contenido-modal {
+    display: flex;
+    padding: 20px;
+    background-color: #fefefe;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 0.625rem;
+    width: 34.375rem;
+    height: 15.625rem;
+    margin: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Estilos de paginación */
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.pagination .step-links a {
+    color: white;
+    background-color: #373d58;
+    padding: 10px 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.pagination .current {
+    padding: 10px 15px;
+    background-color: #D9D9D9;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.pagination .step-links {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.disabled {
+    color: white;
+    background-color: #373d58;
+    padding: 10px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}

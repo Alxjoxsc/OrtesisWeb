@@ -1,115 +1,131 @@
-{% extends 'base_recepcionista.html' %}
+{% extends 'recepcionista_base.html' %}
 {% load static %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/recepcionista_terapeutas_activos.css' %}">
+<link rel="stylesheet" href="{% static 'css/tabla.css' %}">
+{% endblock %}
+
+{% block title %}Terapeutas{% endblock %}
+
+{% block header %}
+<div class="contenedor-header">
+    <h1>Terapeutas</h1>
+    <form method="GET" action="{% url 'recepcionista_terapeutas_activos' %}" class="terapeutas-busqueda-form">
+        <input type="text" name="search" placeholder="Búsqueda por Nombre o Rut" class="terapeutas-search-input" id="searchBar" value="{{ request.GET.search|default:'' }}" oninput="toggleClearButton()">
+        <img src="{% static 'icons/Lupa.svg' %}" alt="Buscar" class="terapeutas-search-icon">
+        <button type="button" id="clearButton" class="terapeutas-clear-button" onclick="clearSearch()" style="display: {% if request.GET.search %}inline-block{% else %}none{% endif %};">
+            Limpiar Filtro
+        </button>
+    </form>
+    <div class="dropdown">
+        <button class="filtro-btn" type="button" id="dropdownMenuButton">
+            Filtrar
+            <span id="arrow">▼</span>
+        </button>
+        <ul id="filterOptions" class="dropdown-content" style="display:none;">
+            <li><a href="#" onclick="applyFilter('fecha_ingreso')">Fecha de Ingreso</a></li>
+            <li><a href="#" onclick="applyFilter('especialidad')">Especialidad</a></li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
 
 {% block content %}
-<div class="recepcionista-container">  
-    <div class="header">
-        <h2>Terapeutas</h2>
-        <form id="busqueda-form" method="get" action="{% url 'recepcionista_terapeutas_activos' %}" class="busqueda-form">
-            <div class="busqueda-input">
-                <input id="busqueda" type="text" name="q" placeholder="Búsqueda por Nombre o Rut" value="{{ request.GET.q }}">
-                <button type="submit" class="search-button">
-                    <img src="{% static 'icons/Search.svg' %}" alt="Buscar" />
-                </button>
-            </div>
-            
-        </form>
-            <div class="dropdown">
-                <button type="button" class="filtro-btn">
-                    Filtrar <span class="flecha">▼</span>
-                </button>
-                <div class="dropdown-content">
-                    <label class="dropdown-label">
-                        <input type="radio" name="orden" value="fecha_contratacion" class="hidden-input"> Fecha de Ingreso
-                    </label>
-                    <label class="dropdown-label">
-                        <input type="radio" name="orden" value="especialidad" class="hidden-input"> Especialidad
-                    </label>
-                </div>
-            </div>
-        </form>                
-    </div>
-    <div class="header_right">
-        <button type="button" class="filtro-btn">
-            Filtrar <span class="flecha">▼</span>
-        </button>
-        <div class="dropdown-content">
-            <label>
-                <input type="checkbox" name="filtro" value="fecha_ingreso"> Fecha de Ingreso
-            </label>
-            <label>
-                <input type="checkbox" name="filtro" value="especialidad"> Especialidad
-            </label>
-        </div>
-    </div>
 
-
-    <!-- Encabezado de la lista de terapeutas -->
-    <div class="lista-terapeutas">
-        <div class="header-lista">
-            <span><strong>Nombre</strong></span>
-            <span><strong>Rut</strong></span>
-            <span><strong>Estado</strong></span>
-            <span><strong>Especialidad</strong></span>
-            <span><strong>Fecha de Ingreso</strong></span>
-        </div>
-        
-        <!-- Lista de terapeutas -->
-{% for terapeuta in terapeutas %}
-<div class="terapeuta-card">
-    <span>{{ terapeuta.user.first_name }} {{ terapeuta.user.last_name }}</span>
-    <span>{{ terapeuta.user.profile.rut }}</span>
-    <span class="estado-activo">{{"Activo"}}</span>
-    <span>{{ terapeuta.especialidad }}</span>
-    <span>{{ terapeuta.fecha_contratacion|date:"d/m/Y" }}</span> <!-- Aquí se aplica el formato -->
-    <img src="{% static 'icons/terapeuta.svg' %}" alt="Icono terapeuta" class="terapeuta-imagen">
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Rut</th>
+                <th>Estado</th>
+                <th>Especialidad</th>
+                <th>Fecha de Ingreso</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for terapeuta in terapeutas %}
+            <tr>
+                <td class="inicio-tabla">{{ terapeuta.user.first_name }} {{ terapeuta.user.last_name }}</td>
+                <td class="centro-tabla">{{ terapeuta.user.username }}</td>
+                <td class="centro-tabla">
+                    <span class="badge {% if terapeuta.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                        {% if terapeuta.is_active %}Activo <img class = "img-activo" src="{% static "icons/activo.svg" %}"> {% else %}Inactivo <img class = "img-activo" src="{% static "icons/inactivo.svg" %}"> {% endif %}
+                    </span>
+                </td>
+                <td class="centro-tabla">{{terapeuta.especialidad}}</td>
+                <td class="centro-tabla">{{ terapeuta.fecha_ingreso }}</td>
+                <td class="final-tabla">
+                    <img src="{% static 'icons/terapeuta_morado.svg' %}" alt="Doctor Logo" class="doctor-logo" style="width: 50px; height: auto;">
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="table-empty">No hay terapeutas registrados.</td>
+            </tr>
+            {% endfor %}
+            <tr id="no-coincidencias" style="display: none;">
+                <td colspan="7" class="table-empty">No se encontraron coincidencias.</td>
+            </tr>
+        </tbody>
+    </table>
 </div>
-{% empty %}
-<p>No se encontraron terapeutas activos.</p>
-{% endfor %}
 
-<!-- Controles de paginación -->
-<div class="paginacion">
-    <div class="pagination-links">
+<div class="pagination">
+    <span class="step-links">
         {% if terapeutas.has_previous %}
-            <a href="?page=1&q={{ request.GET.q }}&orden={{ request.GET.orden|default:'user__first_name' }}">Primera</a>
-            <a href="?page={{ terapeutas.previous_page_number }}&q={{ request.GET.q }}&orden={{ request.GET.orden|default:'user__first_name' }}">Anterior</a>
+            <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Primera Página">
+                &#171;
+            </a>
+            <a href="?page={{ terapeutas.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Página Anterior">
+                &#8249;
+            </a>
+        {% else %}
+            <span class="disabled">&#171;</span>
+            <span class="disabled">&#8249;</span>
         {% endif %}
 
-        <span class="current-page">{{ terapeutas.number }}</span>
+        <span class="current">
+            {{ terapeutas.number }}
+        </span>
 
         {% if terapeutas.has_next %}
-            <a href="?page={{ terapeutas.next_page_number }}&q={{ request.GET.q }}&orden={{ request.GET.orden|default:'user__first_name' }}">Siguiente</a>
-            <a href="?page={{ terapeutas.paginator.num_pages }}&q={{ request.GET.q }}&orden={{ request.GET.orden|default:'user__first_name' }}">Última</a>
+            <a href="?page={{ terapeutas.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Página Siguiente">
+                &#8250;
+            </a>
+            <a href="?page={{ terapeutas.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Última Página">
+                &#187;
+            </a>
+        {% else %}
+            <span class="disabled">&#8250;</span>
+            <span class="disabled">&#187;</span>
         {% endif %}
-    </div>
+    </span>
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
+
 <script>
-    document.getElementById('busqueda').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            document.getElementById('busqueda-form').submit();
-        }
+    // Mostrar/ocultar opciones del filtro
+    const dropdownButton = document.getElementById('dropdownMenuButton');
+    const filterOptions = document.getElementById('filterOptions');
+    const arrow = document.getElementById('arrow');
+    
+    dropdownButton.addEventListener('click', () => {
+        filterOptions.style.display = filterOptions.style.display === 'none' ? 'block' : 'none';
+        arrow.textContent = arrow.textContent === '▼' ? '▲' : '▼';
     });
 
-    document.querySelector('.filtro-btn').addEventListener('click', function() {
-        const dropdown = document.querySelector('.dropdown-content');
-        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-    });
-
-    document.querySelectorAll('input[name="orden"]').forEach(input => {
-        input.addEventListener('change', function() {
-            const ordenValue = this.value;
-            const form = document.getElementById('busqueda-form');
-            const ordenInput = document.createElement('input');
-            ordenInput.type = 'hidden';
-            ordenInput.name = 'orden';
-            ordenInput.value = ordenValue;
-            form.appendChild(ordenInput);
-            form.submit(); // Envía el formulario para aplicar el filtro
-        });
-    });
+    // Aplicar el filtro cuando se selecciona una opción
+    function applyFilter(orderBy) {
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('order_by', orderBy);
+        window.location.search = urlParams.toString();
+    }
 </script>
 
+<script src="{% static 'js/buscar_terapeutas.js' %}"></script>
 {% endblock %}

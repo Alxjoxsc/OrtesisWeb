@@ -13,22 +13,22 @@ from django.core.exceptions import ObjectDoesNotExist
 from datetime import date
 from django.contrib import messages
 
-@role_required('Recepcionista')
-def recepcionista_terapeutas_activos(request):
-    '''query = request.GET.get('q', '')
-    if query:
-        terapeuta = Terapeuta.objects.filter(
-            estado='activo',
-            nombre__icontains=query
-        ) | Terapeuta.objects.filter(
-            estado='activo',
-            rut__icontains=query
-        )
-    else:
-    '''
-    terapeuta = Terapeuta.objects.all()
+# @role_required('Recepcionista')
+# def recepcionista_terapeutas_activos(request):
+#     '''query = request.GET.get('q', '')
+#     if query:
+#         terapeuta = Terapeuta.objects.filter(
+#             estado='activo',
+#             nombre__icontains=query
+#         ) | Terapeuta.objects.filter(
+#             estado='activo',
+#             rut__icontains=query
+#         )
+#     else:
+#     '''
+#     terapeuta = Terapeuta.objects.all()
 
-    return render(request, 'recepcionista_terapeutas_activos.html', {'terapeuta': terapeuta})
+#     return render(request, 'recepcionista_terapeutas_activos.html', {'terapeuta': terapeuta})
 
 
 def calcular_edad(fecha_nacimiento):
@@ -176,32 +176,34 @@ def asignar_terapeuta(request, terapeuta_id, paciente_id):
     # Redirigir a la página de mostrar paciente
     return render(request, 'mostrar_paciente_recepcionista.html', {'paciente': paciente})
 
-
 @role_required('Recepcionista')
-def listar_terapeutas_activos(request):
-    query = request.GET.get('q', '')
-    orden = request.GET.get('orden', 'user__first_name')  # Valor por defecto para ordenación
-    valid_order_fields = ['user__first_name', 'user__last_name', 'user__profile__rut', 'especialidad', 'fecha_contratacion']
-    if orden not in valid_order_fields:
-        orden = 'user__first_name'  # Restablecer a un valor por defecto si no es válido
+def recepcionista_terapeutas_activos(request):
+    query = request.GET.get('search')
+    order_by = request.GET.get('order_by', 'user__first_name')
+    
+    terapeutas_list = Terapeuta.objects.filter(is_active=True)
 
-    # Filtrado de terapeutas activos
     if query:
-        terapeutas = Terapeuta.objects.filter(
-            Q(user__first_name__icontains=query) | 
-            Q(user__last_name__icontains=query) | 
-            Q(user__profile__rut__icontains=query),
-            user__is_active=True  # Filtrar por usuarios activos
-        ).order_by(orden)  # Aplicar ordenación
-    else:
-        terapeutas = Terapeuta.objects.filter(user__is_active=True).order_by(orden)  # Aplicar ordenación
+        terapeutas_list = terapeutas_list.filter(
+            Q(user__first_name__icontains=query) |  
+            Q(user__last_name__icontains=query) |   
+            Q(user__username__icontains=query)       
+        )
+    
+    # Aplicar el orden basado en el parámetro
+    if order_by:
+        terapeutas_list = terapeutas_list.order_by(order_by)
+    
+    total_terapeutas = terapeutas_list.count()
 
-    # Paginación
-    paginator = Paginator(terapeutas, 5)  # 5 terapeutas por página
-    page_number = request.GET.get('page')  # Obtener el número de página de la URL
-    page_obj = paginator.get_page(page_number)  # Obtener la página correspondiente
+    paginator = Paginator(terapeutas_list, 10)
+    page_number = request.GET.get('page')
+    terapeutas = paginator.get_page(page_number)
 
-    return render(request, 'terapeutas.html', {'terapeutas': page_obj})
+    return render(request, 'recepcionista_terapeutas_activos.html', {
+        'terapeutas': terapeutas,
+        'total_terapeutas': total_terapeutas,
+    })
 
 @role_required('Recepcionista')
 def calendar_asignar_paciente(request, paciente_id, terapeuta_id):
