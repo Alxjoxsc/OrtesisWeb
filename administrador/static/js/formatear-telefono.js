@@ -3,14 +3,24 @@ document.addEventListener('input', (e) => {
     if (e.target === telefono) {
         let telefonoFormateado = formatPhoneNumber(telefono.value);
         telefono.value = telefonoFormateado;
+
+        // Validar que el número comience con 9
+        if (telefono.value.length > 0 && telefono.value[0] !== '9') {
+            telefono.value = ''; // Borra el contenido si no empieza con 9
+        }
     }
 });
 
 document.addEventListener('input', (e) => {
-    const telefono = document.getElementById('id_telefono_emergencia');
-    if (e.target === telefono) {
-        let telefonoFormateado = formatPhoneNumber(telefono.value);
-        telefono.value = telefonoFormateado;
+    const telefonoEmergencia = document.getElementById('id_telefono_emergencia');
+    if (e.target === telefonoEmergencia) {
+        let telefonoFormateado = formatPhoneNumber(telefonoEmergencia.value);
+        telefonoEmergencia.value = telefonoFormateado;
+
+        // Validar que el número comience con 9
+        if (telefonoEmergencia.value.length > 0 && telefonoEmergencia.value[0] !== '9') {
+            telefonoEmergencia.value = ''; // Borra el contenido si no empieza con 9
+        }
     }
 });
 

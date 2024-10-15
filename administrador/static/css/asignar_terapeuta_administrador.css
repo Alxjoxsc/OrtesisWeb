@@ -1,0 +1,187 @@
+.main-content {
+    margin: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.header{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+.contenedor-header {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 20px;
+    width: 100%;
+}
+
+.contenedor-header h1 {
+    font-size: 48px;
+    color: black;
+    font-weight: 500;
+}
+
+/* Formulario de búsqueda */
+.pacientes-busqueda-form {
+    display: flex;
+    align-items: center;
+}
+
+/* Ajustar el tamaño y color de la barra de búsqueda */
+.pacientes-search-input {
+    display: flex;
+    width: 500px;
+    height: 35px;
+    border: 2px solid #d9d9d9;
+    border-radius: 0px;
+    padding: 5px 10px;
+    outline: none;
+    color: black;
+    background-color: #f9f9f9;
+    font-size: 16px;
+}
+
+/* Icono de búsqueda */
+.pacientes-search-icon {
+    position: flex;
+    justify-content: flex-end;
+    width: 20px;
+    height: 20px;
+    margin-left: -30px;
+    cursor: pointer;
+}
+
+/* Botón de limpiar búsqueda */
+.pacientes-clear-button {
+    display: flex;
+    gap: 5px;
+    background-color: #f5554a;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 20px;
+    height: auto;
+}
+
+.pacientes-clear-button:hover {
+    background-color: #d32f2f;
+}
+
+input[type="checkbox"] {
+    cursor: pointer;
+    margin: 0 20px;
+}
+
+.final-tabla {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: row;
+    max-height: 100%;
+    width: auto;
+}
+
+/* Botones de acciones en la tabla */
+.table .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 17px;
+    cursor: pointer;
+}
+
+/* Mensaje para cuando no hay pacientes */
+.table-empty {
+    text-align: center;
+    padding: 20px;
+    color: #999;
+}
+
+.modal {
+    display: none; /* Oculto por defecto */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+}
+
+.contenido-modal {
+    display: flex;
+    padding: 20px;
+    background-color: #fefefe;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 0.625rem;
+    width: 34.375rem;
+    height: 15.625rem;
+    margin: auto; /* Centrar horizontalmente */
+    position: absolute; /* Centrar verticalmente */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.close {
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: red;
+}
+
+.botones-modal {
+    display: flex;
+    gap: 1.25rem;
+    margin-top: 1.25rem;
+}
+
+.boton-cancelar {
+    background-color: #FF6161;
+    color: white;
+    padding: 0.625rem 1.875rem;
+    border: none;
+    border-radius: 3.125rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.boton-confirmar {
+    background-color: #006A60;
+    color: white;
+    padding: 0.625rem 1.875rem;
+    border: none;
+    border-radius: 3.125rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.boton-cancelar:hover {
+    background-color: #FF7D7D;
+}
+
+.boton-confirmar:hover {
+    background-color: #008F85;
+}
+
+.terapeuta-icono{
+    width: 34px; /* Ajusta el tamaño de la imagen */
+    height: 34px; /* Ajusta la altura de la imagen */
+    margin: 0 10px; /* Ajusta los márgenes */
+    cursor: pointer; /* Cambia el cursor cuando pase sobre la imagen */
+    /* Cualquier otro estilo adicional */
+}

@@ -2,72 +2,183 @@
 {% load static %}
 {% block content %}
 
-<link rel="stylesheet" type="text/css" href="{% static 'styles/mostrar_paciente.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'styles/mostrar_paciente_administrador.css' %}">
+<link rel="stylesheet" href="{% static 'styles/modal.css' %}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
+<header>
+
+{% if paciente.is_active%}
+    <a class="back-arrow" href="{% url 'listar_pacientes_activos' %}">
+        <img src="{% static 'icons/Volver-atras.svg' %}" alt="">
+    </a>
+{% else %}
+    <a class="back-arrow" href="{% url 'listar_pacientes_inactivos' %}">
+        <img src="{% static 'icons/Volver-atras.svg' %}" alt="">
+    </a>
+{% endif %}
+<h1>Paciente {{paciente.first_name}} {{paciente.last_name}}</h1>
+</header>  
+
 <div class="container-paciente">
-    <div class="header-container">
-        <div class="back-arrow" onclick="window.location.href='{% url 'admin_pacientes' %}';">
-            &#8592; Regresar
-        </div>
-        <div class="edit-icon" onclick="window.location.href='{% url 'editar_datos_paciente_admin' paciente.id %}'">
-            <i class="fas fa-pencil-alt"></i>
-        </div>
-
-    </div>
-
-    <h1>Información Paciente</h1>
-    
     <div class="card-paciente">
-        <div class="datos-paciente">
-            <div class="columna">
-                <p><strong>Nombre:</strong> {{ paciente.first_name }} {{ paciente.last_name }}</p>
-                <p><strong>Rut:</strong> {{ paciente.rut }}</p>
-                <p><strong>Estado:</strong> 
-                    {% if paciente.is_active %}
-                        Activo <span class="estado-activo"></span>
+        {% if paciente.is_active %}
+            <div class="icon-container" onclick="window.location.href='{% url 'editar_datos_paciente_admin' paciente.id %}'">
+                <img src="{% static 'icons/lapiz.svg' %}" class="icon">
+            </div>
+        {% else %}
+        <a href="#" class="btn btn-reactivar" title="Restaurar a estado activo" 
+            onclick="mostrarPopUpRestaurar('{{ paciente.id }}', '{{ paciente.first_name }} {{ paciente.last_name }}')">
+            Reactivar Paciente
+        </a> 
+        {% endif %}
+        <div class="columna izquierda">
+            <p><strong>Rut:</strong><br> <span>{{ paciente.rut }}</span></p>
+            <p><strong>Fecha de Ingreso:</strong><br><span>{{paciente.date_joined}}</span></p>
+            <p><strong>Correo Electrónico:</strong><br> <span>{{ paciente.email }}</span></p>
+            <p><strong>Número de teléfono:</strong><br> <span>{{ paciente.telefono }}</span></p>
+            <p><strong>Dirección:</strong><br> <span>{{ paciente.calle }}, {{ paciente.comuna }}, {{ paciente.provincia }}, {{ paciente.region }}</span></p>
+            <p><strong>Contacto de emergencia:</strong><br> <span>{{ paciente.contacto_emergencia }}</span></p>
+            <p><strong>Número contacto de emergencia:</strong><br> <span>{{ paciente.telefono_emergencia }}</span></p>
+            <p><strong>Estado:</strong><br> <span>
+                {% if paciente.is_active %}
+                    Activo <span class="estado-activo"> <img class = "img-activo" src="{% static "icons/activo.svg" %}"></span>
+                {% else %}
+                    Inactivo <span class="estado-activo"> <img class = "img-activo" src="{% static "icons/inactivo.svg" %}"></span>
+                {% endif %}
+            </span>
+            </p>
+            {% if not paciente.is_active %}
+                <p><strong>Motivo de desvinculación:</strong><br><span class="campo-formulario" readonly> {{ paciente.motivo_desvinculacion|default:"Sin motivo de desvinculación ingresado" }}</span></p>
+            {% endif %}
+            {% if paciente.is_active %}
+                {% if paciente.terapeuta %}
+                    <p><strong>Próxima Cita:</strong><br><span> 
+                        {% if cita %}
+                            {{ cita.fecha }}
+                            <button class="btn" onclick="window.location.href='{% url 'calendar_asignar_paciente_administrador' paciente.id paciente.terapeuta_id %}'">Reasignar Cita</button>
+                        {% else %}
+                            Sin cita asignada
+                            <button class="btn" onclick="window.location.href='{% url 'calendar_asignar_paciente_administrador' paciente.id paciente.terapeuta_id %}'">Asignar Cita</button>
+                        {% endif %}
+                    </span></p>
+                {% endif %}
+                <p><strong>Terapeuta a Cargo:</strong><br>
+                    <span class="terapeuta-info">{{ paciente.terapeuta.user.first_name }} {{ paciente.terapeuta.user.last_name|default:"Sin terapeuta asignado" }}
+                    {% if paciente.terapeuta%}
+                        <button class="btn" onclick="window.location.href='{% url 'elegir_terapeuta_administrador' paciente.id %}'">Reasignar Terapeuta</button></span>
                     {% else %}
-                        Inactivo
+                        <button class="btn" onclick="window.location.href='{% url 'elegir_terapeuta_administrador' paciente.id %}'">Asignar Terapeuta</button></span>
                     {% endif %}
                 </p>
-                <p><strong>Edad:</strong> {{ edad }}</p>
-                <p><strong>Sexo:</strong> {{ paciente.sexo }}</p>
-                <p><strong>Número de teléfono:</strong> {{ paciente.telefono }}</p>
-                <p><strong>Correo Electrónico:</strong> {{ paciente.email }}</p>
-                <p><strong>Patología:</strong> {{ paciente.patologia }}</p>
-                <p><strong>Dirección:</strong> {{ paciente.calle }}, {{ paciente.comuna}}, {{ paciente.provincia}}, {{ paciente.region}}</p>
-                <p><strong>Peso:</strong> {{ paciente.peso|default:"Sin peso ingresado" }}</p>
-                <p><strong>Altura:</strong> {{ paciente.altura|default:"Sin altura ingresada" }}</p>
-                <p><strong>IMC:</strong> {{ imc|default:"Sin IMC ingresado" }}</p>
-                <p><strong>Historial médico:</strong> {{ paciente.historial_medico|default:"Sin historial médico" }}</p>
-                <p><strong>Medicamentos:</strong> {{ paciente.medicamentos|default:"Sin medicamentos ingresados" }}</p>
-                <p><strong>Alergias:</strong> {{ paciente.alergias|default:"Sin alergias" }}</p>
-                <p><strong>Progreso:</strong> {{ paciente.progreso|default:"Sin progreso ingresado" }}</p>
-                {% if not paciente.is_active %}
-                    <p><strong>Motivo de desvinculación:</strong> {{ paciente.motivo_desvinculacion|default:"Sin motivo de desvinculación ingresado" }}</p>
-                {% endif %}
-                <p><strong>Dispositivo Órtesis:</strong> {{ paciente.dispositivo_ortesis|default:"Sin dispositivo de órtesis ingresado" }}</p>
-                <p><strong>Actividad física:</strong> {{ paciente.actividad_fisica|default:"Sin actividad física ingresada" }}</p>
-                <p><strong>Próxima Cita:</strong> 
-                    {% if cita %}
-                        {{ cita.fecha }}
-                    {% else %}
-                        Sin cita asignada
-                    {% endif %}
-                </p>                
-                <p><strong>Terapeuta a Cargo:</strong> {{ paciente.terapeuta.user.first_name }} {{ paciente.terapeuta.user.last_name|default:"Sin terapeuta asignado" }}</p>
-            </div>
-        </div>
-        
-        <div class="footer-card">
-            <button class="btn" onclick="window.location.href='{% url 'elegir_terapeuta_administrador' paciente.id %}'">Asignar Terapeuta</button>
-            {% if paciente.terapeuta_id %}
-                <button class="btn" onclick="window.location.href='{% url 'calendar_asignar_paciente_administrador' paciente.id paciente.terapeuta_id %}'">Asignar Cita</button>
             {% else %}
-                <button class="btn" disabled title="No se puede asignar cita sin terapeuta">Asignar Cita</button>
+                {% if paciente.terapeuta%}
+                    <p><strong>Atendido por el terapeuta:</strong><br><span>{{paciente.terapeuta.user.first_name}} {{paciente.terapeuta.user.last_name}}</span></strong>
+                {% endif %}
             {% endif %}
+
+        </div>
+        <div class="columna derecha">
+            <p><strong>Edad:</strong><br> <span>{{ edad }}</span></p>
+            <p><strong>Sexo:</strong><br> <span>{{ paciente.sexo }}</span></p>
+            <p><strong>Altura:</strong><br> <span>{{ paciente.altura|default:"Sin altura ingresada" }}</span></p>
+            <p><strong>Peso:</strong><br> <span>{{ paciente.peso|default:"Sin peso ingresado" }}</span></p>
+            <p><strong>IMC:</strong><br> <span>{{ imc|default:"Sin IMC ingresado" }}</span></p>
+            <p><strong>Actividad física:</strong><br><span>{{ paciente.actividad_fisica|default:"Sin actividad física ingresada" }}</span></p>
+            <p><strong>Alergias:</strong><br> <span>{{ paciente.alergias|default:"Sin alergias" }}</span></p>
+            <p><strong>Medicamentos:</strong><br> <span>{{ paciente.medicamentos|default:"Sin medicamentos ingresados" }}</span></p>
+            <p><strong>Patología:</strong><br> <span>{{ paciente.patologia }}</span></p>
+            <p><strong>Descripción de la patología</strong><br>
+                <span name="descripcion_patologia" class="campo-formulario" readonly>
+                    {% if paciente.descripcion_patologia %}
+                        {{ paciente.descripcion_patologia }}
+                    {% else %}
+                        Sin descripción de la patología
+                    {% endif %}
+                </span>
+            </p>
         </div>
     </div>
 </div>
+
+<div id="popupModal" class="modal" style="display: none;">
+    <div class="contenido-modal">
+        <span class="close" onclick="cerrarPopUp()">&times;</span>
+        <h2 id="popup-titulo"></h2>
+        <p id="popup-mensaje"></p>
+        <div class="botones-modal">
+            <button class="boton-cancelar" onclick="cerrarPopUp()">Cancelar</button>
+            <button class="boton-confirmar" id="confirmButton" onclick="confirmarCambioEstado()">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const restaurarBtn = document.getElementById('restaurar-btn');
+
+        function updateButtonsState() {
+            const selectedCheckboxes = Array.from(checkboxes).filter(checkbox => checkbox.checked);
+
+            if (restaurarBtn) {
+                restaurarBtn.disabled = selectedCheckboxes.length === 0 || !selectedCheckboxes.some(checkbox => {
+                    const badge = checkbox.closest('tr').querySelector('td:nth-child(4) .badge');
+                    return badge.textContent.trim() === 'Inactivo';
+                });
+            }
+
+        if (restaurarBtn) {
+            restaurarBtn.addEventListener('click', function() {
+                mostrarPopUpCambioEstado('activo');
+            });
+            }
+        }
+
+        window.mostrarPopUpRestaurar = function(id, nombre) {
+            document.getElementById('popup-titulo').textContent = `Restaurar paciente`;
+            document.getElementById('popup-mensaje').textContent = `¿Está seguro de que desea restaurar a ${nombre}?`;
+            document.getElementById('popupModal').style.display = 'block';
+        
+            document.getElementById('confirmButton').setAttribute('data-estado', 'activo');
+            document.getElementById('confirmButton').setAttribute('data-ids', JSON.stringify([id]));
+
+        };
+
+        window.cerrarPopUp = function() {
+            document.getElementById('popupModal').style.display = 'none';
+        };
+
+        window.confirmarCambioEstado = function() {
+            const estado = document.getElementById('confirmButton').getAttribute('data-estado');
+            const selectedIds = JSON.parse(document.getElementById('confirmButton').getAttribute('data-ids'));
+
+            const url = estado === 'inactivo' ? "{% url 'agregar_paciente_admin' %}" : "{% url 'restaurar_paciente' %}";
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({ pacientes_ids: selectedIds })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    window.location.href = "{% url 'listar_pacientes_activos' %}";
+                } else {
+                    alert(`Error al ${estado === 'inactivo' ? 'inactivar' : 'restaurar'} los pacientes.`);
+                }
+            });
+
+            cerrarPopUp();
+        };
+    });
+</script>
+    
 
 {% endblock %}

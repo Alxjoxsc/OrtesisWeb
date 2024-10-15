@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block header %}
-<a href="{% url 'recepcionista_pacientes_activos' %}">
+<a href="{% url 'mostrar_paciente_recepcionista' paciente.id %}">
     <img src="{% static 'icons/Volver-atras.svg' %}" alt="">
 </a>
 <h1>Editar paciente</h1>
@@ -54,6 +54,13 @@
                 {{ paciente_form.patologia }}
                 <div class="error">{{ paciente_form.patologia.errors }}</div>
             </div>
+
+            <!-- Descripcion patologia -->
+            <div class="form-group">
+                <label for="{{ paciente_form.descripcion_patologia.id_for_label }}">{{ paciente_form.descripcion_patologia.label }}</label>
+                {{ paciente_form.descripcion_patologia }}
+                <div class="error">{{ paciente_form.descripcion_patologia.errors }}</div>
+            </div>
             
             <!-- Campo Sexo -->
             <div class="form-group">
@@ -74,13 +81,6 @@
                 <label for="{{ paciente_form.altura.id_for_label }}">{{ paciente_form.altura.label }}</label>
                 {{ paciente_form.altura }}
                 <div class="error">{{ paciente_form.altura.errors }}</div>
-            </div>
-            
-            <!-- Historial Médico -->
-            <div class="form-group">
-                <label for="{{ paciente_form.historial_medico.id_for_label }}">{{ paciente_form.historial_medico.label }}</label>
-                {{ paciente_form.historial_medico }}
-                <div class="error">{{ paciente_form.historial_medico.errors }}</div>
             </div>
             
             <!-- Medicamentos -->
@@ -104,10 +104,12 @@
 
             <!-- Campo Fecha de Nacimiento -->
             <div class="form-group">
-                <label for="{{ paciente_form.fecha_nacimiento.id_for_label }}">{{ paciente_form.fecha_nacimiento.label }}</label>
-                <input type="date" id="{{ paciente_form.fecha_nacimiento.id_for_label }}" name="fecha_nacimiento" value="{{ paciente_form.fecha_nacimiento.value|date:'Y-m-d' }}">
-                <div class="error">{{ paciente_form.fecha_nacimiento.errors }}</div>
-            </div>         
+                <label for="fecha_nacimiento">Fecha de nacimiento:</label>
+                <div class="fecha_nacimiento">
+                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="{{ paciente.fecha_nacimiento|date:'Y-m-d' }}" readonly>
+                </div>
+            </div>
+
             <!-- Campo Email -->
             <div class="form-group">
                 <label for="{{ paciente_form.email.id_for_label }}">{{ paciente_form.email.label }}</label>
@@ -186,7 +188,7 @@
 
 
     document.getElementById("boton-cancelar").addEventListener("click", function(){
-        window.location.href = "{% url 'recepcionista_pacientes_activos' %}";
+        window.location.href = "{% url 'mostrar_paciente_recepcionista' paciente.id %}";
     });
 
     document.addEventListener("DOMContentLoaded", function() {
@@ -231,5 +233,7 @@
 </script>
 <script src="{% static 'js/formatear-rut.js' %}"></script>
 <script src="{% static 'js/formatear-telefono.js' %}"></script>
+<script src="{% static 'js/formatear-altura.js' %}"></script>
+<script src="{% static 'js/valida-peso-altura.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 {% endblock %}

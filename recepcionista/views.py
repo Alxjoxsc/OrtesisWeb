@@ -97,16 +97,45 @@ def recepcionista_cambiar_estado_inactivo(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         pacientes_ids = data.get('pacientes_ids', [])
-        Paciente.objects.filter(id__in=pacientes_ids).update(is_active=False)
-        return JsonResponse({'status': 'success'})
+        
+        # Obtener el queryset de los pacientes antes de actualizar su estado
+        pacientes = Paciente.objects.filter(id__in=pacientes_ids)
+        
+        # Eliminar todas las citas de los pacientes afectados
+        Cita.objects.filter(paciente__in=pacientes).delete()
+        
+        # Cambiar el estado de los pacientes a inactivo
+        pacientes.update(is_active=False)
+        
+        # Ahora tienes las instancias de los pacientes afectados
+        pacientes_afectados = list(pacientes)  # Puedes usarlas para lo que necesites
+        
+        return JsonResponse({
+            'status': 'success',
+            'pacientes_afectados': [paciente.id for paciente in pacientes_afectados]
+        })
+
+
 
 @role_required('Recepcionista')
 def recepcionista_restaurar_paciente(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         pacientes_ids = data.get('pacientes_ids', [])
-        Paciente.objects.filter(id__in=pacientes_ids).update(is_active=True)
-        return JsonResponse({'status': 'success'})
+        
+        # Obtener el queryset de los pacientes a restaurar
+        pacientes = Paciente.objects.filter(id__in=pacientes_ids)
+        
+        # Desasignar el terapeuta (poniendo terapeuta_id a None)
+        pacientes.update(terapeuta_id=None)
+        
+        # Restaurar el estado de los pacientes a activo
+        pacientes.update(is_active=True)
+        
+        return JsonResponse({
+            'status': 'success',
+            'pacientes_restaurados': [paciente.id for paciente in pacientes]
+        })
 
 
 @role_required('Recepcionista')
@@ -127,20 +156,25 @@ def agregar_paciente(request):
 def elegir_terapeuta(request, id):
     paciente = Paciente.objects.get(id=id)
     terapeuta = Terapeuta.objects.all()
+    print(terapeuta)
     return render(request, 'elegir_terapeuta.html', {'terapeuta': terapeuta, 'paciente': paciente})
 
 @role_required('Recepcionista')
 def asignar_terapeuta(request, terapeuta_id, paciente_id):
-    print(paciente_id)
-    print(terapeuta_id)
-    paciente = Paciente.objects.get(id=paciente_id)
-    terapeuta = Terapeuta.objects.get(id=terapeuta_id)
-    print(paciente)
-    
-    paciente.terapeuta_id = terapeuta.id
+    # Obtener el paciente y el terapeuta, manejando el caso en que no existan
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+    terapeuta = get_object_or_404(Terapeuta, id=terapeuta_id)
+
+    # Obtener y eliminar todas las citas existentes del paciente
+    citas_existentes = Cita.objects.filter(paciente=paciente)
+    citas_existentes.delete()
+
+    # Asignar el terapeuta al paciente
+    paciente.terapeuta = terapeuta
     paciente.save()
-    
-    return render(request, 'mostrar_paciente.html', {'paciente': paciente})
+
+    # Redirigir a la página de mostrar paciente
+    return render(request, 'mostrar_paciente_recepcionista.html', {'paciente': paciente})
 
 
 @role_required('Recepcionista')
@@ -185,55 +219,43 @@ def calendar_asignar_paciente(request, paciente_id, terapeuta_id):
     }
     return render(request, 'calendar_asignar_paciente.html', {'horario_terapeuta': horario_terapeuta, 'cita': cita,
                                                               'paciente':paciente, 'terapeuta':terapeuta})
+
 @role_required('Recepcionista')
-def agendar_cita_recepcionista(request):
-    
+def agendar_cita_recepcionista(request, paciente_id, terapeuta_id):
+    terapeuta_instance = get_object_or_404(Terapeuta, id=terapeuta_id)
+    paciente_instance = get_object_or_404(Paciente, id=paciente_id)
+
     if request.method == 'POST':
         titulo = request.POST['titulo']
-        terapeuta_id = request.POST['terapeuta']
-        paciente_id = request.POST['paciente']
         fecha = request.POST['fecha']
         hora = request.POST['hora']
         sala = request.POST['sala']
         detalle = request.POST['detalle']
-    
-        terapeuta_instance = Terapeuta.objects.get(id=terapeuta_id)
-        
-        paciente_instance = Paciente.objects.get(id=paciente_id)
-        try:
-            # Intentar obtener una cita existente para el paciente y el terapeuta
-            cita = Cita.objects.filter(paciente=paciente_instance, terapeuta=terapeuta_instance).latest('fecha')
-            # Si existe, actualizar los campos
-            cita.titulo = titulo
-            cita.fecha = fecha
-            cita.hora = hora
-            cita.sala = sala
-            cita.detalle = detalle
-            mensaje = "Cita actualizada exitosamente."
 
-        except ObjectDoesNotExist:
-            # Si no existe, crear una nueva cita
-            cita = Cita(
-                terapeuta=terapeuta_instance,
-                paciente=paciente_instance,
-                titulo=titulo,
-                fecha=fecha,
-                hora=hora,
-                sala=sala,
-                detalle=detalle
-            )
-            mensaje = "Nueva cita creada exitosamente."
-    
-            # Guardar los cambios (ya sea la nueva cita o la cita actualizada)
-            cita.save()
-        
-        #Guardar la asignación del terapeuta al paciente
-        
-        paciente_instance.terapeuta_id = terapeuta_instance.id
-        paciente_instance.save()
-        
-        return redirect('mostrar_paciente_con_terapeuta', paciente_instance.id, terapeuta_instance.id)
-    return render(request, 'mostrar_paciente.html', {'paciente': paciente_instance})
+        # Obtener todas las citas existentes del paciente con ese terapeuta
+        citas_existentes = Cita.objects.filter(paciente=paciente_instance)
+
+        # Eliminar todas las citas anteriores (si existen)
+        citas_existentes.delete()
+
+        # Crear una nueva cita
+        cita = Cita(
+            terapeuta=terapeuta_instance,
+            paciente=paciente_instance,
+            titulo=titulo,
+            fecha=fecha,
+            hora=hora,
+            sala=sala,
+            detalle=detalle
+        )
+        cita.save()
+
+        mensaje = "Cita creada y citas anteriores eliminadas exitosamente."
+
+        return redirect('mostrar_paciente_recepcionista', paciente_instance.id)
+
+    return render(request, 'mostrar_paciente_recepcionista.html', {'paciente': paciente_instance})
+
 
     
 def formulario_agregar_paciente(request):
@@ -255,7 +277,6 @@ def formulario_agregar_paciente(request):
         patologia = request.POST.get('patologia', None)
         alergias = request.POST.get('alergias', None)
         progreso = request.POST.get('progreso', None)
-        dispositivo_ortesis = request.POST.get('dispositivo_ortesis', None)
         actividad_fisica = request.POST.get('actividad_fisica', None)
         peso = request.POST.get('peso', None)
         altura = request.POST.get('altura', None)
@@ -281,7 +302,6 @@ def formulario_agregar_paciente(request):
             patologia=patologia,
             alergias=alergias,
             progreso=progreso,
-            dispositivo_ortesis=dispositivo_ortesis,
             actividad_fisica=actividad_fisica,
             peso=peso,
             altura=altura,
@@ -299,8 +319,8 @@ def mostrar_paciente_sin_terapeuta(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
     edad = paciente.calcular_edad()
     imc = paciente.calcular_imc()
-    cita = Cita.objects.filter(paciente_id=paciente_id).order_by('fecha').last()
-    return render(request, 'mostrar_paciente.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc})
+    cita = Cita.objects.filter(paciente_id=paciente_id).last()
+    return render(request, 'mostrar_paciente_recepcionista.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc})
 
 
 def mostrar_paciente_con_terapeuta(request, paciente_id, terapeuta_id):
@@ -308,9 +328,26 @@ def mostrar_paciente_con_terapeuta(request, paciente_id, terapeuta_id):
     terapeuta = Terapeuta.objects.get(id=terapeuta_id)
     edad = paciente.calcular_edad()
     imc = paciente.calcular_imc()
-    cita = Cita.objects.filter(paciente_id=paciente_id).order_by('fecha').last()
-    return render(request, 'mostrar_paciente.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc, 'terapeuta':terapeuta})
+    cita = Cita.objects.filter(paciente_id=paciente_id).last()
+    return render(request, 'mostrar_paciente_recepcionista.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc, 'terapeuta':terapeuta})
 
+@role_required('Recepcionista')
+def mostrar_paciente_recepcionista(request, paciente_id):
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+    edad = paciente.calcular_edad()
+    imc = paciente.calcular_imc()
+
+    try:
+        cita = Cita.objects.get(paciente_id=paciente_id)
+    except Cita.DoesNotExist:
+        cita = None  # Asigna None si no existe la cita
+
+    return render(request, 'mostrar_paciente_recepcionista.html', {
+        'paciente': paciente,
+        'edad': edad,
+        'imc': imc,
+        'cita': cita  # Envía la cita o None si no existe
+    })
 
 @role_required('Recepcionista')
 def editar_datos_paciente_recepcionista(request, paciente_id, terapeuta=None):

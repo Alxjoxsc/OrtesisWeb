@@ -1,9 +1,37 @@
-{% extends 'base_admin.html' %}
+{% extends 'administrador_base.html' %}
+
+{% load static %}
 
 {% block title %}Recepcionista{% endblock %}
+
+{% block extra_head%}
+    <link rel="stylesheet" href="{% static 'styles/admin_recepcionista.css' %}">
+{% endblock %}
+
+
+{% block header %}
+<div class="contenedor-header">
+    <h1>Recepcionistas</h1>
+    <form class="busqueda-form">
+        <div class="busqueda-input">
+            <input type="text" class="form-control" id="searchInput" placeholder="Búsqueda por Nombre o Rut" aria-label="Buscar Terapeuta">
+            <button type="button" id="clearButton" class="clear-button" style="display: none;">Limpiar Filtro</button>
+        </div>
+    </form>
+    <button id="boton-agregar-recepcionista">Agregar Recepcionista
+        <img <img src="{% static 'icons/plus.svg' %}" alt="Agregar">
+    </button>
+</div>
+{% endblock %}
+
 
 {% block content %}
 <div style="display: flex; justify-content: center; align-items: center; height: 80vh;">
     <h1 style="font-size: 48px; font-weight: bold;">Recepcionista</h1>
 </div>
 {% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/admin_buscador_recepcionista.js' %}"></script>
+{% endblock %}
+
