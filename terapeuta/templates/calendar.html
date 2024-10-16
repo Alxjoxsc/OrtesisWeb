@@ -30,4 +30,47 @@
 </body>
 <script src="{% static 'js/calendar.js' %}"></script>
 
+<!-- Modal Popup para añadir nueva rutina -->
+<div id="nuevaRutinaModal" class="modal modal-nueva-rutina">
+    <div class="modal-content">
+        <span class="close" id="cerrarNuevaRutina">&times;</span>
+        <h2>Nueva Rutina</h2>
+        <form id="nuevaRutinaForm">
+            {% csrf_token %}
+            <label for="fecha_inicio">Fecha de Inicio</label>
+            <input type="date" id="fecha_inicio" name="fecha_inicio" required>
+
+            <label for="cantidad_sesiones">Cantidad de Sesiones</label>
+            <input type="number" id="cantidad_sesiones" name="cantidad_sesiones" required>
+
+            <label for="repeticiones">Repeticiones por Sesión</label>
+            <input type="number" id="repeticiones" name="repeticiones" required>
+
+            <label for="frecuencia_sesiones">Frecuencia de Sesiones</label>
+            <div class="frecuencia-inputs">
+                <input type="number" id="frecuencia_cantidad" name="frecuencia_cantidad" required>
+                <select id="frecuencia_tipo" name="frecuencia_tipo">
+                  <p>cada</p>
+                    <option value="dias">días</option>
+                    <option value="semanas">semanas</option>
+                </select>
+            </div>
+
+            <label for="angulo_inicial">Ángulo Inicial</label>
+            <input type="number" id="angulo_inicial" name="angulo_inicial" required>
+
+            <label for="angulo_final">Ángulo Final</label>
+            <input type="number" id="angulo_final" name="angulo_final" required>
+
+            <label for="velocidad">Velocidad</label>
+            <input type="text" id="velocidad" name="velocidad" required>
+
+            <div class="modal-footer">
+                <button type="button" class="cancel-btn" id="cancelarNuevaRutina">Cancelar</button>
+                <button type="submit" class="confirm-btn">Confirmar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 </html>

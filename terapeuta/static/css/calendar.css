@@ -183,6 +183,20 @@ label {
 .modal-content {
     padding: 10px;
 }
+
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    margin-left: 50px;
+    font-weight: 400;
+    font-size: 17px;
+    justify-content: space-between;
+    width: 80%;
+}
+
 .popup-content h2, .modal-content h2 {
     text-align: center;
     font-size: 20px;
@@ -217,6 +231,33 @@ input[type="text"], input[type="time"], input[type="date"], select, textarea {
 .cita-item p {
     margin: 5px 0;
 }
+
+/* Botones generales para todos los modals */
+.confirm-btn,
+.cancel-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.confirm-btn {
+    background-color: #006A60;
+    color: white;
+}
+
+.cancel-btn {
+    background-color: #FF6161;
+    color: white;
+}
+
+.confirm-btn:hover,
+.cancel-btn:hover {
+    opacity: 0.9;
+}
+
 
 /* Estilo de los botones */
 button {
@@ -523,4 +564,10 @@ button {
 
 #confirmarCambiosBtn:hover {
     background-color: #006A60;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: center;
+    gap: 100px;
 }
