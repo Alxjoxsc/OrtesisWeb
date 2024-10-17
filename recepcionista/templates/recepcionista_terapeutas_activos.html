@@ -16,6 +16,9 @@
         <button type="button" id="clearButton" class="terapeutas-clear-button" onclick="clearSearch()" style="display: {% if request.GET.search %}inline-block{% else %}none{% endif %};">
             Limpiar Filtro
         </button>
+        <div class="filtro-eliminar-container" style="display: {% if request.GET.order_by %}block{% else %}none{% endif %};">
+            <button type="button" class="filtro-eliminar-btn" onclick="clearOrderFilter()">Eliminar Filtro</button>
+        </div>
     </form>
     <div class="dropdown">
         <button class="filtro-btn" type="button" id="dropdownMenuButton">
@@ -50,8 +53,8 @@
                 <td class="inicio-tabla">{{ terapeuta.user.first_name }} {{ terapeuta.user.last_name }}</td>
                 <td class="centro-tabla">{{ terapeuta.user.username }}</td>
                 <td class="centro-tabla">
-                    <span class="badge {% if terapeuta.is_active %}bg-success{% else %}bg-secondary{% endif %}">
-                        {% if terapeuta.is_active %}Activo <img class = "img-activo" src="{% static "icons/activo.svg" %}"> {% else %}Inactivo <img class = "img-activo" src="{% static "icons/inactivo.svg" %}"> {% endif %}
+                    <span class="badge {% if terapeuta.user.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                        {% if terapeuta.user.is_active %}Activo <img class = "img-activo" src="{% static "icons/activo.svg" %}"> {% else %}Inactivo <img class = "img-activo" src="{% static "icons/inactivo.svg" %}"> {% endif %}
                     </span>
                 </td>
                 <td class="centro-tabla">{{terapeuta.especialidad}}</td>
@@ -124,6 +127,11 @@
         const urlParams = new URLSearchParams(window.location.search);
         urlParams.set('order_by', orderBy);
         window.location.search = urlParams.toString();
+    }
+    function clearOrderFilter() {
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.delete('order_by');
+    window.location.search = urlParams.toString();
     }
 </script>
 
