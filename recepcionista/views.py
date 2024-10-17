@@ -181,13 +181,13 @@ def recepcionista_terapeutas_activos(request):
     query = request.GET.get('search')
     order_by = request.GET.get('order_by', 'user__first_name')
     
-    terapeutas_list = Terapeuta.objects.filter(is_active=True)
+    terapeutas_list = Terapeuta.objects.filter(user__is_active = True)
 
     if query:
         terapeutas_list = terapeutas_list.filter(
             Q(user__first_name__icontains=query) |  
             Q(user__last_name__icontains=query) |   
-            Q(user__username__icontains=query)       
+            Q(user__username__icontains=query)
         )
     
     # Aplicar el orden basado en el parámetro

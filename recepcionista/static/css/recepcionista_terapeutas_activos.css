@@ -103,6 +103,24 @@
     margin-right: 70px; /* Para empujar el botón hacia la derecha */
 }
 
+.filtro-eliminar-container {
+    margin-left: 20px;
+}
+
+.filtro-eliminar-btn {
+    background-color: #f5554a;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.filtro-eliminar-btn:hover {
+    background-color: #d32f2f;
+}
+
 /* Estilos del contenido del menú desplegable (oculto por defecto) */
 .dropdown-content {
     display: none;
