@@ -171,8 +171,7 @@ button:hover {
     transform: translate(-50%, -50%); /* Ajuste de posición para centrar */
 }
 
-
-
+/*Entrada de Datos del Modal*/
 .modal-content input {
     background-color: #E0E0E0;
     align-items: center;
@@ -187,11 +186,27 @@ button:hover {
     padding: 5px;
 }
 
+/*Títulos para el Modal*/
 .modal-content label {
     display: block;
     margin-bottom: 1px;
     text-align: left;
     font-size: 20px;
+}
+
+/*Select del Modal*/
+.modal-content select {
+    background-color: #E0E0E0;
+    align-items: center;
+    font-size: 16px;
+    font-weight:300;
+    color: black;
+    border-radius: 5px;
+    border: 0.5px solid black;
+    width: 100%;
+    line-height: 12px;
+    margin-bottom: 15px;
+    padding: 5px;
 }
 
 

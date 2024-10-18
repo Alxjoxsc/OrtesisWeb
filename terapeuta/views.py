@@ -20,11 +20,13 @@ from django.utils import timezone
 
 #-------------------------------------AGENDA-------------------------------------
 def agenda(request):
+    #Datos para renderizar el select de pacientes en los Popup
     user_id = request.user.id
-    print(user_id, "xd")
     terapeuta = Terapeuta.objects.get(user_id=user_id)
     terapeuta_id = terapeuta.id
     pacientes = Paciente.objects.filter(terapeuta_id=terapeuta_id)  # Obtener los pacientes del terapeuta
+    
+    #Obtención de las citas
     citas = Cita.objects.all()
     citas_json = []
     for cita in citas:
