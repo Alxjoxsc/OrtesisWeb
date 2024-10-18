@@ -20,7 +20,11 @@ from django.utils import timezone
 
 #-------------------------------------AGENDA-------------------------------------
 def agenda(request):
-    paciente = Paciente.objects.all()
+    user_id = request.user.id
+    print(user_id, "xd")
+    terapeuta = Terapeuta.objects.get(user_id=user_id)
+    terapeuta_id = terapeuta.id
+    pacientes = Paciente.objects.filter(terapeuta_id=terapeuta_id)  # Obtener los pacientes del terapeuta
     citas = Cita.objects.all()
     citas_json = []
     for cita in citas:
@@ -38,12 +42,8 @@ def agenda(request):
             })
         else:
             continue
-    context = {
-        'paciente': Paciente.objects.all(),
-        'fechas_citas': json.dumps(citas_json)
-    }
-    return render(request, 'agenda.html', context)
-    return render(request, 'agenda.html', {'paciente':paciente})
+    fechas_citas = json.dumps(citas_json)
+    return render(request, 'agenda.html', {'pacientes':pacientes, 'fechas_citas': fechas_citas})
 
 def obtener_fechas_citas(request):
     if request.method == "GET":
@@ -236,10 +236,10 @@ def agendar_cita(request):
             return redirect('agenda')
     return render(request, 'agenda.html')
 
+@login_required  # Asegúrate de que el usuario esté autenticado
 def calendar(request):
-    paciente = Paciente.objects.all()
-    print(paciente)
-    return render (request, 'calendar.html', {'paciente':paciente})
+    return render(request, 'calendar.html')
+
 
 
 def editar_cita(request):
