@@ -1,0 +1,66 @@
+/* Encabezado del Historial */
+.encabezado-historial {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #f5f5f5;
+  }
+  
+  /* Nombre del Paciente */
+  .nombre-paciente h2 {
+    margin: 0;
+    font-size: 24px;
+  }
+  
+  /* Seleccionar Rutina */
+  .seleccionar-rutina {
+    position: relative;
+  }
+  
+  .btn-desplegable {
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .btn-desplegable i {
+    margin-left: 5px;
+  }
+  
+  /* Contenido Desplegable */
+.contenido-desplegable {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    min-width: 200px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    border-radius: 5px;
+  }
+  
+  .contenido-desplegable.mostrar {
+    display: block;
+  }
+  
+  .contenido-desplegable ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .contenido-desplegable li a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+  }
+  
+  .contenido-desplegable li a:hover {
+    background-color: #f1f1f1;
+  }

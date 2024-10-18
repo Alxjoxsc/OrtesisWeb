@@ -3,7 +3,7 @@
 
 {% block extra_head %}
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
-  <link rel="stylesheet" href="{% static 'css/historial_paciente.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/historial_sesiones.css' %}" />
 {% endblock %}
 
 {% block title %}
@@ -14,35 +14,64 @@
   <!-- Botón para volver -->
   <a href="{% url 'paciente_terapeuta' %}" class="back-button"><i class="fas fa-arrow-left"></i></a>
   <div class="contenedor-header">
-    <h1>Historial del paciente</h1>
-    <button class="desvincular-btn" data-id="{{ paciente.id }}">Desvincular paciente <i class="fas fa-unlink"></i></button>
-    <input type="hidden" id="pacienteId" value="{{ paciente.id }}" />
-    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
+    <h1>Historial sesiones</h1>
   </div>
-  <scrip type="text/javascript">
-    function getCookie(name) {
-      let cookieValue = null
-      if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';')
-        for (let i = 0; i < cookies.length; i++) {
-          const cookie = cookies[i].trim()
-          if (cookie.substring(0, name.length + 1) === name + '=') {
-            cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
-            break
-          }
-        }
-      }
-      return cookieValue
-    }
-    const csrftoken = getCookie('csrftoken')
-  </script>
 {% endblock %}
 
 {% block content %}
-  
+<div class="encabezado-historial">
+    <!-- Nombre del Paciente -->
+    <div class="nombre-paciente">
+      <h2>{{ paciente.first_name }} {{ paciente.last_name }}</h2>
+    </div>
+    
+    <!-- Botón Desplegable para Seleccionar Rutina -->
+    <div class="seleccionar-rutina">
+      <button class="btn-desplegable" id="btnDesplegableRutina">
+        Seleccionar Rutina <i class="fas fa-chevron-down"></i>
+      </button>
+      <div class="contenido-desplegable" id="contenidoDesplegableRutina">
+        <ul>
+          {% for rutina in rutinas %}
+            <li>
+              <a href="{% url 'historial_sesiones' paciente.id %}?rutina_id={{ rutina.id }}">
+                Rutina {{ forloop.counter }} - {{ rutina.fecha_inicio|date:"d/m/Y" }}
+              </a>
+            </li>
+          {% empty %}
+            <li>No hay rutinas disponibles.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
 
+    <!-- Sección de "Cards" para las Sesiones -->
+    {% if sesiones %}
+    <div class="cards-container">
+      {% for sesion in sesiones %}
+        <div class="sesion-card">
+          <h3>Sesión {{ forloop.counter }}</h3>
+          <div class="sesion-detalles">
+            <p><strong>Fecha:</strong> {{ sesion.fecha|date:"d/m/Y" }}</p>
+            <p><strong>Hora:</strong> {{ sesion.hora_inicio|time:"H:i" }} - {{ sesion.hora_final|time:"H:i" }}</p>
+            <p><strong>Duración:</strong> {{ sesion.duracion }} minutos</p>
+            <p><strong>Estado:</strong> {{ sesion.estado }}</p>
+          </div>
+          <div class="boton-ver-grafico">
+            <button class="btn-ver-grafico" onclick="enviarIdSesion({{ sesion.id }})">
+              Ver Gráfico <i class="fas fa-chart-line"></i>
+            </button>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No hay sesiones registradas para esta rutina.</p>
+  {% endif %}
 {% endblock %}
 
-{% block extra_js %}
 
+{% block extra_js %}
+  <script src="{% static 'js/historial_sesiones.js' %}"></script>
 {% endblock %}
