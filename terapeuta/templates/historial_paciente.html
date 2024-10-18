@@ -131,6 +131,9 @@
             {% empty %}
               <p>No hay sesiones registradas para esta rutina.</p>
             {% endfor %}
+            <div class="boton-historial">
+              <a href="{% url 'historial_sesiones' %}" class="btn-historial">Ver Historial Completo <i class="fas fa-history"></i></a>
+            </div>
           </div>
         {% endfor %}
       </ul>

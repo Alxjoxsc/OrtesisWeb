@@ -1,0 +1,48 @@
+{% extends 'terapeuta_base.html' %}
+{% load static %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+  <link rel="stylesheet" href="{% static 'css/historial_paciente.css' %}" />
+{% endblock %}
+
+{% block title %}
+  Historial del paciente
+{% endblock %}
+
+{% block header %}
+  <!-- Botón para volver -->
+  <a href="{% url 'paciente_terapeuta' %}" class="back-button"><i class="fas fa-arrow-left"></i></a>
+  <div class="contenedor-header">
+    <h1>Historial del paciente</h1>
+    <button class="desvincular-btn" data-id="{{ paciente.id }}">Desvincular paciente <i class="fas fa-unlink"></i></button>
+    <input type="hidden" id="pacienteId" value="{{ paciente.id }}" />
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
+  </div>
+  <scrip type="text/javascript">
+    function getCookie(name) {
+      let cookieValue = null
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';')
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim()
+          if (cookie.substring(0, name.length + 1) === name + '=') {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
+            break
+          }
+        }
+      }
+      return cookieValue
+    }
+    const csrftoken = getCookie('csrftoken')
+  </script>
+{% endblock %}
+
+{% block content %}
+  
+
+{% endblock %}
+
+{% block extra_js %}
+
+{% endblock %}

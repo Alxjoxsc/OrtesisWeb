@@ -530,3 +530,16 @@ def eliminar_observacion(request, observacion_id):
         return JsonResponse({'success': True})
     
     return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+def historial_sesiones(request, paciente_id):
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+    
+    # Obtener las rutinas relacionadas con el paciente, ordenadas por fecha de inicio
+    rutinas = Rutina.objects.filter(paciente=paciente).order_by('-fecha_inicio')
+    
+    context = {
+        'paciente': paciente,
+        'rutinas': rutinas
+    }
+    
+    return render(request, 'historia_sesiones.html', context)
