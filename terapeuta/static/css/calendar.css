@@ -1,88 +1,75 @@
-
+/* Contenedores y elementos generales */
 .calendar-container {
     background-color: white;
     border-radius: 5px;
     padding: 20px; 
     display: flex;
     flex-direction: column;
-    width: 100%;
+    width: 80%;
     max-width: 1200px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); 
-    margin-top: 20px;
+    margin: 20px auto 0;
+    text-align: center;
 }
 
-.button-container {
+.button-container,
+.view-options {
     display: flex;
     justify-content: center;
-    width: 130px;
-
+    width: auto;
 }
-/* Encabezado del calendario */
+
 .calendar-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-right: 80px; /* Reduce el espacio solo en el lado derecho */
-    margin-top: -140px;
-}
-.month-header {
-    font-size: 1.5em;
-    text-align: center;
-    flex-grow: 1;
 }
 
-.view-options {
-    display: flex;
-    justify-content: center;
-    width: 130px;
-}
-.view-options {
-    display: flex;
-    justify-content: space-between;
-    width: auto;
-}
-/* Botones de navegación */
-.nav-button {
+.nav-button,
+.confirm-btn,
+.cancel-btn,
+button {
     background-color: #008CAB;
-    border: none;
     color: white;
-    padding: 12px;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
     cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
     margin: 2px;
+    transition: background-color 0.3s ease;
 }
 
-.nav-button:hover {
+.nav-button:hover,
+.confirm-btn:hover,
+.cancel-btn:hover,
+button:hover {
     background-color: #399fb6;
 }
 
-/* Estilos para la vista mensual */
+/* Vista mensual */
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: repeat(7, 55px);
-    gap: 2px;
+    gap: 10px;
     margin-top: 20px;
 }
 
-.day {
-    padding: 10px;
+.day, 
+.day-name, 
+.empty-day {
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
     text-align: center;
     border: 1px solid #ddd;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
-.day:hover {
+.day:hover,
+.week-view td:hover {
     background-color: #82b2bd;
     border-color: #399fb6;
-}
-
-.day-name, .day, .empty-day {
-    padding: 10px;
-    text-align: center;
-    border: 1px solid #ddd;
 }
 
 .weekend {
@@ -94,241 +81,6 @@
     color: white;
 }
 
-/* Ajustes generales para la vista semanal */
-
-.week-view-container {
-    height: 450px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-.week-view {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.week-view th {
-    background-color: #008CAB;
-    color: white;
-    padding: 10px;
-    text-align: center;
-    font-size: 15px;
-    border: 1px solid #ddd;
-}
-
-/* Separación de los días */
-.week-view td {
-    border: 1px solid #ddd;
-    padding: 5px;
-    text-align: center;
-    height: 40px;
-    transition: background-color 0.3s ease;
-}
-
-/* Efecto hover sobre las celdas de las horas */
-.week-view td:hover {
-    background-color: #82b2bd;
-    border-color: #399fb6;
-}
-
-/* Resalta la columna de las horas */
-.week-view .time-slot {
-    background-color: #f7f7f7;
-    color: #333;
-    font-weight: bold;
-    font-size: 10px;
-    width: 80px;
-}
-
-/* Estilos del pop-up */
-.popup {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 100;
-    overflow-y: auto;
-}
-
-label {
-    font-weight: bold;
-}
-.popup-content {
-    background-color: white;
-    margin: 5% auto;
-    padding: 20px;
-    border-radius: 8px;
-    width: 400px;
-    position: relative;
-    z-index: 101;
-    text-align: center;
-}
-/* Estilos del popup de citas */
-.modal {
-    display: none;
-    position: absolute;
-    background-color: white;
-    border: 1px solid #ddd;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    z-index: 101;
-    padding: 20px;
-    border-radius: 8px;
-    width: 400px;
-}
-.modal-content {
-    padding: 10px;
-}
-
-.modal-body {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-top: 15px;
-    margin-bottom: 15px;
-    margin-left: 50px;
-    font-weight: 400;
-    font-size: 17px;
-    justify-content: space-between;
-    width: 80%;
-}
-
-.popup-content h2, .modal-content h2 {
-    text-align: center;
-    font-size: 20px;
-    margin-bottom: 20px;
-}
-.close, .close-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    cursor: pointer;
-    font-size: 20px;
-    color: #333;
-}
-
-input[type="text"], input[type="time"], input[type="date"], select, textarea {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-    width: 100%;
-    margin: 0;
-    box-sizing: border-box;
-}
-/* Estilo de los items dentro del popup de citas */
-.cita-item {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    background-color: #f9f9f9;
-}
-.cita-item p {
-    margin: 5px 0;
-}
-
-/* Botones generales para todos los modals */
-.confirm-btn,
-.cancel-btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-top: 10px;
-}
-
-.confirm-btn {
-    background-color: #006A60;
-    color: white;
-}
-
-.cancel-btn {
-    background-color: #FF6161;
-    color: white;
-}
-
-.confirm-btn:hover,
-.cancel-btn:hover {
-    opacity: 0.9;
-}
-
-
-/* Estilo de los botones */
-button {
-    padding: 10px;
-    font-size: 16px;
-    border: none;
-    border-radius: 4px;
-    background-color: #008CAB;
-    color: white;
-    cursor: pointer;
-    width: 48%;
-}
-
-.botones {
-    display: flex;
-    justify-content: space-between;
-    margin: 15px; 
-}
-
-#cancelarBtn {
-    background-color: #FF0000;
-    color: white;
-}
-
-#cancelarBtn:hover {
-    background-color: #FF0000;
-}
-
-#confirmarBtn {
-    background-color: #006A60;
-    color: white;
-}
-
-#confirmarBtn:hover {
-    background-color: #006A60;
-}
-
-.popup-content {
-    background-color: white;
-    margin: 5% auto;
-    padding: 20px;
-    border-radius: 8px;
-    width: 400px;
-    position: relative;
-    z-index: 101;
-}
-.popup-content h2 {
-    text-align: center;
-    margin: 20px;
-    font-size: 24px;
-}
-
-.campo {
-    margin:10px;
-}
-#fechaSeleccionada {
-    display: none; /* Oculta el span */
-}
-
-/* Boton de cerrar */
-.close {
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    cursor: pointer;
-    font-size: 24px;
-}
-/* Resaltar días y horas con citas */
-.dia-con-cita {
-    position: relative;
-}
 .dia-con-cita::after {
     content: '';
     position: absolute;
@@ -341,132 +93,163 @@ button {
     border-radius: 50%;
 }
 
-/* Vista semanal adicional */
-.appointment {
-    background-color: #ffcccc;
-    color: #333;
+/* Vista semanal */
+.week-view-container {
+    height: 450px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
     border-radius: 5px;
-    padding: 5px;
-    font-size: 12px;
-    display: block;
-    margin-top: 5px;
 }
 
-/*calendar_asignar_paciente*/
-.week-hour.working-hour {
-    background-color: rgba(0, 128, 0, 0.2); /* Color de fondo para las horas de trabajo */
-    border: 1px solid #008000; /* Borde para destacar más */
+.week-view {
+    width: 100%;
+    border-collapse: collapse;
 }
-/* Estilo para el popup */
-#popupCitas {
-    background-color: #008CAB;
-    border: 2px #008CAB;
+
+.week-view th, .week-view td {
+    border: 1px solid #ddd;
     padding: 10px;
-    border-radius: 8px;
-    width: 300px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-}
-/* Estilo para el contenido de las citas */
-.cita-item {
-    background-color: #ffffff;
-    margin: 5px;
-    padding: 5px;
-    border-radius: 5px;
     text-align: center;
 }
-#closePopupCitas {
-    position: absolute;
-    top: 0px;
-    right: 5px;
+
+.week-view th {
+    background-color: #008CAB;
+    color: white;
+}
+
+.time-slot {
+    background-color: #f7f7f7;
+    font-weight: bold;
+    width: 80px;
+}
+
+/* Estilos para popups y modales */
+.popup, 
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow: auto;
+}
+
+.popup-content, 
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    margin: auto;
+    padding: 15px;
+    border-radius: 15px;
+    width: 30%;
+    max-width: 600px;
+    /* Aseguramos que ambos modales tengan el mismo tamaño */
+    min-width: 300px;
+    max-height: 80%;
+    overflow-y: auto;
+}
+
+.popup-content h2,
+.modal-content h2 {
     font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
     cursor: pointer;
 }
-/* Estilo del popup de edición */
-#popupEditarCita {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 2000;  /* Aseguramos que tenga un z-index mayor que el popup de citas */
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-.mostrar {
-    display: block !important;
-}
-/* Cuando el popup de edición está activo */
-#popupEditarCita.mostrar {
-    opacity: 1;
-    visibility: visible;
-}
-/* Estilo para ocultar el popup de citas mientras se edita */
-#popupCitas {
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-#popupEditarCita.mostrar ~ #popupCitas {
-    opacity: 0;
-    visibility: hidden;
-}
-/* Estilo del popup de edición */
-#popupEditarCita label {
-    display: block; /* Cada label en una línea separada */
-    text-align: left; /* Alinea el texto a la izquierda */
-    margin-bottom: 5px; /* Espacio entre la etiqueta y el campo */
-    font-size: 18px;
-    font-weight: 600;
-    line-height: 29.05px;
-}
-#popupEditarCita texthora {
-    text-align: left; /* Alinea el texto a la izquierda */
-    margin-bottom: 5px; /* Espacio entre la etiqueta y el campo */
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 19.36px;
-}
-#popupEditarCita input[type="text"],
-#popupEditarCita input[type="date"],
-#popupEditarCita input[type="time"],
-#popupEditarCita select,
-#popupEditarCita textarea {
-    width: calc(100% - 0px);  /* Ajustar el ancho para ocupar el espacio restante */
-    background-color: #E0E0E0;  /* Cambia el color de fondo aquí */
-    padding: 8px;
+
+.cita-item {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
     margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box; /* Incluir padding y border en el ancho total */
+    text-align: center;
 }
 
-/* ---- Media Queries para hacer responsive ---- */
+/* Botones del modal */
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 100px;
+}
 
-/* Estilos para pantallas medianas (tabletas) */
+#cancelarBtn, 
+.cancel-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+    background-color: #FF6161;
+}
+
+#confirmarBtn, 
+.confirm-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+    background-color: #006A60;
+}
+
+.popup-content h2 {
+    text-align: center;
+    margin: 20px;
+    font-size: 24px;
+}
+
+
+#nuevaCita input[type="text"], 
+#nuevaCita input[type="date"], 
+#nuevaCita input[type="time"], 
+#nuevaCita select, 
+#nuevaCita textarea {
+    background-color: #ebeaea;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+#nuevaCita form {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin: 10px auto;
+    width: 95%;
+
+}
+
+/* Responsive */
 @media (min-width: 768px) and (max-width: 1023px) {
-    /* Ajustar el tamaño del popup */
     .popup-content {
         width: 60%;
     }
-
-    /* Botones más grandes en tabletas */
-    button {
-        font-size: 18px;
-        width: 48%;
-    }
-
-    /* Ajustar el margen de los campos */
-    .campo {
-        margin: 15px;
-    }
 }
 
-/* Estilos para pantallas pequeñas (móviles) */
 @media (max-width: 767px) {
-    /* Ajustar el tamaño del popup */
     .popup-content {
         width: 90%;
     }
 
-    /* Cambiar el diseño de los botones en una columna */
     .botones {
         flex-direction: column;
         align-items: center;
@@ -474,100 +257,7 @@ button {
     }
 
     button {
-        width: 100%; /* Los botones ocupan el ancho completo */
-        font-size: 16px;
+        width: 100%;
         margin-bottom: 10px;
     }
-
-    /* Ajustar los márgenes de los campos en pantallas pequeñas */
-    .campo {
-        margin: 10px 5px;
-    }
-
-    /* El título del popup será más pequeño */
-    .popup-content h2 {
-        font-size: 20px;
-    }
-
-    /* Ajustar el tamaño del botón de cerrar */
-    .close {
-        font-size: 20px;
-    }
-}
-
-/* Estilos del fondo del popup de confirmación de cambios */
-#popupConfirmarCambios {
-    display: none; /* Oculto por defecto */
-    position: fixed;
-    top: 0; 
-    left: 0;
-    width: 100%; 
-    height: 100%; /* Cubre toda la pantalla */
-    background-color: rgba(0, 0, 0, 0.5); /* Fondo translúcido oscuro */
-    z-index: 3000; /* Asegura que el popup esté sobre otros elementos */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* Estilos del contenido del popup */
-#popupConfirmarCambios .popup-content {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    width: 400px; /* Ajusta según lo que necesites */
-    text-align: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombras para resaltar el popup */
-}
-
-#popupConfirmarCambios h2 {
-    font-size: 24px;
-    margin-bottom: 10px;
-}
-
-#popupConfirmarCambios hr {
-    margin-bottom: 15px;
-}
-
-#popupConfirmarCambios p {
-    font-size: 16px;
-    margin-bottom: 20px;
-}
-
-#popupConfirmarCambios .botones {
-    display: flex;
-    justify-content: space-between;
-    margin: 15px 0;
-}
-
-#cancelarConfirmacionBtn {
-    background-color: #FF0000;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    border: none;
-}
-
-#cancelarConfirmacionBtn:hover {
-    background-color: #CC0000;
-}
-
-#confirmarCambiosBtn {
-    background-color: #008CAB;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    border: none;
-}
-
-#confirmarCambiosBtn:hover {
-    background-color: #006A60;
-}
-
-.modal-footer {
-    display: flex;
-    justify-content: center;
-    gap: 100px;
 }

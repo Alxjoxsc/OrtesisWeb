@@ -18,59 +18,51 @@
                 <button id="today" class="nav-button">Hoy</button>
             </div>
             <div class="month-header">
-                <h2 id="month-year">Agosto 2024</h2>
+                <h2 id="month-year">Octubre 2024</h2>
             </div>
             <div class="view-options">
-                <button id="week-view" class="nav-button">Sem</button>
+                <button id="week-view" class="nav-button">Semana</button>
                 <button id="month-view" class="nav-button">Mes</button>
             </div>
         </div>
         <div id="calendar"></div>
     </div>
-</body>
-<script src="{% static 'js/calendar.js' %}"></script>
 
-<!-- Modal Popup para añadir nueva rutina -->
-<div id="nuevaRutinaModal" class="modal modal-nueva-rutina">
-    <div class="modal-content">
-        <span class="close" id="cerrarNuevaRutina">&times;</span>
-        <h2>Nueva Rutina</h2>
-        <form id="nuevaRutinaForm">
-            {% csrf_token %}
-            <label for="fecha_inicio">Fecha de Inicio</label>
-            <input type="date" id="fecha_inicio" name="fecha_inicio" required>
+    <!-- Modal Popup para añadir nueva Cita -->
+    <div id="nuevaCita" class="modal">
+        <div class="modal-content">
+            <span class="close" id="cerrarModal">&times;</span>
+            <h2>Agendar Cita</h2>
+            <form id="nuevaCita">
+                {% csrf_token %}
+                <label for="titulo">Título</label>
+                <input type="text" id="titulo" name="titulo" required>
 
-            <label for="cantidad_sesiones">Cantidad de Sesiones</label>
-            <input type="number" id="cantidad_sesiones" name="cantidad_sesiones" required>
+                <label for="paciente">Paciente</label>
+                <input type="text" id="paciente" name="paciente" required>
 
-            <label for="repeticiones">Repeticiones por Sesión</label>
-            <input type="number" id="repeticiones" name="repeticiones" required>
+                <label for="Fecha">Fecha</label>
+                <input type="date" id="Fecha" name="Fecha" required>
 
-            <label for="frecuencia_sesiones">Frecuencia de Sesiones</label>
-            <div class="frecuencia-inputs">
-                <input type="number" id="frecuencia_cantidad" name="frecuencia_cantidad" required>
-                <select id="frecuencia_tipo" name="frecuencia_tipo">
-                  <p>cada</p>
-                    <option value="dias">días</option>
-                    <option value="semanas">semanas</option>
-                </select>
-            </div>
+                <label for="hora">Hora</label>
+                <input type="time" id="hora" name="hora" required>
 
-            <label for="angulo_inicial">Ángulo Inicial</label>
-            <input type="number" id="angulo_inicial" name="angulo_inicial" required>
+                <label for="sala">Sala</label>
+                <input type="text" id="sala" name="sala" required>
 
-            <label for="angulo_final">Ángulo Final</label>
-            <input type="number" id="angulo_final" name="angulo_final" required>
-
-            <label for="velocidad">Velocidad</label>
-            <input type="text" id="velocidad" name="velocidad" required>
-
-            <div class="modal-footer">
-                <button type="button" class="cancel-btn" id="cancelarNuevaRutina">Cancelar</button>
-                <button type="submit" class="confirm-btn">Confirmar</button>
-            </div>
-        </form>
+                <label for="detalle">Detalle</label>
+                <input type="text" id="detalle" name="detalle" required>
+                
+                <div class="modal-footer">
+                    <button type="button" class="cancel-btn" id="cancelarNuevaCita">Cancelar</button>
+                    <button type="submit" class="confirm-btn">Confirmar</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
+
+    <script src="{% static 'js/calendar.js' %}"></script>
+</body>
 
 </html>
+    
