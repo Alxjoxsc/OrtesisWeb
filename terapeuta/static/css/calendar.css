@@ -259,6 +259,57 @@ button:hover {
     background-color: #006A60;
 }
 
+/* ... tus estilos existentes ... */
+
+/* Estilos para la badge de citas en la vista mensual */
+.cita-badge {
+    background-color: #24b7d8; /* Verde */
+    color: white;
+    border-radius: 50%;
+    padding: 4px 8px;
+    font-size: 12px;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 10;
+}
+
+/* Estilos para las citas en la vista semanal */
+.cita-semana {
+    background-color: #6ea7b4; /* Azul */
+    color: white;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-bottom: 2px;
+    cursor: pointer;
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    top: 2px;
+    bottom: 2px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.cita-semana:hover {
+    background-color: #008CAB;
+}
+
+/* Asegurar que los días en la vista mensual sean relativos para posicionar el badge */
+.day {
+    position: relative;
+}
+
+/* Asegurar que el contenedor de la cita en la vista semanal tenga posición relativa */
+.week-hour {
+    position: relative;
+    height: 40px; /* Ajustar según tus necesidades */
+}
+
+
+
 
 @media (max-width: 320px) {
     .modal-content {

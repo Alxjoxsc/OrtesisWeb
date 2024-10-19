@@ -1,0 +1,89 @@
+{% extends 'terapeuta_base.html' %}
+{% load static %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+  <link rel="stylesheet" href="{% static 'css/historial_sesiones.css' %}" />
+{% endblock %}
+
+{% block title %}
+  Historial del paciente
+{% endblock %}
+
+{% block header %}
+  <!-- Botón para volver -->
+  <a href="{% url 'paciente_terapeuta' %}" class="back-button"><i class="fas fa-arrow-left"></i></a>
+  <div class="contenedor-header">
+    <h1>Historial sesiones</h1>
+  </div>
+{% endblock %}
+
+{% block content %}
+<div class="encabezado-historial">
+    <!-- Nombre del Paciente -->
+    <div class="nombre-paciente">
+      <h2>{{ paciente.first_name }} {{ paciente.last_name }}</h2>
+    </div>
+    
+    <!-- Botón Desplegable para Seleccionar Rutina -->
+    <div class="seleccionar-rutina">
+      <button class="btn-desplegable" id="btnDesplegableRutina">
+        {% if rutina_seleccionada %}
+          Rutina {{ forloop.counter }} - {{ rutina_seleccionada.fecha_inicio|date:"d/m/Y" }} <i class="fas fa-chevron-down"></i>
+        {% else %}
+          Seleccionar Rutina <i class="fas fa-chevron-down"></i>
+        {% endif %}
+      </button>
+      <div class="contenido-desplegable" id="contenidoDesplegableRutina">
+        <ul>
+          {% for rutina in rutinas %}
+            <li>
+              <a href="{% url 'historial_sesiones' paciente.id %}?rutina_id={{ rutina.id }}">
+                Rutina {{ forloop.counter }} - {{ rutina.fecha_inicio|date:"d/m/Y" }}
+              </a>
+            </li>
+          {% empty %}
+            <li>No hay rutinas disponibles.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+    <!-- Sección de "Cards" para las Sesiones -->
+    {% if sesiones %}
+    <div class="cards-container">
+      {% for sesion in sesiones %}
+        <div class="sesion-card">
+          <h3>Sesión {{ forloop.counter }}</h3>
+          <div class="sesion-detalles">
+            <div class="detalle">
+              <p><strong>Fecha:</strong> {{ sesion.fecha|date:"d/m/Y" }}</p>
+            </div>
+            <div class="detalle">
+              <p><strong>Hora:</strong> {{ sesion.hora_inicio|time:"H:i" }} - {{ sesion.hora_final|time:"H:i" }}</p>
+            </div>
+            <div class="detalle">
+              <p><strong>Duración:</strong> {{ sesion.duracion }} minutos</p>
+            </div>
+            <div class="detalle">
+              <p><strong>Estado:</strong> {{ sesion.estado }}</p>
+            </div>
+            <div class="detalle">
+              <button class="btn-ver-grafico" onclick="enviarIdSesion({{ sesion.id }})">
+                Ver Gráfico <i class="fas fa-chart-line"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No hay sesiones registradas para esta rutina.</p>
+  {% endif %}
+{% endblock %}
+
+
+{% block extra_js %}
+  <script src="{% static 'js/historial_sesiones.js' %}"></script>
+{% endblock %}
