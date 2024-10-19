@@ -131,7 +131,10 @@
             {% empty %}
               <p>No hay sesiones registradas para esta rutina.</p>
             {% endfor %}
-             
+            <!-- Botón adicional para ir a historial_paciente.html -->
+            <div class="boton-historial">
+              <a href="{% url 'historial_sesiones' paciente.id %}" class="btn-historial">Ver Historial Completo <i class="fas fa-history"></i></a>
+            </div>   
           </div>
         {% endfor %}
       </ul>
