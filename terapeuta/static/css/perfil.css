@@ -1,0 +1,298 @@
+/* Estilos para el contenedor del perfil */
+.profile-container {
+    display: flex;
+    align-items: flex-start;
+    padding: 20px;
+    width: 75%;
+    margin: 0 auto;
+    margin-top: 50px;
+}
+
+/* Estilos para la información del perfil */
+.profile-info h1 {
+    font-size: 40px;
+    font-weight: 500;
+    margin-bottom: 30px;
+}
+
+.profile-info p {
+    font-weight: 500;
+    font-size: 30px;
+}
+
+/* Estilos para el logo del médico */
+.doctor-logo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 50px;
+    margin-top: 20px;
+}
+
+.doctor-logo h2 {
+    font-weight: 500;
+    margin-top: 100px;
+    margin-bottom: 15px;
+}
+
+/* Estilos para la información de contacto */
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+.contact-item {
+    border: 2px solid rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: white;
+    border-radius: 5px;
+    padding: 10px;
+    width: 400px;
+}
+
+.contact-item i {
+    margin-right: 15px;
+    font-size: 24px;
+    color: #008CAB;
+}
+
+.contact-item p {
+    font-size: 18px;
+}
+
+/* Estilos para información adicional */
+.additional-info-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+/* Estilos para la sección de presentación */
+.presentation {
+    width: 45%;
+    width: 600px;
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 40px;
+}
+
+.presentation h2 {
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.presentation-edit-icon {
+    margin-left: 10px;
+    color: #008CAB;
+}
+
+.edit-icon {
+    cursor: pointer;
+}
+
+.presentation p {
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 1.5;
+    width: 90%;
+}
+
+/* Estilos para el logo SVG */
+.svg-logo {
+    transform: scale(4);
+    margin-left: 250px;
+    width: 100px;
+    height: 50px;
+    fill: #008CAB;
+}
+
+/* Estilo general del popup */
+.popup {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-title {
+    font-size: 32px;
+    font-weight: 400;
+    text-align: center;
+    margin-bottom: 25px;
+    color: #000000;
+}
+
+.popup-subtitle {
+    font-size: 24px;
+    font-weight: 400; 
+    color: #000000;
+    margin-bottom: 10px;
+}
+
+/* Contenido del popup */
+.popup-content {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 440px;
+    position: relative;
+}
+
+.close {
+    position: absolute; 
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    color: #000000;
+    cursor: pointer;
+}
+
+/* Estilos para la caja de texto de presentación */
+#presentacion {
+    width: 100%; 
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    line-height: 1.5;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    resize: vertical;
+    margin-bottom: 20px;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 40px;
+}
+
+.contact-item input {
+    border: none;
+    outline: none;
+    flex: 1;
+}
+
+/* Estilo de los botones */
+.popup-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.cancel-btn,
+.confirm-btn {
+    padding: 10px 30px;
+    border: none;
+    border-radius: 25px;
+    margin: 0 10px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.cancel-btn {
+    background-color: #FF6161;
+    color: white;
+}
+
+.confirm-btn {
+    background-color: #006A60;
+    color: white;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 1400px) {
+    .profile-container {
+        flex-direction: column;
+        align-items: center;
+        width: 90%;
+        margin-top: 30px;
+    }
+
+    .profile-info h1 {
+        font-size: 28px;
+        text-align: center;
+    }
+
+    .profile-info p {
+        font-size: 18px;
+        text-align: center;
+    }
+
+    .doctor-logo {
+        align-items: center;
+        margin-top: 40px;
+    }
+
+    .doctor-logo h2 {
+        margin-top: 50px;
+        text-align: center;
+    }
+
+    .svg-logo {
+        transform: scale(2);
+        fill: #008CAB;
+        cursor: pointer;
+        margin-left: 100px;
+    }
+
+    .contact-item {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .presentation {
+        width: 100%;
+        padding: 15px;
+        margin-top: 20px;
+    }
+
+    .presentation h2 {
+        font-size: 20px;
+    }
+
+    .presentation p {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-info h1 {
+        font-size: 22px;
+    }
+
+    .profile-info p {
+        font-size: 16px;
+    }
+
+    .contact-item p {
+        font-size: 16px;
+    }
+
+    .presentation h2 {
+        font-size: 18px;
+    }
+
+    .presentation p {
+        font-size: 14px;
+    }
+}
