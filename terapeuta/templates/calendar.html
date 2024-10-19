@@ -18,16 +18,59 @@
                 <button id="today" class="nav-button">Hoy</button>
             </div>
             <div class="month-header">
-                <h2 id="month-year">Agosto 2024</h2>
+                <h2 id="month-year">Octubre 2024</h2>
             </div>
             <div class="view-options">
-                <button id="week-view" class="nav-button">Sem</button>
+                <button id="week-view" class="nav-button">Semana</button>
                 <button id="month-view" class="nav-button">Mes</button>
             </div>
         </div>
         <div id="calendar"></div>
     </div>
+
+    <!-- Modal Popup para añadir nueva Cita -->
+    <div id="nuevaCita" class="modal">
+        <div class="modal-content">
+            <span class="close" id="cerrarModal">&times;</span>
+            <h2>Agendar Cita</h2>
+            <form id="formNuevaCita" action="{% url 'agendar_cita' %}" method="POST">
+                {% csrf_token %}
+                <label for="titulo">Título</label><br>
+                <input type="text" id="titulo" name="titulo" required><br>
+
+                <label for="paciente">Paciente</label><br>
+                <select id="paciente" name="paciente" required>
+                    <option value="" disabled selected>Selecciona un paciente</option>
+                    {% for paciente in pacientes %}
+                        <option value="{{ paciente.id }}">{{ paciente.first_name }}</option>
+                    {% endfor %}
+                </select><br>
+
+                <label for="fecha">Fecha</label><br>
+                <input type="date" id="fecha" name="fecha" required><br>
+
+                <label for="hora">Hora</label><br>
+                <input type="time" id="hora" name="hora" required><br>
+
+                <label for="sala">Sala</label><br>
+                <input type="text" id="sala" name="sala" required><br>
+
+                <label for="detalle">Detalle</label><br>
+                <input type="text" id="detalle" name="detalle" required><br>
+                
+                <div class="modal-footer">
+                    <button type="button" class="cancel-btn" id="cancelarNuevaCita">Cancelar</button>
+                    <button type="submit" class="confirm-btn">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Incluir las citas como variable JavaScript -->
+    <script>
+        const citas = {{ fechas_citas|safe }};
+    </script>
+    <script src="{% static 'js/calendar.js' %}"></script>
 </body>
-<script src="{% static 'js/calendar.js' %}"></script>
 
 </html>

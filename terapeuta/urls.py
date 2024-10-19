@@ -24,4 +24,5 @@ urlpatterns = [
     path('eliminar_observacion/<int:observacion_id>/', eliminar_observacion, name='eliminar_observacion'),
     path('perfil/', views.perfil, name='perfil'),
     path('editar_perfil/<int:pk>/', views.editar_perfil, name='editar_perfil'),
+    path('historial_sesiones/<int:paciente_id>/', views.historial_sesiones, name='historial_sesiones'),
 ]

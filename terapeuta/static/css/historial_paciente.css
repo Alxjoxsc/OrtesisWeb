@@ -572,6 +572,34 @@
     text-decoration: none;
     cursor: pointer;
 }
+/* Estilos para el botón adicional de historial completo */
+.boton-historial {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.btn-historial {
+    background-color: #008CAB;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-historial:hover {
+    background-color: #005f6b;
+}
+
+.btn-historial i {
+    margin-left: 5px;
+}
 
 /* Estilos específicos para el formulario Editar Rutina */
 #editarRutinaForm {

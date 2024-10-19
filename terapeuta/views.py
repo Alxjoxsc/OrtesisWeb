@@ -23,7 +23,13 @@ import re
 
 #-------------------------------------AGENDA-------------------------------------
 def agenda(request):
-    paciente = Paciente.objects.all()
+    #Datos para renderizar el select de pacientes en los Popup
+    user_id = request.user.id
+    terapeuta = Terapeuta.objects.get(user_id=user_id)
+    terapeuta_id = terapeuta.id
+    pacientes = Paciente.objects.filter(terapeuta_id=terapeuta_id)  # Obtener los pacientes del terapeuta
+    
+    #Obtención de las citas
     citas = Cita.objects.all()
     citas_json = []
     for cita in citas:
@@ -41,12 +47,8 @@ def agenda(request):
             })
         else:
             continue
-    context = {
-        'paciente': Paciente.objects.all(),
-        'fechas_citas': json.dumps(citas_json)
-    }
-    return render(request, 'agenda.html', context)
-    return render(request, 'agenda.html', {'paciente':paciente})
+    fechas_citas = json.dumps(citas_json)
+    return render(request, 'agenda.html', {'pacientes':pacientes, 'fechas_citas': fechas_citas})
 
 def obtener_fechas_citas(request):
     if request.method == "GET":
@@ -239,10 +241,10 @@ def agendar_cita(request):
             return redirect('agenda')
     return render(request, 'agenda.html')
 
+@login_required  # Asegúrate de que el usuario esté autenticado
 def calendar(request):
-    paciente = Paciente.objects.all()
-    print(paciente)
-    return render (request, 'calendar.html', {'paciente':paciente})
+    return render(request, 'calendar.html')
+
 
 
 def editar_cita(request):
@@ -578,3 +580,30 @@ def validar_correo(correo):
     patron = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     if not re.match(patron, correo):
         raise ValidationError("Introduzca una dirección de correo electrónico válida.")
+
+
+
+
+def historial_sesiones(request, paciente_id):
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+    rutinas = Rutina.objects.filter(paciente=paciente).order_by('-fecha_inicio')
+    
+    # Obtener el parámetro 'rutina_id' de la URL
+    rutina_id = request.GET.get('rutina_id')
+    if rutina_id:
+        rutina_seleccionada = get_object_or_404(Rutina, id=rutina_id, paciente=paciente)
+    else:
+        rutina_seleccionada = rutinas.first()  # Selecciona la rutina más reciente si no se especifica
+    
+    # Obtener las sesiones de la rutina seleccionada
+    sesiones = Sesion.objects.filter(rutina=rutina_seleccionada).order_by('-fecha')
+    
+    context = {
+        'paciente': paciente,
+        'rutinas': rutinas,
+        'rutina_seleccionada': rutina_seleccionada,
+        'sesiones': sesiones,
+    }
+    return render(request, 'historial_sesiones.html', context)
+
+
