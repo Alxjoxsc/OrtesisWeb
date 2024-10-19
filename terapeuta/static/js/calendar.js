@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function () {
         citas.forEach(cita => {
             // Obtener la fecha y hora de la cita
             const fecha = cita.fecha; // 'YYYY-MM-DD'
-            const hora = cita.hora; // 'HH:MM'
+            const hora = cita.hora_inicio; // 'HH:MM'
             
             console.log(`Procesando cita: ${cita.titulo} en ${fecha} a las ${hora}`);
             
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Agregar evento de clic para ver detalles
                 citaDiv.addEventListener('click', function(event) {
                     event.stopPropagation(); // Evitar que se abra el modal de crear cita
-                    abrirModal(cita.fecha.split('-').reverse().join('/'), cita.hora);
+                    abrirModal(cita.fecha.split('-').reverse().join('/'), cita.hora_inicio);
                 });
                 
                 cell.appendChild(citaDiv);
@@ -191,25 +191,45 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    function abrirModal(fecha, hora = null) {
-        console.log(`Abrir modal para fecha: ${fecha}, hora: ${hora}`);
+    function abrirModal(fecha, hora_inicio = null, hora_final = null) {
+        console.log(`Abrir modal para fecha: ${fecha}, hora_inicio: ${hora_inicio}, hora_final: ${hora_final}`);
         modal.style.display = "block";
+    
         // Convertir 'DD/MM/YYYY' a 'YYYY-MM-DD'
         const fechaISO = fecha.split('/').reverse().join('-');
         console.log(`Fecha ISO: ${fechaISO}`);
         document.getElementById("fecha").value = fechaISO;
-        if (hora) {
-            document.getElementById("hora").value = hora;
-        } else {
-            document.getElementById("hora").value = '';
+    
+        // Asignar hora de inicio si existe
+        if (hora_inicio) {
+            document.getElementById("hora_inicio").value = hora_inicio;
+    
+            // Si no se ha proporcionado hora_final, asignar hora_inicio + 1 hora
+            if (!hora_final) {
+                const [hours, minutes] = hora_inicio.split(':');
+                let nuevaHoraFinal = parseInt(hours) + 1; // Sumar una hora
+                if (nuevaHoraFinal < 10) {
+                    nuevaHoraFinal = `0${nuevaHoraFinal}`; // Formatear con un cero delante si es menor a 10
+                }
+                hora_final = `${nuevaHoraFinal}:${minutes}`; // Mantener los mismos minutos
+            }
         }
+    
+        // Asignar hora de finalización si existe
+        if (hora_final) {
+            document.getElementById("hora_final").value = hora_final;
+        } else {
+            document.getElementById("hora_final").value = '';
+        }
+    
         // Limpiar otros campos para una nueva cita
         document.getElementById("titulo").value = '';
         document.getElementById("paciente").value = '';
         document.getElementById("sala").value = '';
         document.getElementById("detalle").value = '';
     }
-
+    
+    
     function getStartOfWeek(date) {
         const dayOfWeek = date.getDay() === 0 ? 6 : date.getDay() - 1;
         const startOfWeek = new Date(date);

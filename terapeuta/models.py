@@ -94,7 +94,8 @@ class Cita(models.Model):
     paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, null=True, blank=True)
     titulo = models.CharField(max_length=50)
     fecha = models.DateField()
-    hora = models.TimeField()
+    hora_inicio = models.TimeField()
+    hora_final = models.TimeField()
     sala = models.CharField(max_length=50)
     detalle = models.CharField(max_length=100)
     def __str__(self):

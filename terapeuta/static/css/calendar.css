@@ -160,46 +160,24 @@ button:hover {
     padding: 20px;
     border-radius: 20px;
     width: 35%;
-    height: 90%;
+    height: auto;
     position: fixed;
     z-index: 101;
     text-align: center;
-    box-sizing: border-box; /* Asegura que padding y border no afecten las dimensiones */
-    overflow-y: auto; /* Habilita scroll vertical si el contenido es mayor que el contenedor */
-    top: 50%; /* Centra verticalmente */
-    left: 50%; /* Centra horizontalmente */
-    transform: translate(-50%, -50%); /* Ajuste de posición para centrar */
+    box-sizing: border-box;
+    overflow-y: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
-/*Entrada de Datos del Modal*/
-.modal-content input {
-    background-color: #E0E0E0;
-    align-items: center;
-    font-size: 16px;
-    font-weight:300;
-    color: black;
-    border-radius: 5px;
-    border: 0.5px solid black;
-    width: 100%;
-    line-height: 12px;
-    margin-bottom: 15px;
-    padding: 5px;
-}
-
-/*Títulos para el Modal*/
-.modal-content label {
-    display: block;
-    margin-bottom: 1px;
-    text-align: left;
-    font-size: 20px;
-}
-
-/*Select del Modal*/
+/* Entrada de datos del modal */
+.modal-content input,
 .modal-content select {
     background-color: #E0E0E0;
     align-items: center;
     font-size: 16px;
-    font-weight:300;
+    font-weight: 300;
     color: black;
     border-radius: 5px;
     border: 0.5px solid black;
@@ -209,12 +187,34 @@ button:hover {
     padding: 5px;
 }
 
+/* Títulos para el modal */
+.modal-content label {
+    display: block;
+    margin-bottom: 5px;
+    text-align: left;
+    font-size: 20px;
+}
 
+/* Flex container para las horas */
+.hora-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+/* Elementos de cada hora */
+.hora-item {
+    display: flex;
+    flex-direction: column;
+    width: 48%;
+}
+
+/* Estilo general del título */
 .popup-content h2,
 .modal-content h2 {
     text-align: center;
     font-size: 32px;
-    font-weight:normal;
+    font-weight: normal;
     margin-bottom: 20px;
 }
 
@@ -230,7 +230,7 @@ button:hover {
 .modal-footer {
     display: flex;
     justify-content: space-between;
-    margin: 15px;
+    margin: 15px 0;
 }
 
 #cancelarBtn, 
@@ -258,6 +258,8 @@ button:hover {
 .confirm-btn:hover {
     background-color: #006A60;
 }
+
+
 
 /* ... tus estilos existentes ... */
 

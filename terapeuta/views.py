@@ -38,7 +38,8 @@ def agenda(request):
                 'id': cita.id,  # Añadimos el ID de la cita
                 'fecha': cita.fecha.strftime('%Y-%m-%d'),
                 'titulo': cita.titulo,
-                'hora': cita.hora.strftime('%H:%M'),
+                'hora_inicio': cita.hora_inicio.strftime('%H:%M'),
+                'hora_final': cita.hora_final.strftime('%H:%M'),
                 'descripcion': cita.detalle,
                 'paciente': {
                     'id': cita.paciente.id,
@@ -59,7 +60,8 @@ def obtener_fechas_citas(request):
                 'id': cita.id,
                 'fecha': cita.fecha.strftime('%Y-%m-%d'),
                 'titulo': cita.titulo,
-                'hora': cita.hora.strftime('%H:%M'),
+                'hora_inicio': cita.hora_inicio.strftime('%H:%M'),
+                'hora_final': cita.hora_final.strftime('%H:%M'),
                 'descripcion': cita.detalle,
                 'paciente': {
                     'id': cita.paciente.id,
@@ -163,7 +165,7 @@ def obtener_grafico_sesion_paciente(request, sesion_id):
     sesion = get_object_or_404(Sesion, id=sesion_id)
     
     # Obtener todas las corrientes de la sesion
-    corrientes = Corriente.objects.filter(sesion=sesion).order_by('hora')
+    corrientes = Corriente.objects.filter(sesion=sesion).order_by('hora_inicio')
 
     # Listas para almacenar las horas y corrientes de las sesiones
     horas = []
@@ -219,7 +221,8 @@ def agendar_cita(request):
             titulo = request.POST['titulo']
             paciente_id = request.POST['paciente']
             fecha = request.POST['fecha']
-            hora = request.POST['hora']
+            hora_inicio = request.POST['hora_inicio']
+            hora_final = request.POST['hora_final']
             sala = request.POST['sala']
             detalle = request.POST['detalle']
         
@@ -232,7 +235,8 @@ def agendar_cita(request):
                 titulo = titulo,
                 paciente = paciente_instance,
                 fecha = fecha,
-                hora = hora,
+                hora_inicio = hora_inicio,
+                hora_final = hora_final,
                 sala = sala,
                 detalle = detalle
             )
@@ -254,7 +258,8 @@ def editar_cita(request):
         cita.titulo = request.POST["titulo"]
         cita.paciente = Paciente.objects.get(id=request.POST["paciente"])
         cita.fecha = request.POST["fecha"]
-        cita.hora = request.POST["hora"]
+        cita.hora_inicio = request.POST["hora_inicio"]
+        cita.hora_final = request.POST["hora_final"]
         cita.sala = request.POST["sala"]
         cita.detalle = request.POST["detalle"]
         cita.save()
