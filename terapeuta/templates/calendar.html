@@ -76,6 +76,54 @@
 </div>
 
 
+<!-- Modal Popup para Editar una Cita -->
+<div id="editarCita" class="modal">
+    <div class="modal-content">
+        <span class="close" id="cerrarEditarModal">&times;</span>
+        <h2>Editar Cita</h2>
+        <form id="formEditarCita" action="{% url 'editar_cita' %}" method="POST">
+            {% csrf_token %}
+            <label for="titulo_editar">Título</label>
+            <input type="text" id="titulo_editar" name="titulo_editar" required>
+
+            <label for="paciente_editar">Paciente</label>
+            <select id="paciente_editar" name="paciente_editar" required>
+                <option value="{{ paciente.id }}">{{ paciente.first_name }}</option>
+                {% for paciente in pacientes %}
+                    <option value="{{ paciente.id }}">{{ paciente.first_name }}</option>
+                {% endfor %}
+            </select>
+
+
+            <label for="fecha_editar">Fecha</label>
+            <input type="date" id="fecha_editar" name="fecha_editar" required>
+
+            <div class="hora-container">
+                <div class="hora-item">
+                    <label for="hora_inicio_editar">Hora Inicio</label>
+                    <input type="time" id="hora_inicio_editar" name="hora_inicio_editar" required>
+                </div>
+                <div class="hora-item">
+                    <label for="hora_final_editar">Hora Final</label>
+                    <input type="time" id="hora_final_editar" name="hora_final_editar" required>
+                </div>
+            </div>
+
+            <label for="sala_editar">Sala</label>
+            <input type="text" id="sala_editar" name="sala_editar" required>
+
+            <label for="detalle_editar">Detalle</label>
+            <input type="text" id="detalle_editar" name="detalle_editar" required>
+
+            <div class="modal-footer">
+                <button type="button" class="cancel-btn" id="cancelarEditarCita">Cancelar</button>
+                <button type="submit" class="confirm-btn">Confirmar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 
     <!-- Incluir las citas como variable JavaScript -->
     <script>

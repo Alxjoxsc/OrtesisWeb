@@ -8,11 +8,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const monthViewButton = document.getElementById('month-view');
     let currentDate = new Date();
     let currentView = 'month'; // 'month' o 'week'
-    // let citas = []; // Eliminar esta línea
     const modal = document.getElementById("nuevaCita");
     const modal_editar = document.getElementById("editarCita");
     const btnCerrar = document.getElementById("cerrarModal");
     const btnCancelar = document.getElementById("cancelarNuevaCita");
+    const btnCerrarEditar = document.getElementById("cerrarEditarModal");
+    const btnCancelarEditar = document.getElementById("cancelarEditarCita");
 
     // Verificar que 'citas' está definida
     if (typeof citas === 'undefined') {
@@ -251,47 +252,19 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById("detalle").value = '';
     }
 
-    function abrirEditar(fecha, hora_inicio = null, hora_final = null, titulo = null, paciente=null, sala=null, detalle=null) {
-        console.log(`Abrir modal para fecha: ${fecha}, hora_inicio: ${hora_inicio}, hora_final: ${hora_final}`);
-        modal.style.display = "block";
-    
-        // Convertir 'DD/MM/YYYY' a 'YYYY-MM-DD'
-        const fechaISO = fecha.split('/').reverse().join('-');
-        console.log(`Fecha ISO: ${fechaISO}`);
-        document.getElementById("fecha").value = fechaISO;
-        console.log(titulo);
-        console.log(paciente);
-        console.log(sala);
-        console.log(detalle);
-    
-        // Asignar hora de inicio si existe
-        if (hora_inicio) {
-            document.getElementById("hora_inicio").value = hora_inicio;
-    
-            // Si no se ha proporcionado hora_final, asignar hora_inicio + 1 hora
-            if (!hora_final) {
-                const [hours, minutes] = hora_inicio.split(':');
-                let nuevaHoraFinal = parseInt(hours) + 1; // Sumar una hora
-                if (nuevaHoraFinal < 10) {
-                    nuevaHoraFinal = `0${nuevaHoraFinal}`; // Formatear con un cero delante si es menor a 10
-                }
-                hora_final = `${nuevaHoraFinal}:${minutes}`; // Mantener los mismos minutos
-            }
-        }
-    
-        // Asignar hora de finalización si existe
-        if (hora_final) {
-            document.getElementById("hora_final").value = hora_final;
-        } else {
-            document.getElementById("hora_final").value = '';
-        }
+// Reasignación de IDs en abrirEditar
+function abrirEditar(fecha, hora_inicio = null, hora_final = null, titulo = null, paciente = null, sala = null, detalle = null) {
+    modal_editar.style.display = "block";
 
-        // Asignar otros campos para una nueva cita
-        document.getElementById("titulo").value = titulo;
-        document.getElementById("paciente").value = paciente;
-        document.getElementById("sala").value = sala;
-        document.getElementById("detalle").value = detalle;
-    }
+    const fechaISO = fecha.split('/').reverse().join('-');
+    document.getElementById("fecha_editar").value = fechaISO; // Cambiado ID
+    document.getElementById("hora_inicio_editar").value = hora_inicio || ''; // Cambiado ID
+    document.getElementById("hora_final_editar").value = hora_final || ''; // Cambiado ID
+    document.getElementById("titulo_editar").value = titulo || ''; // Cambiado ID
+    document.getElementById("paciente_editar").value = paciente || ''; // Cambiado ID
+    document.getElementById("sala_editar").value = sala || ''; // Cambiado ID
+    document.getElementById("detalle_editar").value = detalle || ''; // Cambiado ID
+}
     
     function getStartOfWeek(date) {
         const dayOfWeek = date.getDay() === 0 ? 6 : date.getDay() - 1;
@@ -349,9 +322,15 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     window.onclick = function(event) {
-        if (event.target === modal) {
-            modal.style.display = "none";
-        }
+        modal.style.display = "none";
+    };
+
+    btnCerrar.onclick = btnCancelar.onclick = function() {
+        modal_editar.style.display = "none";
+    };
+
+    window.onclick = function(event) {
+        modal_editar.style.display = "none";
     };
 
     updateCalendar();

@@ -40,11 +40,12 @@ def agenda(request):
                 'titulo': cita.titulo,
                 'hora_inicio': cita.hora_inicio.strftime('%H:%M'),
                 'hora_final': cita.hora_final.strftime('%H:%M'),
-                'descripcion': cita.detalle,
+                'detalle': cita.detalle,
+                'sala': cita.sala,
                 'paciente': {
                     'id': cita.paciente.id,
                     'nombre': f'{cita.paciente.first_name} {cita.paciente.last_name}'
-                }
+                },
             })
         else:
             continue
