@@ -49,7 +49,7 @@ def agenda(request):
         else:
             continue
     fechas_citas = json.dumps(citas_json)
-    return render(request, 'agenda.html', {'pacientes':pacientes, 'fechas_citas': fechas_citas})
+    return render(request, 'agenda.html', {'pacientes':pacientes, 'fechas_citas': fechas_citas, 'citas':citas})
 
 def obtener_fechas_citas(request):
     if request.method == "GET":

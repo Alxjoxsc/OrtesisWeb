@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentView = 'month'; // 'month' o 'week'
     // let citas = []; // Eliminar esta línea
     const modal = document.getElementById("nuevaCita");
+    const modal_editar = document.getElementById("editarCita");
     const btnCerrar = document.getElementById("cerrarModal");
     const btnCancelar = document.getElementById("cancelarNuevaCita");
 
@@ -193,7 +194,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Agregar evento de clic para ver detalles
                 citaDiv.addEventListener('click', function(event) {
                     event.stopPropagation(); // Evitar que se abra el modal de crear cita
-                    abrirModal(cita.fecha.split('-').reverse().join('/'), cita.hora_inicio, cita.hora_final);
+                    abrirEditar(cita.fecha.split('-').reverse().join('/'), cita.hora_inicio, cita.hora_final, cita.titulo,  `${cita.paciente.nombre}`, cita.sala, cita.detalle);
                 });
     
                 cell.appendChild(citaDiv);
@@ -249,7 +250,48 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById("sala").value = '';
         document.getElementById("detalle").value = '';
     }
+
+    function abrirEditar(fecha, hora_inicio = null, hora_final = null, titulo = null, paciente=null, sala=null, detalle=null) {
+        console.log(`Abrir modal para fecha: ${fecha}, hora_inicio: ${hora_inicio}, hora_final: ${hora_final}`);
+        modal.style.display = "block";
     
+        // Convertir 'DD/MM/YYYY' a 'YYYY-MM-DD'
+        const fechaISO = fecha.split('/').reverse().join('-');
+        console.log(`Fecha ISO: ${fechaISO}`);
+        document.getElementById("fecha").value = fechaISO;
+        console.log(titulo);
+        console.log(paciente);
+        console.log(sala);
+        console.log(detalle);
+    
+        // Asignar hora de inicio si existe
+        if (hora_inicio) {
+            document.getElementById("hora_inicio").value = hora_inicio;
+    
+            // Si no se ha proporcionado hora_final, asignar hora_inicio + 1 hora
+            if (!hora_final) {
+                const [hours, minutes] = hora_inicio.split(':');
+                let nuevaHoraFinal = parseInt(hours) + 1; // Sumar una hora
+                if (nuevaHoraFinal < 10) {
+                    nuevaHoraFinal = `0${nuevaHoraFinal}`; // Formatear con un cero delante si es menor a 10
+                }
+                hora_final = `${nuevaHoraFinal}:${minutes}`; // Mantener los mismos minutos
+            }
+        }
+    
+        // Asignar hora de finalización si existe
+        if (hora_final) {
+            document.getElementById("hora_final").value = hora_final;
+        } else {
+            document.getElementById("hora_final").value = '';
+        }
+
+        // Asignar otros campos para una nueva cita
+        document.getElementById("titulo").value = titulo;
+        document.getElementById("paciente").value = paciente;
+        document.getElementById("sala").value = sala;
+        document.getElementById("detalle").value = detalle;
+    }
     
     function getStartOfWeek(date) {
         const dayOfWeek = date.getDay() === 0 ? 6 : date.getDay() - 1;

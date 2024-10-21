@@ -100,7 +100,7 @@ class Cita(models.Model):
     detalle = models.CharField(max_length=100)
     def __str__(self):
         terapeuta_nombre = f"{self.terapeuta.user.first_name} {self.terapeuta.user.last_name}" if self.terapeuta else "Sin terapeuta"
-        paciente_nombre = f"{self.paciente.user.first_name} {self.paciente.user.last_name}" if self.paciente else "Sin paciente"
+        paciente_nombre = f"{self.paciente.first_name} {self.paciente.last_name}" if self.paciente else "Sin paciente"
         return f"{terapeuta_nombre} - {paciente_nombre}"
 
 class Rutina(models.Model):
