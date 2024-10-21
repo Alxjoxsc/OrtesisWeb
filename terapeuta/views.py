@@ -165,7 +165,7 @@ def obtener_grafico_sesion_paciente(request, sesion_id):
     sesion = get_object_or_404(Sesion, id=sesion_id)
     
     # Obtener todas las corrientes de la sesion
-    corrientes = Corriente.objects.filter(sesion=sesion).order_by('hora_inicio')
+    corrientes = Corriente.objects.filter(sesion=sesion).order_by('hora')
 
     # Listas para almacenar las horas y corrientes de las sesiones
     horas = []
