@@ -156,40 +156,61 @@ document.addEventListener('DOMContentLoaded', function () {
         citas.forEach(cita => {
             // Obtener la fecha y hora de la cita
             const fecha = cita.fecha; // 'YYYY-MM-DD'
-            const hora = cita.hora_inicio; // 'HH:MM'
+            const horaInicio = cita.hora_inicio; // 'HH:MM'
+            const horaFin = cita.hora_final; // 'HH:MM'
             
-            console.log(`Procesando cita: ${cita.titulo} en ${fecha} a las ${hora}`);
+            console.log(`Procesando cita: ${cita.titulo} en ${fecha} de ${horaInicio} a ${horaFin}`);
             
             // Convertir fecha a 'DD/MM/YYYY'
             const fechaParts = cita.fecha.split('-');
             const fechaFormateada = `${fechaParts[2]}/${fechaParts[1]}/${fechaParts[0]}`;
             
-            console.log(`Fecha formateada: ${fechaFormateada}`);
-            
-            // Obtener el elemento de la tabla correspondiente al día y hora
-            const horaFormateada = hora; // 'HH:MM'
-            const cell = document.querySelector(`.week-hour[data-date="${fechaFormateada}"][data-hour="${horaFormateada}"]`);
+            // Convertir horas a formato de 24 horas
+            const horaInicioParts = horaInicio.split(':');
+            const horaFinParts = horaFin.split(':');
+            const horaInicioDecimal = parseInt(horaInicioParts[0]) + parseInt(horaInicioParts[1]) / 60;
+            const horaFinDecimal = parseInt(horaFinParts[0]) + parseInt(horaFinParts[1]) / 60;
+    
+            // Calcular la duración de la cita en bloques de 30 minutos
+            const duracionEnHoras = horaFinDecimal - horaInicioDecimal;
+            const duracionEnBloques = duracionEnHoras * 2; // Cada bloque representa 30 minutos
+    
+            // Obtener la celda correspondiente al inicio de la cita
+            const cell = document.querySelector(`.week-hour[data-date="${fechaFormateada}"][data-hour="${horaInicio}"]`);
             
             if (cell) {
                 console.log(`Cita encontrada en cell: ${cell}`);
+    
                 // Crear un elemento para la cita
                 const citaDiv = document.createElement('div');
                 citaDiv.classList.add('cita-semana');
                 citaDiv.textContent = cita.titulo;
                 citaDiv.title = `Título: ${cita.titulo}\nPaciente: ${cita.paciente.nombre}\nSala: ${cita.sala}\nDetalle: ${cita.descripcion}`;
-                
+    
+                // Hacer que la cita ocupe varios bloques usando rowspan
+                cell.setAttribute('rowspan', duracionEnBloques);
+    
                 // Agregar evento de clic para ver detalles
                 citaDiv.addEventListener('click', function(event) {
                     event.stopPropagation(); // Evitar que se abra el modal de crear cita
-                    abrirModal(cita.fecha.split('-').reverse().join('/'), cita.hora_inicio);
+                    abrirModal(cita.fecha.split('-').reverse().join('/'), cita.hora_inicio, cita.hora_final);
                 });
-                
+    
                 cell.appendChild(citaDiv);
+    
+                // Remover las celdas que se superponen
+                for (let i = 1; i < duracionEnBloques; i++) {
+                    const nextCell = document.querySelector(`.week-hour[data-date="${fechaFormateada}"][data-hour="${horaInicioDecimal + i * 0.5}:00"]`);
+                    if (nextCell) {
+                        nextCell.remove();
+                    }
+                }
             } else {
-                console.warn(`No se encontró la celda para la cita: ${cita.titulo} en ${fechaFormateada} a las ${horaFormateada}`);
+                console.warn(`No se encontró la celda para la cita: ${cita.titulo} en ${fechaFormateada} a las ${horaInicio}`);
             }
         });
     }
+    
 
     function abrirModal(fecha, hora_inicio = null, hora_final = null) {
         console.log(`Abrir modal para fecha: ${fecha}, hora_inicio: ${hora_inicio}, hora_final: ${hora_final}`);
