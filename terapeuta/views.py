@@ -104,7 +104,7 @@ def pacientes_view(request):
     total_pacientes = pacientes_list.count()  # Cuenta la cantidad total de pacientes
 
     # Implementar la paginación
-    paginator = Paginator(pacientes_list, 6)  # Muestra 6 pacientes por página
+    paginator = Paginator(pacientes_list, 5)  # Muestra 5 pacientes por página
     page_number = request.GET.get('page')  # Obtiene el número de la página de la URL
     pacientes = paginator.get_page(page_number)  # Obtiene los pacientes de la página actual
     
@@ -165,7 +165,7 @@ def obtener_grafico_sesion_paciente(request, sesion_id):
     sesion = get_object_or_404(Sesion, id=sesion_id)
     
     # Obtener todas las corrientes de la sesion
-    corrientes = Corriente.objects.filter(sesion=sesion).order_by('hora_inicio')
+    corrientes = Corriente.objects.filter(sesion=sesion).order_by('hora')
 
     # Listas para almacenar las horas y corrientes de las sesiones
     horas = []

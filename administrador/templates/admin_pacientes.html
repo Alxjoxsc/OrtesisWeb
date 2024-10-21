@@ -112,6 +112,40 @@
         </div>
     </div>
 </div>
+
+<!--    Paginación  -->
+<div class="pagination">
+    <span class="step-links">
+        {% if pacientes.has_previous %}
+            <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Primera Página">
+                &#171;
+            </a>
+            <a href="?page={{ pacientes.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Página Anterior">
+                &#8249;
+            </a>
+        {% else %}
+            <span class="disabled">&#171;</span>
+            <span class="disabled">&#8249;</span>
+        {% endif %}
+
+        <span class="current">
+            {{ pacientes.number }}
+        </span>
+
+        {% if pacientes.has_next %}
+            <a href="?page={{ pacientes.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Página Siguiente">
+                &#8250;
+            </a>
+            <a href="?page={{ pacientes.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Última Página">
+                &#187;
+            </a>
+        {% else %}
+            <span class="disabled">&#8250;</span>
+            <span class="disabled">&#187;</span>
+        {% endif %}
+    </span>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}

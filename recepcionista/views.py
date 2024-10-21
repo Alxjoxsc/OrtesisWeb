@@ -57,12 +57,15 @@ def recepcionista_pacientes_activos(request):
 
     total_pacientes = pacientes_list.count()
 
-    paginator = Paginator(pacientes_list, 15)
+    paginator = Paginator(pacientes_list, 5)
     page_number = request.GET.get('page') 
     pacientes = paginator.get_page(page_number)
 
     # Renderizar el template con los pacientes y la información de paginación
-    return render(request, 'recepcionista_pacientes.html', {'pacientes': pacientes, 'total_pacientes': total_pacientes, 'estado': 'activos'})
+    return render(request, 'recepcionista_pacientes.html', {
+        'pacientes': pacientes, 
+        'total_pacientes': total_pacientes, 
+        'estado': 'activos'})
 
 @role_required('Recepcionista')
 def recepcionista_pacientes_inactivos(request):
@@ -84,7 +87,7 @@ def recepcionista_pacientes_inactivos(request):
 
     total_pacientes = pacientes_list.count()
 
-    paginator = Paginator(pacientes_list, 15)
+    paginator = Paginator(pacientes_list, 5)
     page_number = request.GET.get('page') 
     pacientes = paginator.get_page(page_number)
 
@@ -196,7 +199,7 @@ def recepcionista_terapeutas_activos(request):
     
     total_terapeutas = terapeutas_list.count()
 
-    paginator = Paginator(terapeutas_list, 10)
+    paginator = Paginator(terapeutas_list, 5)
     page_number = request.GET.get('page')
     terapeutas = paginator.get_page(page_number)
 

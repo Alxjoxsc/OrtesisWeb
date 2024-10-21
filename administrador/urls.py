@@ -4,7 +4,6 @@ from . import views
 urlpatterns = [
     path('administrador/gestion_terapeutas/', views.gestion_terapeutas, name='gestion_terapeutas'),
     path('base_admin/', views.base_admin_view, name='base_admin'),
-    path('admin_pacientes/', views.admin_pacientes, name='admin_pacientes'),
     path('listar_pacientes_activos/', views.listar_pacientes_activos, name='listar_pacientes_activos'),
     path('listar_pacientes_inactivos/', views.listar_pacientes_inactivos, name='listar_pacientes_inactivos'),
     path('admin_pacientes/inactivar/', views.cambiar_estado_inactivo, name='cambiar_estado_inactivo'),

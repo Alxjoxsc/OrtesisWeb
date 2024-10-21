@@ -9,7 +9,9 @@ from django.http import JsonResponse
 from terapeuta.models import Paciente, Terapeuta, Cita, Horario
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.contrib import messages
 
@@ -21,11 +23,6 @@ def gestion_terapeutas(request):
 def base_admin_view(request):
     return render(request, 'base_admin.html')
 ################### ADMIN PACIENTES ##################
-@role_required('Administrador')
-def admin_pacientes(request):
-    pacientes = Paciente.objects.all() 
-    return render(request, 'admin_pacientes.html',{'pacientes': pacientes})
-
 @role_required('Administrador')
 def agregar_paciente_admin(request):
     success = False
@@ -86,10 +83,22 @@ def mostrar_paciente_con_terapeuta(request, paciente_id, terapeuta_id):
 
 @role_required('Administrador')
 def listar_pacientes_activos(request):
-    # Obtener todos los pacientes activos
+    query = request.GET.get('search')
     pacientes_activos = Paciente.objects.filter(is_active=True)
+
+    if query:
+        pacientes_activos = pacientes_activos.filter(
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query) |
+            Q(rut__icontains=query)
+        )
+        
+    paginator = Paginator(pacientes_activos, 5)
+    page_number = request.GET.get('page')
+    pacientes = paginator.get_page(page_number)
+
     return render(request, 'admin_pacientes.html', {
-        'pacientes': pacientes_activos,
+        'pacientes': pacientes,
         'estado': 'activos',
     })
     
@@ -141,10 +150,22 @@ def restaurar_paciente(request):
     
 @role_required('Administrador')
 def listar_pacientes_inactivos(request):
-    # Obtener todos los pacientes inactivos
+    query = request.GET.get('search')
     pacientes_inactivos = Paciente.objects.filter(is_active=False)
+
+    if query:
+        pacientes_inactivos = pacientes_inactivos.filter(
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query) |
+            Q(rut__icontains=query)
+        )
+        
+    paginator = Paginator(pacientes_inactivos, 5)
+    page_number = request.GET.get('page')
+    pacientes = paginator.get_page(page_number)
+
     return render(request, 'admin_pacientes.html', {
-        'pacientes': pacientes_inactivos,
+        'pacientes': pacientes,
         'estado': 'inactivos',
     })
 ########################################################
