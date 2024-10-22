@@ -615,9 +615,11 @@ def historial_sesiones(request, paciente_id):
 def obtener_rutinas(request):
     rutinas = Rutina.objects.all()
     data = []
+    fecha_actual = timezone.now().date()  # Obtiene la fecha actual
 
     for rutina in rutinas:
-        sesiones = rutina.sesiones.all()
+        # Filtrar las sesiones que tengan una fecha de inicio posterior a la fecha actual
+        sesiones = rutina.sesiones.filter(fecha__gt=fecha_actual).order_by('fecha', 'hora_inicio')
 
         for sesion in sesiones:
             hora_inicio = (
@@ -632,4 +634,3 @@ def obtener_rutinas(request):
             })
 
     return JsonResponse({'rutinas': data})
-
