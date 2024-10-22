@@ -88,11 +88,11 @@
 
             <label for="paciente_editar">Paciente</label>
             <select id="paciente_editar" name="paciente_editar" required>
-                <option value="{{ paciente.id }}">{{ paciente.first_name }}</option>
                 {% for paciente in pacientes %}
                     <option value="{{ paciente.id }}">{{ paciente.first_name }}</option>
                 {% endfor %}
             </select>
+
 
 
             <label for="fecha_editar">Fecha</label>

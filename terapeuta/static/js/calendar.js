@@ -257,14 +257,36 @@ function abrirEditar(fecha, hora_inicio = null, hora_final = null, titulo = null
     modal_editar.style.display = "block";
 
     const fechaISO = fecha.split('/').reverse().join('-');
-    document.getElementById("fecha_editar").value = fechaISO; // Cambiado ID
-    document.getElementById("hora_inicio_editar").value = hora_inicio || ''; // Cambiado ID
-    document.getElementById("hora_final_editar").value = hora_final || ''; // Cambiado ID
-    document.getElementById("titulo_editar").value = titulo || ''; // Cambiado ID
-    document.getElementById("paciente_editar").value = paciente || ''; // Cambiado ID
-    document.getElementById("sala_editar").value = sala || ''; // Cambiado ID
-    document.getElementById("detalle_editar").value = detalle || ''; // Cambiado ID
+    document.getElementById("fecha_editar").value = fechaISO;
+    document.getElementById("hora_inicio_editar").value = hora_inicio || '';
+    document.getElementById("hora_final_editar").value = hora_final || '';
+    document.getElementById("titulo_editar").value = titulo || '';
+
+    const pacienteSelect = document.getElementById("paciente_editar");
+
+    // Verificar si el paciente está en las opciones del select
+    let optionExists = false;
+    for (let i = 0; i < pacienteSelect.options.length; i++) {
+        if (pacienteSelect.options[i].value === paciente) {
+            optionExists = true;
+            break;
+        }
+    }
+
+    if (optionExists) {
+        // Si el paciente existe, seleccionarlo
+        pacienteSelect.value = paciente;
+    } else {
+        // Si no existe, agregar una opción temporal
+        let newOption = new Option(paciente, paciente, true, true);
+        pacienteSelect.add(newOption);
+    }
+
+    document.getElementById("sala_editar").value = sala || '';
+    document.getElementById("detalle_editar").value = detalle || '';
 }
+
+
     
     function getStartOfWeek(date) {
         const dayOfWeek = date.getDay() === 0 ? 6 : date.getDay() - 1;
@@ -317,21 +339,17 @@ function abrirEditar(fecha, hora_inicio = null, hora_final = null, titulo = null
         updateCalendar();
     });
 
+    // Para el modal de crear nueva cita
     btnCerrar.onclick = btnCancelar.onclick = function() {
         modal.style.display = "none";
     };
 
-    window.onclick = function(event) {
-        modal.style.display = "none";
-    };
-
-    btnCerrar.onclick = btnCancelar.onclick = function() {
+    // Para el modal de editar cita
+    btnCerrarEditar.onclick = btnCancelarEditar.onclick = function() {
         modal_editar.style.display = "none";
     };
 
-    window.onclick = function(event) {
-        modal_editar.style.display = "none";
-    };
+
 
     updateCalendar();
 });
