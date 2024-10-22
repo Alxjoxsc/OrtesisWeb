@@ -25,4 +25,5 @@ urlpatterns = [
     path('perfil/', views.perfil, name='perfil'),
     path('editar_perfil/<int:pk>/', views.editar_perfil, name='editar_perfil'),
     path('historial_sesiones/<int:paciente_id>/', views.historial_sesiones, name='historial_sesiones'),
+    path('obtener_rutinas/', views.obtener_rutinas, name='obtener_rutinas'),
 ]

@@ -612,3 +612,24 @@ def historial_sesiones(request, paciente_id):
     return render(request, 'historial_sesiones.html', context)
 
 
+def obtener_rutinas(request):
+    rutinas = Rutina.objects.all()
+    data = []
+
+    for rutina in rutinas:
+        sesiones = rutina.sesiones.all()
+
+        for sesion in sesiones:
+            hora_inicio = (
+                sesion.hora_inicio.strftime('%H:%M') 
+                if sesion.hora_inicio
+                else 'Por definir'
+            )
+            data.append({
+                'nombre_paciente': f'{rutina.paciente.first_name} {rutina.paciente.last_name}',
+                'fecha_inicio': sesion.fecha.strftime('%d-%m-%Y'),
+                'hora_inicio': hora_inicio,
+            })
+
+    return JsonResponse({'rutinas': data})
+

@@ -86,10 +86,54 @@
             <p>&copy; 2024 OrtesisWeb</p>
         </footer>
     </div>
+
+    <div id="modalRutinas" class="modal-rutinas">
+        <div class="modal-rutinas-content">
+            <ul id="rutinas-list">
+                <!-- Aquí se cargarán las rutinas -->
+            </ul>
+        </div>
+    </div>
     
 
     <!-- JavaScript general -->
     <script src="{% static 'js/activeMenu.js' %}"></script>
+    <script>
+
+        let modalVisible = false;
+    
+        // Mostrar y ocultar el modal al hacer clic en el icono de notificaciones
+        document.querySelector('.notification-icon a').addEventListener('click', function(event) {
+            event.preventDefault();
+            
+            var modal = document.getElementById('modalRutinas');
+            
+            if (modalVisible) {
+                modal.style.display = 'none';
+            } else {
+                modal.style.display = 'block';
+    
+                // Hacer la llamada AJAX para obtener las rutinas solo si el modal se está abriendo
+                fetch('{% url "obtener_rutinas" %}')
+                .then(response => response.json())
+                .then(data => {
+                    const rutinasList = document.getElementById('rutinas-list');
+                    rutinasList.innerHTML = '';
+    
+                    data.rutinas.forEach(rutina => {
+                        const li = document.createElement('li');
+                        li.innerText = `Paciente: ${rutina.nombre_paciente}, Fecha: ${rutina.fecha_inicio}, Hora: ${rutina.hora_inicio}`;
+                        rutinasList.appendChild(li);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error al obtener las rutinas:', error);
+                });
+            }
+    
+            modalVisible = !modalVisible;
+        });
+    </script>
     
     <!-- Bloque adicional para cargar scripts JS específicos -->
     {% block extra_js %}{% endblock %}
