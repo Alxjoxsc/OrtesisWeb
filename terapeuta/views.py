@@ -250,22 +250,22 @@ def agendar_cita(request):
 def calendar(request):
     return render(request, 'calendar.html')
 
-
-
 def editar_cita(request):
     if request.method == "POST":
         cita_id = request.POST["cita_id"]
         cita = Cita.objects.get(id=cita_id)
-        cita.titulo = request.POST["titulo"]
-        cita.paciente = Paciente.objects.get(id=request.POST["paciente"])
-        cita.fecha = request.POST["fecha"]
-        cita.hora_inicio = request.POST["hora_inicio"]
-        cita.hora_final = request.POST["hora_final"]
-        cita.sala = request.POST["sala"]
-        cita.detalle = request.POST["detalle"]
+        cita.titulo = request.POST["titulo_editar"]
+        cita.paciente = Paciente.objects.get(id=request.POST["paciente_editar"])
+        cita.fecha = request.POST["fecha_editar"]
+        cita.hora_inicio = request.POST["hora_inicio_editar"]
+        cita.hora_final = request.POST["hora_final_editar"]
+        cita.sala = request.POST["sala_editar"]
+        cita.detalle = request.POST["detalle_editar"]
         cita.save()
         return redirect("agenda")
-    return render(request, "editar_cita.html")
+
+    return agenda(request)
+
 
 def eliminar_cita(request, cita_id):
     if request.method == 'DELETE':

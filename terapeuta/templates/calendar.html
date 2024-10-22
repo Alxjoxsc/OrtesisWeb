@@ -83,17 +83,18 @@
         <h2>Editar Cita</h2>
         <form id="formEditarCita" action="{% url 'editar_cita' %}" method="POST">
             {% csrf_token %}
+
+            <input type="hidden" name="cita_id" id="cita_id">
+
             <label for="titulo_editar">Título</label>
             <input type="text" id="titulo_editar" name="titulo_editar" required>
 
             <label for="paciente_editar">Paciente</label>
             <select id="paciente_editar" name="paciente_editar" required>
                 {% for paciente in pacientes %}
-                    <option value="{{ paciente.id }}">{{ paciente.first_name }}</option>
+                    <option value="{{ paciente.id }}">{{ paciente.first_name }} {{ paciente.last_name }}</option>
                 {% endfor %}
             </select>
-
-
 
             <label for="fecha_editar">Fecha</label>
             <input type="date" id="fecha_editar" name="fecha_editar" required>

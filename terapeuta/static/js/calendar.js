@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Agregar evento de clic para ver detalles
                 citaDiv.addEventListener('click', function(event) {
                     event.stopPropagation(); // Evitar que se abra el modal de crear cita
-                    abrirEditar(cita.fecha.split('-').reverse().join('/'), cita.hora_inicio, cita.hora_final, cita.titulo,  `${cita.paciente.nombre}`, cita.sala, cita.detalle);
+                    abrirEditar(cita.id, cita.fecha.split('-').reverse().join('/'), cita.hora_inicio, cita.hora_final, cita.titulo,  cita.paciente.id , cita.paciente.nombre, cita.sala, cita.detalle);
                 });
     
                 cell.appendChild(citaDiv);
@@ -253,38 +253,42 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 // Reasignación de IDs en abrirEditar
-function abrirEditar(fecha, hora_inicio = null, hora_final = null, titulo = null, paciente = null, sala = null, detalle = null) {
+function abrirEditar(cita_id, fecha, hora_inicio = null, hora_final = null, titulo = null, paciente_id = null, paciente_nombre = null, sala = null, detalle = null) {
     modal_editar.style.display = "block";
 
     const fechaISO = fecha.split('/').reverse().join('-');
+    document.getElementById("cita_id").value = cita_id;
     document.getElementById("fecha_editar").value = fechaISO;
     document.getElementById("hora_inicio_editar").value = hora_inicio || '';
     document.getElementById("hora_final_editar").value = hora_final || '';
     document.getElementById("titulo_editar").value = titulo || '';
 
     const pacienteSelect = document.getElementById("paciente_editar");
+    console.log(pacienteSelect, "XDDDD");
 
-    // Verificar si el paciente está en las opciones del select
+    // Verificar si el paciente con la ID existe en las opciones del select
     let optionExists = false;
     for (let i = 0; i < pacienteSelect.options.length; i++) {
-        if (pacienteSelect.options[i].value === paciente) {
+        console.log(pacienteSelect, "XDDDD");
+        if (pacienteSelect.options[i].value === paciente_id) {
             optionExists = true;
             break;
         }
     }
 
     if (optionExists) {
-        // Si el paciente existe, seleccionarlo
-        pacienteSelect.value = paciente;
+        // Si el paciente existe en el select, seleccionarlo
+        pacienteSelect.value = paciente_id;
     } else {
-        // Si no existe, agregar una opción temporal
-        let newOption = new Option(paciente, paciente, true, true);
+        // Si no existe, agregar una opción temporal con el nombre y la ID del paciente
+        let newOption = new Option(paciente_nombre, paciente_id, true, true);
         pacienteSelect.add(newOption);
     }
 
     document.getElementById("sala_editar").value = sala || '';
     document.getElementById("detalle_editar").value = detalle || '';
 }
+
 
 
     
