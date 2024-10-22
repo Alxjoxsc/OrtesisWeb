@@ -264,13 +264,11 @@ function abrirEditar(cita_id, fecha, hora_inicio = null, hora_final = null, titu
     document.getElementById("titulo_editar").value = titulo || '';
 
     const pacienteSelect = document.getElementById("paciente_editar");
-    console.log(pacienteSelect, "XDDDD");
 
     // Verificar si el paciente con la ID existe en las opciones del select
     let optionExists = false;
     for (let i = 0; i < pacienteSelect.options.length; i++) {
-        console.log(pacienteSelect, "XDDDD");
-        if (pacienteSelect.options[i].value === paciente_id) {
+        if (pacienteSelect.options[i].value === String(paciente_id)) {
             optionExists = true;
             break;
         }
@@ -289,9 +287,6 @@ function abrirEditar(cita_id, fecha, hora_inicio = null, hora_final = null, titu
     document.getElementById("detalle_editar").value = detalle || '';
 }
 
-
-
-    
     function getStartOfWeek(date) {
         const dayOfWeek = date.getDay() === 0 ? 6 : date.getDay() - 1;
         const startOfWeek = new Date(date);
