@@ -49,11 +49,12 @@
     background-color: #f5554a;
     color: white;
     border: none;
-    padding: 8px 15px;
+    padding: 8px 10px;
     border-radius: 5px;
     cursor: pointer;
     margin-left: 20px;
     height: auto;
+    text-wrap: nowrap;  
 }
 
 .clear-button:hover {
