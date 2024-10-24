@@ -12,6 +12,7 @@
 .profile-info h1 {
     font-size: 40px;
     font-weight: 500;
+    margin-top: 128.5px;
     margin-bottom: 30px;
 }
 
@@ -20,38 +21,49 @@
     font-size: 30px;
 }
 
-/* Estilos para el logo del médico */
-.doctor-logo {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin-left: 50px;
+.contact-info h2 {
+    font-weight: 500;
     margin-top: 20px;
+    margin-bottom: 20px;
 }
 
-.doctor-logo h2 {
-    font-weight: 500;
-    margin-top: 100px;
-    margin-bottom: 15px;
+.perfil-imagen,.doctor-logo {
+    width: 300px;
+    height: 300px;
+    border-radius: 50%; 
+    object-fit: cover;
+    margin-top: auto;
+    margin-left: auto;
+    color: #008CAB;
+    cursor: pointer;
+    
 }
 
 /* Estilos para la información de contacto */
 .contact-info {
     display: flex;
     flex-direction: column;
-    margin-top: 20px;
+    margin-left: 80px;
+    margin-top: auto;
 }
 
 .contact-item {
-    border: 2px solid rgba(0, 0, 0, 0.3);
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    background-color: white;
+    border: 1px solid #ccc;
     border-radius: 5px;
     padding: 10px;
+    margin-bottom: 40px;
+    justify-content: space-between;
+    background-color: white;
     width: 400px;
+
+}
+
+.contact-item input {
+    border: none;
+    outline: none;
+    flex: 1;
 }
 
 .contact-item i {
@@ -107,15 +119,6 @@
     width: 90%;
 }
 
-/* Estilos para el logo SVG */
-.svg-logo {
-    transform: scale(4);
-    margin-left: 250px;
-    width: 100px;
-    height: 50px;
-    fill: #008CAB;
-}
-
 /* Estilo general del popup */
 .popup {
     display: none;
@@ -155,6 +158,26 @@
     position: relative;
 }
 
+/* Agregar y eliminar foto de perfil*/
+input[type="file"]::-webkit-file-upload-button {
+    background-color: #008CAB;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+.eliminar-imagen-label {
+    color: white;
+    margin-top: 20px;
+    background-color: #FF6161;
+    padding: 10px 15px;
+    border-radius: 5px;
+    display: inline-block;
+    margin-right: 10px;
+}
+
 .close {
     position: absolute; 
     top: 10px;
@@ -175,21 +198,6 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     resize: vertical;
     margin-bottom: 20px;
-}
-
-.contact-item {
-    display: flex;
-    align-items: center;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    margin-bottom: 40px;
-}
-
-.contact-item input {
-    border: none;
-    outline: none;
-    flex: 1;
 }
 
 /* Estilo de los botones */
@@ -229,30 +237,19 @@
     }
 
     .profile-info h1 {
+        margin-top: 0px;
         font-size: 28px;
         text-align: center;
     }
 
     .profile-info p {
         font-size: 18px;
-        text-align: center;
-    }
-
-    .doctor-logo {
-        align-items: center;
-        margin-top: 40px;
+        text-align: justify;
     }
 
     .doctor-logo h2 {
         margin-top: 50px;
-        text-align: center;
-    }
-
-    .svg-logo {
-        transform: scale(2);
-        fill: #008CAB;
-        cursor: pointer;
-        margin-left: 100px;
+        text-align:justify;
     }
 
     .contact-item {
@@ -264,6 +261,7 @@
         width: 100%;
         padding: 15px;
         margin-top: 20px;
+        margin-bottom: 25px;
     }
 
     .presentation h2 {
