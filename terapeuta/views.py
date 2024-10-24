@@ -268,14 +268,13 @@ def editar_cita(request):
 
 
 def eliminar_cita(request, cita_id):
-    if request.method == 'DELETE':
-        try:
-            cita = Cita.objects.get(id=cita_id)
-            cita.delete()  # Elimina la cita de la base de datos
-            return JsonResponse({'message': 'Cita eliminada exitosamente.'}, status=200)
-        except Cita.DoesNotExist:
-            return JsonResponse({'error': 'Cita no encontrada.'}, status=404)
-    return JsonResponse({'error': 'Método no permitido.'}, status=405)
+    cita = get_object_or_404(Cita, id=cita_id)
+    
+    # Lógica para eliminar la cita
+    cita.delete()
+    
+    # Redirigir a la página de citas o donde desees
+    return redirect('agenda')
 
 ################################################### GRÁFICOS PACIENTES ###################################################
 

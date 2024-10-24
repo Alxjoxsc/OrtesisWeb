@@ -14,6 +14,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnCancelar = document.getElementById("cancelarNuevaCita");
     const btnCerrarEditar = document.getElementById("cerrarEditarModal");
     const btnCancelarEditar = document.getElementById("cancelarEditarCita");
+    const eliminarCitaBtn = document.getElementById('eliminarCita');
+    const confirmarEliminarModal = document.getElementById('confirmarEliminarCita');
+    const cerrarConfirmarEliminarModal = document.getElementById('cerrarConfirmarEliminarModal');
+    const cancelarEliminarCita = document.getElementById('cancelarEliminarCita');
+    const confirmarEliminarCitaBtn = document.getElementById('confirmarEliminarCitaBtn');
+    const citaIdInput = document.getElementById('cita_id'); // El input hidden que tiene el cita_id
+
 
     // Verificar que 'citas' está definida
     if (typeof citas === 'undefined') {
@@ -348,7 +355,39 @@ function abrirEditar(cita_id, fecha, hora_inicio = null, hora_final = null, titu
         modal_editar.style.display = "none";
     };
 
+    // Función para abrir el modal de confirmación
+    eliminarCitaBtn.addEventListener('click', function () {
+        confirmarEliminarModal.style.display = 'block';
+    });
 
+    // Función para cerrar el modal de confirmación
+    cerrarConfirmarEliminarModal.addEventListener('click', function () {
+        confirmarEliminarModal.style.display = 'none';
+    });
+
+    // Cerrar modal de confirmación al cancelar
+    cancelarEliminarCita.addEventListener('click', function () {
+        confirmarEliminarModal.style.display = 'none';
+    });
+
+    // Función para confirmar la eliminación de la cita
+    confirmarEliminarCitaBtn.addEventListener('click', function () {
+        // Obtener el valor de cita_id
+        const citaId = citaIdInput.value;
+
+        // Redirigir a la URL de eliminación de la cita con el cita_id en la ruta
+        const eliminarUrl = `/eliminar_cita/${citaId}/`;
+
+        // Redirigir a la URL
+        window.location.href = eliminarUrl;
+    });
+
+    // Cerrar el modal si se hace clic fuera de la ventana del modal
+    window.addEventListener('click', function (event) {
+        if (event.target == confirmarEliminarModal) {
+            confirmarEliminarModal.style.display = 'none';
+        }
+    });
 
     updateCalendar();
 });

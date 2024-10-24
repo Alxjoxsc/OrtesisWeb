@@ -79,7 +79,10 @@
 <!-- Modal Popup para Editar una Cita -->
 <div id="editarCita" class="modal">
     <div class="modal-content">
-        <span class="close" id="cerrarEditarModal">&times;</span>
+        <div class="modal-header">
+            <button type="button" class="delete-btn" id="eliminarCita">Eliminar</button>
+            <span class="close" id="cerrarEditarModal">&times;</span>
+        </div>
         <h2>Editar Cita</h2>
         <form id="formEditarCita" action="{% url 'editar_cita' %}" method="POST">
             {% csrf_token %}
@@ -124,7 +127,17 @@
     </div>
 </div>
 
-
+<!-- Modal de Confirmación para Eliminar Cita -->
+<div id="confirmarEliminarCita" class="modal">
+    <div class="modal-content-confirmacion">
+        <span class="close" id="cerrarConfirmarEliminarModal">&times;</span>
+        <h2>¿Estás seguro de eliminar esta cita?</h2>
+        <div class="modal-footer">
+            <button type="button" class="cancel-btn-confirmar" id="cancelarEliminarCita">Cancelar</button>
+            <button type="button" class="confirm-btn.confirmar" id="confirmarEliminarCitaBtn">Confirmar</button>
+        </div>
+    </div>
+</div>
 
     <!-- Incluir las citas como variable JavaScript -->
     <script>

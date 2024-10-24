@@ -259,7 +259,70 @@ button:hover {
     background-color: #006A60;
 }
 
+.delete-btn {
+    display: block;
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    margin-right: 10px;
+    border-radius: 4px;
+}
 
+.delete-btn:hover {
+    background-color: rgba(227, 66, 66, 0.889);
+}
+
+/*Popup de Confirmación*/
+
+.modal-content-confirmacion{
+    display: flex;
+    padding: 20px;
+    background-color: #fefefe;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 0.625rem;
+    width: 34.375rem;
+    height: 15.625rem;
+    margin: auto; /* Centrar horizontalmente */
+    position: absolute; /* Centrar verticalmente */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.cancel-btn-confirmar{
+    background-color: #FF0000;
+    color: white;
+    padding: 0.625rem 1.875rem;
+    border: none;
+    border-radius: 3.125rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.confirm-btn-confirmar{
+    background-color: #006A60;
+    color: white;
+    padding: 0.625rem 1.875rem;
+    border: none;
+    border-radius: 3.125rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.cancel-btn-confirmar:hover {
+    background-color: #FF7D7D;
+}
+
+.confirm-btn-confirmar:hover {
+    background-color: #008F85;
+}
 
 /* ... tus estilos existentes ... */
 
