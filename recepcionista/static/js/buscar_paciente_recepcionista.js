@@ -1,48 +1,56 @@
-// Función para detectar la tecla Enter y activar la búsqueda
 function detectEnter(event) {
     if (event.key === "Enter") {
         event.preventDefault();
         searchPacientes();
+        
     }
 }
 
-// Función para buscar pacientes según el nombre, RUT o terapeuta
 function searchPacientes() {
-    const input = document.getElementById('searchBar').value.trim().toLowerCase();
+    const input = document.getElementById('searchBar').value.toLowerCase();
     const pacientes = document.querySelectorAll('.paciente');
     let found = false;
 
     pacientes.forEach(paciente => {
-        const nombre = paciente.querySelector('.nombre').textContent.toLowerCase();
-        const rut = paciente.querySelector('.rut').textContent.toLowerCase();
+        const nombre = paciente.querySelector('.centro-tabla:nth-child(2)').textContent.toLowerCase();
+        const rut = paciente.querySelector('.centro-tabla:nth-child(3)').textContent.toLowerCase();
         const terapeuta = paciente.querySelector('.centro-tabla:nth-child(5)').textContent.toLowerCase(); // Nombre del terapeuta
 
-        const matches = [nombre, rut, terapeuta].some(field => field.includes(input));
-
-        paciente.style.display = matches ? '' : 'none'; // Mostrar u ocultar paciente
-        if (matches) found = true;
+        if (nombre.includes(input) || rut.includes(input) || terapeuta.includes(input)) {
+            paciente.style.display = ''; // Mostrar el paciente
+            found = true;
+        } else {
+            paciente.style.display = 'none'; // Ocultar el paciente
+        }
     });
 
-    if (!found && input !== '') {
+    if (!found) {
         console.log('No se encontraron pacientes.');
     }
 }
 
-// Función para mostrar el botón de limpiar si hay texto en el campo de búsqueda
 function toggleClearButton() {
     const searchBar = document.getElementById('searchBar');
     const clearButton = document.getElementById('clearButton');
 
-    clearButton.style.display = searchBar.value.trim() ? 'inline-block' : 'none';
+    // Mostrar el botón de "Limpiar filtro" solo si hay texto en el campo de búsqueda
+    if (searchBar.value.trim() !== '') {
+        clearButton.style.display = 'inline-block';
+    } else {
+        clearButton.style.display = 'none';
+    }
 }
 
-// Función para limpiar el campo de búsqueda y mostrar todos los pacientes
 function clearSearch() {
+    // Limpiar el campo de búsqueda
     const searchBar = document.getElementById('searchBar');
     searchBar.value = '';
-
+    
+    // Ocultar el botón de "Limpiar filtro"
     const clearButton = document.getElementById('clearButton');
     clearButton.style.display = 'none';
-
-    searchPacientes(); // Mostrar todos los pacientes al limpiar el filtro
+    
+    // Enviar el formulario para mostrar todos los pacientes de nuevo
+    searchBar.form.submit();
 }
+

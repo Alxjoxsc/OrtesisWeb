@@ -14,7 +14,7 @@
     flex-flow: row wrap;
     align-items: center;
     justify-content: flex-start;
-    gap: 20px;
+    gap: 40px;
     width: 100%;
 }
 
@@ -23,54 +23,54 @@
     color: black;
     font-weight: 500;
 }
-
-/* Formulario de búsqueda */
-.pacientes-busqueda-form {
+.search-container {
     display: flex;
-    align-items: center;
+    width: 70%;
 }
 
-/* Ajustar el tamaño y color de la barra de búsqueda */
-.pacientes-search-input {
-    display: flex;
-    width: 500px;
-    height: 35px;
-    border: 2px solid #d9d9d9;
-    border-radius: 0px;
-    padding: 5px 10px;
-    outline: none;
-    color: black;
-    background-color: #f9f9f9;
-    font-size: 16px;
-}
-
-/* Icono de búsqueda */
-.pacientes-search-icon {
+.search-icon {
     position: flex;
     justify-content: flex-end;
-    width: 20px;
+    width: 20px; 
     height: 20px;
     margin-left: -30px;
-    cursor: pointer;
+    margin-top: 8px;
+}
+/* Estilos para la barra de búsqueda */
+.search-bar {
+    display: flex;
+    padding: 8px;
+    font-size: 16px;
+    background-color: #D9D9D9;
+    border: 0.5px solid rgb(165, 165, 165);
+    border-radius: 5px;
+    width: 500px;
 }
 
-/* Botón de limpiar búsqueda */
-.pacientes-clear-button {
+.search-bar:focus {
+    outline: none;
+    border-color: black;
+}
+
+/* Estilos para el buscadoe */
+.clear-button {
     display: flex;
     gap: 5px;
     background-color: #f5554a;
     color: white;
     border: none;
-    padding: 5px 10px;
+    padding: 8px 10px;
     border-radius: 5px;
     cursor: pointer;
     margin-left: 20px;
     height: auto;
+    text-wrap: nowrap;  
 }
 
-.pacientes-clear-button:hover {
+.clear-button:hover {
     background-color: #d32f2f;
 }
+
 
 /* Estilo para el botón Agregar Paciente */
 .pacientes-agregar-paciente-btn {

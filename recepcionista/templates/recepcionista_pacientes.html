@@ -11,10 +11,16 @@
 {% block header %}
 <div class="contenedor-header">
     <h1>Pacientes</h1>
-    <form method="GET" action="{% url 'recepcionista_pacientes_activos' %}" class="pacientes-busqueda-form">
-        <input type="text" name="search" placeholder="Búsqueda por Nombre, Rut o Terapeuta" class="pacientes-search-input" id="searchBar" value="{{ request.GET.search|default:'' }}" oninput="toggleClearButton()">
-        <img src="{% static 'icons/Lupa.svg' %}" alt="Buscar" class="pacientes-search-icon">
-        <button type="button" id="clearButton" class="pacientes-clear-button" onclick="clearSearch()" style="display: {% if request.GET.search %}inline-block{% else %}none{% endif %};">
+    <form method="GET" action="{% if estado == 'activos' %}
+                                    {% url 'recepcionista_pacientes_activos' %}
+                                {% else %}
+                                    {% url 'recepcionista_pacientes_inactivos' %}
+                                {% endif %}"
+                                class="search-container"> 
+        <input type="text" name="search" placeholder="Búsqueda por Nombre, Rut o Terapeuta" class="search-bar" id="searchBar" value="{{ request.GET.search|default:'' }}" oninput="toggleClearButton()">
+        <img src="{% static 'icons/Lupa.svg' %}" alt="Buscar" class="search-icon">
+        
+        <button type="button" id="clearButton" class="clear-button" onclick="clearSearch()" style="display: {% if request.GET.search %}inline-block{% else %}none{% endif %};">
             Limpiar Filtro
         </button>
     </form>

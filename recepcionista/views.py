@@ -49,8 +49,7 @@ def recepcionista_pacientes_activos(request):
             Q(last_name__icontains=query) |
             Q(rut__icontains=query) |
             Q(terapeuta__user__first_name__icontains=query) |
-            Q(terapeuta__user__last_name__icontains=query) |
-            Q(terapeuta__isnull=True)
+            Q(terapeuta__user__last_name__icontains=query)
         )
 
     # Calcular la edad de cada paciente
@@ -81,8 +80,7 @@ def recepcionista_pacientes_inactivos(request):
             Q(last_name__icontains=query) |
             Q(rut__icontains=query) |
             Q(terapeuta__user__first_name__icontains=query) |
-            Q(terapeuta__user__last_name__icontains=query) |
-            Q(terapeuta__isnull=True)
+            Q(terapeuta__user__last_name__icontains=query)
         )
 
     # Calcular la edad de cada paciente
