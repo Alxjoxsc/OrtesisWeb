@@ -90,8 +90,11 @@ def listar_pacientes_activos(request):
         pacientes_activos = pacientes_activos.filter(
             Q(first_name__icontains=query) |
             Q(last_name__icontains=query) |
-            Q(rut__icontains=query)
+            Q(rut__icontains=query) |
+            Q(terapeuta__user__first_name__icontains=query) |
+            Q(terapeuta__user__last_name__icontains=query)
         )
+
         
     paginator = Paginator(pacientes_activos, 5)
     page_number = request.GET.get('page')

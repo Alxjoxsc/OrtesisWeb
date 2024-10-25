@@ -12,11 +12,18 @@
 <div class="contenedor-header">
     <h1>Pacientes</h1>
 
-    <form class="busqueda-form">
-        <div class="busqueda-input">
-            <input type="text" class="form-control" id="searchInput" placeholder="Búsqueda por Nombre o Rut" aria-label="Buscar Paciente">
-            <button type="button" id="clearButton" class="clear-button" style="display: none;">Limpiar Filtro</button>
-        </div>
+    <form method="GET" action="{% if estado == 'activos' %}
+                                    {% url 'listar_pacientes_activos' %}
+                                {% else %}
+                                    {% url 'listar_pacientes_inactivos' %}
+                                {% endif %}"
+                                class="search-container"> 
+        <input type="text" name="search" placeholder="Búsqueda por Nombre, Rut o Terapeuta" class="search-bar" id="searchBar" value="{{ request.GET.search|default:'' }}" oninput="toggleClearButton()">
+        <img src="{% static 'icons/Lupa.svg' %}" alt="Buscar" class="search-icon">
+        
+        <button type="button" id="clearButton" class="clear-button" onclick="clearSearch()" style="display: {% if request.GET.search %}inline-block{% else %}none{% endif %};">
+            Limpiar Filtro
+        </button>
     </form>
     <button id="boton-agregar-paciente">Agregar Paciente
         <img src="{% static 'icons/plus.svg' %}">
@@ -276,6 +283,6 @@
     });
     
 </script>
-<script src="{% static 'js/admin_buscador_paciente.js' %}"></script>
+<script src="{% static 'js/buscar_paciente_recepcionista.js' %}"></script>
 {% endblock %}
 
