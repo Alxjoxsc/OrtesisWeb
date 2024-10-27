@@ -373,6 +373,16 @@ button:hover {
     height: 40px; /* Ajustar según tus necesidades */
 }
 
+/* Resaltar la columna del día actual en la vista semanal */
+.today-column {
+    background-color: #E0F7FA; /* Un tono suave de azul */
+}
+
+.week-view th.today-column {
+    background-color: #008CAB; /* Mantener el encabezado con el color principal */
+    color: white;
+}
+
 
 
 
