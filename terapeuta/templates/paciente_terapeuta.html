@@ -20,6 +20,18 @@
                 Limpiar Filtro
             </button>
         </form>
+        <div class="dropdown">
+            <button class="filtro-btn" type="button" id="dropdownMenuButton">
+                Filtrar
+                <span id="arrow">▼</span>
+            </button>
+            <ul id="filterOptions" class="dropdown-content" style="display:none;">
+                <li><a href="#" onclick="applyFilter('first_name')">Nombre</a></li>
+                <li><a href="#" onclick="applyFilter('last_name')">Apellido</a></li>
+                <li><a href="#" onclick="applyFilter('edad')">Edad</a></li>
+                <li><a href="#" onclick="applyFilter('patologia')">Tratamiento</a></li>
+            </ul>
+        </div>
     </div>
 {% endblock %}
 
@@ -100,5 +112,6 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'js/filtroListados.js' %}"></script>
 <script src="{% static 'js/buscar_paciente.js' %}"></script>
 {% endblock %}

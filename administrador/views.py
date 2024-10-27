@@ -84,6 +84,7 @@ def mostrar_paciente_con_terapeuta(request, paciente_id, terapeuta_id):
 @role_required('Administrador')
 def listar_pacientes_activos(request):
     query = request.GET.get('search')
+    order_by = request.GET.get('order_by', 'first_name')
     pacientes_activos = Paciente.objects.filter(is_active=True)
 
     if query:
@@ -95,6 +96,8 @@ def listar_pacientes_activos(request):
             Q(terapeuta__user__last_name__icontains=query)
         )
 
+    if order_by:
+        pacientes_activos = pacientes_activos.order_by(order_by)
         
     paginator = Paginator(pacientes_activos, 5)
     page_number = request.GET.get('page')
@@ -154,6 +157,7 @@ def restaurar_paciente(request):
 @role_required('Administrador')
 def listar_pacientes_inactivos(request):
     query = request.GET.get('search')
+    order_by = request.GET.get('order_by', 'first_name')
     pacientes_inactivos = Paciente.objects.filter(is_active=False)
 
     if query:
@@ -162,7 +166,10 @@ def listar_pacientes_inactivos(request):
             Q(last_name__icontains=query) |
             Q(rut__icontains=query)
         )
-        
+    
+    if order_by:
+        pacientes_inactivos = pacientes_inactivos.order_by(order_by)
+    
     paginator = Paginator(pacientes_inactivos, 5)
     page_number = request.GET.get('page')
     pacientes = paginator.get_page(page_number)

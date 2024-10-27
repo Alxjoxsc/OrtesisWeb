@@ -14,66 +14,64 @@
 
 .contenedor-header {
     display: flex;
-    justify-content: space-between; /* Cambiado para empujar los elementos a los extremos */
+    flex-flow: row wrap;
     align-items: center;
-    gap: 20px;
+    justify-content: flex-start;
+    gap: 40px;
     width: 100%;
-    margin-top: 30px;
-    margin-bottom: 50px;
 }
 
 .contenedor-header h1 {
     font-size: 48px;
     color: black;
     font-weight: 500;
-    margin: 0; /* Asegúrate de que no haya margen en el h1 */
 }
 
-/* Estilos del formulario de búsqueda */
-.terapeutas-busqueda-form {
+/* Estilos para la barra de búsqueda */
+.search-container {
     display: flex;
-    align-items: center;
+    width: 70%;
 }
 
-/* Ajustar el tamaño y color de la barra de búsqueda */
-.terapeutas-search-input {
-    display: flex;
-    width: 500px;
-    height: 35px;
-    border: 2px solid #d9d9d9;
-    border-radius: 0px;
-    padding: 5px 10px;
-    outline: none;
-    color: black;
-    background-color: #D9D9D9;
-    font-size: 16px;
-}
-
-/* Icono de búsqueda */
-.terapeutas-search-icon {
+.search-icon {
     position: flex;
     justify-content: flex-end;
-    width: 20px;
+    width: 20px; 
     height: 20px;
     margin-left: -30px;
-    cursor: pointer;
+    margin-top: 8px;
 }
 
-/* Botón de limpiar búsqueda */
-.terapeutas-clear-button {
+.search-bar {
+    display: flex;
+    padding: 8px;
+    font-size: 16px;
+    background-color: #D9D9D9;
+    border: 0.5px solid rgb(165, 165, 165);
+    border-radius: 5px;
+    width: 500px;
+}
+
+.search-bar:focus {
+    outline: none;
+    border-color: black;
+}
+
+.clear-button {
     display: flex;
     gap: 5px;
     background-color: #f5554a;
     color: white;
     border: none;
-    padding: 5px 10px;
+    padding: 8px 10px;
     border-radius: 5px;
     cursor: pointer;
     margin-left: 20px;
     height: auto;
+    text-wrap: nowrap;  
 }
 
-.terapeutas-clear-button:hover {
+.clear-button:hover {
     background-color: #d32f2f;
 }
 
@@ -94,13 +92,15 @@
 }
 
 .filtro-btn {
+    display: flex;
+    flex-direction: row;
     background-color: #373d58;
     color: white;
     border: none;
     border-radius: 7px;
-    padding: 10px 20px;
+    padding: 5px 10px;
     cursor: pointer;
-    margin-right: 70px; /* Para empujar el botón hacia la derecha */
+    gap: 10px;
 }
 
 .filtro-eliminar-container {
@@ -132,6 +132,7 @@
     box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
     z-index: 1;
     padding: 0; /* Asegúrate de que no haya padding adicional */
+    right: 0;
 }
 
 /* Agregar este estilo para eliminar los puntos de la lista */
@@ -170,6 +171,8 @@
 
 .doctor-logo {
     cursor: pointer;
+    width: 45px;
+    height: 45px;
 }
 
 /* Mensaje para cuando no hay terapeutas */
@@ -178,6 +181,15 @@
     padding: 20px;
     color: #999;
 }
+
+/* Círcuos Verde y Amarillo */
+.img-estado{
+    width: 15px;
+    height: 15px;
+    padding-top: 3px;
+    margin-left: 10px;
+}
+
 
 /* Estilos del contenido del modal */
 .contenido-modal {

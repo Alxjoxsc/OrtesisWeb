@@ -49,7 +49,16 @@
         {% endif %}
     </div>
 
-    <button class="filtro-btn" type="button">Filtrar</button>
+    <div class="dropdown">
+        <button class="filtro-btn" type="button" id="dropdownMenuButton">
+            Filtrar
+            <span id="arrow">▼</span>
+        </button>
+        <ul id="filterOptions" class="dropdown-content" style="display:none;">
+            <li><a href="#" onclick="applyFilter('date_joined')">Fecha de Ingreso</a></li>
+            <li><a href="#" onclick="applyFilter('terapeuta')">Terapeuta</a></li>
+        </ul>
+    </div>
     
 </div>
 
@@ -74,7 +83,7 @@
                 <td class="centro-tabla">{{ paciente.rut }}</td>
                 <td class="centro-tabla">
                     <span class="badge {% if paciente.is_active %}bg-success{% else %}bg-secondary{% endif %}">
-                        {% if paciente.is_active %}Activo <img class = "img-activo" src="{% static "icons/activo.svg" %}"> {% else %}Inactivo <img class = "img-activo" src="{% static "icons/inactivo.svg" %}"> {% endif %}
+                        {% if paciente.is_active %}Activo <img class = "img-estado" src="{% static "icons/activo.svg" %}"> {% else %}Inactivo <img class = "img-estado" src="{% static "icons/inactivo.svg" %}"> {% endif %}
                     </span>
                 </td>
                 <td class="centro-tabla">{% if paciente.terapeuta %}{{ paciente.terapeuta.user.first_name }} {{ paciente.terapeuta.user.last_name }}{% else %}Sin terapeuta{% endif %}</td>
@@ -157,6 +166,8 @@
 {% endblock %}
 
 {% block extra_js %}
+
+<script src="{% static 'js/filtroListados.js' %}"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

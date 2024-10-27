@@ -1,11 +1,24 @@
+/* Estilos generales */
+.main-content {
+    margin: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Estilos del encabezado */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
 .contenedor-header {
     display: flex;
-    align-items: center; 
+    flex-flow: row wrap;
+    align-items: center;
     justify-content: flex-start;
     gap: 40px;
-    flex-flow: row nowrap;
     width: 100%;
-
 }
 
 .contenedor-header h1 {
@@ -41,6 +54,79 @@
 .search-bar:focus {
     outline: none;
     border-color: black;
+}
+
+/* Estilos del botón de filtro */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.filtro-btn {
+    display: flex;
+    flex-direction: row;
+    background-color: #008cab;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    padding: 5px 10px;
+    cursor: pointer;
+    gap: 10px;
+}
+
+.filtro-btn:hover {
+    background-color: #005f6b;
+}
+
+.filtro-eliminar-container {
+    margin-left: 20px;
+}
+
+.filtro-eliminar-btn {
+    background-color: #f5554a;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.filtro-eliminar-btn:hover {
+    background-color: #d32f2f;
+}
+
+/* Estilos del contenido del menú desplegable (oculto por defecto) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    border: 1.5px solid black;
+    border-radius: 7px;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    padding: 0; /* Asegúrate de que no haya padding adicional */
+    right: 0;
+}
+
+/* Agregar este estilo para eliminar los puntos de la lista */
+.dropdown-content li {
+    list-style-type: none; /* Elimina los puntos de la lista */
+    margin: 0; /* Elimina el margin por defecto */
+}
+
+/* Estilos de los enlaces dentro del menú */
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    display: block;
+    text-decoration: none; /* Asegúrate de que no haya subrayado */
+}
+
+/* Cambiar el color de fondo de los enlaces al pasar el cursor */
+.dropdown-content a:hover {
+    background-color: #D9D9D9;
 }
 
 .clear-button {
@@ -153,14 +239,6 @@
 }
 
 @media screen and (max-width: 1200px){
-    .contenedor-header{
-        flex-flow: column nowrap;
-        justify-content: flex-start;
-        align-items: flex-start;
-        text-align: left;
-        gap: 0px;
-    }
-
     .report-icon {
         width: 40px;
         height: 40px;

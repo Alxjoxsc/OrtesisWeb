@@ -84,8 +84,11 @@ def calcular_edad(fecha_nacimiento):
 
 
 #-------------------------------------PACIENTES-------------------------------------
+@role_required('Terapeuta')
+@role_required('Terapeuta')
 def pacientes_view(request):
     query = request.GET.get('search')  # Obtiene el parámetro de búsqueda desde el GET
+    order_by = request.GET.get('order_by', 'first_name')  # Obtiene el parámetro de orden desde el GET
     pacientes_list = Paciente.objects.filter(is_active=True)
 
     # Si hay una búsqueda, filtrar los pacientes
@@ -98,17 +101,29 @@ def pacientes_view(request):
         )
 
     # Calcular la edad de cada paciente
+    pacientes_con_edad = []
     for paciente in pacientes_list:
         paciente.edad = calcular_edad(paciente.fecha_nacimiento)
+        pacientes_con_edad.append(paciente)
 
-    total_pacientes = pacientes_list.count()  # Cuenta la cantidad total de pacientes
+    # Ordenar la lista de pacientes con edad calculada
+    if order_by == 'edad':
+        pacientes_con_edad.sort(key=lambda x: x.edad)  # Ordena por edad
+    else:
+        pacientes_con_edad.sort(key=lambda x: getattr(x, order_by))  # Ordena por otros campos
+
+    total_pacientes = len(pacientes_con_edad)  # Cuenta la cantidad total de pacientes
 
     # Implementar la paginación
-    paginator = Paginator(pacientes_list, 5)  # Muestra 5 pacientes por página
+    paginator = Paginator(pacientes_con_edad, 5)  # Muestra 5 pacientes por página
     page_number = request.GET.get('page')  # Obtiene el número de la página de la URL
     pacientes = paginator.get_page(page_number)  # Obtiene los pacientes de la página actual
     
-    return render(request, 'paciente_terapeuta.html', {'pacientes': pacientes, 'total_pacientes': total_pacientes})
+    return render(request, 'paciente_terapeuta.html', {
+        'pacientes': pacientes, 
+        'total_pacientes': total_pacientes
+    })
+
 
 @role_required('Terapeuta')
 def cambiar_estado_paciente(request, id):

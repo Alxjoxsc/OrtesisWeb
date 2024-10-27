@@ -40,6 +40,7 @@ def calcular_edad(fecha_nacimiento):
 @role_required('Recepcionista')
 def recepcionista_pacientes_activos(request):
     query = request.GET.get('search')
+    order_by = request.GET.get('order_by', 'first_name')
     pacientes_list = Paciente.objects.filter(is_active=True)
 
     # Si hay un parámetro de búsqueda, filtrar los pacientes
@@ -51,6 +52,9 @@ def recepcionista_pacientes_activos(request):
             Q(terapeuta__user__first_name__icontains=query) |
             Q(terapeuta__user__last_name__icontains=query)
         )
+
+    if order_by:
+        pacientes_list = pacientes_list.order_by(order_by)
 
     # Calcular la edad de cada paciente
     for paciente in pacientes_list:
@@ -71,6 +75,7 @@ def recepcionista_pacientes_activos(request):
 @role_required('Recepcionista')
 def recepcionista_pacientes_inactivos(request):
     query = request.GET.get('search')
+    order_by = request.GET.get('order_by', 'first_name')
     pacientes_list = Paciente.objects.filter(is_active=False)
 
     # Si hay un parámetro de búsqueda, filtrar los pacientes
@@ -83,6 +88,9 @@ def recepcionista_pacientes_inactivos(request):
             Q(terapeuta__user__last_name__icontains=query)
         )
 
+    if order_by:
+        pacientes_list = pacientes_list.order_by(order_by)
+        
     # Calcular la edad de cada paciente
     for paciente in pacientes_list:
         paciente.edad = calcular_edad(paciente.fecha_nacimiento)
@@ -192,7 +200,8 @@ def recepcionista_terapeutas_activos(request):
         terapeutas_list = terapeutas_list.filter(
             Q(user__first_name__icontains=query) |  
             Q(user__last_name__icontains=query) |   
-            Q(user__username__icontains=query)
+            Q(user__profile__rut__icontains=query) |
+            Q(especialidad__icontains=query)
         )
     
     # Aplicar el orden basado en el parámetro
