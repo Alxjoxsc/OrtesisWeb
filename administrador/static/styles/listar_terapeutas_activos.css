@@ -1,3 +1,14 @@
+.main-content {
+    margin: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.header{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
 
 .contenedor-header {
     display: flex;
@@ -15,49 +26,52 @@
 }
 
 /* Formulario de búsqueda */
-.busqueda-form {
+.search-container {
     display: flex;
-    align-items: center;
+    width: 70%;
 }
 
-.busqueda-input {
-    width: 100%;
-    position: relative;
+.search-icon {
+    position: flex;
+    justify-content: flex-end;
+    width: 20px; 
+    height: 20px;
+    margin-left: -30px;
+    margin-top: 8px;
 }
-
-/* Ajustar el tamaño y color de la barra de búsqueda */
-.busqueda-input input[type="text"] {
-    width: 450px;
-    height: 35px;
-    border: 2px solid #d9d9d9;
-    border-radius: 0px;
-    padding: 5px 10px;
-    outline: none;
-    color: black;
-    background-color: #f9f9f9;
+/* Estilos para la barra de búsqueda */
+.search-bar {
+    display: flex;
+    padding: 8px;
     font-size: 16px;
+    background-color: #D9D9D9;
+    border: 0.5px solid rgb(165, 165, 165);
+    border-radius: 5px;
+    width: 500px;
 }
+
+.search-bar:focus {
+    outline: none;
+    border-color: black;
+}
+
+/* Estilos para el buscadoe */
 .clear-button {
     display: flex;
+    gap: 5px;
     background-color: #f5554a;
     color: white;
     border: none;
-    padding: 8px 15px;
+    padding: 8px 10px;
     border-radius: 5px;
     cursor: pointer;
-    margin-left: 10px;
+    margin-left: 20px;
     height: auto;
+    text-wrap: nowrap;  
 }
 
 .clear-button:hover {
     background-color: #d32f2f;
-}
-
-
-.contenedor-boton {
-    display: flex;
-    margin-bottom: 20px;
-    right: 20px;
 }
 
 #boton-agregar-terapeuta {
@@ -67,12 +81,14 @@
     padding: 3px 20px;
     border-radius: 25px;
     font-size: 16px;
-    font-weight: bold;
+    font-weight: 500;
     display: flex;
+    flex-direction: row;
     align-items: center;
     gap: 10px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    text-wrap: nowrap;
 }
 
 #boton-agregar-terapeuta img {
@@ -82,4 +98,303 @@
 
 #boton-agregar-terapeuta:hover {
     background-color: #002080; /* Un color ligeramente más claro para el hover */
+}
+
+.contenedor-superior{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 0 10px 0 10px;
+}
+
+/* Estilos del botón de filtro */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.filtro-btn {
+    display: flex;
+    flex-direction: row;
+    background-color: #373d58;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    padding: 5px 10px;
+    cursor: pointer;
+    gap: 10px;
+}
+
+.filtro-btn:hover {
+    background-color: #535c83;
+}
+
+.filtro-activo {
+    font-weight: 600;
+    background-color: #d4edda; /* Fondo verde claro */
+    border-radius: 4px; /* Bordes redondeados */
+    padding: 5px;
+}
+
+.filtro-eliminar-container {
+    margin-left: 20px;
+}
+
+.filtro-eliminar-btn {
+    background-color: #f5554a;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.filtro-eliminar-btn:hover {
+    background-color: #d32f2f;
+}
+
+/* Estilos del contenido del menú desplegable (oculto por defecto) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    border: 1.5px solid black;
+    border-radius: 7px;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    padding: 0; /* Asegúrate de que no haya padding adicional */
+    right: 0;
+}
+
+/* Agregar este estilo para eliminar los puntos de la lista */
+.dropdown-content li {
+    list-style-type: none; /* Elimina los puntos de la lista */
+    margin: 0; /* Elimina el margin por defecto */
+}
+
+/* Estilos de los enlaces dentro del menú */
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    display: block;
+    text-decoration: none; /* Asegúrate de que no haya subrayado */
+}
+
+/* Cambiar el color de fondo de los enlaces al pasar el cursor */
+.dropdown-content a:hover {
+    background-color: #D9D9D9;
+}
+
+/* Botón de filtro */
+.filtro-btn {
+    background-color: #001058;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Estilo para los filtros de Activos/Inactivos */
+.filtros {
+    display: flex;
+    gap: 10px;
+}
+
+.filtros a{
+    text-decoration: none;
+    font-weight: 400;
+    padding: 5px 10px 5px 10px;
+    color: white;
+    border-radius: 5px;
+    background-color: rgba(55, 61, 88, 0.5);
+}
+
+.filtros .btn-active {
+    background-color: #001058;
+}
+
+.filtros .btn-inactive {
+    background-color: rgba(55, 61, 88, 0.5);
+}
+
+.filtros .btn-active:hover {
+    background-color: #002080;
+}
+
+.filtros a:hover {
+    background-color: rgba(55, 61, 88, 0.7);
+}
+
+#inactivar-btn:enabled, #restaurar-btn:enabled {
+    background-color: #001058;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#inactivar-btn:enabled:hover, #restaurar-btn:enabled:hover {
+    background-color: #002080;
+}
+
+#inactivar-btn:disabled, #restaurar-btn:disabled {
+    background-color: #cccccc;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 15px;
+    cursor: not-allowed;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+input[type="checkbox"] {
+    cursor: pointer;
+    margin: 0 20px;
+}
+
+.final-tabla {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: row;
+    max-height: 100%;
+    width: auto;
+}
+
+.final-tabla a img{
+    width: auto;
+    max-height: 100%;
+}
+/* Botones de acciones en la tabla */
+.table .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 17px;
+    cursor: pointer;
+}
+
+/* Mensaje para cuando no hay pacientes */
+.table-empty {
+    text-align: center;
+    padding: 20px;
+    color: #999;
+}
+
+.contenido-modal {
+    display: flex;
+    padding: 20px;
+    background-color: #fefefe;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 0.625rem;
+    width: 34.375rem;
+    height: 15.625rem;
+    margin: auto; /* Centrar horizontalmente */
+    position: absolute; /* Centrar verticalmente */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.botones-modal {
+    display: flex;
+    gap: 1.25rem;
+    margin-top: 1.25rem;
+}
+
+.boton-cancelar {
+    background-color: #FF6161;
+    color: white;
+    padding: 0.625rem 1.875rem;
+    border: none;
+    border-radius: 3.125rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.boton-confirmar {
+    background-color: #006A60;
+    color: white;
+    padding: 0.625rem 1.875rem;
+    border: none;
+    border-radius: 3.125rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.boton-cancelar:hover {
+    background-color: #FF7D7D;
+}
+
+.boton-confirmar:hover {
+    background-color: #008F85;
+}
+
+/*Círculos Verde y Amarillo*/
+.img-estado{
+    width: 15px;
+    height: 15px;
+    padding-top: 3px;
+    margin-left: 10px;
+}
+
+/* Estilos de paginación */
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.pagination .step-links a {
+    color: white;
+    background-color: #001058;
+    padding: 10px 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.pagination .step-links a:hover {
+    background-color: #002080
+}
+
+.pagination .current {
+    padding: 10px 15px;
+    background-color: #D9D9D9;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.pagination .step-links {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.disabled {
+    color: white;
+    background-color: #d9d9d9;
+    padding: 10px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
 }

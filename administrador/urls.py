@@ -4,7 +4,7 @@ from . import views
 urlpatterns = [
     path('listar_terapeutas_activos/', views.listar_terapeutas_activos, name='listar_terapeutas_activos'),
     path('listar_terapeutas_inactivos/', views.listar_terapeutas_inactivos, name='listar_terapeutas_inactivos'),
-    path('inactivar_terapeuta/', views.cambiar_estado_inactivo_terapeuta, name='inactivar_terapeuta'),
+    path('inactivar_terapeuta/', views.cambiar_estado_inactivo_terapeuta, name='cambiar_estado_inactivo_terapeuta'),
     path('restaurar_terapeuta/', views.restaurar_terapeuta, name='restaurar_terapeuta'),
     path('listar_pacientes_activos/', views.listar_pacientes_activos, name='listar_pacientes_activos'),
     path('listar_pacientes_inactivos/', views.listar_pacientes_inactivos, name='listar_pacientes_inactivos'),

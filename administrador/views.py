@@ -22,17 +22,20 @@ def listar_terapeutas_activos(request):
     order_by = request.GET.get('order_by', 'user__first_name')
     terapeutas_list = Terapeuta.objects.filter(user__is_active=True)
 
+    # Aplicar el filtro de búsqueda
     if query:
         terapeutas_list = terapeutas_list.filter(
             Q(user__first_name__icontains=query) |
             Q(user__last_name__icontains=query) |
-            Q(rut__icontains=query) |
+            Q(user__profile__rut__icontains=query) |  # Asumiendo que 'rut' está en el perfil
             Q(especialidad__icontains=query)
         )
-    
+
+    # Aplicar el filtro de orden
     if order_by:
         terapeutas_list = terapeutas_list.order_by(order_by)
     
+    # Paginación
     paginator = Paginator(terapeutas_list, 5)
     page_number = request.GET.get('page')
     terapeutas = paginator.get_page(page_number)
@@ -40,6 +43,8 @@ def listar_terapeutas_activos(request):
     return render(request, 'admin_terapeutas.html', {
         'terapeutas': terapeutas,
         'estado': 'activos',
+        'query': query,  # Para mantener el valor en el HTML
+        'order_by': order_by  # Para saber el orden actual en el HTML
     })
 
 @role_required('Administrador')
@@ -52,7 +57,7 @@ def listar_terapeutas_inactivos(request):
         terapeutas_list = terapeutas_list.filter(
             Q(user__first_name__icontains=query) |
             Q(user__last_name__icontains=query) |
-            Q(rut__icontains=query) |
+            Q(user__profile__rut__icontains=query) |
             Q(especialidad__icontains=query)
         )
     

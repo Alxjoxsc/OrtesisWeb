@@ -6,6 +6,8 @@
 
 {% block extra_head%}
     <link rel="stylesheet" href="{% static 'styles/listar_terapeutas_activos.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tabla.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/modal.css' %}">
 {% endblock %}
 
 {% block header %}
@@ -17,17 +19,17 @@
                                     {% url 'listar_terapeutas_inactivos' %}
                                 {% endif %}"
                                 class="search-container"> 
-        <input type="text" name="search" placeholder="Búsqueda por Nombre, Rut o Terapeuta" class="search-bar" id="searchBar" value="{{ request.GET.search|default:'' }}" oninput="toggleClearButton()">
+        <input type="text" name="search" placeholder="Búsqueda por Nombre, Rut o Especialidad" class="search-bar" id="searchBar" value="{{ request.GET.search|default:'' }}" oninput="toggleClearButton()">
         <img src="{% static 'icons/Lupa.svg' %}" alt="Buscar" class="search-icon">
         
         <button type="button" id="clearButton" class="clear-button" onclick="clearSearch()" style="display: {% if request.GET.search %}inline-block{% else %}none{% endif %};">
             Limpiar Filtro
         </button>
     </form>
-    <button id="boton-agregar-terapeuta">Agregar Terapeuta
-        <img src="{% static 'icons/plus.svg' %}" alt="Agregar">
-    </button>
 </div>
+<button id="boton-agregar-terapeuta">Agregar Terapeuta
+    <img src="{% static 'icons/plus.svg' %}" alt="Agregar">
+</button>
 {% endblock %}
 
 {% block content %}
@@ -53,8 +55,11 @@
             <span id="arrow">▼</span>
         </button>
         <ul id="filterOptions" class="dropdown-content" style="display:none;">
-            <li><a href="#" onclick="applyFilter('date_joined')">Fecha de Ingreso</a></li>
-            <li><a href="#" onclick="applyFilter('terapeuta')">Terapeuta</a></li>
+            <li><a href="#" onclick="applyFilter('user__date_joined')" class="{% if order_by == 'user__date_joined' %}filtro-activo{% endif %}">Fecha de Ingreso</a></li>
+            <li><a href="#" onclick="applyFilter('user__first_name')" class="{% if order_by == 'user__first_name' %}filtro-activo{% endif %}">Nombre</a></li>
+            <li><a href="#" onclick="applyFilter('user__last_name')" class="{% if order_by == 'user__last_name' %}filtro-activo{% endif %}">Apellido</a></li>
+            <li><a href="#" onclick="applyFilter('user__profile__rut')" class="{% if order_by == 'user__profile__rut' %}filtro-activo{% endif %}">Rut</a></li>
+            <li><a href="#" onclick="clearOrderFilter()">Limpiar filtro</a></li>
         </ul>
     </div>
     
@@ -78,16 +83,16 @@
             <tr>
                 <td class="inicio-tabla"><input type="checkbox" class="terapeuta-checkbox" value="{{ terapeuta.id }}"></td>
                 <td class="centro-tabla">{{ terapeuta.user.first_name }} {{ terapeuta.user.last_name }}</td>
-                <td class="centro-tabla">{{ terapeuta.profile.rut }}</td>
+                <td class="centro-tabla">{{ terapeuta.user.profile.rut }}</td>
                 <td class="centro-tabla">
                     <span class="badge {% if terapeuta.user.is_active %}bg-success{% else %}bg-secondary{% endif %}">
                         {% if terapeuta.user.is_active %}Activo <img class = "img-estado" src="{% static "icons/activo.svg" %}"> {% else %}Inactivo <img class = "img-estado" src="{% static "icons/inactivo.svg" %}"> {% endif %}
                     </span>
                 </td>
                 <td class="centro-tabla">{{ terapeuta.especialidad }}</td>
-                <td class="centro-tabla">{{ terapeuta.user.date_joined }}
+                <td class="centro-tabla">{{ terapeuta.user.date_joined.date }}</td>
                 <td class="final-tabla">
-                    <a href="{% url 'mostrar_terapeuta_administrador' terapeuta.id %}" class="btn btn-outline-danger btn-sm" title="Ver detalle terapeuta" 
+                    <a href="#" class="btn btn-outline-danger btn-sm" title="Ver detalle terapeuta" 
                         onclick="mostrarPopUp('{{ terapeuta.id }}', '{{ terapeuta.first_name }} {{ terapeuta.last_name }}', '{{ terapeuta.rut }}', '{{ terapeuta.patologia }}')">
                         <img src="{% static 'icons/Detalle.svg' %}" alt="Ver Detalle" />
                     </a>
@@ -171,5 +176,168 @@
         window.location.href = "{% url 'agregar_terapeuta' %}";
     });
 </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkboxes = document.querySelectorAll('.terapeuta-checkbox');
+        const selectAllCheckbox = document.getElementById('select-all');
+        const inactivarBtn = document.getElementById('inactivar-btn');
+        const restaurarBtn = document.getElementById('restaurar-btn');
+
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', function() {
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+                updateButtonsState();
+            });
+        }
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateButtonsState);
+        });
+
+        function updateButtonsState() {
+            const selectedCheckboxes = Array.from(checkboxes).filter(checkbox => checkbox.checked);
+            
+            if (inactivarBtn) {
+                inactivarBtn.disabled = selectedCheckboxes.length === 0 || !selectedCheckboxes.some(checkbox => {
+                    const badge = checkbox.closest('tr').querySelector('td:nth-child(4) .badge');
+                    return badge.textContent.trim() === 'Activo';
+                });
+            }
+
+            if (restaurarBtn) {
+                restaurarBtn.disabled = selectedCheckboxes.length === 0 || !selectedCheckboxes.some(checkbox => {
+                    const badge = checkbox.closest('tr').querySelector('td:nth-child(4) .badge');
+                    return badge.textContent.trim() === 'Inactivo';
+                });
+            }
+        }
+
+        if (inactivarBtn) {
+            inactivarBtn.addEventListener('click', function() {
+                mostrarPopUpCambioEstado('inactivo');
+            });
+        }
+
+        if (restaurarBtn) {
+            restaurarBtn.addEventListener('click', function() {
+                mostrarPopUpCambioEstado('activo');
+            });
+        }
+
+        // Pop-up para varios terapeutas
+        window.mostrarPopUpCambioEstado = function(estado) {
+            const selectedCheckboxes = Array.from(checkboxes).filter(cb => cb.checked);
+            const cantidadSeleccionados = selectedCheckboxes.length;
+            const titulo = estado === 'inactivo' ? 'Cambiar a estado inactivo' : 'Restaurar a estado activo';
+            const mensaje = estado === 'inactivo' 
+                ? `¿Desea cambiar a estado inactivo a ${cantidadSeleccionados} terapeutas? Los terapeutas podrán ser visualizados y reactivados en la sección de inactivos.`
+                : `¿Desea restaurar a estado activo a ${cantidadSeleccionados} terapeutas? Los terapeutas podrán ser visualizados en la sección de activos y se considerarán como terapeutas en tratamiento.`;
+
+            document.getElementById('popup-titulo').textContent = titulo;
+            document.getElementById('popup-mensaje').textContent = mensaje;
+            document.getElementById('popupModal').style.display = 'block';
+
+            document.getElementById('confirmButton').setAttribute('data-estado', estado);
+            document.getElementById('confirmButton').setAttribute('data-ids', JSON.stringify(selectedCheckboxes.map(cb => cb.value)));
+        };
+
+        // Pop-up individual para un terapeuta
+        window.mostrarPopUpInactivar = function(terapeutaId, nombre, rut) {
+            const titulo = `Cambiar a estado inactivo a ${nombre}`;
+            const mensaje = `¿Está seguro de que desea inactivar al terapeuta ${nombre} (${rut})? Este terapeuta podrá ser reactivado en la sección de inactivos.`;
+
+            document.getElementById('popup-titulo').textContent = titulo;
+            document.getElementById('popup-mensaje').textContent = mensaje;
+            document.getElementById('popupModal').style.display = 'block';
+
+            document.getElementById('confirmButton').setAttribute('data-estado', 'inactivo');
+            document.getElementById('confirmButton').setAttribute('data-ids', JSON.stringify([terapeutaId]));
+        };
+        window.mostrarPopUpRestaurar = function(id, nombre) {
+            document.getElementById('popup-titulo').textContent = `Restaurar terapeuta`;
+            document.getElementById('popup-mensaje').textContent = `¿Está seguro de que desea restaurar a ${nombre}?`;
+            document.getElementById('popupModal').style.display = 'block';
+        
+            document.getElementById('confirmButton').setAttribute('data-estado', 'activo');
+            document.getElementById('confirmButton').setAttribute('data-ids', JSON.stringify([id]));
+        };
+
+        window.cerrarPopUp = function() {
+            document.getElementById('popupModal').style.display = 'none';
+        };
+
+        window.confirmarCambioEstado = function() {
+            const estado = document.getElementById('confirmButton').getAttribute('data-estado');
+            const selectedIds = JSON.parse(document.getElementById('confirmButton').getAttribute('data-ids'));
+
+            const url = estado === 'inactivo' ? "{% url 'cambiar_estado_inactivo_terapeuta' %}" : "{% url 'restaurar_terapeuta' %}";
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({ terapeutas_ids: selectedIds })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    location.reload();
+                } else {
+                    alert(`Error al ${estado === 'inactivo' ? 'inactivar' : 'restaurar'} los terapeutas.`);
+                }
+            });
+
+            cerrarPopUp();
+        };
+    });
+    
+</script>
+
 <script src="{% static 'js/admin_buscador_terapeuta.js' %}"></script>
+<script>
+
+    // Mostrar/ocultar opciones del filtro
+const dropdownButton = document.getElementById('dropdownMenuButton');
+const filterOptions = document.getElementById('filterOptions');
+const arrow = document.getElementById('arrow');
+
+dropdownButton.addEventListener('click', () => {
+    filterOptions.style.display = filterOptions.style.display === 'none' ? 'block' : 'none';
+    arrow.textContent = arrow.textContent === '▼' ? '▲' : '▼';
+});
+
+// Aplicar el filtro cuando se selecciona una opción
+function applyFilter(orderBy) {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Mantener el valor de búsqueda si está presente
+    const searchQuery = urlParams.get('search');
+    if (searchQuery) {
+        urlParams.set('search', searchQuery);
+    }
+    
+    urlParams.set('order_by', orderBy);
+    window.location.search = urlParams.toString();
+}
+
+// Limpiar el filtro de orden
+function clearOrderFilter() {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Mantener el valor de búsqueda si está presente
+    const searchQuery = urlParams.get('search');
+    if (searchQuery) {
+        urlParams.set('search', searchQuery);
+    }
+
+    urlParams.delete('order_by');
+    window.location.search = urlParams.toString();
+}
+
+</script>
 {% endblock %}
