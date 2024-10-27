@@ -19,17 +19,25 @@ from django.core.exceptions import ValidationError
 from django.contrib import messages
 import re
 
-@role_required('Terapeuta')
+
 
 #-------------------------------------AGENDA-------------------------------------
+
+@login_required
+@role_required('Terapeuta')
 def agenda(request):
-    #Datos para renderizar el select de pacientes en los Popup
+    # Datos para renderizar el select de pacientes en los Popup
     user_id = request.user.id
-    terapeuta = Terapeuta.objects.get(user_id=user_id)
+    try:
+        terapeuta = Terapeuta.objects.get(user_id=user_id)
+    except Terapeuta.DoesNotExist:
+        messages.error(request, "No tienes un perfil de Terapeuta asociado.")
+        return redirect('perfil')  # Redirige a una página adecuada
+
     terapeuta_id = terapeuta.id
     pacientes = Paciente.objects.filter(terapeuta_id=terapeuta_id)  # Obtener los pacientes del terapeuta
-    
-    #Obtención de las citas
+
+    # Obtención de las citas
     citas = Cita.objects.all()
     citas_json = []
     for cita in citas:
@@ -50,7 +58,7 @@ def agenda(request):
         else:
             continue
     fechas_citas = json.dumps(citas_json)
-    return render(request, 'agenda.html', {'pacientes':pacientes, 'fechas_citas': fechas_citas, 'citas':citas})
+    return render(request, 'agenda.html', {'pacientes': pacientes, 'fechas_citas': fechas_citas, 'citas': citas})
 
 def obtener_fechas_citas(request):
     if request.method == "GET":
