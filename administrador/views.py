@@ -7,6 +7,7 @@ from .forms import CrearTerapeutaForm, HorarioFormSet, CrearPacienteForm, Editar
 from autenticacion.models import Provincia, Comuna
 from django.http import JsonResponse
 from terapeuta.models import Paciente, Terapeuta, Cita, Horario
+from recepcionista.models import Recepcionista
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
@@ -273,20 +274,99 @@ def listar_pacientes_inactivos(request):
         'query': query,  # Para mantener el valor en el HTML
         'order_by': order_by  # Para saber el orden actual en el HTML
     })
-########################################################
+##################################################      ADMIN RECEPCIONISTAS      ########################################################
 
 @role_required('Administrador')
-def admin_recepcionistas(request):
-    # Lógica para listar o gestionar recepcionistas desde la vista del administrador
-    return render(request, 'admin_recepcionistas.html')
+def listar_recepcionistas_activos(request):
+    query = request.GET.get('search')
+    order_by = request.GET.get('order_by', 'user__first_name')
+    recepcionistas_list = Recepcionista.objects.filter(user__is_active=True)
+
+    if query:
+        recepcionistas_list = recepcionistas_list.filter(
+            Q(user__first_name__icontains=query) |
+            Q(user__last_name__icontains=query) |
+            Q(user__profile__rut__icontains=query)  # Asumiendo que 'rut' está en el perfil
+        )
+
+    if order_by:
+        recepcionistas_list = recepcionistas_list.order_by(order_by)
+    
+    paginator = Paginator(recepcionistas_list, 5)
+    page_number = request.GET.get('page')
+    recepcionistas = paginator.get_page(page_number)
+
+    return render(request, 'admin_recepcionistas.html', {
+        'recepcionistas': recepcionistas,
+        'estado': 'activos',
+        'query': query,  # Para mantener el valor en el HTML
+        'order_by': order_by  # Para saber el orden actual en el HTML
+        })
 
 @role_required('Administrador')
-def logout_view(request):
-    # Lógica para cerrar la sesión
-    # Puedes usar Django's auth logout
-    from django.contrib.auth import logout
-    logout(request)
-    return redirect('login')  # Redirigir al login después de cerrar sesión
+def listar_recepcionistas_inactivos(request):
+    query = request.GET.get('search')
+    order_by = request.GET.get('order_by', 'user__first_name')
+    recepcionistas_list = Recepcionista.objects.filter(user__is_active=False)
+
+    if query:
+        recepcionistas_list = recepcionistas_list.filter(
+            Q(user__first_name__icontains=query) |
+            Q(user__last_name__icontains=query) |
+            Q(user__profile__rut__icontains=query)  # Asumiendo que 'rut' está en el perfil
+        )
+
+    if order_by:
+        recepcionistas_list = recepcionistas_list.order_by(order_by)
+    
+    paginator = Paginator(recepcionistas_list, 5)
+    page_number = request.GET.get('page')
+    recepcionistas = paginator.get_page(page_number)
+
+    return render(request, 'admin_recepcionistas.html', {
+        'recepcionistas': recepcionistas,
+        'estado': 'inactivos',
+        'query': query,  # Para mantener el valor en el HTML
+        'order_by': order_by  # Para saber el orden actual en el HTML
+        })
+
+@role_required('Administrador')
+def cambiar_estado_inactivo_recepcionista(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        recepcionistas_ids = data.get('recepcionistas_ids', [])
+        
+        # Obtener el queryset de los recepcionistas antes de actualizar su estado
+        recepcionistas = Recepcionista.objects.filter(id__in=recepcionistas_ids)
+
+        # Cambiar el estado de los recepcionistas a inactivo
+        for recepcionista in recepcionistas:
+            recepcionista.user.is_active = False
+            recepcionista.user.save()
+        
+        return JsonResponse({
+            'status': 'success',
+            'recepcionistas_afectados': [recepcionista.id for recepcionista in recepcionistas]
+        })
+
+@role_required('Administrador')
+def restaurar_recepcionista(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        recepcionistas_ids = data.get('recepcionistas_ids', [])
+        
+        # Obtener el queryset de los recepcionistas a restaurar
+        recepcionistas = Recepcionista.objects.filter(id__in=recepcionistas_ids)
+        
+        # Restaurar el estado de los recepcionistas a activo
+        for recepcionista in recepcionistas:
+            recepcionista.user.is_active = True
+            recepcionista.user.save()
+        
+        return JsonResponse({
+            'status': 'success',
+            'recepcionistas_restaurados': [recepcionista.id for recepcionista in recepcionistas]
+        })
 
 @role_required('Administrador')
 def agregar_terapeuta(request):

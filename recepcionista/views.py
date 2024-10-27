@@ -13,24 +13,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from datetime import date
 from django.contrib import messages
 
-# @role_required('Recepcionista')
-# def recepcionista_terapeutas_activos(request):
-#     '''query = request.GET.get('q', '')
-#     if query:
-#         terapeuta = Terapeuta.objects.filter(
-#             estado='activo',
-#             nombre__icontains=query
-#         ) | Terapeuta.objects.filter(
-#             estado='activo',
-#             rut__icontains=query
-#         )
-#     else:
-#     '''
-#     terapeuta = Terapeuta.objects.all()
-
-#     return render(request, 'recepcionista_terapeutas_activos.html', {'terapeuta': terapeuta})
-
-
 def calcular_edad(fecha_nacimiento):
     hoy = date.today()
     return hoy.year - fecha_nacimiento.year - ((hoy.month, hoy.day) < (fecha_nacimiento.month, fecha_nacimiento.day))
@@ -174,6 +156,8 @@ def agregar_paciente(request):
     
     return render(request, 'agregar_paciente.html', {'paciente_form': paciente_form})
 
+
+######################################    TERAPEUTAS     ######################################
 @role_required('Recepcionista')
 def elegir_terapeuta(request, id):
     paciente = Paciente.objects.get(id=id)
@@ -247,6 +231,7 @@ def calendar_asignar_paciente(request, paciente_id, terapeuta_id):
     return render(request, 'calendar_asignar_paciente.html', {'horario_terapeuta': horario_terapeuta, 'cita': cita,
                                                               'paciente':paciente, 'terapeuta':terapeuta})
 
+###################################     CITAS     ###################################
 @role_required('Recepcionista')
 def agendar_cita_recepcionista(request, paciente_id, terapeuta_id):
     terapeuta_instance = get_object_or_404(Terapeuta, id=terapeuta_id)

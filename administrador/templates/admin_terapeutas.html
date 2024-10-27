@@ -235,7 +235,7 @@
             const titulo = estado === 'inactivo' ? 'Cambiar a estado inactivo' : 'Restaurar a estado activo';
             const mensaje = estado === 'inactivo' 
                 ? `¿Desea cambiar a estado inactivo a ${cantidadSeleccionados} terapeutas? Los terapeutas podrán ser visualizados y reactivados en la sección de inactivos.`
-                : `¿Desea restaurar a estado activo a ${cantidadSeleccionados} terapeutas? Los terapeutas podrán ser visualizados en la sección de activos y se considerarán como terapeutas en tratamiento.`;
+                : `¿Desea restaurar a estado activo a ${cantidadSeleccionados} terapeutas? Los terapeutas podrán ser visualizados en la sección de activos`;
 
             document.getElementById('popup-titulo').textContent = titulo;
             document.getElementById('popup-mensaje').textContent = mensaje;
