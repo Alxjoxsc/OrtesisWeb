@@ -15,13 +15,93 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.contrib import messages
 
-# Create your views here.
+############################### LISTAR TERAPEUTAS ################################
 @role_required('Administrador')
-def gestion_terapeutas(request):
-    return render(request, 'gestion_terapeutas.html')
+def listar_terapeutas_activos(request):
+    query = request.GET.get('search')
+    order_by = request.GET.get('order_by', 'user__first_name')
+    terapeutas_list = Terapeuta.objects.filter(user__is_active=True)
 
-def base_admin_view(request):
-    return render(request, 'base_admin.html')
+    if query:
+        terapeutas_list = terapeutas_list.filter(
+            Q(user__first_name__icontains=query) |
+            Q(user__last_name__icontains=query) |
+            Q(rut__icontains=query) |
+            Q(especialidad__icontains=query)
+        )
+    
+    if order_by:
+        terapeutas_list = terapeutas_list.order_by(order_by)
+    
+    paginator = Paginator(terapeutas_list, 5)
+    page_number = request.GET.get('page')
+    terapeutas = paginator.get_page(page_number)
+
+    return render(request, 'admin_terapeutas.html', {
+        'terapeutas': terapeutas,
+        'estado': 'activos',
+    })
+
+@role_required('Administrador')
+def listar_terapeutas_inactivos(request):
+    query = request.GET.get('search')
+    order_by = request.GET.get('order_by', 'user__first_name')
+    terapeutas_list = Terapeuta.objects.filter(user__is_active=False)
+
+    if query:
+        terapeutas_list = terapeutas_list.filter(
+            Q(user__first_name__icontains=query) |
+            Q(user__last_name__icontains=query) |
+            Q(rut__icontains=query) |
+            Q(especialidad__icontains=query)
+        )
+    
+    if order_by:
+        terapeutas_list = terapeutas_list.order_by(order_by)
+    
+    paginator = Paginator(terapeutas_list, 5)
+    page_number = request.GET.get('page')
+    terapeutas = paginator.get_page(page_number)
+
+    return render(request, 'admin_terapeutas.html', {
+        'terapeutas': terapeutas,
+        'estado': 'inactivos',
+    })
+
+@role_required('Administrador')
+def cambiar_estado_inactivo_terapeuta(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        terapeutas_ids = data.get('terapeutas_ids', [])
+        
+        # Obtener el queryset de los terapeutas antes de actualizar su estado
+        terapeutas = Terapeuta.objects.filter(id__in=terapeutas_ids)
+
+        # Cambiar el estado de los terapeutas a inactivo
+        terapeutas.update(user__is_active=False)
+        
+        return JsonResponse({
+            'status': 'success',
+            'terapeutas_afectados': [terapeuta.id for terapeuta in terapeutas]
+        })
+
+@role_required('Administrador')
+def restaurar_terapeuta(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        terapeutas_ids = data.get('terapeutas_ids', [])
+        
+        # Obtener el queryset de los terapeutas a restaurar
+        terapeutas = Terapeuta.objects.filter(id__in=terapeutas_ids)
+        
+        # Restaurar el estado de los terapeutas a activo
+        terapeutas.update(user__is_active=True)
+        
+        return JsonResponse({
+            'status': 'success',
+            'terapeutas_restaurados': [terapeuta.id for terapeuta in terapeutas]
+        })
+
 ################### ADMIN PACIENTES ##################
 @role_required('Administrador')
 def agregar_paciente_admin(request):
@@ -184,10 +264,6 @@ def listar_pacientes_inactivos(request):
 def admin_recepcionistas(request):
     # Lógica para listar o gestionar recepcionistas desde la vista del administrador
     return render(request, 'admin_recepcionistas.html')
-
-@role_required('Administrador')
-def admin_terapeutas(request):
-    return render (request,'admin_terapeutas.html')
 
 @role_required('Administrador')
 def logout_view(request):

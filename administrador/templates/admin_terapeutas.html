@@ -1,0 +1,175 @@
+{% extends 'administrador_base.html' %}
+
+{% load static %}
+
+{% block title %}Gestión de terapeutas{% endblock %}
+
+{% block extra_head%}
+    <link rel="stylesheet" href="{% static 'styles/listar_terapeutas_activos.css' %}">
+{% endblock %}
+
+{% block header %}
+<div class="contenedor-header">
+    <h1>Terapeutas</h1>
+    <form method="GET" action="{% if estado == 'activos' %}
+                                    {% url 'listar_terapeutas_activos' %}
+                                {% else %}
+                                    {% url 'listar_terapeutas_inactivos' %}
+                                {% endif %}"
+                                class="search-container"> 
+        <input type="text" name="search" placeholder="Búsqueda por Nombre, Rut o Terapeuta" class="search-bar" id="searchBar" value="{{ request.GET.search|default:'' }}" oninput="toggleClearButton()">
+        <img src="{% static 'icons/Lupa.svg' %}" alt="Buscar" class="search-icon">
+        
+        <button type="button" id="clearButton" class="clear-button" onclick="clearSearch()" style="display: {% if request.GET.search %}inline-block{% else %}none{% endif %};">
+            Limpiar Filtro
+        </button>
+    </form>
+    <button id="boton-agregar-terapeuta">Agregar Terapeuta
+        <img src="{% static 'icons/plus.svg' %}" alt="Agregar">
+    </button>
+</div>
+{% endblock %}
+
+{% block content %}
+
+<div class="contenedor-superior">
+
+    <div class="filtros">
+        <a href="{% url 'listar_terapeutas_activos' %}" class="btn-{% if estado == 'activos' %}active{% endif %}" type="button">Activos</a>
+        <a href="{% url 'listar_terapeutas_inactivos' %}" class="btn-{% if estado == 'inactivos' %}active{% endif %}" type="button">Inactivos</a>
+    </div>
+
+    <div class="seleccion-estados">
+        {% if estado == 'activos' %}
+            <button id="inactivar-btn" class="btn btn-warning" disabled>Inactivar</button>
+        {% elif estado == 'inactivos' %}
+            <button id="restaurar-btn" class="btn btn-success" disabled>Restaurar</button>
+        {% endif %}
+    </div>
+
+    <div class="dropdown">
+        <button class="filtro-btn" type="button" id="dropdownMenuButton">
+            Filtrar
+            <span id="arrow">▼</span>
+        </button>
+        <ul id="filterOptions" class="dropdown-content" style="display:none;">
+            <li><a href="#" onclick="applyFilter('date_joined')">Fecha de Ingreso</a></li>
+            <li><a href="#" onclick="applyFilter('terapeuta')">Terapeuta</a></li>
+        </ul>
+    </div>
+    
+</div>
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="select-all"></th>
+                <th>Nombre</th>
+                <th>Rut</th>
+                <th>Estado</th>
+                <th>Especialidad</th>
+                <th>Fecha de Ingreso</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for terapeuta in terapeutas %}
+            <tr>
+                <td class="inicio-tabla"><input type="checkbox" class="terapeuta-checkbox" value="{{ terapeuta.id }}"></td>
+                <td class="centro-tabla">{{ terapeuta.user.first_name }} {{ terapeuta.user.last_name }}</td>
+                <td class="centro-tabla">{{ terapeuta.profile.rut }}</td>
+                <td class="centro-tabla">
+                    <span class="badge {% if terapeuta.user.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                        {% if terapeuta.user.is_active %}Activo <img class = "img-estado" src="{% static "icons/activo.svg" %}"> {% else %}Inactivo <img class = "img-estado" src="{% static "icons/inactivo.svg" %}"> {% endif %}
+                    </span>
+                </td>
+                <td class="centro-tabla">{{ terapeuta.especialidad }}</td>
+                <td class="centro-tabla">{{ terapeuta.user.date_joined }}
+                <td class="final-tabla">
+                    <a href="{% url 'mostrar_terapeuta_administrador' terapeuta.id %}" class="btn btn-outline-danger btn-sm" title="Ver detalle terapeuta" 
+                        onclick="mostrarPopUp('{{ terapeuta.id }}', '{{ terapeuta.first_name }} {{ terapeuta.last_name }}', '{{ terapeuta.rut }}', '{{ terapeuta.patologia }}')">
+                        <img src="{% static 'icons/Detalle.svg' %}" alt="Ver Detalle" />
+                    </a>
+                    {% if estado == 'activos' %}
+                    <a href="#" class="btn btn-outline-danger btn-sm" title="Pasar a estado inactivo" 
+                        onclick="mostrarPopUpInactivar('{{ terapeuta.id }}', '{{ terapeuta.first_name }} {{ terapeuta.last_name }}', '{{ terapeuta.rut }}')">
+                        <img src="{% static 'icons/DeleteUser.svg' %}" alt="Inactivar" />
+                    </a>
+                    {% elif estado == 'inactivos' %}
+                    <a href="#" class="btn btn-outline-danger btn-sm" title="Restaurar a estado activo" 
+                        onclick="mostrarPopUpRestaurar('{{ terapeuta.id }}', '{{ terapeuta.first_name }} {{ terapeuta.last_name }}')">
+                        <img src="{% static 'icons/restore.svg' %}" alt="Restaurar" />
+                    </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="table-empty">No hay terapeutas registrados.</td>
+            </tr>
+            {% endfor %}
+            <tr id="no-coincidencias" style="display: none;">
+                <td colspan="7" class="table-empty">No se encontraron coincidencias.</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="popupModal" class="modal" style="display: none;">
+    <div class="contenido-modal">
+        <span class="close" onclick="cerrarPopUp()">&times;</span>
+        <h2 id="popup-titulo"></h2>
+        <p id="popup-mensaje"></p>
+        <div class="botones-modal">
+            <button class="boton-cancelar" onclick="cerrarPopUp()">Cancelar</button>
+            <button class="boton-confirmar" id="confirmButton" onclick="confirmarCambioEstado()">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<!--    Paginación  -->
+<div class="pagination">
+    <span class="step-links">
+        {% if terapeutas.has_previous %}
+            <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Primera Página">
+                &#171;
+            </a>
+            <a href="?page={{ terapeutas.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Página Anterior">
+                &#8249;
+            </a>
+        {% else %}
+            <span class="disabled">&#171;</span>
+            <span class="disabled">&#8249;</span>
+        {% endif %}
+
+        <span class="current">
+            {{ terapeutas.number }}
+        </span>
+
+        {% if terapeutas.has_next %}
+            <a href="?page={{ terapeutas.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Página Siguiente">
+                &#8250;
+            </a>
+            <a href="?page={{ terapeutas.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Última Página">
+                &#187;
+            </a>
+        {% else %}
+            <span class="disabled">&#8250;</span>
+            <span class="disabled">&#187;</span>
+        {% endif %}
+    </span>
+</div>
+
+{% endblock %}
+
+
+
+{% block extra_js %}
+<script>
+    document.getElementById("boton-agregar-terapeuta").addEventListener("click", function(){
+        window.location.href = "{% url 'agregar_terapeuta' %}";
+    });
+</script>
+<script src="{% static 'js/admin_buscador_terapeuta.js' %}"></script>
+{% endblock %}
