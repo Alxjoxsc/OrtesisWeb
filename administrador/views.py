@@ -71,6 +71,8 @@ def listar_terapeutas_inactivos(request):
     return render(request, 'admin_terapeutas.html', {
         'terapeutas': terapeutas,
         'estado': 'inactivos',
+        'query': query,  # Para mantener el valor en el HTML
+        'order_by': order_by  # Para saber el orden actual en el HTML
     })
 
 @role_required('Administrador')
@@ -83,7 +85,9 @@ def cambiar_estado_inactivo_terapeuta(request):
         terapeutas = Terapeuta.objects.filter(id__in=terapeutas_ids)
 
         # Cambiar el estado de los terapeutas a inactivo
-        terapeutas.update(user__is_active=False)
+        for terapeuta in terapeutas:
+            terapeuta.user.is_active = False
+            terapeuta.user.save()
         
         return JsonResponse({
             'status': 'success',
@@ -100,7 +104,9 @@ def restaurar_terapeuta(request):
         terapeutas = Terapeuta.objects.filter(id__in=terapeutas_ids)
         
         # Restaurar el estado de los terapeutas a activo
-        terapeutas.update(user__is_active=True)
+        for terapeuta in terapeutas:
+            terapeuta.user.is_active = True
+            terapeuta.user.save()
         
         return JsonResponse({
             'status': 'success',
@@ -191,6 +197,8 @@ def listar_pacientes_activos(request):
     return render(request, 'admin_pacientes.html', {
         'pacientes': pacientes,
         'estado': 'activos',
+        'query': query,  # Para mantener el valor en el HTML
+        'order_by': order_by  # Para saber el orden actual en el HTML
     })
     
 @role_required('Administrador')
@@ -262,6 +270,8 @@ def listar_pacientes_inactivos(request):
     return render(request, 'admin_pacientes.html', {
         'pacientes': pacientes,
         'estado': 'inactivos',
+        'query': query,  # Para mantener el valor en el HTML
+        'order_by': order_by  # Para saber el orden actual en el HTML
     })
 ########################################################
 

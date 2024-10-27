@@ -132,6 +132,13 @@
     background-color: #535c83;
 }
 
+.filtro-activo {
+    font-weight: 600;
+    background-color: #d4edda; /* Fondo verde claro */
+    border-radius: 4px; /* Bordes redondeados */
+    padding: 5px;
+}
+
 .filtro-eliminar-container {
     margin-left: 20px;
 }
@@ -395,21 +402,21 @@ input[type="checkbox"] {
 
 @media screen and (max-width: 1200px){
     .final-tabla a img {
-        width: 40px;
-        height: 40px;
-    }
-}
-
-@media screen and (max-width: 768px){
-    .final-tabla a img {
         width: 30px;
         height: 30px;
     }
 }
 
-@media screen and (max-width: 600px){
+@media screen and (max-width: 768px){
     .final-tabla a img {
         width: 25px;
         height: 25px;
+    }
+}
+
+@media screen and (max-width: 600px){
+    .final-tabla a img {
+        width: 20px;
+        height: 20px;
     }
 }

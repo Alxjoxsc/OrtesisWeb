@@ -70,7 +70,10 @@ def recepcionista_pacientes_activos(request):
     return render(request, 'recepcionista_pacientes.html', {
         'pacientes': pacientes, 
         'total_pacientes': total_pacientes, 
-        'estado': 'activos'})
+        'estado': 'activos',
+        'query': query,  # Para mantener el valor en el HTML
+        'order_by': order_by  # Para saber el orden actual en el HTML
+        })
 
 @role_required('Recepcionista')
 def recepcionista_pacientes_inactivos(request):
@@ -102,7 +105,13 @@ def recepcionista_pacientes_inactivos(request):
     pacientes = paginator.get_page(page_number)
 
     # Renderizar el template con los pacientes y la información de paginación
-    return render(request, 'recepcionista_pacientes.html', {'pacientes': pacientes, 'total_pacientes': total_pacientes, 'estado': 'inactivos'})
+    return render(request, 'recepcionista_pacientes.html', {
+        'pacientes': pacientes,
+        'total_pacientes': total_pacientes,
+        'estado': 'inactivos',
+        'query': query,  # Para mantener el valor en el HTML
+        'order_by': order_by  # Para saber el orden actual en el HTML
+        })
 
 
 @role_required('Recepcionista')
@@ -217,6 +226,8 @@ def recepcionista_terapeutas_activos(request):
     return render(request, 'recepcionista_terapeutas_activos.html', {
         'terapeutas': terapeutas,
         'total_terapeutas': total_terapeutas,
+        'query': query,  # Para mantener el valor en el HTML
+        'order_by': order_by  # Para saber el orden actual en el HTML
     })
 
 @role_required('Recepcionista')

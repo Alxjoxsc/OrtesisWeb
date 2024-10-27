@@ -26,10 +26,12 @@
                 <span id="arrow">▼</span>
             </button>
             <ul id="filterOptions" class="dropdown-content" style="display:none;">
-                <li><a href="#" onclick="applyFilter('first_name')">Nombre</a></li>
-                <li><a href="#" onclick="applyFilter('last_name')">Apellido</a></li>
-                <li><a href="#" onclick="applyFilter('edad')">Edad</a></li>
-                <li><a href="#" onclick="applyFilter('patologia')">Tratamiento</a></li>
+                <li><a href="#" onclick="applyFilter('first_name')" class="{% if order_by == 'first_name' %}filtro-activo{% endif %}">Nombre</a></li>
+                <li><a href="#" onclick="applyFilter('last_name')" class="{% if order_by == 'last_name' %}filtro-activo{% endif %}">Apellido</a></li>
+                <li><a href="#" onclick="applyFilter('rut')" class="{% if order_by == 'rut' %}filtro-activo{% endif %}">Rut</a></li>
+                <li><a href="#" onclick="applyFilter('edad')" class="{% if order_by == 'edad' %}filtro-activo{% endif %}">Edad</a></li>
+                <li><a href="#" onclick="applyFilter('patologia')" class="{% if order_by == 'patologia' %}filtro-activo{% endif %}">Tratamiento</a></li>
+                <li><a href="#" onclick="clearOrderFilter()">Limpiar filtro</a></li>
             </ul>
         </div>
     </div>

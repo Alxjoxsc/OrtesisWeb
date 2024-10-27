@@ -121,7 +121,9 @@ def pacientes_view(request):
     
     return render(request, 'paciente_terapeuta.html', {
         'pacientes': pacientes, 
-        'total_pacientes': total_pacientes
+        'total_pacientes': total_pacientes,
+        'query': query,  # Para mantener el valor en el HTML
+        'order_by': order_by  # Para saber el orden actual en el HTML
     })
 
 

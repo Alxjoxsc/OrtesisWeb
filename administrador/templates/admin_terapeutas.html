@@ -59,6 +59,7 @@
             <li><a href="#" onclick="applyFilter('user__first_name')" class="{% if order_by == 'user__first_name' %}filtro-activo{% endif %}">Nombre</a></li>
             <li><a href="#" onclick="applyFilter('user__last_name')" class="{% if order_by == 'user__last_name' %}filtro-activo{% endif %}">Apellido</a></li>
             <li><a href="#" onclick="applyFilter('user__profile__rut')" class="{% if order_by == 'user__profile__rut' %}filtro-activo{% endif %}">Rut</a></li>
+            <li><a href="#" onclick="applyFilter('especialidad')" class="{% if order_by == 'especialidad' %}filtro-activo{% endif %}">Especialidad</a></li>
             <li><a href="#" onclick="clearOrderFilter()">Limpiar filtro</a></li>
         </ul>
     </div>
@@ -94,16 +95,16 @@
                 <td class="final-tabla">
                     <a href="#" class="btn btn-outline-danger btn-sm" title="Ver detalle terapeuta" 
                         onclick="mostrarPopUp('{{ terapeuta.id }}', '{{ terapeuta.first_name }} {{ terapeuta.last_name }}', '{{ terapeuta.rut }}', '{{ terapeuta.patologia }}')">
-                        <img src="{% static 'icons/Detalle.svg' %}" alt="Ver Detalle" />
+                        <img src="{% static 'icons/terapeuta_morado.svg' %}" alt="Ver Detalle terapeuta" />
                     </a>
                     {% if estado == 'activos' %}
                     <a href="#" class="btn btn-outline-danger btn-sm" title="Pasar a estado inactivo" 
-                        onclick="mostrarPopUpInactivar('{{ terapeuta.id }}', '{{ terapeuta.first_name }} {{ terapeuta.last_name }}', '{{ terapeuta.rut }}')">
+                        onclick="mostrarPopUpInactivar('{{ terapeuta.id }}', '{{ terapeuta.user.first_name }} {{ terapeuta.user.last_name }}', '{{ terapeuta.user.profile.rut }}')">
                         <img src="{% static 'icons/DeleteUser.svg' %}" alt="Inactivar" />
                     </a>
                     {% elif estado == 'inactivos' %}
                     <a href="#" class="btn btn-outline-danger btn-sm" title="Restaurar a estado activo" 
-                        onclick="mostrarPopUpRestaurar('{{ terapeuta.id }}', '{{ terapeuta.first_name }} {{ terapeuta.last_name }}')">
+                        onclick="mostrarPopUpRestaurar('{{ terapeuta.id }}', '{{ terapeuta.user.first_name }} {{ terapeuta.user.last_name }}')">
                         <img src="{% static 'icons/restore.svg' %}" alt="Restaurar" />
                     </a>
                     {% endif %}
@@ -299,45 +300,5 @@
 </script>
 
 <script src="{% static 'js/admin_buscador_terapeuta.js' %}"></script>
-<script>
-
-    // Mostrar/ocultar opciones del filtro
-const dropdownButton = document.getElementById('dropdownMenuButton');
-const filterOptions = document.getElementById('filterOptions');
-const arrow = document.getElementById('arrow');
-
-dropdownButton.addEventListener('click', () => {
-    filterOptions.style.display = filterOptions.style.display === 'none' ? 'block' : 'none';
-    arrow.textContent = arrow.textContent === '▼' ? '▲' : '▼';
-});
-
-// Aplicar el filtro cuando se selecciona una opción
-function applyFilter(orderBy) {
-    const urlParams = new URLSearchParams(window.location.search);
-
-    // Mantener el valor de búsqueda si está presente
-    const searchQuery = urlParams.get('search');
-    if (searchQuery) {
-        urlParams.set('search', searchQuery);
-    }
-    
-    urlParams.set('order_by', orderBy);
-    window.location.search = urlParams.toString();
-}
-
-// Limpiar el filtro de orden
-function clearOrderFilter() {
-    const urlParams = new URLSearchParams(window.location.search);
-
-    // Mantener el valor de búsqueda si está presente
-    const searchQuery = urlParams.get('search');
-    if (searchQuery) {
-        urlParams.set('search', searchQuery);
-    }
-
-    urlParams.delete('order_by');
-    window.location.search = urlParams.toString();
-}
-
-</script>
+<script src="{% static 'js/filtroListados.js' %}"></script>
 {% endblock %}

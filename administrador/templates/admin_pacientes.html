@@ -54,8 +54,12 @@
             <span id="arrow">▼</span>
         </button>
         <ul id="filterOptions" class="dropdown-content" style="display:none;">
-            <li><a href="#" onclick="applyFilter('date_joined')">Fecha de Ingreso</a></li>
-            <li><a href="#" onclick="applyFilter('terapeuta')">Terapeuta</a></li>
+            <li><a href="#" onclick="applyFilter('date_joined')" class="{% if order_by == 'date_joined' %}filtro-activo{% endif %}">Fecha de Ingreso</a></li>
+            <li><a href="#" onclick="applyFilter('terapeuta')" class="{% if order_by == 'terapeuta' %}filtro-activo{% endif %}">Terapeuta</a></li>
+            <li><a href="#" onclick="applyFilter('first_name')" class="{% if order_by == 'first_name' %}filtro-activo{% endif %}">Nombre</a></li>
+            <li><a href="#" onclick="applyFilter('last_name')" class="{% if order_by == 'last_name' %}filtro-activo{% endif %}">Apellido</a></li>
+            <li><a href="#" onclick="applyFilter('rut')" class="{% if order_by == 'rut' %}filtro-activo{% endif %}">Rut</a></li>
+            <li><a href="#" onclick="clearOrderFilter()">Limpiar filtro</a></li>
         </ul>
     </div>
     

@@ -278,6 +278,7 @@ input[type="checkbox"] {
 .final-tabla a img{
     width: auto;
     max-height: 100%;
+    filter: brightness(0) saturate(100%) invert(11%) sepia(30%) saturate(5553%) hue-rotate(219deg) brightness(93%) contrast(119%);
 }
 /* Botones de acciones en la tabla */
 .table .btn {
@@ -397,4 +398,25 @@ input[type="checkbox"] {
     border-radius: 5px;
     font-size: 14px;
     cursor: pointer;
+}
+
+@media screen and (max-width: 1200px){
+    .final-tabla a img {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+@media screen and (max-width: 768px){
+    .final-tabla a img {
+        width: 25px;
+        height: 25px;
+    }
+}
+
+@media screen and (max-width: 600px){
+    .final-tabla a img {
+        width: 20px;
+        height: 20px;
+    }
 }
