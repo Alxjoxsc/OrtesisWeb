@@ -49,7 +49,6 @@
       </div>
     </div>
   </div>
-
     <!-- Sección de "Cards" para las Sesiones -->
     {% if sesiones %}
     <div class="cards-container">
@@ -81,9 +80,74 @@
   {% else %}
     <p>No hay sesiones registradas para esta rutina.</p>
   {% endif %}
+
+<!-- Modal PopUp para gráfico de las sesiones-->
+<div id="popupModal" class="modal">
+  <div class="contenido-modal">
+    <span class="close">&times;</span>
+    <h2 id="popup-titulo">Gráfico de Corriente vs Tiempo</h2>
+    <div id="chart_sesion"></div>
+  </div>
+</div>
+
 {% endblock %}
 
 
+
 {% block extra_js %}
-  <script src="{% static 'js/historial_sesiones.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.1.0/echarts.min.js"></script>
+<script src="{% static 'js/historial_sesiones.js' %}"></script>
+<script type="text/javascript">
+  let chartSesion;
+
+  // Función para obtener los datos del gráfico de una sesión específica
+  const getOptionChartSesion = async (sesionId) => {
+    try {
+      const response = await fetch(`/obtener_grafico_sesion_paciente/${sesionId}/`);
+      return await response.json();
+    } catch (ex) {
+      alert("Error al obtener los datos del gráfico: " + ex);
+    }
+  };
+
+  // Función para inicializar el gráfico en el modal
+  const initChartSesion = async (sesionId) => {
+    const chartData = await getOptionChartSesion(sesionId);
+    if (!chartData) return;
+
+    const chartContainer = document.getElementById("chart_sesion");
+    if (!chartSesion) {
+      chartSesion = echarts.init(chartContainer);
+    }
+    chartSesion.setOption(chartData.chart);
+    chartSesion.resize();
+  };
+
+  // Función para mostrar el modal y cargar el gráfico
+  const enviarIdSesion = async (sesionId) => {
+    const modal = document.getElementById("popupModal");
+    modal.style.display = "block";  // Mostrar el modal
+
+    // Inicializar el gráfico
+    await initChartSesion(sesionId);
+  };
+
+  // Cerrar el modal cuando el usuario haga clic en "x"
+  document.querySelector(".close").onclick = () => {
+    document.getElementById("popupModal").style.display = "none";
+  };
+
+  // Cerrar el modal cuando el usuario haga clic fuera de él
+  window.onclick = (event) => {
+    const modal = document.getElementById("popupModal");
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  };
+
+  // Redimensionar el gráfico cuando la ventana cambie de tamaño
+  window.addEventListener('resize', () => {
+    if (chartSesion) chartSesion.resize();
+  });
+</script>
 {% endblock %}
