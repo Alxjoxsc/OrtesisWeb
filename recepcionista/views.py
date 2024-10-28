@@ -13,24 +13,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from datetime import date
 from django.contrib import messages
 
-# @role_required('Recepcionista')
-# def recepcionista_terapeutas_activos(request):
-#     '''query = request.GET.get('q', '')
-#     if query:
-#         terapeuta = Terapeuta.objects.filter(
-#             estado='activo',
-#             nombre__icontains=query
-#         ) | Terapeuta.objects.filter(
-#             estado='activo',
-#             rut__icontains=query
-#         )
-#     else:
-#     '''
-#     terapeuta = Terapeuta.objects.all()
-
-#     return render(request, 'recepcionista_terapeutas_activos.html', {'terapeuta': terapeuta})
-
-
 def calcular_edad(fecha_nacimiento):
     hoy = date.today()
     return hoy.year - fecha_nacimiento.year - ((hoy.month, hoy.day) < (fecha_nacimiento.month, fecha_nacimiento.day))
@@ -40,6 +22,7 @@ def calcular_edad(fecha_nacimiento):
 @role_required('Recepcionista')
 def recepcionista_pacientes_activos(request):
     query = request.GET.get('search')
+    order_by = request.GET.get('order_by', 'first_name')
     pacientes_list = Paciente.objects.filter(is_active=True)
 
     # Si hay un parámetro de búsqueda, filtrar los pacientes
@@ -48,8 +31,12 @@ def recepcionista_pacientes_activos(request):
             Q(first_name__icontains=query) |
             Q(last_name__icontains=query) |
             Q(rut__icontains=query) |
-            Q(patologia__icontains=query)
+            Q(terapeuta__user__first_name__icontains=query) |
+            Q(terapeuta__user__last_name__icontains=query)
         )
+
+    if order_by:
+        pacientes_list = pacientes_list.order_by(order_by)
 
     # Calcular la edad de cada paciente
     for paciente in pacientes_list:
@@ -57,16 +44,23 @@ def recepcionista_pacientes_activos(request):
 
     total_pacientes = pacientes_list.count()
 
-    paginator = Paginator(pacientes_list, 15)
+    paginator = Paginator(pacientes_list, 5)
     page_number = request.GET.get('page') 
     pacientes = paginator.get_page(page_number)
 
     # Renderizar el template con los pacientes y la información de paginación
-    return render(request, 'recepcionista_pacientes.html', {'pacientes': pacientes, 'total_pacientes': total_pacientes, 'estado': 'activos'})
+    return render(request, 'recepcionista_pacientes.html', {
+        'pacientes': pacientes, 
+        'total_pacientes': total_pacientes, 
+        'estado': 'activos',
+        'query': query,  # Para mantener el valor en el HTML
+        'order_by': order_by  # Para saber el orden actual en el HTML
+        })
 
 @role_required('Recepcionista')
 def recepcionista_pacientes_inactivos(request):
     query = request.GET.get('search')
+    order_by = request.GET.get('order_by', 'first_name')
     pacientes_list = Paciente.objects.filter(is_active=False)
 
     # Si hay un parámetro de búsqueda, filtrar los pacientes
@@ -75,21 +69,31 @@ def recepcionista_pacientes_inactivos(request):
             Q(first_name__icontains=query) |
             Q(last_name__icontains=query) |
             Q(rut__icontains=query) |
-            Q(patologia__icontains=query)
+            Q(terapeuta__user__first_name__icontains=query) |
+            Q(terapeuta__user__last_name__icontains=query)
         )
 
+    if order_by:
+        pacientes_list = pacientes_list.order_by(order_by)
+        
     # Calcular la edad de cada paciente
     for paciente in pacientes_list:
         paciente.edad = calcular_edad(paciente.fecha_nacimiento)
 
     total_pacientes = pacientes_list.count()
 
-    paginator = Paginator(pacientes_list, 15)
+    paginator = Paginator(pacientes_list, 5)
     page_number = request.GET.get('page') 
     pacientes = paginator.get_page(page_number)
 
     # Renderizar el template con los pacientes y la información de paginación
-    return render(request, 'recepcionista_pacientes.html', {'pacientes': pacientes, 'total_pacientes': total_pacientes, 'estado': 'inactivos'})
+    return render(request, 'recepcionista_pacientes.html', {
+        'pacientes': pacientes,
+        'total_pacientes': total_pacientes,
+        'estado': 'inactivos',
+        'query': query,  # Para mantener el valor en el HTML
+        'order_by': order_by  # Para saber el orden actual en el HTML
+        })
 
 
 @role_required('Recepcionista')
@@ -152,6 +156,8 @@ def agregar_paciente(request):
     
     return render(request, 'agregar_paciente.html', {'paciente_form': paciente_form})
 
+
+######################################    TERAPEUTAS     ######################################
 @role_required('Recepcionista')
 def elegir_terapeuta(request, id):
     paciente = Paciente.objects.get(id=id)
@@ -187,7 +193,8 @@ def recepcionista_terapeutas_activos(request):
         terapeutas_list = terapeutas_list.filter(
             Q(user__first_name__icontains=query) |  
             Q(user__last_name__icontains=query) |   
-            Q(user__username__icontains=query)
+            Q(user__profile__rut__icontains=query) |
+            Q(especialidad__icontains=query)
         )
     
     # Aplicar el orden basado en el parámetro
@@ -196,13 +203,15 @@ def recepcionista_terapeutas_activos(request):
     
     total_terapeutas = terapeutas_list.count()
 
-    paginator = Paginator(terapeutas_list, 10)
+    paginator = Paginator(terapeutas_list, 5)
     page_number = request.GET.get('page')
     terapeutas = paginator.get_page(page_number)
 
     return render(request, 'recepcionista_terapeutas_activos.html', {
         'terapeutas': terapeutas,
         'total_terapeutas': total_terapeutas,
+        'query': query,  # Para mantener el valor en el HTML
+        'order_by': order_by  # Para saber el orden actual en el HTML
     })
 
 @role_required('Recepcionista')
@@ -222,6 +231,7 @@ def calendar_asignar_paciente(request, paciente_id, terapeuta_id):
     return render(request, 'calendar_asignar_paciente.html', {'horario_terapeuta': horario_terapeuta, 'cita': cita,
                                                               'paciente':paciente, 'terapeuta':terapeuta})
 
+###################################     CITAS     ###################################
 @role_required('Recepcionista')
 def agendar_cita_recepcionista(request, paciente_id, terapeuta_id):
     terapeuta_instance = get_object_or_404(Terapeuta, id=terapeuta_id)

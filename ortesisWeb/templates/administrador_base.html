@@ -42,13 +42,13 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'gestion_terapeutas' %}" class="{% if request.path == '/terapeutas/' %}active{% endif %}">
+                    <a href="{% url 'listar_terapeutas_activos' %}" class="{% if request.path == '/terapeutas/' %}active{% endif %}">
                             <img src="{% static 'icons/therapist.svg' %}" alt="Listado Terapeutas">
                             Terapeutas
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'admin_recepcionistas' %}" class="{% if request.path == '/recepcionistas/' %}active{% endif %}">
+                    <a href="{% url 'listar_recepcionistas_activos' %}" class="{% if request.path == '/recepcionistas/' %}active{% endif %}">
                             <img src="{% static 'icons/Vector.svg' %}" alt="Listado Recepcionistas">
                             Recepcionistas
                     </a>

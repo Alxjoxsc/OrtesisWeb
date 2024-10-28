@@ -12,11 +12,11 @@ function searchPacientes() {
     let found = false;
 
     pacientes.forEach(paciente => {
-        const nombre = paciente.querySelector('.nombre').textContent.toLowerCase();
-        const rut = paciente.querySelector('.rut').textContent.toLowerCase();
-        const tratamiento = paciente.querySelector('.tratamiento').textContent.toLowerCase();
+        const nombre = paciente.querySelector('.centro-tabla:nth-child(2)').textContent.toLowerCase();
+        const rut = paciente.querySelector('.centro-tabla:nth-child(3)').textContent.toLowerCase();
+        const terapeuta = paciente.querySelector('.centro-tabla:nth-child(5)').textContent.toLowerCase(); // Nombre del terapeuta
 
-        if (nombre.includes(input) || rut.includes(input) || tratamiento.includes(input)) {
+        if (nombre.includes(input) || rut.includes(input) || terapeuta.includes(input)) {
             paciente.style.display = ''; // Mostrar el paciente
             found = true;
         } else {

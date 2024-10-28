@@ -1,68 +1,56 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const searchInput = document.getElementById('searchInput');
-    const clearButton = document.getElementById('clearButton');
-    const filasPacientes = document.querySelectorAll('tbody tr:not(#no-coincidencias):not(.table-empty)');
-    const mensajeError = document.getElementById('no-coincidencias');
-
-    toggleClearButton();
-
-    searchInput.addEventListener('input', function () {
-        toggleClearButton();
-    });
-
-    clearButton.addEventListener('click', function () {
-        searchInput.value = '';
-        toggleClearButton();
-        mostrarTodasLasFilas();
-    });
-
-    searchInput.addEventListener('keypress', verificarEnter);
-
-    function toggleClearButton() {
-        if (searchInput.value.trim() !== '') {
-            clearButton.style.display = 'inline-block';
-        } else {
-            clearButton.style.display = 'none';
-        }
-    }
-
-    function mostrarTodasLasFilas() {
-        filasPacientes.forEach((fila) => {
-            fila.style.display = ''; // Mostrar todas las filas
-        });
-        mensajeError.style.display = 'none'; // Ocultar mensaje de no coincidencias
-    }
-
-    function filtrarPacientes(event) {
+function detectEnter(event) {
+    if (event.key === "Enter") {
         event.preventDefault();
+        searchTerapeutas();
+        
+    }
+}
 
-        const searchValue = searchInput.value.toLowerCase();
-        let bandera = false; // Bandera para saber si hay coincidencias
+function searchTerapeutas() {
+    const input = document.getElementById('searchBar').value.toLowerCase();
+    const terapeutas = document.querySelectorAll('.terapeuta');
+    let found = false;
 
-        filasPacientes.forEach((fila) => {
-            const nombre_paciente = fila.cells[0].textContent.toLowerCase();
-            const rut_paciente = fila.cells[1].textContent.toLowerCase();
+    terapeutas.forEach(terapeuta => {
+        const nombre = terapeuta.querySelector('.centro-tabla:nth-child(2)').textContent.toLowerCase();
+        const rut = terapeuta.querySelector('.centro-tabla:nth-child(3)').textContent.toLowerCase();
+        const especialidad = terapeuta.querySelector('.centro-tabla:nth-child(5)').textContent.toLowerCase(); // Nombre del especialidad
 
-            // Verificar si el nombre o el rut contiene el texto de búsqueda
-            if (nombre_paciente.includes(searchValue) || rut_paciente.includes(searchValue)) {
-                fila.style.display = ''; // Mostrar la fila que coincida
-                bandera = true; // Si encontramos un resultado, actualizamos la bandera
-            } else {
-                fila.style.display = 'none'; // Ocultar la fila que no coincida
-            }
-        });
-
-        if (!bandera && searchValue !== '') {
-            mensajeError.style.display = 'table-row';
+        if (nombre.includes(input) || rut.includes(input) || especialidad.includes(input)) {
+            terapeuta.style.display = ''; // Mostrar el terapeuta
+            found = true;
         } else {
-            mensajeError.style.display = 'none';
+            terapeuta.style.display = 'none'; // Ocultar el terapeuta
         }
-    }
+    });
 
-    function verificarEnter(event) {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            filtrarPacientes(event);
-        }
+    if (!found) {
+        console.log('No se encontraron terapeutas.');
     }
-});
+}
+
+function toggleClearButton() {
+    const searchBar = document.getElementById('searchBar');
+    const clearButton = document.getElementById('clearButton');
+
+    // Mostrar el botón de "Limpiar filtro" solo si hay texto en el campo de búsqueda
+    if (searchBar.value.trim() !== '') {
+        clearButton.style.display = 'inline-block';
+    } else {
+        clearButton.style.display = 'none';
+    }
+}
+
+function clearSearch() {
+    // Limpiar el campo de búsqueda
+    const searchBar = document.getElementById('searchBar');
+    searchBar.value = '';
+    
+    // Ocultar el botón de "Limpiar filtro"
+    const clearButton = document.getElementById('clearButton');
+    clearButton.style.display = 'none';
+    
+    // Enviar el formulario para mostrar todos los terapeutas de nuevo
+    searchBar.form.submit();
+}
+

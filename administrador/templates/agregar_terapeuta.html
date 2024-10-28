@@ -13,7 +13,7 @@
 
 {% block header %}
 <div class="contenedor-header">
-    <a href="{% url 'gestion_terapeutas' %}">
+    <a href="{% url 'listar_terapeutas_activos' %}">
         <img src="{% static 'icons/Volver-atras.svg' %}" alt="">
     </a>
     <h1>Agregar terapeuta</h1>
@@ -346,7 +346,7 @@
 </script>
 <script>
     document.getElementById("boton-cancelar").addEventListener("click", function(){
-        window.location.href = "{% url 'gestion_terapeutas' %}";
+        window.location.href = "{% url 'listar_terapeutas_activos' %}";
     });
 </script>
 {% endblock %}

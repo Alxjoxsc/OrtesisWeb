@@ -1,68 +1,55 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const searchInput = document.getElementById('searchInput');
-    const clearButton = document.getElementById('clearButton');
-    const filasPacientes = document.querySelectorAll('tbody tr:not(#no-coincidencias):not(.table-empty)');
-    const mensajeError = document.getElementById('no-coincidencias');
-
-    toggleClearButton();
-
-    searchInput.addEventListener('input', function () {
-        toggleClearButton();
-    });
-
-    clearButton.addEventListener('click', function () {
-        searchInput.value = '';
-        toggleClearButton();
-        mostrarTodasLasFilas();
-    });
-
-    searchInput.addEventListener('keypress', verificarEnter);
-
-    function toggleClearButton() {
-        if (searchInput.value.trim() !== '') {
-            clearButton.style.display = 'inline-block';
-        } else {
-            clearButton.style.display = 'none';
-        }
-    }
-
-    function mostrarTodasLasFilas() {
-        filasPacientes.forEach((fila) => {
-            fila.style.display = ''; // Mostrar todas las filas
-        });
-        mensajeError.style.display = 'none'; // Ocultar mensaje de no coincidencias
-    }
-
-    function filtrarPacientes(event) {
+function detectEnter(event) {
+    if (event.key === "Enter") {
         event.preventDefault();
+        searchRecepcionistas();
+        
+    }
+}
 
-        const searchValue = searchInput.value.toLowerCase();
-        let bandera = false; // Bandera para saber si hay coincidencias
+function searchRecepcionistas() {
+    const input = document.getElementById('searchBar').value.toLowerCase();
+    const recepcionistas = document.querySelectorAll('.recepcionista');
+    let found = false;
 
-        filasPacientes.forEach((fila) => {
-            const nombre_paciente = fila.cells[0].textContent.toLowerCase();
-            const rut_paciente = fila.cells[1].textContent.toLowerCase();
+    recepcionistas.forEach(recepcionista => {
+        const nombre = recepcionista.querySelector('.centro-tabla:nth-child(2)').textContent.toLowerCase();
+        const rut = recepcionista.querySelector('.centro-tabla:nth-child(3)').textContent.toLowerCase();
 
-            // Verificar si el nombre o el rut contiene el texto de búsqueda
-            if (nombre_paciente.includes(searchValue) || rut_paciente.includes(searchValue)) {
-                fila.style.display = ''; // Mostrar la fila que coincida
-                bandera = true; // Si encontramos un resultado, actualizamos la bandera
-            } else {
-                fila.style.display = 'none'; // Ocultar la fila que no coincida
-            }
-        });
-
-        if (!bandera && searchValue !== '') {
-            mensajeError.style.display = 'table-row';
+        if (nombre.includes(input) || rut.includes(input)) {
+            recepcionista.style.display = ''; // Mostrar el recepcionista
+            found = true;
         } else {
-            mensajeError.style.display = 'none';
+            recepcionista.style.display = 'none'; // Ocultar el recepcionista
         }
-    }
+    });
 
-    function verificarEnter(event) {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            filtrarPacientes(event);
-        }
+    if (!found) {
+        console.log('No se encontraron recepcionistas.');
     }
-});
+}
+
+function toggleClearButton() {
+    const searchBar = document.getElementById('searchBar');
+    const clearButton = document.getElementById('clearButton');
+
+    // Mostrar el botón de "Limpiar filtro" solo si hay texto en el campo de búsqueda
+    if (searchBar.value.trim() !== '') {
+        clearButton.style.display = 'inline-block';
+    } else {
+        clearButton.style.display = 'none';
+    }
+}
+
+function clearSearch() {
+    // Limpiar el campo de búsqueda
+    const searchBar = document.getElementById('searchBar');
+    searchBar.value = '';
+    
+    // Ocultar el botón de "Limpiar filtro"
+    const clearButton = document.getElementById('clearButton');
+    clearButton.style.display = 'none';
+    
+    // Enviar el formulario para mostrar todos los recepcionistas de nuevo
+    searchBar.form.submit();
+}
+

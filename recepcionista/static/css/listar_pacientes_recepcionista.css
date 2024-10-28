@@ -14,7 +14,7 @@
     flex-flow: row wrap;
     align-items: center;
     justify-content: flex-start;
-    gap: 20px;
+    gap: 40px;
     width: 100%;
 }
 
@@ -23,54 +23,54 @@
     color: black;
     font-weight: 500;
 }
-
-/* Formulario de búsqueda */
-.pacientes-busqueda-form {
+.search-container {
     display: flex;
-    align-items: center;
+    width: 70%;
 }
 
-/* Ajustar el tamaño y color de la barra de búsqueda */
-.pacientes-search-input {
-    display: flex;
-    width: 500px;
-    height: 35px;
-    border: 2px solid #d9d9d9;
-    border-radius: 0px;
-    padding: 5px 10px;
-    outline: none;
-    color: black;
-    background-color: #f9f9f9;
-    font-size: 16px;
-}
-
-/* Icono de búsqueda */
-.pacientes-search-icon {
+.search-icon {
     position: flex;
     justify-content: flex-end;
-    width: 20px;
+    width: 20px; 
     height: 20px;
     margin-left: -30px;
-    cursor: pointer;
+    margin-top: 8px;
+}
+/* Estilos para la barra de búsqueda */
+.search-bar {
+    display: flex;
+    padding: 8px;
+    font-size: 16px;
+    background-color: #D9D9D9;
+    border: 0.5px solid rgb(165, 165, 165);
+    border-radius: 5px;
+    width: 500px;
 }
 
-/* Botón de limpiar búsqueda */
-.pacientes-clear-button {
+.search-bar:focus {
+    outline: none;
+    border-color: black;
+}
+
+/* Estilos para el buscadoe */
+.clear-button {
     display: flex;
     gap: 5px;
     background-color: #f5554a;
     color: white;
     border: none;
-    padding: 5px 10px;
+    padding: 8px 10px;
     border-radius: 5px;
     cursor: pointer;
     margin-left: 20px;
     height: auto;
+    text-wrap: nowrap;  
 }
 
-.pacientes-clear-button:hover {
+.clear-button:hover {
     background-color: #d32f2f;
 }
+
 
 /* Estilo para el botón Agregar Paciente */
 .pacientes-agregar-paciente-btn {
@@ -109,17 +109,84 @@
     padding: 0 10px 0 10px;
 }
 
-/* Botón de filtro */
+/* Estilos del botón de filtro */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
 .filtro-btn {
+    display: flex;
+    flex-direction: row;
     background-color: #373d58;
     color: white;
     border: none;
-    border-radius: 5px;
-    padding: 5px 15px;
+    border-radius: 7px;
+    padding: 5px 10px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
+    gap: 10px;
+}
+
+.filtro-btn:hover {
+    background-color: #535c83;
+}
+
+.filtro-activo {
+    font-weight: 600;
+    background-color: #d4edda; /* Fondo verde claro */
+    border-radius: 4px; /* Bordes redondeados */
+    padding: 5px;
+}
+
+.filtro-eliminar-container {
+    margin-left: 20px;
+}
+
+.filtro-eliminar-btn {
+    background-color: #f5554a;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.filtro-eliminar-btn:hover {
+    background-color: #d32f2f;
+}
+
+/* Estilos del contenido del menú desplegable (oculto por defecto) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    border: 1.5px solid black;
+    border-radius: 7px;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    padding: 0; /* Asegúrate de que no haya padding adicional */
+    right: 0;
+}
+
+/* Agregar este estilo para eliminar los puntos de la lista */
+.dropdown-content li {
+    list-style-type: none; /* Elimina los puntos de la lista */
+    margin: 0; /* Elimina el margin por defecto */
+}
+
+/* Estilos de los enlaces dentro del menú */
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    display: block;
+    text-decoration: none; /* Asegúrate de que no haya subrayado */
+}
+
+/* Cambiar el color de fondo de los enlaces al pasar el cursor */
+.dropdown-content a:hover {
+    background-color: #D9D9D9;
 }
 
 /* Estilo para los filtros de Activos/Inactivos */
@@ -267,4 +334,76 @@ input[type="checkbox"] {
 
 .boton-confirmar:hover {
     background-color: #008F85;
+}
+
+/* Círcuos Verde y Amarillo */
+.img-estado{
+    width: 15px;
+    height: 15px;
+    padding-top: 3px;
+    margin-left: 10px;
+}
+
+/* Estilos de paginación */
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.pagination .step-links a {
+    color: white;
+    background-color: #373d58;
+    padding: 10px 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.pagination .step-links a:hover {
+    background-color: #535c83
+}
+
+.pagination .current {
+    padding: 10px 15px;
+    background-color: #D9D9D9;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.pagination .step-links {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.disabled {
+    color: white;
+    background-color: #d9d9d9;
+    padding: 10px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+@media screen and (max-width: 1200px){
+    .final-tabla a img {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+@media screen and (max-width: 768px){
+    .final-tabla a img {
+        width: 25px;
+        height: 25px;
+    }
+}
+
+@media screen and (max-width: 600px){
+    .final-tabla a img {
+        width: 20px;
+        height: 20px;
+    }
 }

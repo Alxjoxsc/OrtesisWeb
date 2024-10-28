@@ -1,23 +1,25 @@
-{% extends 'recepcionista_base.html' %}
-{% load static %}
-{% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/listar_pacientes_recepcionista.css' %}">
-<link rel="stylesheet" href="{% static 'css/tabla.css' %}">
-<link rel="stylesheet" href="{% static 'styles/modal.css' %}">
-{% endblock %}
+{% extends 'administrador_base.html' %}
 
-{% block title %}Pacientes{% endblock %}
+{% load static %}
+
+{% block title %}Gestión de terapeutas{% endblock %}
+
+{% block extra_head%}
+    <link rel="stylesheet" href="{% static 'styles/listar_terapeutas_activos.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tabla.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/modal.css' %}">
+{% endblock %}
 
 {% block header %}
 <div class="contenedor-header">
-    <h1>Pacientes</h1>
+    <h1>Terapeutas</h1>
     <form method="GET" action="{% if estado == 'activos' %}
-                                    {% url 'recepcionista_pacientes_activos' %}
+                                    {% url 'listar_terapeutas_activos' %}
                                 {% else %}
-                                    {% url 'recepcionista_pacientes_inactivos' %}
+                                    {% url 'listar_terapeutas_inactivos' %}
                                 {% endif %}"
                                 class="search-container"> 
-        <input type="text" name="search" placeholder="Búsqueda por Nombre, Rut o Terapeuta" class="search-bar" id="searchBar" value="{{ request.GET.search|default:'' }}" oninput="toggleClearButton()">
+        <input type="text" name="search" placeholder="Búsqueda por Nombre, Rut o Especialidad" class="search-bar" id="searchBar" value="{{ request.GET.search|default:'' }}" oninput="toggleClearButton()">
         <img src="{% static 'icons/Lupa.svg' %}" alt="Buscar" class="search-icon">
         
         <button type="button" id="clearButton" class="clear-button" onclick="clearSearch()" style="display: {% if request.GET.search %}inline-block{% else %}none{% endif %};">
@@ -25,11 +27,9 @@
         </button>
     </form>
 </div>
-<div class="pacientes-agregar-paciente">
-    <a href="{% url 'agregar_paciente' %}" class="pacientes-agregar-paciente-btn">
-        Agregar Paciente<img src="{% static 'icons/plus.svg' %}">
-    </a>
-</div>
+<button id="boton-agregar-terapeuta">Agregar Terapeuta
+    <img src="{% static 'icons/plus.svg' %}" alt="Agregar">
+</button>
 {% endblock %}
 
 {% block content %}
@@ -37,8 +37,8 @@
 <div class="contenedor-superior">
 
     <div class="filtros">
-        <a href="{% url 'recepcionista_pacientes_activos' %}" class="btn-{% if estado == 'activos' %}active{% endif %}" type="button">Activos</a>
-        <a href="{% url 'recepcionista_pacientes_inactivos' %}" class="btn-{% if estado == 'inactivos' %}active{% endif %}" type="button">Inactivos</a>
+        <a href="{% url 'listar_terapeutas_activos' %}" class="btn-{% if estado == 'activos' %}active{% endif %}" type="button">Activos</a>
+        <a href="{% url 'listar_terapeutas_inactivos' %}" class="btn-{% if estado == 'inactivos' %}active{% endif %}" type="button">Inactivos</a>
     </div>
 
     <div class="seleccion-estados">
@@ -55,11 +55,11 @@
             <span id="arrow">▼</span>
         </button>
         <ul id="filterOptions" class="dropdown-content" style="display:none;">
-            <li><a href="#" onclick="applyFilter('date_joined')" class="{% if order_by == 'date_joined' %}filtro-activo{% endif %}">Fecha de Ingreso</a></li>
-            <li><a href="#" onclick="applyFilter('terapeuta')" class="{% if order_by == 'terapeuta' %}filtro-activo{% endif %}">Terapeuta</a></li>
-            <li><a href="#" onclick="applyFilter('first_name')" class="{% if order_by == 'first_name' %}filtro-activo{% endif %}">Nombre</a></li>
-            <li><a href="#" onclick="applyFilter('last_name')" class="{% if order_by == 'last_name' %}filtro-activo{% endif %}">Apellido</a></li>
-            <li><a href="#" onclick="applyFilter('rut')" class="{% if order_by == 'rut' %}filtro-activo{% endif %}">Rut</a></li>
+            <li><a href="#" onclick="applyFilter('user__date_joined')" class="{% if order_by == 'user__date_joined' %}filtro-activo{% endif %}">Fecha de Ingreso</a></li>
+            <li><a href="#" onclick="applyFilter('user__first_name')" class="{% if order_by == 'user__first_name' %}filtro-activo{% endif %}">Nombre</a></li>
+            <li><a href="#" onclick="applyFilter('user__last_name')" class="{% if order_by == 'user__last_name' %}filtro-activo{% endif %}">Apellido</a></li>
+            <li><a href="#" onclick="applyFilter('user__profile__rut')" class="{% if order_by == 'user__profile__rut' %}filtro-activo{% endif %}">Rut</a></li>
+            <li><a href="#" onclick="applyFilter('especialidad')" class="{% if order_by == 'especialidad' %}filtro-activo{% endif %}">Especialidad</a></li>
             <li><a href="#" onclick="clearOrderFilter()">Limpiar filtro</a></li>
         </ul>
     </div>
@@ -74,37 +74,37 @@
                 <th>Nombre</th>
                 <th>Rut</th>
                 <th>Estado</th>
-                <th>Terapeuta</th>
+                <th>Especialidad</th>
                 <th>Fecha de Ingreso</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
-            {% for paciente in pacientes %}
+            {% for terapeuta in terapeutas %}
             <tr>
-                <td class="inicio-tabla"><input type="checkbox" class="paciente-checkbox" value="{{ paciente.id }}"></td>
-                <td class="centro-tabla">{{ paciente.first_name }} {{ paciente.last_name }}</td>
-                <td class="centro-tabla">{{ paciente.rut }}</td>
+                <td class="inicio-tabla"><input type="checkbox" class="terapeuta-checkbox" value="{{ terapeuta.id }}"></td>
+                <td class="centro-tabla">{{ terapeuta.user.first_name }} {{ terapeuta.user.last_name }}</td>
+                <td class="centro-tabla">{{ terapeuta.user.profile.rut }}</td>
                 <td class="centro-tabla">
-                    <span class="badge {% if paciente.is_active %}bg-success{% else %}bg-secondary{% endif %}">
-                        {% if paciente.is_active %}Activo <img class = "img-estado" src="{% static "icons/activo.svg" %}"> {% else %}Inactivo <img class = "img-estado" src="{% static "icons/inactivo.svg" %}"> {% endif %}
+                    <span class="badge {% if terapeuta.user.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                        {% if terapeuta.user.is_active %}Activo <img class = "img-estado" src="{% static "icons/activo.svg" %}"> {% else %}Inactivo <img class = "img-estado" src="{% static "icons/inactivo.svg" %}"> {% endif %}
                     </span>
                 </td>
-                <td class="centro-tabla">{% if paciente.terapeuta %}{{ paciente.terapeuta.user.first_name }} {{ paciente.terapeuta.user.last_name }}{% else %}Sin terapeuta{% endif %}</td>
-                <td class="centro-tabla">{{ paciente.date_joined }}</td>
+                <td class="centro-tabla">{{ terapeuta.especialidad }}</td>
+                <td class="centro-tabla">{{ terapeuta.user.date_joined.date }}</td>
                 <td class="final-tabla">
-                    <a href="{% url 'mostrar_paciente_recepcionista' paciente.id %}" class="btn btn-outline-danger btn-sm" title="Ver detalle paciente" 
-                        onclick="mostrarPopUp('{{ paciente.id }}', '{{ paciente.first_name }} {{ paciente.last_name }}', '{{ paciente.rut }}', '{{ paciente.patologia }}')">
-                        <img src="{% static 'icons/Detalle.svg' %}" alt="Ver Detalle" />
+                    <a href="#" class="btn btn-outline-danger btn-sm" title="Ver detalle terapeuta" 
+                        onclick="mostrarPopUp('{{ terapeuta.id }}', '{{ terapeuta.first_name }} {{ terapeuta.last_name }}', '{{ terapeuta.rut }}', '{{ terapeuta.patologia }}')">
+                        <img src="{% static 'icons/terapeuta_morado.svg' %}" alt="Ver Detalle terapeuta" />
                     </a>
                     {% if estado == 'activos' %}
                     <a href="#" class="btn btn-outline-danger btn-sm" title="Pasar a estado inactivo" 
-                        onclick="mostrarPopUpInactivar('{{ paciente.id }}', '{{ paciente.first_name }} {{ paciente.last_name }}', '{{ paciente.rut }}')">
+                        onclick="mostrarPopUpInactivar('{{ terapeuta.id }}', '{{ terapeuta.user.first_name }} {{ terapeuta.user.last_name }}', '{{ terapeuta.user.profile.rut }}')">
                         <img src="{% static 'icons/DeleteUser.svg' %}" alt="Inactivar" />
                     </a>
                     {% elif estado == 'inactivos' %}
                     <a href="#" class="btn btn-outline-danger btn-sm" title="Restaurar a estado activo" 
-                        onclick="mostrarPopUpRestaurar('{{ paciente.id }}', '{{ paciente.first_name }} {{ paciente.last_name }}')">
+                        onclick="mostrarPopUpRestaurar('{{ terapeuta.id }}', '{{ terapeuta.user.first_name }} {{ terapeuta.user.last_name }}')">
                         <img src="{% static 'icons/restore.svg' %}" alt="Restaurar" />
                     </a>
                     {% endif %}
@@ -112,7 +112,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="7" class="table-empty">No hay pacientes registrados.</td>
+                <td colspan="7" class="table-empty">No hay terapeutas registrados.</td>
             </tr>
             {% endfor %}
             <tr id="no-coincidencias" style="display: none;">
@@ -137,11 +137,11 @@
 <!--    Paginación  -->
 <div class="pagination">
     <span class="step-links">
-        {% if pacientes.has_previous %}
+        {% if terapeutas.has_previous %}
             <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Primera Página">
                 &#171;
             </a>
-            <a href="?page={{ pacientes.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Página Anterior">
+            <a href="?page={{ terapeutas.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Página Anterior">
                 &#8249;
             </a>
         {% else %}
@@ -150,14 +150,14 @@
         {% endif %}
 
         <span class="current">
-            {{ pacientes.number }}
+            {{ terapeutas.number }}
         </span>
 
-        {% if pacientes.has_next %}
-            <a href="?page={{ pacientes.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Página Siguiente">
+        {% if terapeutas.has_next %}
+            <a href="?page={{ terapeutas.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Página Siguiente">
                 &#8250;
             </a>
-            <a href="?page={{ pacientes.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Última Página">
+            <a href="?page={{ terapeutas.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Última Página">
                 &#187;
             </a>
         {% else %}
@@ -169,13 +169,18 @@
 
 {% endblock %}
 
-{% block extra_js %}
 
-<script src="{% static 'js/filtroListados.js' %}"></script>
+
+{% block extra_js %}
+<script>
+    document.getElementById("boton-agregar-terapeuta").addEventListener("click", function(){
+        window.location.href = "{% url 'agregar_terapeuta' %}";
+    });
+</script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const checkboxes = document.querySelectorAll('.paciente-checkbox');
+        const checkboxes = document.querySelectorAll('.terapeuta-checkbox');
         const selectAllCheckbox = document.getElementById('select-all');
         const inactivarBtn = document.getElementById('inactivar-btn');
         const restaurarBtn = document.getElementById('restaurar-btn');
@@ -223,14 +228,14 @@
             });
         }
 
-        // Pop-up para varios pacientes
+        // Pop-up para varios terapeutas
         window.mostrarPopUpCambioEstado = function(estado) {
             const selectedCheckboxes = Array.from(checkboxes).filter(cb => cb.checked);
             const cantidadSeleccionados = selectedCheckboxes.length;
             const titulo = estado === 'inactivo' ? 'Cambiar a estado inactivo' : 'Restaurar a estado activo';
             const mensaje = estado === 'inactivo' 
-                ? `¿Desea cambiar a estado inactivo a ${cantidadSeleccionados} pacientes? Los pacientes podrán ser visualizados y reactivados en la sección de inactivos.`
-                : `¿Desea restaurar a estado activo a ${cantidadSeleccionados} pacientes? Los pacientes podrán ser visualizados en la sección de activos y se considerarán como pacientes en tratamiento.`;
+                ? `¿Desea cambiar a estado inactivo a ${cantidadSeleccionados} terapeutas? Los terapeutas podrán ser visualizados y reactivados en la sección de inactivos.`
+                : `¿Desea restaurar a estado activo a ${cantidadSeleccionados} terapeutas? Los terapeutas podrán ser visualizados en la sección de activos`;
 
             document.getElementById('popup-titulo').textContent = titulo;
             document.getElementById('popup-mensaje').textContent = mensaje;
@@ -240,20 +245,20 @@
             document.getElementById('confirmButton').setAttribute('data-ids', JSON.stringify(selectedCheckboxes.map(cb => cb.value)));
         };
 
-        // Pop-up individual para un paciente
-        window.mostrarPopUpInactivar = function(pacienteId, nombre, rut) {
+        // Pop-up individual para un terapeuta
+        window.mostrarPopUpInactivar = function(terapeutaId, nombre, rut) {
             const titulo = `Cambiar a estado inactivo a ${nombre}`;
-            const mensaje = `¿Está seguro de que desea inactivar al paciente ${nombre} (${rut})? Este paciente podrá ser reactivado en la sección de inactivos.`;
+            const mensaje = `¿Está seguro de que desea inactivar al terapeuta ${nombre} (${rut})? Este terapeuta podrá ser reactivado en la sección de inactivos.`;
 
             document.getElementById('popup-titulo').textContent = titulo;
             document.getElementById('popup-mensaje').textContent = mensaje;
             document.getElementById('popupModal').style.display = 'block';
 
             document.getElementById('confirmButton').setAttribute('data-estado', 'inactivo');
-            document.getElementById('confirmButton').setAttribute('data-ids', JSON.stringify([pacienteId]));
+            document.getElementById('confirmButton').setAttribute('data-ids', JSON.stringify([terapeutaId]));
         };
         window.mostrarPopUpRestaurar = function(id, nombre) {
-            document.getElementById('popup-titulo').textContent = `Restaurar paciente`;
+            document.getElementById('popup-titulo').textContent = `Restaurar terapeuta`;
             document.getElementById('popup-mensaje').textContent = `¿Está seguro de que desea restaurar a ${nombre}?`;
             document.getElementById('popupModal').style.display = 'block';
         
@@ -269,7 +274,7 @@
             const estado = document.getElementById('confirmButton').getAttribute('data-estado');
             const selectedIds = JSON.parse(document.getElementById('confirmButton').getAttribute('data-ids'));
 
-            const url = estado === 'inactivo' ? "{% url 'cambiar_estado_inactivo' %}" : "{% url 'restaurar_paciente' %}";
+            const url = estado === 'inactivo' ? "{% url 'cambiar_estado_inactivo_terapeuta' %}" : "{% url 'restaurar_terapeuta' %}";
 
             fetch(url, {
                 method: 'POST',
@@ -277,14 +282,14 @@
                     'Content-Type': 'application/json',
                     'X-CSRFToken': '{{ csrf_token }}',
                 },
-                body: JSON.stringify({ pacientes_ids: selectedIds })
+                body: JSON.stringify({ terapeutas_ids: selectedIds })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
                     location.reload();
                 } else {
-                    alert(`Error al ${estado === 'inactivo' ? 'inactivar' : 'restaurar'} los pacientes.`);
+                    alert(`Error al ${estado === 'inactivo' ? 'inactivar' : 'restaurar'} los terapeutas.`);
                 }
             });
 
@@ -293,6 +298,7 @@
     });
     
 </script>
-<script src="{% static 'js/buscar_paciente_recepcionista.js' %}"></script>
-{% endblock %}
 
+<script src="{% static 'js/admin_buscador_terapeuta.js' %}"></script>
+<script src="{% static 'js/filtroListados.js' %}"></script>
+{% endblock %}

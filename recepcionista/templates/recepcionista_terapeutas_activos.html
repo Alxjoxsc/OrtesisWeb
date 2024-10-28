@@ -10,15 +10,13 @@
 {% block header %}
 <div class="contenedor-header">
     <h1>Terapeutas</h1>
-    <form method="GET" action="{% url 'recepcionista_terapeutas_activos' %}" class="terapeutas-busqueda-form">
-        <input type="text" name="search" placeholder="Búsqueda por Nombre o Rut" class="terapeutas-search-input" id="searchBar" value="{{ request.GET.search|default:'' }}" oninput="toggleClearButton()">
-        <img src="{% static 'icons/Lupa.svg' %}" alt="Buscar" class="terapeutas-search-icon">
-        <button type="button" id="clearButton" class="terapeutas-clear-button" onclick="clearSearch()" style="display: {% if request.GET.search %}inline-block{% else %}none{% endif %};">
+    <form method="GET" action="{% url 'recepcionista_terapeutas_activos' %}" class="search-container"> 
+        <input type="text" name="search" placeholder="Búsqueda por Nombre, Rut o Especialidad" class="search-bar" id="searchBar" value="{{ request.GET.search|default:'' }}" oninput="toggleClearButton()">
+        <img src="{% static 'icons/Lupa.svg' %}" alt="Buscar" class="search-icon">
+        
+        <button type="button" id="clearButton" class="clear-button" onclick="clearSearch()" style="display: {% if request.GET.search %}inline-block{% else %}none{% endif %};">
             Limpiar Filtro
         </button>
-        <div class="filtro-eliminar-container" style="display: {% if request.GET.order_by %}block{% else %}none{% endif %};">
-            <button type="button" class="filtro-eliminar-btn" onclick="clearOrderFilter()">Eliminar Filtro</button>
-        </div>
     </form>
     <div class="dropdown">
         <button class="filtro-btn" type="button" id="dropdownMenuButton">
@@ -26,8 +24,12 @@
             <span id="arrow">▼</span>
         </button>
         <ul id="filterOptions" class="dropdown-content" style="display:none;">
-            <li><a href="#" onclick="applyFilter('fecha_ingreso')">Fecha de Ingreso</a></li>
-            <li><a href="#" onclick="applyFilter('especialidad')">Especialidad</a></li>
+            <li><a href="#" onclick="applyFilter('fecha_ingreso')" class="{% if order_by == 'fecha_ingreso' %}filtro-activo{% endif %}">Fecha de Ingreso</a></li>
+            <li><a href="#" onclick="applyFilter('user__first_name')" class="{% if order_by == 'user__first_name' %}filtro-activo{% endif %}">Nombre</a></li>
+            <li><a href="#" onclick="applyFilter('user__last_name')" class="{% if order_by == 'user__last_name' %}filtro-activo{% endif %}">Apellido</a></li>
+            <li><a href="#" onclick="applyFilter('user__profile__rut')" class="{% if order_by == 'user__profile__rut' %}filtro-activo{% endif %}">Rut</a></li>
+            <li><a href="#" onclick="applyFilter('especialidad')" class="{% if order_by == 'especialidad' %}filtro-activo{% endif %}">Especialidad</a></li>
+            <li><a href="#" onclick="clearOrderFilter()">Limpiar filtro</a></li>
         </ul>
     </div>
 </div>
@@ -51,16 +53,16 @@
             {% for terapeuta in terapeutas %}
             <tr>
                 <td class="inicio-tabla">{{ terapeuta.user.first_name }} {{ terapeuta.user.last_name }}</td>
-                <td class="centro-tabla">{{ terapeuta.user.username }}</td>
+                <td class="centro-tabla">{{ terapeuta.user.profile.rut }}</td>
                 <td class="centro-tabla">
                     <span class="badge {% if terapeuta.user.is_active %}bg-success{% else %}bg-secondary{% endif %}">
-                        {% if terapeuta.user.is_active %}Activo <img class = "img-activo" src="{% static "icons/activo.svg" %}"> {% else %}Inactivo <img class = "img-activo" src="{% static "icons/inactivo.svg" %}"> {% endif %}
+                        {% if terapeuta.user.is_active %}Activo <img class = "img-estado" src="{% static "icons/activo.svg" %}"> {% else %}Inactivo <img class = "img-estado" src="{% static "icons/inactivo.svg" %}"> {% endif %}
                     </span>
                 </td>
                 <td class="centro-tabla">{{terapeuta.especialidad}}</td>
                 <td class="centro-tabla">{{ terapeuta.fecha_ingreso }}</td>
                 <td class="final-tabla">
-                    <img src="{% static 'icons/terapeuta_morado.svg' %}" alt="Doctor Logo" class="doctor-logo" style="width: 50px; height: auto;">
+                    <img src="{% static 'icons/terapeuta_morado.svg' %}" alt="Doctor Logo" class="doctor-logo">
                 </td>
             </tr>
             {% empty %}
@@ -111,29 +113,6 @@
 
 {% block extra_js %}
 
-<script>
-    // Mostrar/ocultar opciones del filtro
-    const dropdownButton = document.getElementById('dropdownMenuButton');
-    const filterOptions = document.getElementById('filterOptions');
-    const arrow = document.getElementById('arrow');
-    
-    dropdownButton.addEventListener('click', () => {
-        filterOptions.style.display = filterOptions.style.display === 'none' ? 'block' : 'none';
-        arrow.textContent = arrow.textContent === '▼' ? '▲' : '▼';
-    });
-
-    // Aplicar el filtro cuando se selecciona una opción
-    function applyFilter(orderBy) {
-        const urlParams = new URLSearchParams(window.location.search);
-        urlParams.set('order_by', orderBy);
-        window.location.search = urlParams.toString();
-    }
-    function clearOrderFilter() {
-    const urlParams = new URLSearchParams(window.location.search);
-    urlParams.delete('order_by');
-    window.location.search = urlParams.toString();
-    }
-</script>
-
+<script src="{% static 'js/filtroListados.js' %}"></script>
 <script src="{% static 'js/buscar_terapeutas.js' %}"></script>
 {% endblock %}

@@ -74,7 +74,7 @@
     background-color: #d32f2f;
 }
 
-#boton-agregar-recepcionista {
+#boton-agregar-terapeuta {
     background-color: #001058;
     color: #fff;
     border: none;
@@ -91,12 +91,12 @@
     text-wrap: nowrap;
 }
 
-#boton-agregar-recepcionista img {
+#boton-agregar-terapeuta img {
     width: 34px;
     height: 34px;
 }
 
-#boton-agregar-recepcionista:hover {
+#boton-agregar-terapeuta:hover {
     background-color: #002080; /* Un color ligeramente más claro para el hover */
 }
 

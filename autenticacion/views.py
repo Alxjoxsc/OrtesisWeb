@@ -81,7 +81,7 @@ def elegir_rol(request):
 def redireccionamiento_segun_rol(user, role):
     """Redirige según el rol"""
     if role.name == 'Administrador':
-        return redirect('gestion_terapeutas')
+        return redirect('listar_terapeutas_activos')
     elif role.name == 'Terapeuta':
         return redirect('agenda')
     elif role.name == 'Recepcionista':
