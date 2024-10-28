@@ -84,7 +84,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "ortesisweb",
         "USER": "postgres",
-        "PASSWORD": "Admin123",
+        "PASSWORD": "1234",
         "PORT": "5432",
     }
 }
@@ -154,3 +154,8 @@ AUTHENTICATION_BACKENDS = [
 # Configuración para la duración de la sesión
 SESSION_COOKIE_AGE = 1209600  # 14 días en segundos
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+# Define la URL base para acceder a los archivos de medios.
+MEDIA_URL = '/media/'
+# Especifica el directorio donde se almacenan los archivos de medios subidos.
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

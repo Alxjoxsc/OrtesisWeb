@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 from terapeuta.views import *
 
 urlpatterns = [
@@ -25,4 +27,4 @@ urlpatterns = [
     path('perfil/', views.perfil, name='perfil'),
     path('editar_perfil/<int:pk>/', views.editar_perfil, name='editar_perfil'),
     path('historial_sesiones/<int:paciente_id>/', views.historial_sesiones, name='historial_sesiones'),
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
