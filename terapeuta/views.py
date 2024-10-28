@@ -95,11 +95,18 @@ def calcular_edad(fecha_nacimiento):
 
 #-------------------------------------PACIENTES-------------------------------------
 @role_required('Terapeuta')
-@role_required('Terapeuta')
 def pacientes_view(request):
     query = request.GET.get('search')  # Obtiene el parámetro de búsqueda desde el GET
     order_by = request.GET.get('order_by', 'first_name')  # Obtiene el parámetro de orden desde el GET
-    pacientes_list = Paciente.objects.filter(is_active=True)
+    
+    # Filtra los pacientes asignados al terapeuta que inició sesión
+    try:
+        terapeuta = Terapeuta.objects.get(user=request.user)
+    except Terapeuta.DoesNotExist:
+        # Si el terapeuta no existe, retorna un error o redirecciona
+        return render(request, 'error.html', {'mensaje': 'Terapeuta no encontrado.'})
+
+    pacientes_list = Paciente.objects.filter(is_active=True, terapeuta=terapeuta)
 
     # Si hay una búsqueda, filtrar los pacientes
     if query:
