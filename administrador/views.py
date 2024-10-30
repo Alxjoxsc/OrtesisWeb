@@ -434,6 +434,13 @@ def mostrar_paciente_administrador(request, paciente_id):
         'imc': imc,
         'cita': cita  # Envía la cita o None si no existe
     })
+    
+@role_required('Administrador')
+def mostrar_recepcionista_administrador(request, recepcionista_id):
+    
+    recepcionista = recepcionista_id
+    
+    return render(request, 'mostrar_recepcionista_administrador.html', {'recepcionista': recepcionista})
 
 @role_required('Administrador')
 def listado_terapeutas(request, paciente_id):

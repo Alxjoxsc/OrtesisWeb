@@ -91,7 +91,7 @@
                 </td>
                 <td class="centro-tabla">{{ recepcionista.user.date_joined.date }}</td>
                 <td class="final-tabla">
-                    <a href="#" class="btn btn-outline-danger btn-sm" title="Ver detalle recepcionista" 
+                    <a href="{% url 'mostrar_recepcionista_administrador' recepcionista.id %}" class="btn btn-outline-danger btn-sm" title="Ver detalle recepcionista" 
                         onclick="mostrarPopUp('{{ recepcionista.id }}', '{{ recepcionista.first_name }} {{ recepcionista.last_name }}', '{{ recepcionista.rut }}', '{{ recepcionista.patologia }}')">
                         <img src="{% static 'icons/recepcionista_icono.svg' %}" alt="Ver Detalle recepcionista" />
                     </a>
