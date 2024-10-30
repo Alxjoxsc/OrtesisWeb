@@ -594,23 +594,25 @@ def editar_perfil(request, pk):
         eliminar_imagen = request.POST.get('eliminar_imagen')
 
         try:
+            # valida el correo
             validar_correo(nuevo_correo)
-
             if Terapeuta.objects.filter(correo_contacto=nuevo_correo).exclude(pk=terapeuta.pk).exists():
                 messages.error(request, 'El correo ya está en uso por otro terapeuta.')
             else:
+                # Actualiza los datos del terapeuta
                 terapeuta.presentacion = nueva_presentacion
                 terapeuta.correo_contacto = nuevo_correo
-                
+
+                # Manejo de la imagen de perfil
                 if eliminar_imagen:
+                    if terapeuta.imagen_perfil:
+                        terapeuta.imagen_perfil.delete()
                     terapeuta.imagen_perfil = None
                 elif imagen:
-                    fs = FileSystemStorage()
-                    filename = fs.save(imagen.name, imagen)
-                    terapeuta.imagen_perfil = filename
+                    terapeuta.imagen_perfil = imagen
 
                 terapeuta.save()
-                messages.success(request, 'Éxito')
+                messages.success(request, 'Perfil actualizado exitosamente.')
                 return redirect('perfil')
 
         except ValidationError as e:
