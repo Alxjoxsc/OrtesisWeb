@@ -8,50 +8,45 @@
 
 <header>
 
-{% if recepcionista.user.is_active %}
-    <a class="back-arrow" href="{% url 'listar_recepcionistas_activos' %}">
+{% if terapeuta.user.is_active %}
+    <a class="back-arrow" href="{% url 'listar_terapeutas_activos' %}">
         <img src="{% static 'icons/Volver-atras.svg' %}" alt="">
     </a>
 {% else %}
-    <a class="back-arrow" href="{% url 'listar_recepcionistas_inactivos' %}">
+    <a class="back-arrow" href="{% url 'listar_terapeutas_inactivos' %}">
         <img src="{% static 'icons/Volver-atras.svg' %}" alt="">
     </a>
 {% endif %}
-<h1>Recepcionista {{recepcionista.user.first_name}} {{recepcionista.user.last_name}}</h1>
+<h1>Terapeuta {{terapeuta.user.first_name}} {{terapeuta.user.last_name}}</h1>
 </header>  
 
 <div class="container-paciente">
     <div class="card-paciente">
-        {% if recepcionista.user.is_active %}
+        {% if terapeuta.user.is_active %}
             <div class="icon-container" onclick="window.location.href=#">
                 <img src="{% static 'icons/lapiz.svg' %}" class="icon">
             </div>
         {% else %}
         <a href="#" class="btn btn-reactivar" title="Restaurar a estado activo" 
-            onclick="mostrarPopUpRestaurar('{{ recepcionista.id }}', '{{ recepcionista.user.first_name }} {{ recepcionista.user.last_name }}')">
-            Reactivar Recepcionista
+            onclick="mostrarPopUpRestaurar('{{ terapeuta.id }}', '{{ terapeuta.user.first_name }} {{ terapeuta.user.last_name }}')">
+            Reactivar terapeuta
         </a> 
         {% endif %}
         <div class="columna izquierda">
-            <p><strong>Rut:</strong><br> <span>{{ recepcionista.user.username }}</span></p>
-            <p><strong>Correo Electrónico:</strong><br> <span>{{ recepcionista.user.email }}</span></p>
-            <p><strong>Formación Académica:</strong><br> <span>{{ recepcionista.formacion_academica}}</span></p>
+            <p><strong>Rut:</strong><br> <span>{{ terapeuta.user.username }}</span></p>
+            <p><strong>Correo Electrónico:</strong><br> <span>{{ terapeuta.user.email }}</span></p>
+            <p><strong>Fecha de Ingreso:</strong><br> <span>{{ terapeuta.fecha_ingreso }}</span></p>
+            <p><strong>Fecha de Contratación:</strong><br> <span>{{ terapeuta.fecha_contratacion }}</span></p>
+            <p><strong>Título:</strong><br> <span>{{ terapeuta.titulo }}</span></p>
 
         </div>
 
         <div class="columna derecha">
-            <p><strong>Turno:</strong><br>
-                {% if recepcionista.turno == "T" %} 
-                    <span>Tarde</span></p>
-                {% elif recepcionista.turno == "M" %}
-                    <span>Mañana</span></p>
-                {% elif recepcionista.turno == "N" %}
-                    <span>Noche</span></p>
-                {% else %}
-                    <span>Turno Desconocido</span><p>
-                {% endif %}
-            <p><strong>Fecha de Contratación:</strong><br> <span>{{recepcionista.fecha_contratacion}}</span><p>
-            <p><strong>Años de Experiencia:</strong><br> <span>{{recepcionista.experiencia}} Años</span><p>
+            <p><strong>Especialidad:</strong><br> <span>{{ terapeuta.especialidad }}</span></p>
+            <p><strong>Disponibilidad:</strong><br> <span>{{ terapeuta.disponibilidad }}</span></p>
+            <p><strong>Horas Trabajadas:</strong><br> <span>{{ terapeuta.horas_trabajadas }}</span></p>
+            <p><strong>Horas Trabajadas:</strong><br> <span>{{ terapeuta.horas_trabajadas }}</span></p>
+            <p><strong>Años de Experiencia:</strong><br> <span>{{ terapeuta.experiencia }} Años</span></p>
             
         </div>
     </div>
@@ -95,7 +90,7 @@
         }
 
         window.mostrarPopUpRestaurar = function(id, nombre) {
-            document.getElementById('popup-titulo').textContent = `Restaurar paciente`;
+            document.getElementById('popup-titulo').textContent = `Restaurar Terapeuta`;
             document.getElementById('popup-mensaje').textContent = `¿Está seguro de que desea restaurar a ${nombre}?`;
             document.getElementById('popupModal').style.display = 'block';
         

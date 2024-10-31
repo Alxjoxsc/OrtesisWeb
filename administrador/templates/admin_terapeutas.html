@@ -93,7 +93,7 @@
                 <td class="centro-tabla">{{ terapeuta.especialidad }}</td>
                 <td class="centro-tabla">{{ terapeuta.user.date_joined.date }}</td>
                 <td class="final-tabla">
-                    <a href="#" class="btn btn-outline-danger btn-sm" title="Ver detalle terapeuta" 
+                    <a href="{% url 'mostrar_terapeuta_administrador' terapeuta.id %} "class="btn btn-outline-danger btn-sm" title="Ver detalle terapeuta" 
                         onclick="mostrarPopUp('{{ terapeuta.id }}', '{{ terapeuta.first_name }} {{ terapeuta.last_name }}', '{{ terapeuta.rut }}', '{{ terapeuta.patologia }}')">
                         <img src="{% static 'icons/terapeuta_morado.svg' %}" alt="Ver Detalle terapeuta" />
                     </a>

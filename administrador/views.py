@@ -438,13 +438,16 @@ def mostrar_paciente_administrador(request, paciente_id):
     
 @role_required('Administrador')
 def mostrar_recepcionista_administrador(request, recepcionista_id):
-    recepcionista = Recepcionista.objects.get(id=recepcionista_id).user_id
-    user = User.objects.get(pk= recepcionista)
+    recepcionista = Recepcionista.objects.get(id=recepcionista_id)
+    return render(request, 'mostrar_recepcionista_administrador.html', {'recepcionista': recepcionista})
+
+@role_required('Administrador')
+def mostrar_terapeuta_administrador(request, terapeuta_id):
+    terapeuta = Terapeuta.objects.get(id=terapeuta_id)
+
+    print(terapeuta)
+    return render(request, 'mostrar_terapeuta_administrador.html', {'terapeuta': terapeuta})
     
-
-    print(f"{user.last_name, user.username }")
-    return render(request, 'mostrar_recepcionista_administrador.html', {'recepcionista': user})
-
 @role_required('Administrador')
 def listado_terapeutas(request, paciente_id):
     paciente = Paciente.objects.get(id=paciente_id)
