@@ -62,7 +62,9 @@
                 <td class="centro-tabla">{{terapeuta.especialidad}}</td>
                 <td class="centro-tabla">{{ terapeuta.fecha_ingreso }}</td>
                 <td class="final-tabla">
-                    <img src="{% static 'icons/terapeuta_morado.svg' %}" alt="Doctor Logo" class="doctor-logo">
+                    <a href="{% url 'mostrar_terapeuta_recepcionista' terapeuta.id %}" class="btn btn-outline-danger btn-sm" title="Ver detalle terapeuta">
+                        <img src="{% static 'icons/terapeuta_morado.svg' %}" alt="Ver Detalle recepcionista" class="doctor-logo">
+                    </a>
                 </td>
             </tr>
             {% empty %}

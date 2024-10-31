@@ -360,6 +360,10 @@ def mostrar_paciente_recepcionista(request, paciente_id):
         'imc': imc,
         'cita': cita  # Envía la cita o None si no existe
     })
+    
+def mostrar_terapeuta_recepcionista(request, terapeuta_id):
+    terapeuta = Terapeuta.objects.get(id=terapeuta_id)
+    return render(request, 'mostrar_terapeuta_recepcionista.html', {'terapeuta': terapeuta})
 
 @role_required('Recepcionista')
 def editar_datos_paciente_recepcionista(request, paciente_id, terapeuta=None):
