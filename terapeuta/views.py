@@ -19,6 +19,8 @@ from django.core.exceptions import ValidationError
 from django.contrib import messages
 import re
 from django.core.files.storage import FileSystemStorage
+from django.core.mail import send_mail
+from django.conf import settings
 
 
 
@@ -450,6 +452,27 @@ def crear_rutina(request, paciente_id):
                 velocidad=velocidad,
                 descripcion='',  # Puedes ajustar este campo si es necesario
             )
+            asunto = f"Hola {paciente.first_name}, se ha creado una nueva rutina para ti"
+            mensaje = (
+                f"Estimado {paciente.first_name},\n\n"
+                f"Se ha creado una nueva rutina asignada por el terapeuta: {terapeuta.user.first_name} {terapeuta.user.last_name}.\n"
+                f"Detalles de la rutina:\n"
+                f"Fecha de inicio: {nueva_rutina.fecha_inicio}\n"
+                f"Fecha de término: {nueva_rutina.fecha_termino}\n"
+                f"Ángulo inicial: {nueva_rutina.angulo_inicial}\n"
+                f"Ángulo final: {nueva_rutina.angulo_final}\n"
+                f"Repeticiones: {nueva_rutina.repeticiones}\n"
+                f"Velocidad: {nueva_rutina.velocidad}\n\n"
+                f"Saludos,\nOrtesis Web"
+            )
+
+            send_mail(
+                asunto,
+                mensaje,
+                settings.DEFAULT_FROM_EMAIL,
+                [paciente.email],
+                fail_silently=False,
+            )
 
             return JsonResponse({'status': 'success'})
         except Exception as e:
@@ -482,7 +505,9 @@ def editar_rutina(request, rutina_id):
     if request.method == 'POST':
         try:
             rutina = Rutina.objects.get(id=rutina_id)
-
+            paciente = rutina.paciente  # Obtén el paciente desde la rutina
+            terapeuta = get_object_or_404(Terapeuta, user=request.user)
+            
             # Obtener y validar los datos
             fecha_inicio_str = request.POST.get('fecha_inicio')
             angulo_inicial_str = request.POST.get('angulo_inicial')
@@ -502,6 +527,28 @@ def editar_rutina(request, rutina_id):
             # Aquí puedes agregar lógica para fecha_termino
 
             rutina.save()
+
+            asunto = f"Hola {paciente.first_name}, se ha editado tu rutina"
+            mensaje = (
+                f"Estimado {paciente.first_name},\n\n"
+                f"Se han realizado cambios en tu rutina asignada por el terapeuta: {terapeuta.user.first_name} {terapeuta.user.last_name}.\n"
+                f"Detalles de la rutina:\n"
+                f"Fecha de inicio: {rutina.fecha_inicio}\n"
+                f"Fecha de término: {rutina.fecha_termino}\n"
+                f"Ángulo inicial: {rutina.angulo_inicial}\n"
+                f"Ángulo final: {rutina.angulo_final}\n"
+                f"Repeticiones: {rutina.repeticiones}\n"
+                f"Velocidad: {rutina.velocidad}\n\n"
+                f"Saludos,\nOrtesis Web"
+            )
+
+            send_mail(
+                asunto,
+                mensaje,
+                settings.DEFAULT_FROM_EMAIL,
+                [paciente.email],
+                fail_silently=False,
+            )
 
             return JsonResponse({'status': 'success'})
         except ValueError as e:
