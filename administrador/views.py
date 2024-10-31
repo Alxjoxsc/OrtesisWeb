@@ -11,6 +11,7 @@ from recepcionista.models import Recepcionista
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.http import JsonResponse
@@ -437,10 +438,12 @@ def mostrar_paciente_administrador(request, paciente_id):
     
 @role_required('Administrador')
 def mostrar_recepcionista_administrador(request, recepcionista_id):
+    recepcionista = Recepcionista.objects.get(id=recepcionista_id).user_id
+    user = User.objects.get(pk= recepcionista)
     
-    recepcionista = recepcionista_id
-    
-    return render(request, 'mostrar_recepcionista_administrador.html', {'recepcionista': recepcionista})
+
+    print(f"{user.last_name, user.username }")
+    return render(request, 'mostrar_recepcionista_administrador.html', {'recepcionista': user})
 
 @role_required('Administrador')
 def listado_terapeutas(request, paciente_id):

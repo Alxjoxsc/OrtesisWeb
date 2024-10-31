@@ -8,7 +8,7 @@
 
 <header>
 
-{% if recepcionista.user.is_active%}
+{% if recepcionista.is_active%}
     <a class="back-arrow" href="{% url 'listar_recepcionistas_activos' %}">
         <img src="{% static 'icons/Volver-atras.svg' %}" alt="">
     </a>
@@ -17,24 +17,24 @@
         <img src="{% static 'icons/Volver-atras.svg' %}" alt="">
     </a>
 {% endif %}
-<h1>Recepcionista {{recepcionista.user.first_name}} {{recepcionista.user.last_name}}</h1>
+<h1>Recepcionista {{recepcionista.first_name}} {{recepcionista.last_name}}</h1>
 </header>  
 
 <div class="container-paciente">
     <div class="card-paciente">
-        {% if recepcionista.user.is_active %}
+        {% if recepcionista.is_active %}
                 <img src="{% static 'icons/lapiz.svg' %}" class="icon">
             </div>
         {% else %}
         <a href="#" class="btn btn-reactivar" title="Restaurar a estado activo" 
-            onclick="mostrarPopUpRestaurar('{{ recepcionista.id }}', '{{ recepcionista.user.first_name }} {{ recepcionista.user.last_name }}')">
+            onclick="mostrarPopUpRestaurar('{{ recepcionista.id }}', '{{ recepcionista.first_name }} {{ recepcionista.last_name }}')">
             Reactivar Paciente
         </a> 
         {% endif %}
         <div class="columna izquierda">
-            <p><strong>Rut:</strong><br> <span>{{ recepcionista.user.rut }}</span></p>
-            <p><strong>Correo Electrónico:</strong><br> <span>{{ paciente.email }}</span></p>
-            <p><strong>Número de teléfono:</strong><br> <span>{{ paciente.telefono }}</span></p>
+            <p><strong>Rut:</strong><br> <span>{{ recepcionista.username }}</span></p>
+            <p><strong>Correo Electrónico:</strong><br> <span>{{ recepcionista.email }}</span></p>
+            <p><strong>Número de teléfono:</strong><br> <span>{{ recepcionista.telefono }}</span></p>
         </div>
 
         <div class="columna derecha">
