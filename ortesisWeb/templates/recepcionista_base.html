@@ -36,17 +36,25 @@
             <hr class="divider">
             <ul class="menu">
                 <li>
-                    <a href="{% url 'recepcionista_pacientes_activos' %}" class="{% if request.path == 'recepcionista_pacientes_activos/' %}active{% endif %}">
+                    <a href="{% url 'recepcionista_pacientes_activos' %}" class="{% if modulo_pacientes %}modulo-activo-recepcionista{% endif %}">
                         <img src="{% static 'icons/list-users.svg' %}" alt="Listado de pacientes">
                         Pacientes
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'recepcionista_terapeutas_activos' %}" class="{% if request.path == 'terapeutas/' %}active{% endif %}">
+                    <a href="{% url 'recepcionista_terapeutas_activos' %}" class="{% if modulo_terapeutas %}modulo-activo-recepcionista{% endif %}">
                         <img src="{% static 'icons/therapist.svg' %}" alt="Listado de Terapeutas">
                         Terapeutas
                     </a>
                 </li>
+                {% if user.is_authenticated and user.groups.count > 1 %}
+                <li class="elegir-rol">
+                    <a href="{% url 'elegir_rol' %}">
+                        <img src="{% static 'icons/elegir-rol.svg' %}" alt="Elegir rol">
+                        Cambiar rol
+                    </a>
+                </li>
+                {% endif %}
             </ul>
             <hr class="divider divider_logout">
             <div class="logout">

@@ -54,7 +54,8 @@ def recepcionista_pacientes_activos(request):
         'total_pacientes': total_pacientes, 
         'estado': 'activos',
         'query': query,  # Para mantener el valor en el HTML
-        'order_by': order_by  # Para saber el orden actual en el HTML
+        'order_by': order_by,  # Para saber el orden actual en el HTML
+        'modulo_pacientes': True
         })
 
 @role_required('Recepcionista')
@@ -92,7 +93,8 @@ def recepcionista_pacientes_inactivos(request):
         'total_pacientes': total_pacientes,
         'estado': 'inactivos',
         'query': query,  # Para mantener el valor en el HTML
-        'order_by': order_by  # Para saber el orden actual en el HTML
+        'order_by': order_by,  # Para saber el orden actual en el HTML
+        'modulo_pacientes': True
         })
 
 
@@ -154,7 +156,9 @@ def agregar_paciente(request):
     else:
         paciente_form = CrearPacienteForm()
     
-    return render(request, 'agregar_paciente.html', {'paciente_form': paciente_form})
+    return render(request, 'agregar_paciente.html', {
+        'paciente_form': paciente_form,
+        'modulo_pacientes': True})
 
 
 ######################################    TERAPEUTAS     ######################################
@@ -163,7 +167,10 @@ def elegir_terapeuta(request, id):
     paciente = Paciente.objects.get(id=id)
     terapeuta = Terapeuta.objects.all()
     print(terapeuta)
-    return render(request, 'elegir_terapeuta.html', {'terapeuta': terapeuta, 'paciente': paciente})
+    return render(request, 'elegir_terapeuta.html', {
+        'terapeuta': terapeuta,
+        'paciente': paciente,
+        'modulo_terapeutas': True})
 
 @role_required('Recepcionista')
 def asignar_terapeuta(request, terapeuta_id, paciente_id):
@@ -180,7 +187,9 @@ def asignar_terapeuta(request, terapeuta_id, paciente_id):
     paciente.save()
 
     # Redirigir a la página de mostrar paciente
-    return render(request, 'mostrar_paciente_recepcionista.html', {'paciente': paciente})
+    return render(request, 'mostrar_paciente_recepcionista.html', {
+        'paciente': paciente,
+        'modulo_terapeutas': True})
 
 @role_required('Recepcionista')
 def recepcionista_terapeutas_activos(request):
@@ -211,7 +220,8 @@ def recepcionista_terapeutas_activos(request):
         'terapeutas': terapeutas,
         'total_terapeutas': total_terapeutas,
         'query': query,  # Para mantener el valor en el HTML
-        'order_by': order_by  # Para saber el orden actual en el HTML
+        'order_by': order_by,  # Para saber el orden actual en el HTML
+        'modulo_terapeutas': True
     })
 
 @role_required('Recepcionista')
@@ -228,8 +238,12 @@ def calendar_asignar_paciente(request, paciente_id, terapeuta_id):
         'sabado': None,
         'domingo': None,
     }
-    return render(request, 'calendar_asignar_paciente.html', {'horario_terapeuta': horario_terapeuta, 'cita': cita,
-                                                              'paciente':paciente, 'terapeuta':terapeuta})
+    return render(request, 'calendar_asignar_paciente.html', {
+        'horario_terapeuta': horario_terapeuta,
+        'cita': cita,
+        'paciente':paciente,
+        'terapeuta':terapeuta,
+        'modulo_terapeutas': True})
 
 ###################################     CITAS     ###################################
 @role_required('Recepcionista')
@@ -266,7 +280,9 @@ def agendar_cita_recepcionista(request, paciente_id, terapeuta_id):
 
         return redirect('mostrar_paciente_recepcionista', paciente_instance.id)
 
-    return render(request, 'mostrar_paciente_recepcionista.html', {'paciente': paciente_instance})
+    return render(request, 'mostrar_paciente_recepcionista.html', {
+        'paciente': paciente_instance,
+        'modulo_terapeutas': True})
 
 
     
@@ -325,14 +341,20 @@ def formulario_agregar_paciente(request):
 
         return redirect('recepcionista_pacientes_activos')
 
-    return render(request, 'agregar_paciente.html')
+    return render(request, 'agregar_paciente.html', {
+        'modulo_pacientes': True})
 
 def mostrar_paciente_sin_terapeuta(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
     edad = paciente.calcular_edad()
     imc = paciente.calcular_imc()
     cita = Cita.objects.filter(paciente_id=paciente_id).last()
-    return render(request, 'mostrar_paciente_recepcionista.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc})
+    return render(request, 'mostrar_paciente_recepcionista.html', {
+        'paciente': paciente, 
+        'edad': edad, 
+        'cita': cita, 
+        'imc': imc,
+        'modulo_pacientes': True})
 
 
 def mostrar_paciente_con_terapeuta(request, paciente_id, terapeuta_id):
@@ -341,7 +363,13 @@ def mostrar_paciente_con_terapeuta(request, paciente_id, terapeuta_id):
     edad = paciente.calcular_edad()
     imc = paciente.calcular_imc()
     cita = Cita.objects.filter(paciente_id=paciente_id).last()
-    return render(request, 'mostrar_paciente_recepcionista.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc, 'terapeuta':terapeuta})
+    return render(request, 'mostrar_paciente_recepcionista.html', {
+        'paciente': paciente, 
+        'edad': edad, 
+        'cita': cita, 
+        'imc': imc, 
+        'terapeuta':terapeuta,
+        'modulo_pacientes': True})
 
 @role_required('Recepcionista')
 def mostrar_paciente_recepcionista(request, paciente_id):
@@ -358,12 +386,14 @@ def mostrar_paciente_recepcionista(request, paciente_id):
         'paciente': paciente,
         'edad': edad,
         'imc': imc,
-        'cita': cita  # Envía la cita o None si no existe
-    })
+        'cita': cita,  # Envía la cita o None si no existe
+        'modulo_pacientes': True})
     
 def mostrar_terapeuta_recepcionista(request, terapeuta_id):
     terapeuta = Terapeuta.objects.get(id=terapeuta_id)
-    return render(request, 'mostrar_terapeuta_recepcionista.html', {'terapeuta': terapeuta})
+    return render(request, 'mostrar_terapeuta_recepcionista.html', {
+        'terapeuta': terapeuta,
+        'modulo_terapeutas': True})
 
 @role_required('Recepcionista')
 def editar_datos_paciente_recepcionista(request, paciente_id, terapeuta=None):
@@ -390,5 +420,5 @@ def editar_datos_paciente_recepcionista(request, paciente_id, terapeuta=None):
         'paciente': paciente,
         'terapeutas': terapeutas,
         'terapeuta_asignado': paciente.terapeuta.id if paciente.terapeuta else None,
-        'paciente_form': form
-    })
+        'paciente_form': form,
+        'modulo_pacientes': True})

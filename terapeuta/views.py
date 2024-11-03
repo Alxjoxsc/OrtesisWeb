@@ -61,7 +61,11 @@ def agenda(request):
         else:
             continue
     fechas_citas = json.dumps(citas_json)
-    return render(request, 'agenda.html', {'pacientes': pacientes, 'fechas_citas': fechas_citas, 'citas': citas})
+    return render(request, 'agenda.html', {
+        'pacientes': pacientes,
+        'fechas_citas': fechas_citas,
+        'citas': citas,
+        'modulo_agenda': True})
 
 def obtener_fechas_citas(request):
     if request.method == "GET":
@@ -142,7 +146,8 @@ def pacientes_view(request):
         'pacientes': pacientes, 
         'total_pacientes': total_pacientes,
         'query': query,  # Para mantener el valor en el HTML
-        'order_by': order_by  # Para saber el orden actual en el HTML
+        'order_by': order_by,  # Para saber el orden actual en el HTML
+        'modulo_pacientes': True
     })
 
 
@@ -191,6 +196,7 @@ def historial_paciente_view(request, paciente_id):
             'paciente': paciente,
             'terapeuta': terapeuta,
             'rutinas': rutinas,
+            'modulo_pacientes': True,
         }
         return render(request, 'historial_paciente.html', context)
     else:
@@ -279,11 +285,7 @@ def agendar_cita(request):
             cita.save()
             
             return redirect('agenda')
-    return render(request, 'agenda.html')
-
-@login_required  # Asegúrate de que el usuario esté autenticado
-def calendar(request):
-    return render(request, 'calendar.html')
+    return render(request, 'agenda.html', {'modulo_agenda': True})
 
 def editar_cita(request):
     if request.method == "POST":
@@ -315,7 +317,9 @@ def eliminar_cita(request, cita_id):
 
 def grafico_progreso_paciente(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
-    return render(request, 'grafico_progreso_paciente.html', {'paciente': paciente})
+    return render(request, 'grafico_progreso_paciente.html', {
+        'paciente': paciente,
+        'modulo_pacientes': True})
 
 def obtener_grafico_progreso_paciente(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
@@ -571,7 +575,8 @@ def observaciones_paciente(request, paciente_id):
     context = {
         'paciente': paciente,
         'observaciones': observaciones,
-        'fecha_actual': now().strftime('%d/%m/%Y')
+        'fecha_actual': now().strftime('%d/%m/%Y'),
+        'modulo_pacientes': True
     }
 
     return render(request, 'registrar_observaciones.html', context)
@@ -609,7 +614,9 @@ def editar_observacion(request, observacion_id):
         
         return redirect('observaciones_paciente', paciente_id=observacion.paciente.id)
 
-    return render(request, 'editar_observacion.html', {'observacion': observacion})
+    return render(request, 'editar_observacion.html', {
+        'observacion': observacion,
+        'modulo_pacientes': True})
 
 @role_required('Terapeuta')
 def eliminar_observacion(request, observacion_id):
@@ -627,6 +634,7 @@ def perfil(request):
     
     context = {
         'terapeuta': terapeuta,
+        'modulo_perfil': True
     }
     
     return render(request, 'perfil.html', context)
@@ -667,6 +675,7 @@ def editar_perfil(request, pk):
 
     context = {
         'terapeuta': terapeuta,
+        'modulo_perfil': True
     }
     return render(request, 'perfil.html', context)
     
@@ -698,6 +707,7 @@ def historial_sesiones(request, paciente_id):
         'rutinas': rutinas,
         'rutina_seleccionada': rutina_seleccionada,
         'sesiones': sesiones,
+        'modulo_pacientes': True
     }
     return render(request, 'historial_sesiones.html', context)
 

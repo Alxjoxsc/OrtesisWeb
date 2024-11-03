@@ -37,23 +37,31 @@
             <hr class="divider">
             <ul class="menu">
                 <li>
-                    <a href="{% url 'perfil' %}" class="{% if request.path == 'perfil/' %}active{% endif %}">
+                    <a href="{% url 'perfil' %}" class="{% if modulo_perfil %}modulo-activo-terapeuta{% endif %}">
                         <img src="{% static 'icons/user-profile.svg' %}" alt="Perfil terapeuta">
                         Perfil
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'paciente_terapeuta' %}" class="{% if request.path == 'paciente_terapeuta/' %}active{% endif %}">
+                    <a href="{% url 'paciente_terapeuta' %}" class="{% if modulo_pacientes %}modulo-activo-terapeuta{% endif %}">
                         <img src="{% static 'icons/list-users.svg' %}" alt="Listado de pacientes">
                         Pacientes
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'agenda' %}" class="{% if request.path == 'agenda/' %}active{% endif %}">
+                    <a href="{% url 'agenda' %}" class="{% if modulo_agenda %}modulo-activo-terapeuta{% endif %}">
                         <img src="{% static 'icons/calendar.svg' %}" alt="Agenda terapeuta">
                         Agenda
                     </a>
                 </li>
+                {% if user.is_authenticated and user.groups.count > 1 %}
+                <li class="elegir-rol">
+                    <a href="{% url 'elegir_rol' %}">
+                        <img src="{% static 'icons/elegir-rol.svg' %}" alt="Elegir rol">
+                        Cambiar rol
+                    </a>
+                </li>
+                {% endif %}
             </ul>
             <hr class="divider divider_logout">
             <div class="logout">
