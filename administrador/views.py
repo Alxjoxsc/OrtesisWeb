@@ -189,13 +189,20 @@ def listar_pacientes_activos(request):
     pacientes_activos = Paciente.objects.filter(is_active=True)
 
     if query:
-        pacientes_activos = pacientes_activos.filter(
-            Q(first_name__icontains=query) |
-            Q(last_name__icontains=query) |
-            Q(rut__icontains=query) |
-            Q(terapeuta__user__first_name__icontains=query) |
-            Q(terapeuta__user__last_name__icontains=query)
-        )
+
+        if query.lower() == 'sin terapeuta':
+
+            # Filtrar pacientes sin terapeuta
+            pacientes_activos = pacientes_activos.filter(terapeuta__isnull=True)
+
+        else:
+            pacientes_activos = pacientes_activos.filter(
+                Q(first_name__icontains=query) |
+                Q(last_name__icontains=query) |
+                Q(rut__icontains=query) |
+                Q(terapeuta__user__first_name__icontains=query) |
+                Q(terapeuta__user__last_name__icontains=query)
+            )
 
     if order_by:
         pacientes_activos = pacientes_activos.order_by(order_by)
@@ -265,11 +272,20 @@ def listar_pacientes_inactivos(request):
     pacientes_inactivos = Paciente.objects.filter(is_active=False)
 
     if query:
-        pacientes_inactivos = pacientes_inactivos.filter(
-            Q(first_name__icontains=query) |
-            Q(last_name__icontains=query) |
-            Q(rut__icontains=query)
-        )
+
+        if query.lower() == 'sin terapeuta':
+
+            # Filtrar pacientes sin terapeuta
+            pacientes_inactivos = pacientes_inactivos.filter(terapeuta__isnull=True)
+
+        else:
+            pacientes_inactivos = pacientes_inactivos.filter(
+                Q(first_name__icontains=query) |
+                Q(last_name__icontains=query) |
+                Q(rut__icontains=query) |
+                Q(terapeuta__user__first_name__icontains=query) |
+                Q(terapeuta__user__last_name__icontains=query)
+            )
     
     if order_by:
         pacientes_inactivos = pacientes_inactivos.order_by(order_by)

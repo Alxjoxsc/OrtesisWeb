@@ -18,7 +18,7 @@
                                     {% url 'listar_pacientes_inactivos' %}
                                 {% endif %}"
                                 class="search-container"> 
-        <input type="text" name="search" placeholder="Búsqueda por Nombre, Rut o Terapeuta" class="search-bar" id="searchBar" value="{{ request.GET.search|default:'' }}" oninput="toggleClearButton()">
+        <input type="text" name="search" placeholder="Nombre, Rut, Terapeuta o 'Sin terapeuta'" class="search-bar" id="searchBar" value="{{ request.GET.search|default:'' }}" oninput="toggleClearButton()">
         <img src="{% static 'icons/Lupa.svg' %}" alt="Buscar" class="search-icon">
         
         <button type="button" id="clearButton" class="clear-button" onclick="clearSearch()" style="display: {% if request.GET.search %}inline-block{% else %}none{% endif %};">

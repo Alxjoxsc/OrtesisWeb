@@ -27,13 +27,18 @@ def recepcionista_pacientes_activos(request):
 
     # Si hay un parámetro de búsqueda, filtrar los pacientes
     if query:
-        pacientes_list = pacientes_list.filter(
-            Q(first_name__icontains=query) |
-            Q(last_name__icontains=query) |
-            Q(rut__icontains=query) |
-            Q(terapeuta__user__first_name__icontains=query) |
-            Q(terapeuta__user__last_name__icontains=query)
-        )
+
+        if query.lower() == 'sin terapeuta':
+            pacientes_list = pacientes_list.filter(terapeuta=None)
+
+        else:
+            pacientes_list = pacientes_list.filter(
+                Q(first_name__icontains=query) |
+                Q(last_name__icontains=query) |
+                Q(rut__icontains=query) |
+                Q(terapeuta__user__first_name__icontains=query) |
+                Q(terapeuta__user__last_name__icontains=query)
+            )
 
     if order_by:
         pacientes_list = pacientes_list.order_by(order_by)
@@ -66,13 +71,18 @@ def recepcionista_pacientes_inactivos(request):
 
     # Si hay un parámetro de búsqueda, filtrar los pacientes
     if query:
-        pacientes_list = pacientes_list.filter(
-            Q(first_name__icontains=query) |
-            Q(last_name__icontains=query) |
-            Q(rut__icontains=query) |
-            Q(terapeuta__user__first_name__icontains=query) |
-            Q(terapeuta__user__last_name__icontains=query)
-        )
+
+        if query.lower() == 'sin terapeuta':
+            pacientes_list = pacientes_list.filter(terapeuta=None)
+
+        else:
+            pacientes_list = pacientes_list.filter(
+                Q(first_name__icontains=query) |
+                Q(last_name__icontains=query) |
+                Q(rut__icontains=query) |
+                Q(terapeuta__user__first_name__icontains=query) |
+                Q(terapeuta__user__last_name__icontains=query)
+            )
 
     if order_by:
         pacientes_list = pacientes_list.order_by(order_by)
