@@ -26,4 +26,6 @@ urlpatterns = [
     path('perfil/', views.perfil, name='perfil'),
     path('editar_perfil/<int:pk>/', views.editar_perfil, name='editar_perfil'),
     path('historial_sesiones/<int:paciente_id>/', views.historial_sesiones, name='historial_sesiones'),
+    path('obtener_notificaciones/', obtener_notificaciones, name='obtener_notificaciones'),
+    path('marcar-notificacion-como-leida/<int:notificacion_id>/', views.marcar_notificacion_como_leida, name='marcar_notificacion_como_leida'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
