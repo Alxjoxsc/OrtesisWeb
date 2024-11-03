@@ -160,3 +160,12 @@ class Observacion(models.Model):
 
     def __str__(self):
         return f"{self.paciente.first_name} {self.paciente.last_name}"
+
+class Notificacion(models.Model):
+    terapeuta = models.ForeignKey(Terapeuta, on_delete=models.CASCADE)
+    cita = models.ForeignKey(Cita, null=True, blank=True, on_delete=models.CASCADE)
+    leida = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Notificación para {self.terapeuta.user.first_name} {self.terapeuta.user.last_name} sobre cita {self.cita.id if self.cita else 'Sin Cita'}"

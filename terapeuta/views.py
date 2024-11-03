@@ -2,11 +2,11 @@ from random import randrange
 from django.shortcuts import render, redirect
 from autenticacion.decorators import role_required
 from .models import Cita, Terapeuta, Paciente, Rutina
-from .models import Cita, Terapeuta, Paciente, Observacion
+from .models import Cita, Terapeuta, Paciente, Observacion, Notificacion
 from django.http import HttpResponse
 from django.core.paginator import Paginator
 from datetime import date
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 import json
 from django.db.models import Q
 from .models import Paciente, Rutina, Sesion, Corriente
@@ -21,7 +21,7 @@ import re
 from django.core.files.storage import FileSystemStorage
 from django.core.mail import send_mail
 from django.conf import settings
-
+from datetime import timedelta
 
 
 #-------------------------------------AGENDA-------------------------------------
@@ -284,6 +284,13 @@ def agendar_cita(request):
             )
             cita.save()
             
+            # Crear la notificación para la cita
+            Notificacion.objects.create(
+                terapeuta=terapeuta_instance,
+                cita=cita,
+                leida=False  # Inicialmente, la notificación no está leída
+            )
+            
             return redirect('agenda')
     return render(request, 'agenda.html', {'modulo_agenda': True})
 
@@ -299,6 +306,13 @@ def editar_cita(request):
         cita.sala = request.POST["sala_editar"]
         cita.detalle = request.POST["detalle_editar"]
         cita.save()
+
+        try:
+            notificacion = Notificacion.objects.get(cita=cita)
+            notificacion.save() 
+        except Notificacion.DoesNotExist:
+            pass
+
         return redirect("agenda")
 
     return agenda(request)
@@ -711,4 +725,60 @@ def historial_sesiones(request, paciente_id):
     }
     return render(request, 'historial_sesiones.html', context)
 
+def eliminar_notificaciones_antiguas():
+    # Obtén la fecha y hora actual
+    ahora = timezone.now()
+    
+    # Elimina las notificaciones que tengan una cita con fecha anterior a hoy
+    Notificacion.objects.filter(
+        Q(cita__fecha__lt=ahora.date()) | 
+        (Q(cita__fecha=ahora.date()) & Q(cita__hora_inicio__lt=ahora.time()))
+    ).delete()
 
+def obtener_notificaciones(request):
+    if request.user.is_authenticated:
+        # Llamar a la función para eliminar notificaciones antiguas
+        eliminar_notificaciones_antiguas()
+        
+        # Definir el rango de tiempo para hoy y mañana
+        ahora = timezone.now()
+        inicio_hoy = ahora.replace(hour=0, minute=0, second=0, microsecond=0)
+        fin_manana = (inicio_hoy + timedelta(days=2)) - timedelta(seconds=1) 
+
+        # Obtener solo las notificaciones no leídas para citas programadas hoy y mañana
+        notificaciones = Notificacion.objects.filter(
+            terapeuta=request.user.terapeuta,
+            leida=False,
+            cita__fecha__range=(inicio_hoy.date(), (inicio_hoy + timedelta(days=1)).date())
+        ).order_by('cita__fecha', 'cita__hora_inicio')
+
+        # Contar las notificaciones
+        notificaciones_count = notificaciones.count()
+
+        # Preparar los datos para el JsonResponse
+        notificaciones_data = []
+        for notificacion in notificaciones:
+            notificaciones_data.append({
+                'id': notificacion.id,
+                'paciente': f"{notificacion.cita.paciente.first_name} {notificacion.cita.paciente.last_name}",
+                'hora': notificacion.cita.hora_inicio.strftime('%H:%M'),
+                'sala': notificacion.cita.sala,
+            })
+
+        return JsonResponse({
+            'notificaciones': notificaciones_data,
+            'notificaciones_count': notificaciones_count,
+        })
+
+    return JsonResponse({'notificaciones': [], 'notificaciones_count': 0}, safe=False)
+
+def marcar_notificacion_como_leida(request, notificacion_id):
+    if request.method == 'POST' and request.user.is_authenticated:
+        try:
+            notificacion = Notificacion.objects.get(id=notificacion_id, terapeuta=request.user.terapeuta)
+            notificacion.leida = True
+            notificacion.save()
+            return JsonResponse({'success': True})
+        except Notificacion.DoesNotExist:
+            raise Http404("Notificación no encontrada.")
+    return JsonResponse({'success': False}, status=400)
