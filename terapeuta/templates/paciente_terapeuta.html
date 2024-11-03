@@ -20,6 +20,20 @@
                 Limpiar Filtro
             </button>
         </form>
+        <div class="dropdown">
+            <button class="filtro-btn" type="button" id="dropdownMenuButton">
+                Filtrar
+                <span id="arrow">▼</span>
+            </button>
+            <ul id="filterOptions" class="dropdown-content" style="display:none;">
+                <li><a href="#" onclick="applyFilter('first_name')" class="{% if order_by == 'first_name' %}filtro-activo{% endif %}">Nombre</a></li>
+                <li><a href="#" onclick="applyFilter('last_name')" class="{% if order_by == 'last_name' %}filtro-activo{% endif %}">Apellido</a></li>
+                <li><a href="#" onclick="applyFilter('rut')" class="{% if order_by == 'rut' %}filtro-activo{% endif %}">Rut</a></li>
+                <li><a href="#" onclick="applyFilter('edad')" class="{% if order_by == 'edad' %}filtro-activo{% endif %}">Edad</a></li>
+                <li><a href="#" onclick="applyFilter('patologia')" class="{% if order_by == 'patologia' %}filtro-activo{% endif %}">Tratamiento</a></li>
+                <li><a href="#" onclick="clearOrderFilter()">Limpiar filtro</a></li>
+            </ul>
+        </div>
     </div>
 {% endblock %}
 
@@ -66,24 +80,40 @@
 </div>
 
     <!-- Paginación -->
-{% if total_pacientes > 6 %}
-<div class="pagination">
-    {% if pacientes.has_previous %}
-        <a href="?search={{ request.GET.search }}&page={{ pacientes.previous_page_number }}" class="prev-button">
-            <img src="{% static 'icons/chevron-left-solid.svg' %}" alt="Anterior" class="previous-icon">
-        </a>
-    {% endif %}
-    <span id="pageNumber">{{ pacientes.number }}</span>
-    {% if pacientes.has_next %}
-        <a href="?search={{ request.GET.search }}&page={{ pacientes.next_page_number }}" class="next-button">
-            <img src="{% static 'icons/chevron-right-solid.svg' %}" alt="Siguiente" class="next-icon">
-        </a>
-    {% endif %}
-</div>
-{% endif %}
-</div>
+    <div class="pagination">
+        <span class="step-links">
+            {% if pacientes.has_previous %}
+                <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Primera Página">
+                    &#171;
+                </a>
+                <a href="?page={{ pacientes.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Página Anterior">
+                    &#8249;
+                </a>
+            {% else %}
+                <span class="disabled">&#171;</span>
+                <span class="disabled">&#8249;</span>
+            {% endif %}
+    
+            <span class="current">
+                {{ pacientes.number }}
+            </span>
+    
+            {% if pacientes.has_next %}
+                <a href="?page={{ pacientes.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Página Siguiente">
+                    &#8250;
+                </a>
+                <a href="?page={{ pacientes.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Última Página">
+                    &#187;
+                </a>
+            {% else %}
+                <span class="disabled">&#8250;</span>
+                <span class="disabled">&#187;</span>
+            {% endif %}
+        </span>
+    </div>
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'js/filtroListados.js' %}"></script>
 <script src="{% static 'js/buscar_paciente.js' %}"></script>
 {% endblock %}

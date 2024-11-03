@@ -18,6 +18,9 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.contrib import messages
 import re
+from django.core.files.storage import FileSystemStorage
+from django.core.mail import send_mail
+from django.conf import settings
 
 
 
@@ -58,7 +61,11 @@ def agenda(request):
         else:
             continue
     fechas_citas = json.dumps(citas_json)
-    return render(request, 'agenda.html', {'pacientes': pacientes, 'fechas_citas': fechas_citas, 'citas': citas})
+    return render(request, 'agenda.html', {
+        'pacientes': pacientes,
+        'fechas_citas': fechas_citas,
+        'citas': citas,
+        'modulo_agenda': True})
 
 def obtener_fechas_citas(request):
     if request.method == "GET":
@@ -93,9 +100,19 @@ def calcular_edad(fecha_nacimiento):
 
 
 #-------------------------------------PACIENTES-------------------------------------
+@role_required('Terapeuta')
 def pacientes_view(request):
     query = request.GET.get('search')  # Obtiene el parámetro de búsqueda desde el GET
-    pacientes_list = Paciente.objects.filter(is_active=True)
+    order_by = request.GET.get('order_by', 'first_name')  # Obtiene el parámetro de orden desde el GET
+    
+    # Filtra los pacientes asignados al terapeuta que inició sesión
+    try:
+        terapeuta = Terapeuta.objects.get(user=request.user)
+    except Terapeuta.DoesNotExist:
+        # Si el terapeuta no existe, retorna un error o redirecciona
+        return render(request, 'error.html', {'mensaje': 'Terapeuta no encontrado.'})
+
+    pacientes_list = Paciente.objects.filter(is_active=True, terapeuta=terapeuta)
 
     # Si hay una búsqueda, filtrar los pacientes
     if query:
@@ -107,17 +124,32 @@ def pacientes_view(request):
         )
 
     # Calcular la edad de cada paciente
+    pacientes_con_edad = []
     for paciente in pacientes_list:
         paciente.edad = calcular_edad(paciente.fecha_nacimiento)
+        pacientes_con_edad.append(paciente)
 
-    total_pacientes = pacientes_list.count()  # Cuenta la cantidad total de pacientes
+    # Ordenar la lista de pacientes con edad calculada
+    if order_by == 'edad':
+        pacientes_con_edad.sort(key=lambda x: x.edad)  # Ordena por edad
+    else:
+        pacientes_con_edad.sort(key=lambda x: getattr(x, order_by))  # Ordena por otros campos
+
+    total_pacientes = len(pacientes_con_edad)  # Cuenta la cantidad total de pacientes
 
     # Implementar la paginación
-    paginator = Paginator(pacientes_list, 6)  # Muestra 6 pacientes por página
+    paginator = Paginator(pacientes_con_edad, 5)  # Muestra 5 pacientes por página
     page_number = request.GET.get('page')  # Obtiene el número de la página de la URL
     pacientes = paginator.get_page(page_number)  # Obtiene los pacientes de la página actual
     
-    return render(request, 'paciente_terapeuta.html', {'pacientes': pacientes, 'total_pacientes': total_pacientes})
+    return render(request, 'paciente_terapeuta.html', {
+        'pacientes': pacientes, 
+        'total_pacientes': total_pacientes,
+        'query': query,  # Para mantener el valor en el HTML
+        'order_by': order_by,  # Para saber el orden actual en el HTML
+        'modulo_pacientes': True
+    })
+
 
 @role_required('Terapeuta')
 def cambiar_estado_paciente(request, id):
@@ -164,6 +196,7 @@ def historial_paciente_view(request, paciente_id):
             'paciente': paciente,
             'terapeuta': terapeuta,
             'rutinas': rutinas,
+            'modulo_pacientes': True,
         }
         return render(request, 'historial_paciente.html', context)
     else:
@@ -252,11 +285,7 @@ def agendar_cita(request):
             cita.save()
             
             return redirect('agenda')
-    return render(request, 'agenda.html')
-
-@login_required  # Asegúrate de que el usuario esté autenticado
-def calendar(request):
-    return render(request, 'calendar.html')
+    return render(request, 'agenda.html', {'modulo_agenda': True})
 
 def editar_cita(request):
     if request.method == "POST":
@@ -288,7 +317,9 @@ def eliminar_cita(request, cita_id):
 
 def grafico_progreso_paciente(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
-    return render(request, 'grafico_progreso_paciente.html', {'paciente': paciente})
+    return render(request, 'grafico_progreso_paciente.html', {
+        'paciente': paciente,
+        'modulo_pacientes': True})
 
 def obtener_grafico_progreso_paciente(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
@@ -425,6 +456,27 @@ def crear_rutina(request, paciente_id):
                 velocidad=velocidad,
                 descripcion='',  # Puedes ajustar este campo si es necesario
             )
+            asunto = f"Hola {paciente.first_name}, se ha creado una nueva rutina para ti"
+            mensaje = (
+                f"Estimado {paciente.first_name},\n\n"
+                f"Se ha creado una nueva rutina asignada por el terapeuta: {terapeuta.user.first_name} {terapeuta.user.last_name}.\n"
+                f"Detalles de la rutina:\n"
+                f"Fecha de inicio: {nueva_rutina.fecha_inicio}\n"
+                f"Fecha de término: {nueva_rutina.fecha_termino}\n"
+                f"Ángulo inicial: {nueva_rutina.angulo_inicial}\n"
+                f"Ángulo final: {nueva_rutina.angulo_final}\n"
+                f"Repeticiones: {nueva_rutina.repeticiones}\n"
+                f"Velocidad: {nueva_rutina.velocidad}\n\n"
+                f"Saludos,\nOrtesis Web"
+            )
+
+            send_mail(
+                asunto,
+                mensaje,
+                settings.DEFAULT_FROM_EMAIL,
+                [paciente.email],
+                fail_silently=False,
+            )
 
             return JsonResponse({'status': 'success'})
         except Exception as e:
@@ -457,7 +509,9 @@ def editar_rutina(request, rutina_id):
     if request.method == 'POST':
         try:
             rutina = Rutina.objects.get(id=rutina_id)
-
+            paciente = rutina.paciente  # Obtén el paciente desde la rutina
+            terapeuta = get_object_or_404(Terapeuta, user=request.user)
+            
             # Obtener y validar los datos
             fecha_inicio_str = request.POST.get('fecha_inicio')
             angulo_inicial_str = request.POST.get('angulo_inicial')
@@ -477,6 +531,28 @@ def editar_rutina(request, rutina_id):
             # Aquí puedes agregar lógica para fecha_termino
 
             rutina.save()
+
+            asunto = f"Hola {paciente.first_name}, se ha editado tu rutina"
+            mensaje = (
+                f"Estimado {paciente.first_name},\n\n"
+                f"Se han realizado cambios en tu rutina asignada por el terapeuta: {terapeuta.user.first_name} {terapeuta.user.last_name}.\n"
+                f"Detalles de la rutina:\n"
+                f"Fecha de inicio: {rutina.fecha_inicio}\n"
+                f"Fecha de término: {rutina.fecha_termino}\n"
+                f"Ángulo inicial: {rutina.angulo_inicial}\n"
+                f"Ángulo final: {rutina.angulo_final}\n"
+                f"Repeticiones: {rutina.repeticiones}\n"
+                f"Velocidad: {rutina.velocidad}\n\n"
+                f"Saludos,\nOrtesis Web"
+            )
+
+            send_mail(
+                asunto,
+                mensaje,
+                settings.DEFAULT_FROM_EMAIL,
+                [paciente.email],
+                fail_silently=False,
+            )
 
             return JsonResponse({'status': 'success'})
         except ValueError as e:
@@ -499,7 +575,8 @@ def observaciones_paciente(request, paciente_id):
     context = {
         'paciente': paciente,
         'observaciones': observaciones,
-        'fecha_actual': now().strftime('%d/%m/%Y')
+        'fecha_actual': now().strftime('%d/%m/%Y'),
+        'modulo_pacientes': True
     }
 
     return render(request, 'registrar_observaciones.html', context)
@@ -537,7 +614,9 @@ def editar_observacion(request, observacion_id):
         
         return redirect('observaciones_paciente', paciente_id=observacion.paciente.id)
 
-    return render(request, 'editar_observacion.html', {'observacion': observacion})
+    return render(request, 'editar_observacion.html', {
+        'observacion': observacion,
+        'modulo_pacientes': True})
 
 @role_required('Terapeuta')
 def eliminar_observacion(request, observacion_id):
@@ -555,29 +634,40 @@ def perfil(request):
     
     context = {
         'terapeuta': terapeuta,
+        'modulo_perfil': True
     }
     
     return render(request, 'perfil.html', context)
 
 def editar_perfil(request, pk):
     terapeuta = get_object_or_404(Terapeuta, pk=pk)
+    
     if request.method == 'POST':
         nueva_presentacion = request.POST.get('presentacion')
         nuevo_correo = request.POST.get('correo_contacto')
+        imagen = request.FILES.get('imagen_perfil')
+        eliminar_imagen = request.POST.get('eliminar_imagen')
 
         try:
-            # Validar el correo
+            # valida el correo
             validar_correo(nuevo_correo)
-
-            # Verificar si el correo ya está en uso por otro terapeuta
             if Terapeuta.objects.filter(correo_contacto=nuevo_correo).exclude(pk=terapeuta.pk).exists():
                 messages.error(request, 'El correo ya está en uso por otro terapeuta.')
             else:
+                # Actualiza los datos del terapeuta
                 terapeuta.presentacion = nueva_presentacion
                 terapeuta.correo_contacto = nuevo_correo
-                terapeuta.save()
 
-                messages.success(request, 'Perfil actualizado correctamente.')
+                # Manejo de la imagen de perfil
+                if eliminar_imagen:
+                    if terapeuta.imagen_perfil:
+                        terapeuta.imagen_perfil.delete()
+                    terapeuta.imagen_perfil = None
+                elif imagen:
+                    terapeuta.imagen_perfil = imagen
+
+                terapeuta.save()
+                messages.success(request, 'Perfil actualizado exitosamente.')
                 return redirect('perfil')
 
         except ValidationError as e:
@@ -585,6 +675,7 @@ def editar_perfil(request, pk):
 
     context = {
         'terapeuta': terapeuta,
+        'modulo_perfil': True
     }
     return render(request, 'perfil.html', context)
     
@@ -593,8 +684,8 @@ def validar_correo(correo):
     patron = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     if not re.match(patron, correo):
         raise ValidationError("Introduzca una dirección de correo electrónico válida.")
-
-
+    
+    
 
 
 def historial_sesiones(request, paciente_id):
@@ -616,6 +707,7 @@ def historial_sesiones(request, paciente_id):
         'rutinas': rutinas,
         'rutina_seleccionada': rutina_seleccionada,
         'sesiones': sesiones,
+        'modulo_pacientes': True
     }
     return render(request, 'historial_sesiones.html', context)
 

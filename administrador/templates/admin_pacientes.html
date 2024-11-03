@@ -12,16 +12,23 @@
 <div class="contenedor-header">
     <h1>Pacientes</h1>
 
-    <form class="busqueda-form">
-        <div class="busqueda-input">
-            <input type="text" class="form-control" id="searchInput" placeholder="Búsqueda por Nombre o Rut" aria-label="Buscar Paciente">
-            <button type="button" id="clearButton" class="clear-button" style="display: none;">Limpiar Filtro</button>
-        </div>
+    <form method="GET" action="{% if estado == 'activos' %}
+                                    {% url 'listar_pacientes_activos' %}
+                                {% else %}
+                                    {% url 'listar_pacientes_inactivos' %}
+                                {% endif %}"
+                                class="search-container"> 
+        <input type="text" name="search" placeholder="Nombre, Rut, Terapeuta o 'Sin terapeuta'" class="search-bar" id="searchBar" value="{{ request.GET.search|default:'' }}" oninput="toggleClearButton()">
+        <img src="{% static 'icons/Lupa.svg' %}" alt="Buscar" class="search-icon">
+        
+        <button type="button" id="clearButton" class="clear-button" onclick="clearSearch()" style="display: {% if request.GET.search %}inline-block{% else %}none{% endif %};">
+            Limpiar Filtro
+        </button>
     </form>
-    <button id="boton-agregar-paciente">Agregar Paciente
-        <img src="{% static 'icons/plus.svg' %}">
-    </button>
 </div>
+<button id="boton-agregar-paciente">Agregar Paciente
+    <img src="{% static 'icons/plus.svg' %}">
+</button>
 {% endblock %}
 
 {% block content %}
@@ -41,7 +48,20 @@
         {% endif %}
     </div>
 
-    <button class="filtro-btn" type="button">Filtrar</button>
+    <div class="dropdown">
+        <button class="filtro-btn" type="button" id="dropdownMenuButton">
+            Filtrar
+            <span id="arrow">▼</span>
+        </button>
+        <ul id="filterOptions" class="dropdown-content" style="display:none;">
+            <li><a href="#" onclick="applyFilter('date_joined')" class="{% if order_by == 'date_joined' %}filtro-activo{% endif %}">Fecha de Ingreso</a></li>
+            <li><a href="#" onclick="applyFilter('terapeuta')" class="{% if order_by == 'terapeuta' %}filtro-activo{% endif %}">Terapeuta</a></li>
+            <li><a href="#" onclick="applyFilter('first_name')" class="{% if order_by == 'first_name' %}filtro-activo{% endif %}">Nombre</a></li>
+            <li><a href="#" onclick="applyFilter('last_name')" class="{% if order_by == 'last_name' %}filtro-activo{% endif %}">Apellido</a></li>
+            <li><a href="#" onclick="applyFilter('rut')" class="{% if order_by == 'rut' %}filtro-activo{% endif %}">Rut</a></li>
+            <li><a href="#" onclick="clearOrderFilter()">Limpiar filtro</a></li>
+        </ul>
+    </div>
     
 </div>
 
@@ -66,7 +86,7 @@
                 <td class="centro-tabla">{{ paciente.rut }}</td>
                 <td class="centro-tabla">
                     <span class="badge {% if paciente.is_active %}bg-success{% else %}bg-secondary{% endif %}">
-                        {% if paciente.is_active %}Activo <img class = "img-activo" src="{% static "icons/activo.svg" %}"> {% else %}Inactivo <img class = "img-activo" src="{% static "icons/inactivo.svg" %}"> {% endif %}
+                        {% if paciente.is_active %}Activo <img class = "img-estado" src="{% static "icons/activo.svg" %}"> {% else %}Inactivo <img class = "img-estado" src="{% static "icons/inactivo.svg" %}"> {% endif %}
                     </span>
                 </td>
                 <td class="centro-tabla">{% if paciente.terapeuta %}{{ paciente.terapeuta.user.first_name }} {{ paciente.terapeuta.user.last_name }}{% else %}Sin terapeuta{% endif %}</td>
@@ -112,6 +132,40 @@
         </div>
     </div>
 </div>
+
+<!--    Paginación  -->
+<div class="pagination">
+    <span class="step-links">
+        {% if pacientes.has_previous %}
+            <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Primera Página">
+                &#171;
+            </a>
+            <a href="?page={{ pacientes.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Página Anterior">
+                &#8249;
+            </a>
+        {% else %}
+            <span class="disabled">&#171;</span>
+            <span class="disabled">&#8249;</span>
+        {% endif %}
+
+        <span class="current">
+            {{ pacientes.number }}
+        </span>
+
+        {% if pacientes.has_next %}
+            <a href="?page={{ pacientes.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Página Siguiente">
+                &#8250;
+            </a>
+            <a href="?page={{ pacientes.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Última Página">
+                &#187;
+            </a>
+        {% else %}
+            <span class="disabled">&#8250;</span>
+            <span class="disabled">&#187;</span>
+        {% endif %}
+    </span>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -242,6 +296,7 @@
     });
     
 </script>
-<script src="{% static 'js/admin_buscador_paciente.js' %}"></script>
+<script src="{% static 'js/buscar_paciente_recepcionista.js' %}"></script>
+<script src="{% static 'js/filtroListados.js' %}"></script>
 {% endblock %}
 

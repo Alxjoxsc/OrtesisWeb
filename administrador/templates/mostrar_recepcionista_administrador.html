@@ -1,0 +1,140 @@
+{% extends 'administrador_base.html' %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'styles/mostrar_paciente_administrador.css' %}">
+<link rel="stylesheet" href="{% static 'styles/modal.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<header>
+
+{% if recepcionista.user.is_active %}
+    <a class="back-arrow" href="{% url 'listar_recepcionistas_activos' %}">
+        <img src="{% static 'icons/Volver-atras.svg' %}" alt="">
+    </a>
+{% else %}
+    <a class="back-arrow" href="{% url 'listar_recepcionistas_inactivos' %}">
+        <img src="{% static 'icons/Volver-atras.svg' %}" alt="">
+    </a>
+{% endif %}
+<h1>Recepcionista {{recepcionista.user.first_name}} {{recepcionista.user.last_name}}</h1>
+</header>  
+
+<div class="container-paciente">
+    <div class="card-paciente">
+        {% if recepcionista.user.is_active %}
+            <div class="icon-container" onclick="window.location.href=#">
+                <img src="{% static 'icons/lapiz.svg' %}" class="icon">
+            </div>
+        {% else %}
+        <a href="#" class="btn btn-reactivar" title="Restaurar a estado activo" 
+            onclick="mostrarPopUpRestaurar('{{ recepcionista.id }}', '{{ recepcionista.user.first_name }} {{ recepcionista.user.last_name }}')">
+            Reactivar Recepcionista
+        </a> 
+        {% endif %}
+        <div class="columna izquierda">
+            <p><strong>Rut:</strong><br> <span>{{ recepcionista.user.username }}</span></p>
+            <p><strong>Correo Electrónico:</strong><br> <span>{{ recepcionista.user.email }}</span></p>
+            <p><strong>Formación Académica:</strong><br> <span>{{ recepcionista.formacion_academica}}</span></p>
+
+        </div>
+
+        <div class="columna derecha">
+            <p><strong>Turno:</strong><br>
+                {% if recepcionista.turno == "T" %} 
+                    <span>Tarde</span></p>
+                {% elif recepcionista.turno == "M" %}
+                    <span>Mañana</span></p>
+                {% elif recepcionista.turno == "N" %}
+                    <span>Noche</span></p>
+                {% else %}
+                    <span>Turno Desconocido</span><p>
+                {% endif %}
+            <p><strong>Fecha de Contratación:</strong><br> <span>{{recepcionista.fecha_contratacion}}</span><p>
+            <p><strong>Años de Experiencia:</strong><br> <span>{{recepcionista.experiencia}} Años</span><p>
+            
+        </div>
+    </div>
+</div>
+
+<div id="popupModal" class="modal" style="display: none;">
+    <div class="contenido-modal">
+        <span class="close" onclick="cerrarPopUp()">&times;</span>
+        <h2 id="popup-titulo"></h2>
+        <p id="popup-mensaje"></p>
+        <div class="botones-modal">
+            <button class="boton-cancelar" onclick="cerrarPopUp()">Cancelar</button>
+            <button class="boton-confirmar" id="confirmButton" onclick="confirmarCambioEstado()">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const restaurarBtn = document.getElementById('restaurar-btn');
+
+        function updateButtonsState() {
+            const selectedCheckboxes = Array.from(checkboxes).filter(checkbox => checkbox.checked);
+
+            if (restaurarBtn) {
+                restaurarBtn.disabled = selectedCheckboxes.length === 0 || !selectedCheckboxes.some(checkbox => {
+                    const badge = checkbox.closest('tr').querySelector('td:nth-child(4) .badge');
+                    return badge.textContent.trim() === 'Inactivo';
+                });
+            }
+
+        if (restaurarBtn) {
+            restaurarBtn.addEventListener('click', function() {
+                mostrarPopUpCambioEstado('activo');
+            });
+            }
+        }
+
+        window.mostrarPopUpRestaurar = function(id, nombre) {
+            document.getElementById('popup-titulo').textContent = `Restaurar paciente`;
+            document.getElementById('popup-mensaje').textContent = `¿Está seguro de que desea restaurar a ${nombre}?`;
+            document.getElementById('popupModal').style.display = 'block';
+        
+            document.getElementById('confirmButton').setAttribute('data-estado', 'activo');
+            document.getElementById('confirmButton').setAttribute('data-ids', JSON.stringify([id]));
+
+        };
+
+        window.cerrarPopUp = function() {
+            document.getElementById('popupModal').style.display = 'none';
+        };
+
+        window.confirmarCambioEstado = function() {
+            const estado = document.getElementById('confirmButton').getAttribute('data-estado');
+            const selectedIds = JSON.parse(document.getElementById('confirmButton').getAttribute('data-ids'));
+
+            const url = estado === 'inactivo' ? "{% url 'agregar_paciente_admin' %}" : "{% url 'restaurar_paciente' %}";
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({ pacientes_ids: selectedIds })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    window.location.href = "{% url 'listar_pacientes_activos' %}";
+                } else {
+                    alert(`Error al ${estado === 'inactivo' ? 'inactivar' : 'restaurar'} los pacientes.`);
+                }
+            });
+
+            cerrarPopUp();
+        };
+    });
+</script>
+    
+
+{% endblock %}

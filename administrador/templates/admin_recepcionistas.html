@@ -6,32 +6,291 @@
 
 {% block extra_head%}
     <link rel="stylesheet" href="{% static 'styles/admin_recepcionista.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tabla.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/modal.css' %}">
 {% endblock %}
 
 
 {% block header %}
 <div class="contenedor-header">
     <h1>Recepcionistas</h1>
-    <form class="busqueda-form">
-        <div class="busqueda-input">
-            <input type="text" class="form-control" id="searchInput" placeholder="Búsqueda por Nombre o Rut" aria-label="Buscar Terapeuta">
-            <button type="button" id="clearButton" class="clear-button" style="display: none;">Limpiar Filtro</button>
-        </div>
+    <form method="GET" action="{% if estado == 'activos' %}
+                                    {% url 'listar_recepcionistas_activos' %}
+                                {% else %}
+                                    {% url 'listar_recepcionistas_inactivos' %}
+                                {% endif %}"
+                                class="search-container"> 
+        <input type="text" name="search" placeholder="Búsqueda por Nombre, Rut o Especialidad" class="search-bar" id="searchBar" value="{{ request.GET.search|default:'' }}" oninput="toggleClearButton()">
+        <img src="{% static 'icons/Lupa.svg' %}" alt="Buscar" class="search-icon">
+        
+        <button type="button" id="clearButton" class="clear-button" onclick="clearSearch()" style="display: {% if request.GET.search %}inline-block{% else %}none{% endif %};">
+            Limpiar Filtro
+        </button>
     </form>
-    <button id="boton-agregar-recepcionista">Agregar Recepcionista
-        <img <img src="{% static 'icons/plus.svg' %}" alt="Agregar">
-    </button>
 </div>
+<button id="boton-agregar-recepcionista">Agregar Recepcionista
+    <img src="{% static 'icons/plus.svg' %}" alt="Agregar">
+</button>
 {% endblock %}
-
 
 {% block content %}
-<div style="display: flex; justify-content: center; align-items: center; height: 80vh;">
-    <h1 style="font-size: 48px; font-weight: bold;">Recepcionista</h1>
+
+<div class="contenedor-superior">
+
+    <div class="filtros">
+        <a href="{% url 'listar_recepcionistas_activos' %}" class="btn-{% if estado == 'activos' %}active{% endif %}" type="button">Activos</a>
+        <a href="{% url 'listar_recepcionistas_inactivos' %}" class="btn-{% if estado == 'inactivos' %}active{% endif %}" type="button">Inactivos</a>
+    </div>
+
+    <div class="seleccion-estados">
+        {% if estado == 'activos' %}
+            <button id="inactivar-btn" class="btn btn-warning" disabled>Inactivar</button>
+        {% elif estado == 'inactivos' %}
+            <button id="restaurar-btn" class="btn btn-success" disabled>Restaurar</button>
+        {% endif %}
+    </div>
+
+    <div class="dropdown">
+        <button class="filtro-btn" type="button" id="dropdownMenuButton">
+            Filtrar
+            <span id="arrow">▼</span>
+        </button>
+        <ul id="filterOptions" class="dropdown-content" style="display:none;">
+            <li><a href="#" onclick="applyFilter('user__date_joined')" class="{% if order_by == 'user__date_joined' %}filtro-activo{% endif %}">Fecha de Ingreso</a></li>
+            <li><a href="#" onclick="applyFilter('user__first_name')" class="{% if order_by == 'user__first_name' %}filtro-activo{% endif %}">Nombre</a></li>
+            <li><a href="#" onclick="applyFilter('user__last_name')" class="{% if order_by == 'user__last_name' %}filtro-activo{% endif %}">Apellido</a></li>
+            <li><a href="#" onclick="applyFilter('user__profile__rut')" class="{% if order_by == 'user__profile__rut' %}filtro-activo{% endif %}">Rut</a></li>
+            <li><a href="#" onclick="clearOrderFilter()">Limpiar filtro</a></li>
+        </ul>
+    </div>
+    
 </div>
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="select-all"></th>
+                <th>Nombre</th>
+                <th>Rut</th>
+                <th>Estado</th>
+                <th>Fecha de Ingreso</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for recepcionista in recepcionistas %}
+            <tr>
+                <td class="inicio-tabla"><input type="checkbox" class="recepcionista-checkbox" value="{{ recepcionista.id }}"></td>
+                <td class="centro-tabla">{{ recepcionista.user.first_name }} {{ recepcionista.user.last_name }}</td>
+                <td class="centro-tabla">{{ recepcionista.user.profile.rut }}</td>
+                <td class="centro-tabla">
+                    <span class="badge {% if recepcionista.user.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                        {% if recepcionista.user.is_active %}Activo <img class = "img-estado" src="{% static "icons/activo.svg" %}"> {% else %}Inactivo <img class = "img-estado" src="{% static "icons/inactivo.svg" %}"> {% endif %}
+                    </span>
+                </td>
+                <td class="centro-tabla">{{ recepcionista.user.date_joined.date }}</td>
+                <td class="final-tabla">
+                    <a href="{% url 'mostrar_recepcionista_administrador' recepcionista.id %}" class="btn btn-outline-danger btn-sm" title="Ver detalle recepcionista" 
+                        onclick="mostrarPopUp('{{ recepcionista.id }}', '{{ recepcionista.first_name }} {{ recepcionista.last_name }}', '{{ recepcionista.rut }}', '{{ recepcionista.patologia }}')">
+                        <img src="{% static 'icons/recepcionista_icono.svg' %}" alt="Ver Detalle recepcionista" />
+                    </a>
+                    {% if estado == 'activos' %}
+                    <a href="#" class="btn btn-outline-danger btn-sm" title="Pasar a estado inactivo" 
+                        onclick="mostrarPopUpInactivar('{{ recepcionista.id }}', '{{ recepcionista.user.first_name }} {{ recepcionista.user.last_name }}', '{{ recepcionista.user.profile.rut }}')">
+                        <img src="{% static 'icons/DeleteUser.svg' %}" alt="Inactivar" />
+                    </a>
+                    {% elif estado == 'inactivos' %}
+                    <a href="#" class="btn btn-outline-danger btn-sm" title="Restaurar a estado activo" 
+                        onclick="mostrarPopUpRestaurar('{{ recepcionista.id }}', '{{ recepcionista.user.first_name }} {{ recepcionista.user.last_name }}')">
+                        <img src="{% static 'icons/restore.svg' %}" alt="Restaurar" />
+                    </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="table-empty">No hay recepcionistas registrados.</td>
+            </tr>
+            {% endfor %}
+            <tr id="no-coincidencias" style="display: none;">
+                <td colspan="7" class="table-empty">No se encontraron coincidencias.</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="popupModal" class="modal" style="display: none;">
+    <div class="contenido-modal">
+        <span class="close" onclick="cerrarPopUp()">&times;</span>
+        <h2 id="popup-titulo"></h2>
+        <p id="popup-mensaje"></p>
+        <div class="botones-modal">
+            <button class="boton-cancelar" onclick="cerrarPopUp()">Cancelar</button>
+            <button class="boton-confirmar" id="confirmButton" onclick="confirmarCambioEstado()">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<!--    Paginación  -->
+<div class="pagination">
+    <span class="step-links">
+        {% if recepcionistas.has_previous %}
+            <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Primera Página">
+                &#171;
+            </a>
+            <a href="?page={{ recepcionistas.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Página Anterior">
+                &#8249;
+            </a>
+        {% else %}
+            <span class="disabled">&#171;</span>
+            <span class="disabled">&#8249;</span>
+        {% endif %}
+
+        <span class="current">
+            {{ recepcionistas.number }}
+        </span>
+
+        {% if recepcionistas.has_next %}
+            <a href="?page={{ recepcionistas.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Página Siguiente">
+                &#8250;
+            </a>
+            <a href="?page={{ recepcionistas.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.order_by %}&order_by={{ request.GET.order_by }}{% endif %}" title="Última Página">
+                &#187;
+            </a>
+        {% else %}
+            <span class="disabled">&#8250;</span>
+            <span class="disabled">&#187;</span>
+        {% endif %}
+    </span>
+</div>
+
 {% endblock %}
 
+
+
 {% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkboxes = document.querySelectorAll('.recepcionista-checkbox');
+        const selectAllCheckbox = document.getElementById('select-all');
+        const inactivarBtn = document.getElementById('inactivar-btn');
+        const restaurarBtn = document.getElementById('restaurar-btn');
+
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', function() {
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+                updateButtonsState();
+            });
+        }
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateButtonsState);
+        });
+
+        function updateButtonsState() {
+            const selectedCheckboxes = Array.from(checkboxes).filter(checkbox => checkbox.checked);
+            
+            if (inactivarBtn) {
+                inactivarBtn.disabled = selectedCheckboxes.length === 0 || !selectedCheckboxes.some(checkbox => {
+                    const badge = checkbox.closest('tr').querySelector('td:nth-child(4) .badge');
+                    return badge.textContent.trim() === 'Activo';
+                });
+            }
+
+            if (restaurarBtn) {
+                restaurarBtn.disabled = selectedCheckboxes.length === 0 || !selectedCheckboxes.some(checkbox => {
+                    const badge = checkbox.closest('tr').querySelector('td:nth-child(4) .badge');
+                    return badge.textContent.trim() === 'Inactivo';
+                });
+            }
+        }
+
+        if (inactivarBtn) {
+            inactivarBtn.addEventListener('click', function() {
+                mostrarPopUpCambioEstado('inactivo');
+            });
+        }
+
+        if (restaurarBtn) {
+            restaurarBtn.addEventListener('click', function() {
+                mostrarPopUpCambioEstado('activo');
+            });
+        }
+
+        // Pop-up para varios recepcionistas
+        window.mostrarPopUpCambioEstado = function(estado) {
+            const selectedCheckboxes = Array.from(checkboxes).filter(cb => cb.checked);
+            const cantidadSeleccionados = selectedCheckboxes.length;
+            const titulo = estado === 'inactivo' ? 'Cambiar a estado inactivo' : 'Restaurar a estado activo';
+            const mensaje = estado === 'inactivo' 
+                ? `¿Desea cambiar a estado inactivo a ${cantidadSeleccionados} recepcionistas? Los recepcionistas podrán ser visualizados y reactivados en la sección de inactivos.`
+                : `¿Desea restaurar a estado activo a ${cantidadSeleccionados} recepcionistas? Los recepcionistas podrán ser visualizados en la sección de activos`;
+
+            document.getElementById('popup-titulo').textContent = titulo;
+            document.getElementById('popup-mensaje').textContent = mensaje;
+            document.getElementById('popupModal').style.display = 'block';
+
+            document.getElementById('confirmButton').setAttribute('data-estado', estado);
+            document.getElementById('confirmButton').setAttribute('data-ids', JSON.stringify(selectedCheckboxes.map(cb => cb.value)));
+        };
+
+        // Pop-up individual para un recepcionista
+        window.mostrarPopUpInactivar = function(recepcionistaId, nombre, rut) {
+            const titulo = `Cambiar a estado inactivo a ${nombre}`;
+            const mensaje = `¿Está seguro de que desea inactivar al recepcionista ${nombre} (${rut})? Este recepcionista podrá ser reactivado en la sección de inactivos.`;
+
+            document.getElementById('popup-titulo').textContent = titulo;
+            document.getElementById('popup-mensaje').textContent = mensaje;
+            document.getElementById('popupModal').style.display = 'block';
+
+            document.getElementById('confirmButton').setAttribute('data-estado', 'inactivo');
+            document.getElementById('confirmButton').setAttribute('data-ids', JSON.stringify([recepcionistaId]));
+        };
+        window.mostrarPopUpRestaurar = function(id, nombre) {
+            document.getElementById('popup-titulo').textContent = `Restaurar recepcionista`;
+            document.getElementById('popup-mensaje').textContent = `¿Está seguro de que desea restaurar a ${nombre}?`;
+            document.getElementById('popupModal').style.display = 'block';
+        
+            document.getElementById('confirmButton').setAttribute('data-estado', 'activo');
+            document.getElementById('confirmButton').setAttribute('data-ids', JSON.stringify([id]));
+        };
+
+        window.cerrarPopUp = function() {
+            document.getElementById('popupModal').style.display = 'none';
+        };
+
+        window.confirmarCambioEstado = function() {
+            const estado = document.getElementById('confirmButton').getAttribute('data-estado');
+            const selectedIds = JSON.parse(document.getElementById('confirmButton').getAttribute('data-ids'));
+
+            const url = estado === 'inactivo' ? "{% url 'cambiar_estado_inactivo_recepcionista' %}" : "{% url 'restaurar_recepcionista' %}";
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({ recepcionistas_ids: selectedIds })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    location.reload();
+                } else {
+                    alert(`Error al ${estado === 'inactivo' ? 'inactivar' : 'restaurar'} los recepcionistas.`);
+                }
+            });
+
+            cerrarPopUp();
+        };
+    });
+    
+</script>
+<script src="{% static 'js/filtroListados.js' %}"></script>
 <script src="{% static 'js/admin_buscador_recepcionista.js' %}"></script>
 {% endblock %}
 

@@ -13,24 +13,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from datetime import date
 from django.contrib import messages
 
-# @role_required('Recepcionista')
-# def recepcionista_terapeutas_activos(request):
-#     '''query = request.GET.get('q', '')
-#     if query:
-#         terapeuta = Terapeuta.objects.filter(
-#             estado='activo',
-#             nombre__icontains=query
-#         ) | Terapeuta.objects.filter(
-#             estado='activo',
-#             rut__icontains=query
-#         )
-#     else:
-#     '''
-#     terapeuta = Terapeuta.objects.all()
-
-#     return render(request, 'recepcionista_terapeutas_activos.html', {'terapeuta': terapeuta})
-
-
 def calcular_edad(fecha_nacimiento):
     hoy = date.today()
     return hoy.year - fecha_nacimiento.year - ((hoy.month, hoy.day) < (fecha_nacimiento.month, fecha_nacimiento.day))
@@ -40,16 +22,26 @@ def calcular_edad(fecha_nacimiento):
 @role_required('Recepcionista')
 def recepcionista_pacientes_activos(request):
     query = request.GET.get('search')
+    order_by = request.GET.get('order_by', 'first_name')
     pacientes_list = Paciente.objects.filter(is_active=True)
 
     # Si hay un parámetro de búsqueda, filtrar los pacientes
     if query:
-        pacientes_list = pacientes_list.filter(
-            Q(first_name__icontains=query) |
-            Q(last_name__icontains=query) |
-            Q(rut__icontains=query) |
-            Q(patologia__icontains=query)
-        )
+
+        if query.lower() == 'sin terapeuta':
+            pacientes_list = pacientes_list.filter(terapeuta=None)
+
+        else:
+            pacientes_list = pacientes_list.filter(
+                Q(first_name__icontains=query) |
+                Q(last_name__icontains=query) |
+                Q(rut__icontains=query) |
+                Q(terapeuta__user__first_name__icontains=query) |
+                Q(terapeuta__user__last_name__icontains=query)
+            )
+
+    if order_by:
+        pacientes_list = pacientes_list.order_by(order_by)
 
     # Calcular la edad de cada paciente
     for paciente in pacientes_list:
@@ -57,39 +49,63 @@ def recepcionista_pacientes_activos(request):
 
     total_pacientes = pacientes_list.count()
 
-    paginator = Paginator(pacientes_list, 15)
+    paginator = Paginator(pacientes_list, 5)
     page_number = request.GET.get('page') 
     pacientes = paginator.get_page(page_number)
 
     # Renderizar el template con los pacientes y la información de paginación
-    return render(request, 'recepcionista_pacientes.html', {'pacientes': pacientes, 'total_pacientes': total_pacientes, 'estado': 'activos'})
+    return render(request, 'recepcionista_pacientes.html', {
+        'pacientes': pacientes, 
+        'total_pacientes': total_pacientes, 
+        'estado': 'activos',
+        'query': query,  # Para mantener el valor en el HTML
+        'order_by': order_by,  # Para saber el orden actual en el HTML
+        'modulo_pacientes': True
+        })
 
 @role_required('Recepcionista')
 def recepcionista_pacientes_inactivos(request):
     query = request.GET.get('search')
+    order_by = request.GET.get('order_by', 'first_name')
     pacientes_list = Paciente.objects.filter(is_active=False)
 
     # Si hay un parámetro de búsqueda, filtrar los pacientes
     if query:
-        pacientes_list = pacientes_list.filter(
-            Q(first_name__icontains=query) |
-            Q(last_name__icontains=query) |
-            Q(rut__icontains=query) |
-            Q(patologia__icontains=query)
-        )
 
+        if query.lower() == 'sin terapeuta':
+            pacientes_list = pacientes_list.filter(terapeuta=None)
+
+        else:
+            pacientes_list = pacientes_list.filter(
+                Q(first_name__icontains=query) |
+                Q(last_name__icontains=query) |
+                Q(rut__icontains=query) |
+                Q(terapeuta__user__first_name__icontains=query) |
+                Q(terapeuta__user__last_name__icontains=query)
+            )
+
+    if order_by:
+        pacientes_list = pacientes_list.order_by(order_by)
+        
     # Calcular la edad de cada paciente
     for paciente in pacientes_list:
         paciente.edad = calcular_edad(paciente.fecha_nacimiento)
 
     total_pacientes = pacientes_list.count()
 
-    paginator = Paginator(pacientes_list, 15)
+    paginator = Paginator(pacientes_list, 5)
     page_number = request.GET.get('page') 
     pacientes = paginator.get_page(page_number)
 
     # Renderizar el template con los pacientes y la información de paginación
-    return render(request, 'recepcionista_pacientes.html', {'pacientes': pacientes, 'total_pacientes': total_pacientes, 'estado': 'inactivos'})
+    return render(request, 'recepcionista_pacientes.html', {
+        'pacientes': pacientes,
+        'total_pacientes': total_pacientes,
+        'estado': 'inactivos',
+        'query': query,  # Para mantener el valor en el HTML
+        'order_by': order_by,  # Para saber el orden actual en el HTML
+        'modulo_pacientes': True
+        })
 
 
 @role_required('Recepcionista')
@@ -150,14 +166,21 @@ def agregar_paciente(request):
     else:
         paciente_form = CrearPacienteForm()
     
-    return render(request, 'agregar_paciente.html', {'paciente_form': paciente_form})
+    return render(request, 'agregar_paciente.html', {
+        'paciente_form': paciente_form,
+        'modulo_pacientes': True})
 
+
+######################################    TERAPEUTAS     ######################################
 @role_required('Recepcionista')
 def elegir_terapeuta(request, id):
     paciente = Paciente.objects.get(id=id)
     terapeuta = Terapeuta.objects.all()
     print(terapeuta)
-    return render(request, 'elegir_terapeuta.html', {'terapeuta': terapeuta, 'paciente': paciente})
+    return render(request, 'elegir_terapeuta.html', {
+        'terapeuta': terapeuta,
+        'paciente': paciente,
+        'modulo_terapeutas': True})
 
 @role_required('Recepcionista')
 def asignar_terapeuta(request, terapeuta_id, paciente_id):
@@ -174,7 +197,9 @@ def asignar_terapeuta(request, terapeuta_id, paciente_id):
     paciente.save()
 
     # Redirigir a la página de mostrar paciente
-    return render(request, 'mostrar_paciente_recepcionista.html', {'paciente': paciente})
+    return render(request, 'mostrar_paciente_recepcionista.html', {
+        'paciente': paciente,
+        'modulo_terapeutas': True})
 
 @role_required('Recepcionista')
 def recepcionista_terapeutas_activos(request):
@@ -187,7 +212,8 @@ def recepcionista_terapeutas_activos(request):
         terapeutas_list = terapeutas_list.filter(
             Q(user__first_name__icontains=query) |  
             Q(user__last_name__icontains=query) |   
-            Q(user__username__icontains=query)
+            Q(user__profile__rut__icontains=query) |
+            Q(especialidad__icontains=query)
         )
     
     # Aplicar el orden basado en el parámetro
@@ -196,13 +222,16 @@ def recepcionista_terapeutas_activos(request):
     
     total_terapeutas = terapeutas_list.count()
 
-    paginator = Paginator(terapeutas_list, 10)
+    paginator = Paginator(terapeutas_list, 5)
     page_number = request.GET.get('page')
     terapeutas = paginator.get_page(page_number)
 
     return render(request, 'recepcionista_terapeutas_activos.html', {
         'terapeutas': terapeutas,
         'total_terapeutas': total_terapeutas,
+        'query': query,  # Para mantener el valor en el HTML
+        'order_by': order_by,  # Para saber el orden actual en el HTML
+        'modulo_terapeutas': True
     })
 
 @role_required('Recepcionista')
@@ -219,9 +248,14 @@ def calendar_asignar_paciente(request, paciente_id, terapeuta_id):
         'sabado': None,
         'domingo': None,
     }
-    return render(request, 'calendar_asignar_paciente.html', {'horario_terapeuta': horario_terapeuta, 'cita': cita,
-                                                              'paciente':paciente, 'terapeuta':terapeuta})
+    return render(request, 'calendar_asignar_paciente.html', {
+        'horario_terapeuta': horario_terapeuta,
+        'cita': cita,
+        'paciente':paciente,
+        'terapeuta':terapeuta,
+        'modulo_terapeutas': True})
 
+###################################     CITAS     ###################################
 @role_required('Recepcionista')
 def agendar_cita_recepcionista(request, paciente_id, terapeuta_id):
     terapeuta_instance = get_object_or_404(Terapeuta, id=terapeuta_id)
@@ -256,7 +290,9 @@ def agendar_cita_recepcionista(request, paciente_id, terapeuta_id):
 
         return redirect('mostrar_paciente_recepcionista', paciente_instance.id)
 
-    return render(request, 'mostrar_paciente_recepcionista.html', {'paciente': paciente_instance})
+    return render(request, 'mostrar_paciente_recepcionista.html', {
+        'paciente': paciente_instance,
+        'modulo_terapeutas': True})
 
 
     
@@ -315,14 +351,20 @@ def formulario_agregar_paciente(request):
 
         return redirect('recepcionista_pacientes_activos')
 
-    return render(request, 'agregar_paciente.html')
+    return render(request, 'agregar_paciente.html', {
+        'modulo_pacientes': True})
 
 def mostrar_paciente_sin_terapeuta(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
     edad = paciente.calcular_edad()
     imc = paciente.calcular_imc()
     cita = Cita.objects.filter(paciente_id=paciente_id).last()
-    return render(request, 'mostrar_paciente_recepcionista.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc})
+    return render(request, 'mostrar_paciente_recepcionista.html', {
+        'paciente': paciente, 
+        'edad': edad, 
+        'cita': cita, 
+        'imc': imc,
+        'modulo_pacientes': True})
 
 
 def mostrar_paciente_con_terapeuta(request, paciente_id, terapeuta_id):
@@ -331,7 +373,13 @@ def mostrar_paciente_con_terapeuta(request, paciente_id, terapeuta_id):
     edad = paciente.calcular_edad()
     imc = paciente.calcular_imc()
     cita = Cita.objects.filter(paciente_id=paciente_id).last()
-    return render(request, 'mostrar_paciente_recepcionista.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc, 'terapeuta':terapeuta})
+    return render(request, 'mostrar_paciente_recepcionista.html', {
+        'paciente': paciente, 
+        'edad': edad, 
+        'cita': cita, 
+        'imc': imc, 
+        'terapeuta':terapeuta,
+        'modulo_pacientes': True})
 
 @role_required('Recepcionista')
 def mostrar_paciente_recepcionista(request, paciente_id):
@@ -348,8 +396,14 @@ def mostrar_paciente_recepcionista(request, paciente_id):
         'paciente': paciente,
         'edad': edad,
         'imc': imc,
-        'cita': cita  # Envía la cita o None si no existe
-    })
+        'cita': cita,  # Envía la cita o None si no existe
+        'modulo_pacientes': True})
+    
+def mostrar_terapeuta_recepcionista(request, terapeuta_id):
+    terapeuta = Terapeuta.objects.get(id=terapeuta_id)
+    return render(request, 'mostrar_terapeuta_recepcionista.html', {
+        'terapeuta': terapeuta,
+        'modulo_terapeutas': True})
 
 @role_required('Recepcionista')
 def editar_datos_paciente_recepcionista(request, paciente_id, terapeuta=None):
@@ -376,5 +430,5 @@ def editar_datos_paciente_recepcionista(request, paciente_id, terapeuta=None):
         'paciente': paciente,
         'terapeutas': terapeutas,
         'terapeuta_asignado': paciente.terapeuta.id if paciente.terapeuta else None,
-        'paciente_form': form
-    })
+        'paciente_form': form,
+        'modulo_pacientes': True})

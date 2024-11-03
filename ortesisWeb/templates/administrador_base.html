@@ -36,23 +36,31 @@
             <hr class="divider">
             <ul class="menu">
                 <li>
-                    <a href="{% url 'listar_pacientes_activos' %}" class="{% if request.path == '/pacientes/' %}active{% endif %}">
+                    <a href="{% url 'listar_pacientes_activos' %}" class="{% if modulo_pacientes %}modulo-activo-administrador{% endif %}">
                             <img src="{% static 'icons/patient_list.svg' %}" alt="Listado Pacientes">
                             Pacientes
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'gestion_terapeutas' %}" class="{% if request.path == '/terapeutas/' %}active{% endif %}">
+                    <a href="{% url 'listar_terapeutas_activos' %}" class="{% if modulo_terapeutas %}modulo-activo-administrador{% endif %}">
                             <img src="{% static 'icons/therapist.svg' %}" alt="Listado Terapeutas">
                             Terapeutas
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'admin_recepcionistas' %}" class="{% if request.path == '/recepcionistas/' %}active{% endif %}">
+                    <a href="{% url 'listar_recepcionistas_activos' %}" class="{% if modulo_recepcionistas %}modulo-activo-administrador{% endif %}">
                             <img src="{% static 'icons/Vector.svg' %}" alt="Listado Recepcionistas">
                             Recepcionistas
                     </a>
                 </li>
+                {% if user.is_authenticated and user.groups.count > 1 %}
+                <li class="elegir-rol">
+                    <a href="{% url 'elegir_rol' %}">
+                        <img src="{% static 'icons/elegir-rol.svg' %}" alt="Elegir rol">
+                        Cambiar rol
+                    </a>
+                </li>
+                {% endif %}
             </ul>
             <hr class="divider divider_logout">
             <div class="logout">

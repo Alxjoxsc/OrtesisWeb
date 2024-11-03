@@ -16,6 +16,7 @@ class Terapeuta(models.Model):
     experiencia = models.IntegerField(null=True, blank=True)
     presentacion = models.CharField(max_length=500, default="¡Hola! Soy tu terapeuta. Estoy aquí para ayudarte a mejorar tu calidad de vida. ¡Vamos a trabajar juntos!") 
     correo_contacto = models.EmailField(null=True, blank=True)
+    imagen_perfil = models.ImageField(upload_to='perfil_terapeutas/', null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}"
