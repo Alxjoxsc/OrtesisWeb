@@ -296,6 +296,21 @@
   </div>
 </div>
 
+<!-- Modal Popup para mostrar mensaje de éxito -->
+<div id="modalExito" class="modal">
+  <div class="contenido-modal-exito">
+      <img src="{% static 'icons/Exito.svg' %}" alt="Éxito">
+      <p>Paciente {{paciente.first_name}} {{paciente.last_name}} desvinculado con exito</p>
+  </div>
+</div>
+
+<!-- Modal Popup para mostrar mensaje de rellene motivo de desvinculacion -->
+<div id="modalError" class="modal">
+  <div class="contenido-modal-error">
+      <img src="{% static 'icons/Alert.svg' %}" alt="Éxito">
+      <p>Ingrese un motivo para la desvinculacion</p>
+  </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}

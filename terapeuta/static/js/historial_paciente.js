@@ -86,7 +86,10 @@ document.addEventListener("DOMContentLoaded", function () {
             const motivo = motivoTextarea.value;
 
             if (motivo.trim() === "") {
-                alert("Debe ingresar un motivo para inactivar al paciente.");
+                modalError.style.display = 'flex';
+                setTimeout(() => {
+                    modalError.style.display = 'none';
+                }, 2000); // 2 segundos
                 return;
             }
 
@@ -102,8 +105,12 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    alert(data.message);
-                    window.location.href = '/pacientes_terapeuta/';
+                    modalExito.style.display = 'flex';
+                    setTimeout(() => {
+                        modalExito.style.display = 'none';
+                        // Redireccionar si lo deseas
+                        window.location.href = '/pacientes_terapeuta/';
+                    }, 2000); // 2 segundos
                 } else {
                     alert(data.message);
                 }
