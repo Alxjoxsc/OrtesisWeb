@@ -373,7 +373,7 @@ button:hover {
 
 /* Resaltar la columna del día actual en la vista semanal */
 .today-column {
-    background-color: #92cedb; /* Color de fondo para resaltar */
+    background-color: #d5e9ff; /* Color de fondo para resaltar */
 }
 
 .week-view th.today-column {
