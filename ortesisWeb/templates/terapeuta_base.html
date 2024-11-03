@@ -70,16 +70,33 @@
             {% block header %}{% endblock %}
             <div class="notification-icon">
                 <a href="#">
-                    <img src="{% static 'icons/notification.svg' %}" alt="notificación">
+                    {% if notificaciones_count > 0 %}
+                        <i class="fas fa-bell" style="color: #008CAB; font-size: 36px;"></i> <!-- Con notificaciones -->
+                    {% else %}
+                        <i class="fas fa-bell-slash" style="color: #008CAB; font-size: 36px;"></i> <!-- Sin notificaciones -->
+                    {% endif %}
                 </a>
-            </div>
-
+            </div>           
+        
             <!-- Modal de Notificaciones -->
-            <div id="modalNotificaciones" class="modal-notificaciones">
+            <div id="modalNotificaciones" class="modal-notificaciones" style="display: none;">
                 <div class="contenido-notificaciones">
-                    {% for notificacion in notificaciones %}
-                    {% empty %}
-                    {% endfor %}
+                    {% if notificaciones %}
+                        {% for notificacion in notificaciones %}
+                            <div class="item-notificacion" data-id="{{ notificacion.id }}">
+                                <p><strong>Cita de Rutina:</strong><br>
+                                Paciente: {{ notificacion.cita.paciente.first_name }} {{ notificacion.cita.paciente.last_name }}<br>
+                                Hora: {{ notificacion.cita.hora_inicio}} hrs<br>
+                                Sala: {{ notificacion.cita.sala }}</p>
+                                <div class="delete-notification" style="cursor:pointer;">
+                                    <h1>Borrar</h1>
+                                    <i class="fas fa-trash"></i>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>No hay notificaciones para mostrar.</p>
+                    {% endif %}
                 </div>
             </div>
         </header>
@@ -101,15 +118,27 @@
     <!-- JavaScript general -->
     <script src="{% static 'js/activeMenu.js' %}"></script>
     <script>
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cargar las notificaciones al cargar la página
+            fetchNotificaciones();
+        });
+
         function toggleModalNotificaciones() {
             const modal = document.getElementById('modalNotificaciones');
             modal.style.display = (modal.style.display === 'none' || modal.style.display === '') ? 'block' : 'none';
-            
+
             if (modal.style.display === 'block') {
-                fetchNotificaciones();
+                // Solo mostrar el contenido de las notificaciones en el modal
+                mostrarNotificaciones();
             }
         }
-    
+
+        function mostrarNotificaciones() {
+            const contenido = document.querySelector('.contenido-notificaciones');
+            contenido.style.display = 'block'; // Asegúrate de mostrar el contenido cuando se abra el modal
+        }
+
         function fetchNotificaciones() {
             fetch("{% url 'obtener_notificaciones' %}")
                 .then(response => response.json())
@@ -117,10 +146,10 @@
                     const contenido = document.querySelector('.contenido-notificaciones');
                     contenido.innerHTML = '';  // Limpiar contenido previo
 
-                    if (data.length === 0) {
+                    if (data.notificaciones.length === 0) {
                         contenido.innerHTML = '<p>No hay notificaciones para mostrar.</p>';
                     } else {
-                        data.forEach(notificacion => {
+                        data.notificaciones.forEach(notificacion => {
                             contenido.innerHTML += `
                                 <div class="item-notificacion" data-id="${notificacion.id}">
                                     <p><strong>Cita de Rutina:</strong><br>
@@ -135,6 +164,8 @@
                             `;
                         });
                     }
+                    // Actualizar el icono de notificaciones después de obtenerlas
+                    actualizarIconoNotificaciones(data.notificaciones_count);
                 })
                 .catch(error => console.error('Error al obtener notificaciones:', error));
         }
@@ -160,14 +191,18 @@
                 fetch(`/marcar-notificacion-como-leida/${notificacionId}/`, {
                     method: 'POST',
                     headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',  // Asegúrate de incluir el token CSRF
+                        'X-CSRFToken': '{{ csrf_token }}',
                         'Content-Type': 'application/json'
                     },
                 })
                 .then(response => {
                     if (response.ok) {
-                        // Aquí puedes eliminar la notificación del DOM
+                        // Eliminar la notificación del DOM
                         event.target.closest('.item-notificacion').remove();
+                        
+                        // Verificar si hay notificaciones restantes
+                        const notificacionesRestantes = document.querySelectorAll('.item-notificacion');
+                        actualizarIconoNotificaciones(notificacionesRestantes.length);
                     } else {
                         console.error('Error al marcar la notificación como leída');
                     }
@@ -175,6 +210,19 @@
                 .catch(error => console.error('Error:', error));
             }
         });
+
+        // Función para actualizar el icono de notificaciones
+        function actualizarIconoNotificaciones(count) {
+            const notificationIcon = document.querySelector('.notification-icon a i');
+            if (count > 0) {
+                notificationIcon.classList.remove('fa-bell-slash');
+                notificationIcon.classList.add('fa-bell');
+            } else {
+                notificationIcon.classList.remove('fa-bell');
+                notificationIcon.classList.add('fa-bell-slash');
+            }
+        }
+
 
         function getCookie(name) {
             let cookieValue = null;

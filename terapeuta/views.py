@@ -728,18 +728,27 @@ def obtener_notificaciones(request):
             terapeuta=request.user.terapeuta,
             leida=False  # Filtrar solo las no leídas
         ).order_by('cita__fecha', 'cita__hora_inicio')
-        
-        notificaciones_data = [
-            {
-                'id': notificacion.id, 
-                'hora': notificacion.cita.hora_inicio.strftime('%H:%M'),
-                'sala': notificacion.cita.sala,
+
+        # Contar las notificaciones
+        notificaciones_count = notificaciones.count()
+
+        # Preparar los datos para el JsonResponse
+        notificaciones_data = []
+        for notificacion in notificaciones:
+            notificaciones_data.append({
+                'id': notificacion.id,
                 'paciente': f"{notificacion.cita.paciente.first_name} {notificacion.cita.paciente.last_name}",
-            }
-            for notificacion in notificaciones
-        ]
-        return JsonResponse(notificaciones_data, safe=False)
-    return JsonResponse([], safe=False)
+                'hora': notificacion.cita.hora_inicio.strftime('%H:%M'),  # Formato de hora
+                'sala': notificacion.cita.sala,
+            })
+
+        # Devolver un JsonResponse con los datos
+        return JsonResponse({
+            'notificaciones': notificaciones_data,
+            'notificaciones_count': notificaciones_count,
+        })
+
+    return JsonResponse({'notificaciones': [], 'notificaciones_count': 0}, safe=False)
 
 def marcar_notificacion_como_leida(request, notificacion_id):
     if request.method == 'POST' and request.user.is_authenticated:
