@@ -298,7 +298,7 @@
 
 <!-- Modal Popup para mostrar mensaje de éxito -->
 <div id="modalExito" class="modal">
-  <div class="contenido-modal-exito">
+  <div class="contenido-modal-mensaje">
       <img src="{% static 'icons/Exito.svg' %}" alt="Éxito">
       <p>Paciente {{paciente.first_name}} {{paciente.last_name}} desvinculado con exito</p>
   </div>
@@ -306,9 +306,25 @@
 
 <!-- Modal Popup para mostrar mensaje de rellene motivo de desvinculacion -->
 <div id="modalError" class="modal">
-  <div class="contenido-modal-error">
+  <div class="contenido-modal-mensaje">
       <img src="{% static 'icons/Alert.svg' %}" alt="Éxito">
       <p>Ingrese un motivo para la desvinculacion</p>
+  </div>
+</div>
+
+<!-- Modal Popup para mostrar mensaje de éxito -->
+<div id="modalExitoRutina" class="modal">
+  <div class="contenido-modal-mensaje">
+      <img src="{% static 'icons/Exito.svg' %}" alt="Éxito">
+      <p>Rutina de {{paciente.first_name}} {{paciente.last_name}} Creada con exito</p>
+  </div>
+</div>
+
+<!-- Modal de Carga -->
+<div id="modalCarga" class="modal" style="display: none;">
+  <div class="contenido-modal-mensaje">
+    <div class="spinner"></div>
+    <p>Guardando rutina, por favor espera...</p>
   </div>
 </div>
 {% endblock %}

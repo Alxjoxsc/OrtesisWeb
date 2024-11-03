@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
      // Manejar el envío del formulario de nueva rutina
-    if (nuevaRutinaForm) {
+     if (nuevaRutinaForm) {
         nuevaRutinaForm.addEventListener('submit', function (event) {
             event.preventDefault(); // Prevenir el envío por defecto del formulario
 
@@ -50,6 +50,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Obtener los datos del formulario
             const formData = new FormData(nuevaRutinaForm);
+
+            // Mostrar el modal de carga
+            const modalCarga = document.getElementById('modalCarga');
+            modalCarga.style.display = 'flex';
 
             // Enviar los datos al backend usando fetch
             fetch(`/paciente/${pacienteId}/crear_rutina/`, {
@@ -61,10 +65,19 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .then(response => response.json())
             .then(data => {
+                // Ocultar el modal de carga
+                modalCarga.style.display = 'none';
+
                 if (data.status === 'success') {
-                    alert('Rutina creada exitosamente.');
-                    // Puedes actualizar la página o la lista de rutinas aquí
-                    window.location.reload();
+                    // Mostrar el modal de éxito
+                    const modalExitoRutina = document.getElementById('modalExitoRutina');
+                    modalExitoRutina.style.display = 'flex';
+
+                    // Ocultar el modal de éxito después de 2 segundos y recargar la página
+                    setTimeout(() => {
+                        modalExitoRutina.style.display = 'none';
+                        window.location.reload();
+                    }, 2000);
                 } else {
                     alert('Error al crear la rutina: ' + data.message);
                 }
@@ -72,9 +85,11 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(error => {
                 console.error('Error al crear la rutina:', error);
                 alert('Ocurrió un error al crear la rutina.');
+                // Ocultar el modal de carga
+                modalCarga.style.display = 'none';
             });
 
-            // Ocultar el modal después de enviar los datos
+            // Ocultar el modal de creación de rutina después de enviar los datos
             nuevaRutinaModal.style.display = 'none';
         });
     }
