@@ -21,7 +21,7 @@ import re
 from django.core.files.storage import FileSystemStorage
 from django.core.mail import send_mail
 from django.conf import settings
-
+from datetime import timedelta
 
 
 #-------------------------------------AGENDA-------------------------------------
@@ -304,6 +304,13 @@ def editar_cita(request):
         cita.sala = request.POST["sala_editar"]
         cita.detalle = request.POST["detalle_editar"]
         cita.save()
+
+        try:
+            notificacion = Notificacion.objects.get(cita=cita)
+            notificacion.save() 
+        except Notificacion.DoesNotExist:
+            pass
+
         return redirect("agenda")
 
     return agenda(request)
@@ -723,10 +730,16 @@ def obtener_notificaciones(request):
         # Llamar a la función para eliminar notificaciones antiguas
         eliminar_notificaciones_antiguas()
         
-        # Obtener solo las notificaciones no leídas
+        # Definir el rango de tiempo para hoy y mañana
+        ahora = timezone.now()
+        inicio_hoy = ahora.replace(hour=0, minute=0, second=0, microsecond=0)
+        fin_manana = (inicio_hoy + timedelta(days=2)) - timedelta(seconds=1) 
+
+        # Obtener solo las notificaciones no leídas para citas programadas hoy y mañana
         notificaciones = Notificacion.objects.filter(
             terapeuta=request.user.terapeuta,
-            leida=False  # Filtrar solo las no leídas
+            leida=False,
+            cita__fecha__range=(inicio_hoy.date(), (inicio_hoy + timedelta(days=1)).date())
         ).order_by('cita__fecha', 'cita__hora_inicio')
 
         # Contar las notificaciones
@@ -738,11 +751,10 @@ def obtener_notificaciones(request):
             notificaciones_data.append({
                 'id': notificacion.id,
                 'paciente': f"{notificacion.cita.paciente.first_name} {notificacion.cita.paciente.last_name}",
-                'hora': notificacion.cita.hora_inicio.strftime('%H:%M'),  # Formato de hora
+                'hora': notificacion.cita.hora_inicio.strftime('%H:%M'),
                 'sala': notificacion.cita.sala,
             })
 
-        # Devolver un JsonResponse con los datos
         return JsonResponse({
             'notificaciones': notificaciones_data,
             'notificaciones_count': notificaciones_count,
