@@ -24,3 +24,71 @@
     text-decoration: none;
     color: white;
 }
+
+.modal-notificaciones {
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    width: auto;
+    max-height: 80%;
+    overflow-y: auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: none;
+}
+
+.contenido-notificaciones {
+    background-color: #fff;
+    padding: 20px;
+    width: 500px;
+    max-height: 80%;
+    overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.contenido-notificaciones h3 {
+    margin-top: 0;
+    font-size: 1.2em;
+    text-align: center;
+}
+
+.item-notificacion {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #D9D9D9;
+    border-radius: 10px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.item-notificacion p {
+    margin: 0;
+}
+
+.delete-notification h1 {
+    color: black;
+    font-size: 14px;
+    font-weight: 500;
+    margin-right: 10px;
+}
+
+
+.delete-notification {
+    height: 40px;
+    width: 75px;
+    margin-left: 15px;
+    border-radius: 5px;
+    background-color: #FFFFFF;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #006A60;
+    cursor: pointer;
+    border: none; 
+    outline: none;
+}

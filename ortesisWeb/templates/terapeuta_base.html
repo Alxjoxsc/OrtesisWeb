@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <!-- Estilos generales -->
     <link rel="stylesheet" href="{% static 'css/base/grid.css' %}">
@@ -72,6 +73,15 @@
                     <img src="{% static 'icons/notification.svg' %}" alt="notificación">
                 </a>
             </div>
+
+            <!-- Modal de Notificaciones -->
+            <div id="modalNotificaciones" class="modal-notificaciones">
+                <div class="contenido-notificaciones">
+                    {% for notificacion in notificaciones %}
+                    {% empty %}
+                    {% endfor %}
+                </div>
+            </div>
         </header>
 
         <!-- Main Content -->
@@ -90,6 +100,100 @@
 
     <!-- JavaScript general -->
     <script src="{% static 'js/activeMenu.js' %}"></script>
+    <script>
+        function toggleModalNotificaciones() {
+            const modal = document.getElementById('modalNotificaciones');
+            modal.style.display = (modal.style.display === 'none' || modal.style.display === '') ? 'block' : 'none';
+            
+            if (modal.style.display === 'block') {
+                fetchNotificaciones();
+            }
+        }
+    
+        function fetchNotificaciones() {
+            fetch("{% url 'obtener_notificaciones' %}")
+                .then(response => response.json())
+                .then(data => {
+                    const contenido = document.querySelector('.contenido-notificaciones');
+                    contenido.innerHTML = '';  // Limpiar contenido previo
+
+                    if (data.length === 0) {
+                        contenido.innerHTML = '<p>No hay notificaciones para mostrar.</p>';
+                    } else {
+                        data.forEach(notificacion => {
+                            contenido.innerHTML += `
+                                <div class="item-notificacion" data-id="${notificacion.id}">
+                                    <p><strong>Cita de Rutina:</strong><br>
+                                    Paciente: ${notificacion.paciente}<br>
+                                    Hora: ${notificacion.hora} hrs<br>
+                                    Sala: ${notificacion.sala}</p>
+                                    <div class="delete-notification">
+                                        <h1>Borrar</h1>
+                                        <i class="fas fa-trash"></i>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+                })
+                .catch(error => console.error('Error al obtener notificaciones:', error));
+        }
+    
+        // Mostrar/ocultar notificaciones al hacer clic en el icono
+        document.querySelector('.notification-icon a').addEventListener('click', function(event) {
+            event.preventDefault();
+            toggleModalNotificaciones();
+        });
+    
+        // Cerrar el modal si se hace clic fuera de él
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('modalNotificaciones');
+            const notificationIcon = document.querySelector('.notification-icon');
+            if (!modal.contains(event.target) && !notificationIcon.contains(event.target)) {
+                modal.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('click', function(event) {
+            if (event.target.closest('.delete-notification')) {
+                const notificacionId = event.target.closest('.item-notificacion').dataset.id;
+                fetch(`/marcar-notificacion-como-leida/${notificacionId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',  // Asegúrate de incluir el token CSRF
+                        'Content-Type': 'application/json'
+                    },
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Aquí puedes eliminar la notificación del DOM
+                        event.target.closest('.item-notificacion').remove();
+                    } else {
+                        console.error('Error al marcar la notificación como leída');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Si esta cookie comienza con el nombre que buscamos
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+    </script>
     
     <!-- Bloque adicional para cargar scripts JS específicos -->
     {% block extra_js %}{% endblock %}
