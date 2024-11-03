@@ -52,16 +52,16 @@ document.addEventListener('DOMContentLoaded', function () {
         const firstDayOfMonth = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const adjustedFirstDay = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
-
+    
         let calendarHTML = '<div class="calendar-grid">';
         ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].forEach(day => {
             calendarHTML += `<div class="day-name">${day}</div>`;
         });
-
+    
         for (let i = 0; i < adjustedFirstDay; i++) {
             calendarHTML += `<div class="empty-day"></div>`;
         }
-
+    
         for (let day = 1; day <= daysInMonth; day++) {
             const isToday = (day === new Date().getDate() && year === new Date().getFullYear() && month === new Date().getMonth());
             // Formatear la fecha como 'DD/MM/YYYY'
@@ -69,74 +69,110 @@ document.addEventListener('DOMContentLoaded', function () {
             const monthStr = String(month + 1).padStart(2, '0');
             const fechaFormateada = `${dayStr}/${monthStr}/${year}`;
             
-            calendarHTML += `<div class="day ${isToday ? 'today' : ''}" data-fecha="${fechaFormateada}" onclick="abrirModal('${fechaFormateada}')">${day}</div>`;
+            calendarHTML += `<div class="day ${isToday ? 'today' : ''}" data-fecha="${fechaFormateada}" data-day="${day}">${day}</div>`;
         }
-
+    
         const totalCells = adjustedFirstDay + daysInMonth;
         for (let i = totalCells; i < 42; i++) {
             calendarHTML += `<div class="empty-day"></div>`;
         }
-
+    
+        calendarHTML += '</div>'; // Cerrar el div de calendar-grid
         calendar.innerHTML = calendarHTML;
+    
+        // Asignar eventos de clic a los días
+        document.querySelectorAll('.day').forEach(dayElement => {
+            dayElement.addEventListener('click', function() {
+                const fechaSeleccionada = this.getAttribute('data-fecha');
+                // Convertir fecha de 'DD/MM/YYYY' a Date object
+                const [day, month, year] = fechaSeleccionada.split('/');
+                currentDate = new Date(year, month - 1, day);
+                currentView = 'week';
+                updateCalendar();
+            });
+        });
     }
+    
 
     function generateWeekView() {
         const startOfWeek = getStartOfWeek(currentDate);
         const endOfWeek = new Date(startOfWeek);
         endOfWeek.setDate(endOfWeek.getDate() + 6);
         monthYearLabel.textContent = `${formatDate(startOfWeek)} - ${formatDate(endOfWeek)}`;
-    
-        // Identificar si la semana actual incluye el día de hoy
+
+        // Obtener el día actual
         const today = new Date();
-        const isCurrentWeek = today >= startOfWeek && today <= endOfWeek;
-        let currentDayIndex = null;
-        if (isCurrentWeek) {
-            currentDayIndex = today.getDay() === 0 ? 6 : today.getDay() - 1; // Ajuste para que lunes sea 0
+        const todayFormatted = formatDate(today); // 'DD/MM/YYYY'
+
+        // Crear un array con los nombres de los días y las fechas correspondientes
+        const daysOfWeek = [];
+        let todayIndex = -1; // Inicializar con -1 indicando que el día actual no está en la semana mostrada
+        for (let i = 0; i < 7; i++) {
+            const currentDay = new Date(startOfWeek);
+            currentDay.setDate(currentDay.getDate() + i);
+            const dayName = getDayName(currentDay.getDay()); // Obtener el nombre del día basado en getDay()
+            const formattedDate = formatDate(currentDay); // 'DD/MM/YYYY'
+            daysOfWeek.push({ dayName, formattedDate, date: currentDay });
+            
+            // Verificar si currentDay es hoy
+            if (formattedDate === todayFormatted) {
+                todayIndex = i; // Guardar el índice del día actual
+            }
         }
-    
+
         let calendarHTML = `
             <div class="week-view-container">
                 <table class="week-view">
                     <thead>
                         <tr>
                             <th>Hora</th>`;
-    
-        for (let day = 0; day < 7; day++) {
-            const dayName = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'][day];
-            const isToday = (isCurrentWeek && day === currentDayIndex);
-            calendarHTML += `<th class="${isToday ? 'today-column' : ''}">${dayName}</th>`;
-        }
-    
+
+        daysOfWeek.forEach((day, index) => {
+            // Si el índice coincide con todayIndex, agregamos una clase especial
+            const isToday = index === todayIndex;
+            calendarHTML += `<th class="${isToday ? 'today-column' : ''}">${day.dayName} ${day.formattedDate}</th>`;
+        });
+
         calendarHTML += `
                         </tr>
                     </thead>
                     <tbody>`;
-    
+
         for (let hour = 8; hour <= 20; hour++) {
-            const horaStr = String(hour).padStart(2, '0') + ":00";
+            const horaInicio = String(hour).padStart(2, '0') + ":00";
+            const horaFin = String(hour + 1).padStart(2, '0') + ":00";
+            const horaStr = `${horaInicio} - ${horaFin}`;
             calendarHTML += `<tr><td class="time-slot">${horaStr}</td>`;
             for (let day = 0; day < 7; day++) {
-                const currentDay = new Date(startOfWeek);
-                currentDay.setDate(currentDay.getDate() + day);
-                const formattedDate = formatDate(currentDay);
-                const isToday = (isCurrentWeek && day === currentDayIndex);
-                calendarHTML += `<td class="week-hour ${isToday ? 'today-column' : ''}" data-date="${formattedDate}" data-hour="${horaStr}"></td>`;
+                const date = new Date(startOfWeek);
+                date.setDate(date.getDate() + day);
+                const formattedDate = formatDate(date);
+                // Asignar data-hour-inicio
+                const isToday = day === todayIndex;
+                calendarHTML += `<td class="week-hour ${isToday ? 'today-column' : ''}" data-date="${formattedDate}" data-hour-inicio="${horaInicio}"></td>`;
             }
             calendarHTML += '</tr>';
         }
-    
+
         calendarHTML += '</tbody></table></div>';
         calendar.innerHTML = calendarHTML;
     
-        // Reasignar eventos de clic para la vista semanal
+        // Reasignar eventos de click para la vista semanal
         document.querySelectorAll('.week-hour').forEach(hourBlock => {
             hourBlock.addEventListener('click', function() {
                 const fecha = this.getAttribute('data-date'); // 'DD/MM/YYYY'
-                const hora = this.getAttribute('data-hour'); // 'HH:MM'
-                abrirModal(fecha, hora);
+                const horaInicio = this.getAttribute('data-hour-inicio'); // 'HH:MM'
+                const horaFin = this.getAttribute('data-hour-fin'); // 'HH:MM'
+                abrirModal(fecha, horaInicio, horaFin);
             });
         });
+    }
     
+    
+    // Modificar getDayName para usar getDay() correctamente
+    function getDayName(dayIndex) {
+        const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+        return dayNames[dayIndex];
     }
 
     // Función para destacar días con citas en vista mensual
@@ -170,42 +206,53 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-function destacarHorasConCita(citas) {
-    citas.forEach(cita => {
-        // Obtener la fecha y hora de la cita
-        const fecha = cita.fecha; // 'YYYY-MM-DD'
-        const horaInicio = cita.hora_inicio; // 'HH:MM'
-        
-        console.log(`Procesando cita: ${cita.titulo} en ${fecha} a las ${horaInicio}`);
-        
-        // Convertir fecha a 'DD/MM/YYYY'
-        const fechaParts = cita.fecha.split('-');
-        const fechaFormateada = `${fechaParts[2]}/${fechaParts[1]}/${fechaParts[0]}`;
-        
-        // Obtener la celda correspondiente al inicio de la cita
-        const cell = document.querySelector(`.week-hour[data-date="${fechaFormateada}"][data-hour="${horaInicio}"]`);
-        
-        if (cell) {
-            console.log(`Cita encontrada en cell: ${cell}`);
-
-            // Crear un elemento para la cita
-            const citaDiv = document.createElement('div');
-            citaDiv.classList.add('cita-semana');
-            citaDiv.textContent = cita.titulo;
-            citaDiv.title = `Título: ${cita.titulo}\nPaciente: ${cita.paciente.nombre}\nSala: ${cita.sala}\nDetalle: ${cita.descripcion}`;
-
-            // Agregar evento de clic para ver detalles
-            citaDiv.addEventListener('click', function(event) {
-                event.stopPropagation(); // Evitar que se abra el modal de crear cita
-                abrirEditar(cita.id, cita.fecha.split('-').reverse().join('/'), cita.hora_inicio, cita.hora_final, cita.titulo,  cita.paciente.id , cita.paciente.nombre, cita.sala, cita.detalle);
-            });
-
-            cell.appendChild(citaDiv);
-        } else {
-            console.warn(`No se encontró la celda para la cita: ${cita.titulo} en ${fechaFormateada} a las ${horaInicio}`);
-        }
-    });
-}
+    function destacarHorasConCita(citas) {
+        citas.forEach(cita => {
+            // Obtener la fecha y hora de la cita
+            const fecha = cita.fecha; // 'YYYY-MM-DD'
+            const horaInicio = cita.hora_inicio; // 'HH:MM'
+    
+            console.log(`Procesando cita: ${cita.titulo} en ${fecha} a las ${horaInicio}`);
+    
+            // Convertir fecha a 'DD/MM/YYYY'
+            const fechaParts = cita.fecha.split('-');
+            const fechaFormateada = `${fechaParts[2]}/${fechaParts[1]}/${fechaParts[0]}`;
+    
+            // Obtener la celda correspondiente al inicio de la cita
+            const cell = document.querySelector(`.week-hour[data-date="${fechaFormateada}"][data-hour-inicio="${horaInicio}"]`);
+    
+            if (cell) {
+                console.log(`Cita encontrada en cell: ${cell}`);
+    
+                // Crear un elemento para la cita
+                const citaDiv = document.createElement('div');
+                citaDiv.classList.add('cita-semana');
+                citaDiv.textContent = cita.titulo;
+                citaDiv.title = `Título: ${cita.titulo}\nPaciente: ${cita.paciente.nombre}\nSala: ${cita.sala}\nDetalle: ${cita.detalle}`;
+    
+                // Agregar evento de clic para ver detalles
+                citaDiv.addEventListener('click', function(event) {
+                    event.stopPropagation(); // Evitar que se abra el modal de crear cita
+                    abrirEditar(
+                        cita.id,
+                        cita.fecha.split('-').reverse().join('/'),
+                        cita.hora_inicio,
+                        cita.hora_final,
+                        cita.titulo,
+                        cita.paciente.id,
+                        cita.paciente.nombre,
+                        cita.sala,
+                        cita.detalle
+                    );
+                });
+    
+                cell.appendChild(citaDiv);
+            } else {
+                console.warn(`No se encontró la celda para la cita: ${cita.titulo} en ${fechaFormateada} a las ${horaInicio}`);
+            }
+        });
+    }
+    
 
     //     // Función para destacar horas con citas en vista semanal
     // function destacarHorasConCita(citas) {
