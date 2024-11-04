@@ -22,6 +22,8 @@
             </h2>
             <p>{{ terapeuta.presentacion }}</p>
         </div>
+               <button class="btn-editar-credenciales" onclick="window.location.href='{% url 'editar_credenciales' %}'">Editar Credenciales</button>
+
     </div>
 
     <div class="profile-info">
@@ -45,6 +47,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- Popup de Ediciones -->
 <div id="edit-profile-popup" class="popup">

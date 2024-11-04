@@ -1,0 +1,108 @@
+{% extends 'terapeuta_base.html' %}
+{% load static %}
+
+{% block title %}Editar Credenciales{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/editar_credenciales.css' %}">
+<title>Editar Credenciales</title>
+{% endblock %}
+
+{% block content %}
+<div class="credenciales-container">
+    <h1>Editar Credenciales</h1>
+
+    <!-- Contenedor para mensajes de error o éxito -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags %}{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form id="credenciales-form" method="POST" action="{% url 'editar_credenciales' %}">
+        {% csrf_token %}
+
+        <!-- Campo de correo electrónico -->
+        <div class="form-group">
+            <label for="email">Correo Electrónico:</label>
+            <div class="email-editable">
+                <input type="email" id="email" name="email" value="{{ user.email }}" disabled>
+                <i id="edit-email-icon" class="fas fa-pencil-alt edit-icon" style="display: none; cursor: pointer;" title="Editar Correo"></i>
+            </div>
+        </div>
+
+        <!-- Campo de contraseña actual -->
+        <div class="form-group">
+            <label for="password_actual">Contraseña Actual:</label>
+            <input type="password" id="password_actual" name="password_actual" required>
+        </div>
+
+        <!-- Botón para verificar la contraseña actual -->
+        <button type="button" id="verificar-btn">Verificar Contraseña</button>
+
+                <!-- Campos para nueva contraseña y confirmación -->
+        <div id="campos-nuevos" style="display: none;">
+            <!-- Campo para nueva contraseña -->
+            <div class="form-group">
+                <label for="nueva_password">Nueva Contraseña:</label>
+                <input type="password" id="nueva_password" name="nueva_password">
+            </div>
+
+            <!-- Campo para confirmar nueva contraseña -->
+            <div class="form-group">
+                <label for="confirmar_password">Confirmar Nueva Contraseña:</label>
+                <input type="password" id="confirmar_password" name="confirmar_password">
+            </div>
+
+            <!-- Botón para guardar los cambios -->
+            <button type="submit">Guardar Cambios</button>
+        </div>
+    </form>
+</div>
+<div class="info">
+    <p>Nota: Para cambiar tu contraseña o correo, primero debes verificar tu contraseña actual.</p>
+</div>
+
+<script>
+    document.getElementById('verificar-btn').addEventListener('click', function() {
+        // Obtener la contraseña actual ingresada
+        const passwordActual = document.getElementById('password_actual').value;
+    
+        // Realizar una solicitud POST al servidor para verificar la contraseña
+        fetch("{% url 'verificar_contraseña' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 'password_actual': passwordActual })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.valid) {
+                // Mostrar el icono de edición del correo electrónico
+                document.getElementById('edit-email-icon').style.display = 'inline';
+                // Deshabilitar el campo de contraseña actual y ocultar el botón de verificar
+                document.getElementById('password_actual').disabled = true;
+                document.getElementById('verificar-btn').style.display = 'none';
+                // Mostrar los campos para nueva contraseña y confirmación
+                document.getElementById('campos-nuevos').style.display = 'block';
+            } else {
+                alert('Contraseña actual incorrecta.');
+            }
+        })
+        .catch(error => {
+            console.error('Error al verificar la contraseña:', error);
+        });
+    });
+    
+    // Función para habilitar el campo de correo electrónico al hacer clic en el icono de edición
+    document.getElementById('edit-email-icon').addEventListener('click', function() {
+        const emailField = document.getElementById('email');
+        emailField.disabled = false;
+        emailField.focus();
+    });
+    </script>
+{% endblock %}

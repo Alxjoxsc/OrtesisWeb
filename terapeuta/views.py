@@ -22,6 +22,9 @@ from django.core.files.storage import FileSystemStorage
 from django.core.mail import send_mail
 from django.conf import settings
 from datetime import timedelta
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
+from django.contrib.auth import update_session_auth_hash
 
 
 #-------------------------------------AGENDA-------------------------------------
@@ -782,3 +785,61 @@ def marcar_notificacion_como_leida(request, notificacion_id):
         except Notificacion.DoesNotExist:
             raise Http404("Notificación no encontrada.")
     return JsonResponse({'success': False}, status=400)
+
+def editar_credenciales(request):
+    if request.method == 'POST':
+        nuevo_email = request.POST.get('email')
+        nueva_password = request.POST.get('nueva_password')
+        confirmar_password = request.POST.get('confirmar_password')
+
+        user = request.user
+        cambios_realizados = []
+
+        # Verificar si el usuario ha modificado el correo electrónico
+        if nuevo_email and nuevo_email != user.email:
+            # Validar que el nuevo correo no esté en uso
+            if User.objects.filter(email=nuevo_email).exclude(pk=user.pk).exists():
+                messages.error(request, 'El correo electrónico ya está en uso.')
+                return redirect('editar_credenciales')
+            else:
+                user.email = nuevo_email
+                cambios_realizados.append('correo electrónico')
+
+        # Verificar si el usuario desea cambiar la contraseña
+        if nueva_password:
+            if nueva_password != confirmar_password:
+                messages.error(request, 'Las contraseñas no coinciden.')
+                return redirect('editar_credenciales')
+            else:
+                user.set_password(nueva_password)
+                cambios_realizados.append('contraseña')
+                # Actualizar la sesión para mantener al usuario autenticado
+                update_session_auth_hash(request, user)
+
+        user.save()
+
+        if cambios_realizados:
+            mensaje = 'Se han actualizado: ' + ', '.join(cambios_realizados) + '.'
+            messages.success(request, mensaje)
+        else:
+            messages.info(request, 'No se realizaron cambios.')
+
+        return redirect('perfil')
+    else:
+        return render(request, 'editar_credenciales.html')
+
+
+
+def verificar_contraseña(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        password_actual = data.get('password_actual')
+
+        # Verificar la contraseña actual
+        user = authenticate(username=request.user.username, password=password_actual)
+        if user is not None:
+            return JsonResponse({'valid': True})
+        else:
+            return JsonResponse({'valid': False})
+    else:
+        return JsonResponse({'error': 'Método no permitido.'}, status=405)

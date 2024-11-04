@@ -1,0 +1,153 @@
+/* editar_credenciales.css */
+
+
+.credenciales-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 0.625rem;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+}
+
+button {
+    width: 100%;
+    max-width: 200px;
+    display: block;
+    background-color: #008CAB;
+    padding: 0.625rem;
+    border: none;
+    border-radius: 0.3125rem;
+    cursor: pointer;
+    margin: 1rem auto 0 auto;
+    font-size: 1rem;
+    color: white;
+}
+
+button:hover {
+    background-color: #029fc2;
+}
+
+.info {
+    max-width: 500px;
+    margin: 1rem auto;
+    text-align: center;
+    font-weight: 400;
+    font-size: 1rem;
+}
+
+.email-editable {
+    position: relative;
+}
+
+.email-editable .edit-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #555;
+    font-size: 1rem;
+}
+
+.email-editable .edit-icon:hover {
+    color: #000;
+}
+
+.alert {
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.alert.error {
+    background-color: #f44336;
+    color: white;
+}
+
+.alert.success {
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* Media Queries */
+
+/* Para dispositivos con ancho máximo de 768px */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.75rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    label {
+        font-size: 0.9375rem;
+    }
+
+    input[type="email"],
+    input[type="password"] {
+        font-size: 0.9375rem;
+    }
+
+    button {
+        max-width: 100%;
+        font-size: 0.9375rem;
+    }
+
+    .info {
+        font-size: 0.9375rem;
+    }
+}
+
+/* Para dispositivos con ancho máximo de 480px */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5rem;
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    label {
+        font-size: 0.875rem;
+    }
+
+    input[type="email"],
+    input[type="password"] {
+        font-size: 0.875rem;
+    }
+
+    button {
+        font-size: 0.875rem;
+    }
+
+    .info {
+        font-size: 0.875rem;
+    }
+
+    .email-editable .edit-icon {
+        right: 5px;
+    }
+}
