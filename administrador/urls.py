@@ -30,5 +30,7 @@ urlpatterns = [
     path('mostrar_paciente_sin_terapeuta/<int:paciente_id>/', views.mostrar_paciente_sin_terapeuta, name='mostrar_paciente_sin_terapeuta'),
     path('editar_datos_paciente_admin/<int:paciente_id>', views.editar_datos_paciente_admin, name='editar_datos_paciente_admin'),
     path('calendar_asignar_paciente_administrador/<int:terapeuta_id>/<int:paciente_id>', views.calendar_asignar_paciente_administrador, name='calendar_asignar_paciente_administrador'),
-    path('agendar_cita_administrador/',views.agendar_cita_administrador, name='agendar_cita_administrador' )
+    path('agendar_cita_administrador/',views.agendar_cita_administrador, name='agendar_cita_administrador' ),
+    path('carga_masiva_pacientes/', views.carga_masiva_pacientes, name='carga_masiva_pacientes'),
+    path('archivo_csv_ejemplo/', views.archivo_csv_ejemplo, name='archivo_csv_ejemplo'),
 ]

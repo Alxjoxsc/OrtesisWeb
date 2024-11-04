@@ -1,0 +1,191 @@
+#boton-carga-masiva {
+    background-color: #001058;
+    color: #fff;
+    border: none;
+    padding: 3px 20px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 500;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-wrap: nowrap;
+    margin-right: 5px;
+}
+
+#boton-carga-masiva img {
+    width: 34px;
+    height: 34px;
+    padding: 5px 0;
+}
+
+#boton-carga-masiva:hover {
+    background-color: #002080; /* Un color ligeramente más claro para el hover */
+}
+
+#popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 55%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    width: 757px;
+    height: 436px;
+    border-radius: 5px;
+    display: none;
+    z-index: 9999;
+}
+
+#popup h2{
+    margin-bottom: 20px;
+}
+
+#overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+}
+
+#closePopup {
+    float: right;
+    position: absolute;
+    bottom: 30px;
+    left: 30%;
+    width: 181px;
+    height: 30px;
+    background-color: red;
+    color: white;
+    transform: translateX(-50%);
+    border-radius: 15px;
+    border-width: 0px;
+    box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.308);
+}
+
+#closePopup:hover{
+    background-color: rgb(191, 22, 22);
+    cursor: pointer;
+}
+
+
+.boton_subir {
+    position: absolute;
+    bottom: 30px;
+    left: 60%;
+    width: 181px;
+    height: 30px;
+    background-color: rgba(61, 186, 50, 1);
+    color: white;
+    transform: translateX(-50%);
+    border-radius: 15px;
+    border-width: 0px;
+    box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.308);
+}
+
+.boton_subir:hover{
+    background-color: rgb(42, 130, 35);
+    cursor: pointer;
+}
+
+#dropzone {
+    position: relative;
+    width: 700px;
+    height: 253px;
+    border: 2px dashed #aaa;
+    overflow: hidden;
+    border-radius: 5px;
+    margin-top: 10px;
+    left: 9px;
+}
+
+#titulo_carga{
+    position: relative;
+    left: 9px;
+}
+
+#plantilla_ejemplo{
+    position: relative;
+    left: 9px;
+}
+
+#dropzone-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    width: 100%;
+    font-size: 20px;
+    color: rgba(0, 0, 0, 0.6);
+}
+
+#archivo_csv {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%; 
+    height: 100%; 
+    opacity: 0
+}
+
+#dropzone:hover{
+    background-color: #ccc;
+    cursor: pointer;
+}
+
+#message-container{
+    position:fixed;
+    top: 20px;
+    left: 750px;
+    margin: 0px;
+    z-index: 9999;
+}
+
+#message-container .alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    position: relative;
+    display: block;
+    opacity: 1 !important; /* Asegura que la opacidad esté en 100% */
+    color: #000; /* Color de texto por defecto */
+    background-color: #fff; /* Color de fondo por defecto */
+}
+#message-container .alert.alert-success {
+    background-color: #d4edda !important;
+    border-color: #c3e6cb;
+    padding-right: 50px;
+}
+#message-container .alert.alert-error {
+    background-color: #f8d7da !important;
+    border-color: #f5c6cb;
+    padding-right: 40px;
+}
+#message-container .alert .close {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    color: inherit;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+#message-container .alert #text {
+    margin-right: 30px; /* Ajuste el margen derecho según sea necesario */
+}

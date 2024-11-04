@@ -1,11 +1,13 @@
 import json
 import re
+import csv
+import pandas as pd
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 from autenticacion.decorators import role_required
 from .forms import CrearTerapeutaForm, HorarioFormSet, CrearPacienteForm, EditarPacienteForm
-from autenticacion.models import Provincia, Comuna
-from django.http import JsonResponse
+from autenticacion.models import Provincia, Comuna, Region
+from django.http import HttpResponse, JsonResponse
 from terapeuta.models import Paciente, Terapeuta, Cita, Horario
 from recepcionista.models import Recepcionista
 from django.utils import timezone
@@ -19,7 +21,7 @@ from django.contrib import messages
 
 ############################### LISTAR TERAPEUTAS ################################
 @role_required('Administrador')
-def listar_terapeutas_activos(request):
+def listar_terapeutas_activos(request): 
     query = request.GET.get('search')
     order_by = request.GET.get('order_by', 'user__first_name')
     terapeutas_list = Terapeuta.objects.filter(user__is_active=True)
@@ -301,6 +303,97 @@ def listar_pacientes_inactivos(request):
         'order_by': order_by,  # Para saber el orden actual en el HTML
         'modulo_pacientes': True
     })
+
+#                       CARGA MASIVA DE PACIENTES                     #
+
+def archivo_csv_ejemplo(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="ejemplo_carga_masiva_paciente.csv"'
+    writer = csv.writer(response)
+    
+    writer.writerow([
+        'Rut', 'Nombre', 'Apellido', 'Fecha Nacimiento', 'Sexo', 'Telefono', 
+        'Email', 'Contacto Emergencia', 'Telefono Emergencia', 'Patologia', 
+        'Descripcion Patologia', 'Medicamentos', 'Alergias', 'Actividad Fisica', 
+        'Peso', 'Altura', 'Region', 'Provincia', 'Comuna', 'Calle'
+    ])
+    
+    writer.writerow([
+        '8.895.157-3', 'Exequiel', 'Hurtado', '1990-01-01', 'Masculino', '9 1234 5678', 
+        'correo@example.com', 'Contacto Emergencia', '9 8765 4321', 'Diabetes', 
+        'Descripcion de la patologia', 'Insulina', 'Penicilina', 'Activo', 
+        '75.5', '1.78', '1', '1', '1', 'Calle falsa 123'
+    ])
+    
+    return response
+
+def carga_masiva_pacientes(request):
+    registros_subidos = 0
+    registros_no_subidos = 0
+    registros_no_validos = []
+    
+    if request.method == 'POST':
+        if 'archivo_csv' not in request.FILES:
+            messages.error(request, 'No se subió ningún archivo')
+            return redirect('listar_pacientes_activos')
+
+        try:
+            data = pd.read_csv(request.FILES['archivo_csv'])
+        except pd.errors.ParserError:
+            messages.error(request, 'El archivo no tiene el formato correcto')
+            return redirect('listar_pacientes_activos')
+        except Exception as e:
+            messages.error(request, f'Error al leer el archivo: {str(e)}')
+            return redirect('listar_pacientes_activos')
+
+        for index, row in data.iterrows():
+            try:
+                paciente = Paciente(
+                    rut=row['Rut'],
+                    first_name=row['Nombre'],
+                    last_name=row['Apellido'],
+                    fecha_nacimiento=row['Fecha Nacimiento'],
+                    sexo=row['Sexo'],
+                    telefono=row['Telefono'],
+                    email=row['Email'],
+                    contacto_emergencia=row['Contacto Emergencia'],
+                    telefono_emergencia=row['Telefono Emergencia'],
+                    patologia=row['Patologia'],
+                    descripcion_patologia=row['Descripcion Patologia'],
+                    medicamentos=row['Medicamentos'],
+                    alergias=row['Alergias'],
+                    actividad_fisica=row['Actividad Fisica'],
+                    peso=row['Peso'],
+                    altura=row['Altura'],
+                    region=Region.objects.get(id=row['Region']) if not pd.isna(row['Region']) else None,
+                    provincia=Provincia.objects.get(id=row['Provincia']) if not pd.isna(row['Provincia']) else None,
+                    comuna=Comuna.objects.get(id=row['Comuna']) if not pd.isna(row['Comuna']) else None,
+                    calle=row['Calle']
+                )
+
+                # Verificación de duplicados
+                if Paciente.objects.filter(rut=paciente.rut).exists():
+                    registros_no_subidos += 1
+                    registros_no_validos.append(f'El rut {paciente.rut} ya está registrado')
+                else:
+                    paciente.save()
+                    registros_subidos += 1
+
+            except Exception as e:
+                registros_no_subidos += 1
+                registros_no_validos.append(f'Error en la fila {index + 1}: {str(e)}')
+
+        messages.success(request, f'Carga masiva finalizada. Registros subidos: {registros_subidos}. Registros no subidos: {registros_no_subidos}')
+        if registros_no_validos:
+            for mensaje in registros_no_validos:
+                messages.error(request, mensaje)
+        
+        return redirect('listar_pacientes_activos')
+    
+    else:
+        messages.error(request, 'No se subió ningún archivo')
+        return redirect('listar_pacientes_activos')
+
 ##################################################      ADMIN RECEPCIONISTAS      ########################################################
 
 @role_required('Administrador')
