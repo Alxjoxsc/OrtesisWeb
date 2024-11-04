@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <!-- Estilos generales -->
     <link rel="stylesheet" href="{% static 'css/base/grid.css' %}">
@@ -37,23 +38,31 @@
             <hr class="divider">
             <ul class="menu">
                 <li>
-                    <a href="{% url 'perfil' %}" class="{% if request.path == 'perfil/' %}active{% endif %}">
+                    <a href="{% url 'perfil' %}" class="{% if modulo_perfil %}modulo-activo-terapeuta{% endif %}">
                         <img src="{% static 'icons/user-profile.svg' %}" alt="Perfil terapeuta">
                         Perfil
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'paciente_terapeuta' %}" class="{% if request.path == 'paciente_terapeuta/' %}active{% endif %}">
+                    <a href="{% url 'paciente_terapeuta' %}" class="{% if modulo_pacientes %}modulo-activo-terapeuta{% endif %}">
                         <img src="{% static 'icons/list-users.svg' %}" alt="Listado de pacientes">
                         Pacientes
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'agenda' %}" class="{% if request.path == 'agenda/' %}active{% endif %}">
+                    <a href="{% url 'agenda' %}" class="{% if modulo_agenda %}modulo-activo-terapeuta{% endif %}">
                         <img src="{% static 'icons/calendar.svg' %}" alt="Agenda terapeuta">
                         Agenda
                     </a>
                 </li>
+                {% if user.is_authenticated and user.groups.count > 1 %}
+                <li class="elegir-rol">
+                    <a href="{% url 'elegir_rol' %}">
+                        <img src="{% static 'icons/elegir-rol.svg' %}" alt="Elegir rol">
+                        Cambiar rol
+                    </a>
+                </li>
+                {% endif %}
             </ul>
             <hr class="divider divider_logout">
             <div class="logout">
@@ -69,8 +78,34 @@
             {% block header %}{% endblock %}
             <div class="notification-icon">
                 <a href="#">
-                    <img src="{% static 'icons/notification.svg' %}" alt="notificación">
+                    {% if notificaciones_count > 0 %}
+                        <i class="fas fa-bell" style="color: #008CAB; font-size: 36px;"></i> <!-- Con notificaciones -->
+                    {% else %}
+                        <i class="fas fa-bell-slash" style="color: #008CAB; font-size: 36px;"></i> <!-- Sin notificaciones -->
+                    {% endif %}
                 </a>
+            </div>           
+        
+            <!-- Modal de Notificaciones -->
+            <div id="modalNotificaciones" class="modal-notificaciones" style="display: none;">
+                <div class="contenido-notificaciones">
+                    {% if notificaciones %}
+                        {% for notificacion in notificaciones %}
+                            <div class="item-notificacion" data-id="{{ notificacion.id }}">
+                                <p><strong>Cita de Rutina:</strong><br>
+                                Paciente: {{ notificacion.cita.paciente.first_name }} {{ notificacion.cita.paciente.last_name }}<br>
+                                Hora: {{ notificacion.cita.hora_inicio}} hrs<br>
+                                Sala: {{ notificacion.cita.sala }}</p>
+                                <div class="delete-notification" style="cursor:pointer;">
+                                    <h1>Borrar</h1>
+                                    <i class="fas fa-trash"></i>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>No hay notificaciones para mostrar.</p>
+                    {% endif %}
+                </div>
             </div>
         </header>
 
@@ -90,6 +125,131 @@
 
     <!-- JavaScript general -->
     <script src="{% static 'js/activeMenu.js' %}"></script>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cargar las notificaciones al cargar la página
+            fetchNotificaciones();
+        });
+
+        function toggleModalNotificaciones() {
+            const modal = document.getElementById('modalNotificaciones');
+            modal.style.display = (modal.style.display === 'none' || modal.style.display === '') ? 'block' : 'none';
+
+            if (modal.style.display === 'block') {
+                // Solo mostrar el contenido de las notificaciones en el modal
+                mostrarNotificaciones();
+            }
+        }
+
+        function mostrarNotificaciones() {
+            const contenido = document.querySelector('.contenido-notificaciones');
+            contenido.style.display = 'block'; // Asegúrate de mostrar el contenido cuando se abra el modal
+        }
+
+        function fetchNotificaciones() {
+            fetch("{% url 'obtener_notificaciones' %}")
+                .then(response => response.json())
+                .then(data => {
+                    const contenido = document.querySelector('.contenido-notificaciones');
+                    contenido.innerHTML = '';  // Limpiar contenido previo
+
+                    if (data.notificaciones.length === 0) {
+                        contenido.innerHTML = '<p>No hay notificaciones para mostrar.</p>';
+                    } else {
+                        data.notificaciones.forEach(notificacion => {
+                            contenido.innerHTML += `
+                                <div class="item-notificacion" data-id="${notificacion.id}">
+                                    <p><strong>Cita de Rutina:</strong><br>
+                                    Paciente: ${notificacion.paciente}<br>
+                                    Hora: ${notificacion.hora} hrs<br>
+                                    Sala: ${notificacion.sala}</p>
+                                    <div class="delete-notification">
+                                        <h1>Borrar</h1>
+                                        <i class="fas fa-trash"></i>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+                    // Actualizar el icono de notificaciones después de obtenerlas
+                    actualizarIconoNotificaciones(data.notificaciones_count);
+                })
+                .catch(error => console.error('Error al obtener notificaciones:', error));
+        }
+    
+        // Mostrar/ocultar notificaciones al hacer clic en el icono
+        document.querySelector('.notification-icon a').addEventListener('click', function(event) {
+            event.preventDefault();
+            toggleModalNotificaciones();
+        });
+    
+        // Cerrar el modal si se hace clic fuera de él
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('modalNotificaciones');
+            const notificationIcon = document.querySelector('.notification-icon');
+            if (!modal.contains(event.target) && !notificationIcon.contains(event.target)) {
+                modal.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('click', function(event) {
+            if (event.target.closest('.delete-notification')) {
+                const notificacionId = event.target.closest('.item-notificacion').dataset.id;
+                fetch(`/marcar-notificacion-como-leida/${notificacionId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    },
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Eliminar la notificación del DOM
+                        event.target.closest('.item-notificacion').remove();
+                        
+                        // Verificar si hay notificaciones restantes
+                        const notificacionesRestantes = document.querySelectorAll('.item-notificacion');
+                        actualizarIconoNotificaciones(notificacionesRestantes.length);
+                    } else {
+                        console.error('Error al marcar la notificación como leída');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
+
+        // Función para actualizar el icono de notificaciones
+        function actualizarIconoNotificaciones(count) {
+            const notificationIcon = document.querySelector('.notification-icon a i');
+            if (count > 0) {
+                notificationIcon.classList.remove('fa-bell-slash');
+                notificationIcon.classList.add('fa-bell');
+            } else {
+                notificationIcon.classList.remove('fa-bell');
+                notificationIcon.classList.add('fa-bell-slash');
+            }
+        }
+
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Si esta cookie comienza con el nombre que buscamos
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+    </script>
     
     <!-- Bloque adicional para cargar scripts JS específicos -->
     {% block extra_js %}{% endblock %}

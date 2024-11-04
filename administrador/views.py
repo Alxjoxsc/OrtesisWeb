@@ -46,7 +46,8 @@ def listar_terapeutas_activos(request):
         'terapeutas': terapeutas,
         'estado': 'activos',
         'query': query,  # Para mantener el valor en el HTML
-        'order_by': order_by  # Para saber el orden actual en el HTML
+        'order_by': order_by,  # Para saber el orden actual en el HTML
+        'modulo_terapeutas': True
     })
 
 @role_required('Administrador')
@@ -74,7 +75,8 @@ def listar_terapeutas_inactivos(request):
         'terapeutas': terapeutas,
         'estado': 'inactivos',
         'query': query,  # Para mantener el valor en el HTML
-        'order_by': order_by  # Para saber el orden actual en el HTML
+        'order_by': order_by,  # Para saber el orden actual en el HTML
+        'modulo_terapeutas': True
     })
 
 @role_required('Administrador')
@@ -132,13 +134,17 @@ def agregar_paciente_admin(request):
     return render(request, 'agregar_paciente_admin.html', {
         'paciente_form': form,
         'success': success,
+        'modulo_pacientes': True,
     })
 
 @role_required('Administrador')
 def elegir_terapeuta_administrador(request, paciente_id):
     paciente = Paciente.objects.get(id=paciente_id)
     terapeuta = Terapeuta.objects.all()
-    return render(request, 'elegir_terapeuta_administrador.html', {'terapeuta': terapeuta, 'paciente': paciente})
+    return render(request, 'elegir_terapeuta_administrador.html', {
+        'terapeuta': terapeuta, 
+        'paciente': paciente,
+        'modulo_pacientes': True,})
 
 @role_required('Administrador')
 def asignar_terapeuta_administrador(request, terapeuta_id, paciente_id):
@@ -155,7 +161,9 @@ def asignar_terapeuta_administrador(request, terapeuta_id, paciente_id):
     paciente.save()
 
     # Redirigir a la página de mostrar paciente
-    return render(request, 'mostrar_paciente_administrador.html', {'paciente': paciente})
+    return render(request, 'mostrar_paciente_administrador.html', {
+        'paciente': paciente,
+        'modulo_pacientes': True,})
 
 @role_required('Administrador')
 def mostrar_paciente_sin_terapeuta(request, paciente_id):
@@ -163,7 +171,7 @@ def mostrar_paciente_sin_terapeuta(request, paciente_id):
     edad = paciente.calcular_edad()
     imc = paciente.calcular_imc()
     cita = Cita.objects.filter(paciente_id=paciente_id).order_by('fecha').last()
-    return render(request, 'mostrar_paciente_administrador.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc})
+    return render(request, 'mostrar_paciente_administrador.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc, 'modulo_pacientes': True})
 
 @role_required('Administrador')
 def mostrar_paciente_con_terapeuta(request, paciente_id, terapeuta_id):
@@ -172,7 +180,7 @@ def mostrar_paciente_con_terapeuta(request, paciente_id, terapeuta_id):
     edad = paciente.calcular_edad()
     imc = paciente.calcular_imc()
     cita = Cita.objects.filter(paciente_id=paciente_id).order_by('fecha').last()
-    return render(request, 'mostrar_paciente_administrador.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc, 'terapeuta':terapeuta})
+    return render(request, 'mostrar_paciente_administrador.html', {'paciente': paciente, 'edad': edad, 'cita': cita, 'imc': imc, 'terapeuta':terapeuta, 'modulo_pacientes': True})
 
 @role_required('Administrador')
 def listar_pacientes_activos(request):
@@ -181,13 +189,20 @@ def listar_pacientes_activos(request):
     pacientes_activos = Paciente.objects.filter(is_active=True)
 
     if query:
-        pacientes_activos = pacientes_activos.filter(
-            Q(first_name__icontains=query) |
-            Q(last_name__icontains=query) |
-            Q(rut__icontains=query) |
-            Q(terapeuta__user__first_name__icontains=query) |
-            Q(terapeuta__user__last_name__icontains=query)
-        )
+
+        if query.lower() == 'sin terapeuta':
+
+            # Filtrar pacientes sin terapeuta
+            pacientes_activos = pacientes_activos.filter(terapeuta__isnull=True)
+
+        else:
+            pacientes_activos = pacientes_activos.filter(
+                Q(first_name__icontains=query) |
+                Q(last_name__icontains=query) |
+                Q(rut__icontains=query) |
+                Q(terapeuta__user__first_name__icontains=query) |
+                Q(terapeuta__user__last_name__icontains=query)
+            )
 
     if order_by:
         pacientes_activos = pacientes_activos.order_by(order_by)
@@ -200,7 +215,8 @@ def listar_pacientes_activos(request):
         'pacientes': pacientes,
         'estado': 'activos',
         'query': query,  # Para mantener el valor en el HTML
-        'order_by': order_by  # Para saber el orden actual en el HTML
+        'order_by': order_by,  # Para saber el orden actual en el HTML
+        'modulo_pacientes': True
     })
     
 @role_required('Administrador')
@@ -256,11 +272,20 @@ def listar_pacientes_inactivos(request):
     pacientes_inactivos = Paciente.objects.filter(is_active=False)
 
     if query:
-        pacientes_inactivos = pacientes_inactivos.filter(
-            Q(first_name__icontains=query) |
-            Q(last_name__icontains=query) |
-            Q(rut__icontains=query)
-        )
+
+        if query.lower() == 'sin terapeuta':
+
+            # Filtrar pacientes sin terapeuta
+            pacientes_inactivos = pacientes_inactivos.filter(terapeuta__isnull=True)
+
+        else:
+            pacientes_inactivos = pacientes_inactivos.filter(
+                Q(first_name__icontains=query) |
+                Q(last_name__icontains=query) |
+                Q(rut__icontains=query) |
+                Q(terapeuta__user__first_name__icontains=query) |
+                Q(terapeuta__user__last_name__icontains=query)
+            )
     
     if order_by:
         pacientes_inactivos = pacientes_inactivos.order_by(order_by)
@@ -273,7 +298,8 @@ def listar_pacientes_inactivos(request):
         'pacientes': pacientes,
         'estado': 'inactivos',
         'query': query,  # Para mantener el valor en el HTML
-        'order_by': order_by  # Para saber el orden actual en el HTML
+        'order_by': order_by,  # Para saber el orden actual en el HTML
+        'modulo_pacientes': True
     })
 ##################################################      ADMIN RECEPCIONISTAS      ########################################################
 
@@ -301,7 +327,8 @@ def listar_recepcionistas_activos(request):
         'recepcionistas': recepcionistas,
         'estado': 'activos',
         'query': query,  # Para mantener el valor en el HTML
-        'order_by': order_by  # Para saber el orden actual en el HTML
+        'order_by': order_by,  # Para saber el orden actual en el HTML
+        'modulo_recepcionistas': True,
         })
 
 @role_required('Administrador')
@@ -328,7 +355,8 @@ def listar_recepcionistas_inactivos(request):
         'recepcionistas': recepcionistas,
         'estado': 'inactivos',
         'query': query,  # Para mantener el valor en el HTML
-        'order_by': order_by  # Para saber el orden actual en el HTML
+        'order_by': order_by,  # Para saber el orden actual en el HTML
+        'modulo_recepcionistas': True,
         })
 
 @role_required('Administrador')
@@ -388,7 +416,8 @@ def agregar_terapeuta(request):
             return render(request, 'agregar_terapeuta.html', {
                 'success': success,
                 'terapeuta_form': CrearTerapeutaForm(), # Creamos un nuevo formulario vacío
-                'horario_formset': HorarioFormSet(queryset=Horario.objects.none())
+                'horario_formset': HorarioFormSet(queryset=Horario.objects.none()),
+                'modulo_terapeutas': True,
             })
         
     else:
@@ -398,7 +427,8 @@ def agregar_terapeuta(request):
     return render(request, 'agregar_terapeuta.html', {
         'terapeuta_form': terapeuta_form,
         'horario_formset': horario_formset,
-        'success': success # Variable para indicar que el terapeuta no fue creado exitosamente
+        'success': success, # Variable para indicar que el terapeuta no fue creado exitosamente
+        'modulo_terapeutas': True,
     })
 
 #### CARGA DE DATOS DE REGIONES, PROVINCIAS Y COMUNAS ####
@@ -433,26 +463,27 @@ def mostrar_paciente_administrador(request, paciente_id):
         'paciente': paciente,
         'edad': edad,
         'imc': imc,
-        'cita': cita  # Envía la cita o None si no existe
+        'cita': cita,  # Envía la cita o None si no existe
+        'modulo_pacientes': True,
     })
     
 @role_required('Administrador')
 def mostrar_recepcionista_administrador(request, recepcionista_id):
     recepcionista = Recepcionista.objects.get(id=recepcionista_id)
-    return render(request, 'mostrar_recepcionista_administrador.html', {'recepcionista': recepcionista})
+    return render(request, 'mostrar_recepcionista_administrador.html', {'recepcionista': recepcionista, 'modulo_recepcionistas': True})
 
 @role_required('Administrador')
 def mostrar_terapeuta_administrador(request, terapeuta_id):
     terapeuta = Terapeuta.objects.get(id=terapeuta_id)
 
     print(terapeuta)
-    return render(request, 'mostrar_terapeuta_administrador.html', {'terapeuta': terapeuta})
+    return render(request, 'mostrar_terapeuta_administrador.html', {'terapeuta': terapeuta, 'modulo_terapeutas': True})
     
 @role_required('Administrador')
 def listado_terapeutas(request, paciente_id):
     paciente = Paciente.objects.get(id=paciente_id)
     terapeuta = Terapeuta.objects.all()
-    return render(request, 'listado_terapeutas.html', {'terapeuta': terapeuta, 'paciente': paciente})
+    return render(request, 'listado_terapeutas.html', {'terapeuta': terapeuta, 'paciente': paciente, 'modulo_pacientes': True})
 
 @role_required('Administrador')
 def calendar_asignar_paciente_administrador(request, paciente_id, terapeuta_id):
@@ -469,7 +500,7 @@ def calendar_asignar_paciente_administrador(request, paciente_id, terapeuta_id):
         'domingo': None,
     }
     return render(request, 'calendar_asignar_paciente_administrador.html', {'horario_terapeuta': horario_terapeuta, 'cita': cita,
-                                                              'paciente':paciente, 'terapeuta':terapeuta})
+                                                              'paciente':paciente, 'terapeuta':terapeuta, 'modulo_pacientes': True})
 @role_required('Administrador')
 def agendar_cita_administrador(request, paciente_id, terapeuta_id):
     terapeuta_instance = get_object_or_404(Terapeuta, id=terapeuta_id)
@@ -504,7 +535,7 @@ def agendar_cita_administrador(request, paciente_id, terapeuta_id):
 
         return redirect('mostrar_paciente_administrador', paciente_instance.id)
 
-    return render(request, 'mostrar_paciente_administrador.html', {'paciente': paciente_instance})
+    return render(request, 'mostrar_paciente_administrador.html', {'paciente': paciente_instance, 'modulo_pacientes': True})
 
 @role_required('Administrador')
 def editar_datos_paciente_admin(request, paciente_id, terapeuta=None):
@@ -532,7 +563,8 @@ def editar_datos_paciente_admin(request, paciente_id, terapeuta=None):
         'paciente': paciente,
         'terapeutas': terapeutas,
         'terapeuta_asignado': paciente.terapeuta.id if paciente.terapeuta else None,
-        'paciente_form': form
+        'paciente_form': form,
+        'modulo_pacientes': True,
     })
 
 @role_required('Administrador')

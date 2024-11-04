@@ -78,9 +78,12 @@
 
 /* Menu Styles */
 .menu {
+    display: flex;
+    flex-direction: column;
     list-style: none;
     padding: 1rem;
     width: 100%;
+    height: 100%;
     margin-bottom: auto;
 }
 
@@ -104,6 +107,37 @@
     width: 40px;
     height: 40px;
     margin-right: 14px;
+}
+
+.elegir-rol{
+    margin-top: auto;
+}
+
+.modulo-activo-terapeuta {
+    background-color: #ffffff;
+    color: #008CAB !important; /* Activo */
+}
+
+.modulo-activo-terapeuta img {
+    filter: invert(53%) sepia(77%) saturate(317%) hue-rotate(140deg) brightness(100%) contrast(88%); /* Icono en #008CAB */
+}
+
+.modulo-activo-administrador {
+    background-color: #ffffff;
+    color: #001058 !important; /* Activo */
+}
+
+.modulo-activo-administrador img {
+    filter: brightness(0) saturate(100%) invert(11%) sepia(25%) saturate(7358%) hue-rotate(221deg) brightness(89%) contrast(117%); /* Icono en #001058 */
+}
+
+.modulo-activo-recepcionista {
+    background-color: #ffffff;
+    color: #373D58 !important; /* Activo */
+}
+
+.modulo-activo-recepcionista img {
+    filter: brightness(0) saturate(100%) invert(18%) sepia(8%) saturate(3387%) hue-rotate(192deg) brightness(91%) contrast(78%); /* Icono en #373D58 */
 }
 
 /* Sidebar Styles - Hover and Active States */

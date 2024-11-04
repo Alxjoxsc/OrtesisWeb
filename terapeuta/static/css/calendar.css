@@ -341,7 +341,7 @@ button:hover {
 
 /* Estilos para las citas en la vista semanal */
 .cita-semana {
-    background-color: #6ea7b4; /* Azul */
+    background-color: #5596a5; /* Azul */
     color: white;
     padding: 2px 5px;
     border-radius: 4px;
@@ -362,15 +362,23 @@ button:hover {
     background-color: #008CAB;
 }
 
-/* Asegurar que los días en la vista mensual sean relativos para posicionar el badge */
 .day {
     position: relative;
 }
 
-/* Asegurar que el contenedor de la cita en la vista semanal tenga posición relativa */
 .week-hour {
     position: relative;
-    height: 40px; /* Ajustar según tus necesidades */
+    height: 40px; 
+}
+
+/* Resaltar la columna del día actual en la vista semanal */
+.today-column {
+    background-color: #d5e9ff; /* Color de fondo para resaltar */
+}
+
+.week-view th.today-column {
+    background-color: #008CAB; 
+    color: white; 
 }
 
 

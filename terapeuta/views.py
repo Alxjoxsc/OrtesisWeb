@@ -2,11 +2,11 @@ from random import randrange
 from django.shortcuts import render, redirect
 from autenticacion.decorators import role_required
 from .models import Cita, Terapeuta, Paciente, Rutina
-from .models import Cita, Terapeuta, Paciente, Observacion
+from .models import Cita, Terapeuta, Paciente, Observacion, Notificacion
 from django.http import HttpResponse
 from django.core.paginator import Paginator
 from datetime import date
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 import json
 from django.db.models import Q
 from .models import Paciente, Rutina, Sesion, Corriente
@@ -21,7 +21,7 @@ import re
 from django.core.files.storage import FileSystemStorage
 from django.core.mail import send_mail
 from django.conf import settings
-
+from datetime import timedelta
 
 
 #-------------------------------------AGENDA-------------------------------------
@@ -61,7 +61,11 @@ def agenda(request):
         else:
             continue
     fechas_citas = json.dumps(citas_json)
-    return render(request, 'agenda.html', {'pacientes': pacientes, 'fechas_citas': fechas_citas, 'citas': citas})
+    return render(request, 'agenda.html', {
+        'pacientes': pacientes,
+        'fechas_citas': fechas_citas,
+        'citas': citas,
+        'modulo_agenda': True})
 
 def obtener_fechas_citas(request):
     if request.method == "GET":
@@ -142,7 +146,8 @@ def pacientes_view(request):
         'pacientes': pacientes, 
         'total_pacientes': total_pacientes,
         'query': query,  # Para mantener el valor en el HTML
-        'order_by': order_by  # Para saber el orden actual en el HTML
+        'order_by': order_by,  # Para saber el orden actual en el HTML
+        'modulo_pacientes': True
     })
 
 
@@ -191,6 +196,7 @@ def historial_paciente_view(request, paciente_id):
             'paciente': paciente,
             'terapeuta': terapeuta,
             'rutinas': rutinas,
+            'modulo_pacientes': True,
         }
         return render(request, 'historial_paciente.html', context)
     else:
@@ -278,12 +284,15 @@ def agendar_cita(request):
             )
             cita.save()
             
+            # Crear la notificación para la cita
+            Notificacion.objects.create(
+                terapeuta=terapeuta_instance,
+                cita=cita,
+                leida=False  # Inicialmente, la notificación no está leída
+            )
+            
             return redirect('agenda')
-    return render(request, 'agenda.html')
-
-@login_required  # Asegúrate de que el usuario esté autenticado
-def calendar(request):
-    return render(request, 'calendar.html')
+    return render(request, 'agenda.html', {'modulo_agenda': True})
 
 def editar_cita(request):
     if request.method == "POST":
@@ -297,6 +306,13 @@ def editar_cita(request):
         cita.sala = request.POST["sala_editar"]
         cita.detalle = request.POST["detalle_editar"]
         cita.save()
+
+        try:
+            notificacion = Notificacion.objects.get(cita=cita)
+            notificacion.save() 
+        except Notificacion.DoesNotExist:
+            pass
+
         return redirect("agenda")
 
     return agenda(request)
@@ -315,7 +331,9 @@ def eliminar_cita(request, cita_id):
 
 def grafico_progreso_paciente(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
-    return render(request, 'grafico_progreso_paciente.html', {'paciente': paciente})
+    return render(request, 'grafico_progreso_paciente.html', {
+        'paciente': paciente,
+        'modulo_pacientes': True})
 
 def obtener_grafico_progreso_paciente(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
@@ -571,7 +589,8 @@ def observaciones_paciente(request, paciente_id):
     context = {
         'paciente': paciente,
         'observaciones': observaciones,
-        'fecha_actual': now().strftime('%d/%m/%Y')
+        'fecha_actual': now().strftime('%d/%m/%Y'),
+        'modulo_pacientes': True
     }
 
     return render(request, 'registrar_observaciones.html', context)
@@ -609,7 +628,9 @@ def editar_observacion(request, observacion_id):
         
         return redirect('observaciones_paciente', paciente_id=observacion.paciente.id)
 
-    return render(request, 'editar_observacion.html', {'observacion': observacion})
+    return render(request, 'editar_observacion.html', {
+        'observacion': observacion,
+        'modulo_pacientes': True})
 
 @role_required('Terapeuta')
 def eliminar_observacion(request, observacion_id):
@@ -627,6 +648,7 @@ def perfil(request):
     
     context = {
         'terapeuta': terapeuta,
+        'modulo_perfil': True
     }
     
     return render(request, 'perfil.html', context)
@@ -667,6 +689,7 @@ def editar_perfil(request, pk):
 
     context = {
         'terapeuta': terapeuta,
+        'modulo_perfil': True
     }
     return render(request, 'perfil.html', context)
     
@@ -698,7 +721,64 @@ def historial_sesiones(request, paciente_id):
         'rutinas': rutinas,
         'rutina_seleccionada': rutina_seleccionada,
         'sesiones': sesiones,
+        'modulo_pacientes': True
     }
     return render(request, 'historial_sesiones.html', context)
 
+def eliminar_notificaciones_antiguas():
+    # Obtén la fecha y hora actual
+    ahora = timezone.now()
+    
+    # Elimina las notificaciones que tengan una cita con fecha anterior a hoy
+    Notificacion.objects.filter(
+        Q(cita__fecha__lt=ahora.date()) | 
+        (Q(cita__fecha=ahora.date()) & Q(cita__hora_inicio__lt=ahora.time()))
+    ).delete()
 
+def obtener_notificaciones(request):
+    if request.user.is_authenticated:
+        # Llamar a la función para eliminar notificaciones antiguas
+        eliminar_notificaciones_antiguas()
+        
+        # Definir el rango de tiempo para hoy y mañana
+        ahora = timezone.now()
+        inicio_hoy = ahora.replace(hour=0, minute=0, second=0, microsecond=0)
+        fin_manana = (inicio_hoy + timedelta(days=2)) - timedelta(seconds=1) 
+
+        # Obtener solo las notificaciones no leídas para citas programadas hoy y mañana
+        notificaciones = Notificacion.objects.filter(
+            terapeuta=request.user.terapeuta,
+            leida=False,
+            cita__fecha__range=(inicio_hoy.date(), (inicio_hoy + timedelta(days=1)).date())
+        ).order_by('cita__fecha', 'cita__hora_inicio')
+
+        # Contar las notificaciones
+        notificaciones_count = notificaciones.count()
+
+        # Preparar los datos para el JsonResponse
+        notificaciones_data = []
+        for notificacion in notificaciones:
+            notificaciones_data.append({
+                'id': notificacion.id,
+                'paciente': f"{notificacion.cita.paciente.first_name} {notificacion.cita.paciente.last_name}",
+                'hora': notificacion.cita.hora_inicio.strftime('%H:%M'),
+                'sala': notificacion.cita.sala,
+            })
+
+        return JsonResponse({
+            'notificaciones': notificaciones_data,
+            'notificaciones_count': notificaciones_count,
+        })
+
+    return JsonResponse({'notificaciones': [], 'notificaciones_count': 0}, safe=False)
+
+def marcar_notificacion_como_leida(request, notificacion_id):
+    if request.method == 'POST' and request.user.is_authenticated:
+        try:
+            notificacion = Notificacion.objects.get(id=notificacion_id, terapeuta=request.user.terapeuta)
+            notificacion.leida = True
+            notificacion.save()
+            return JsonResponse({'success': True})
+        except Notificacion.DoesNotExist:
+            raise Http404("Notificación no encontrada.")
+    return JsonResponse({'success': False}, status=400)
