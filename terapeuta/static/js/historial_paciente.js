@@ -200,7 +200,14 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch(error => {
                 console.error('Error al obtener los datos de la rutina:', error);
-                alert('Ocurrió un error al obtener los datos de la rutina.');
+                const modalErrorEditRutina = document.getElementById('modalErrorEditRutina');
+                modalErrorEditRutina.style.display = 'flex';
+
+                    // Ocultar el modal de éxito después de 2 segundos y recargar la página
+                    setTimeout(() => {
+                        modalErrorEditRutina.style.display = 'none';
+                        window.location.reload();
+                    }, 2000);
             });
         };
     }
@@ -228,6 +235,9 @@ document.addEventListener("DOMContentLoaded", function () {
             // Obtener los datos del formulario
             const formData = new FormData(editarRutinaForm);
 
+            const modalCarga = document.getElementById('modalCarga');
+            modalCarga.style.display = 'flex';
+
             fetch(`/rutina/${rutinaId}/editar/`, {
                 method: 'POST',
                 headers: {
@@ -239,10 +249,14 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    alert('Rutina actualizada exitosamente.');
                     editarRutinaModal.style.display = 'none';
-                    // Puedes actualizar la página o la lista de rutinas aquí
-                    window.location.reload();
+                    modalCarga.style.display = 'none';
+                    const modalExitoRutinaEditada = document.getElementById('modalExitoRutinaEditada');
+                    modalExitoRutinaEditada.style.display = 'flex';
+                    setTimeout(() => {
+                        modalExitoRutinaEditada.style.display = 'none';
+                        window.location.reload();
+                    }, 2000);
                 } else {
                     alert('Error al actualizar la rutina: ' + data.message);
                 }

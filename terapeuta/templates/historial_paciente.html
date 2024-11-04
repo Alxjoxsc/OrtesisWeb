@@ -296,7 +296,8 @@
   </div>
 </div>
 
-<!-- Modal Popup para mostrar mensaje de éxito -->
+<!-- MENSAJES DESVINVULAR PACIENTE -->\
+<!-- Modal Popup para mostrar mensaje de éxito desvinculacion -->
 <div id="modalExito" class="modal">
   <div class="contenido-modal-mensaje">
       <img src="{% static 'icons/Exito.svg' %}" alt="Éxito">
@@ -312,11 +313,28 @@
   </div>
 </div>
 
+<!-- MENSAJES RUTINAS PACIENTE -->
 <!-- Modal Popup para mostrar mensaje de éxito -->
 <div id="modalExitoRutina" class="modal">
   <div class="contenido-modal-mensaje">
       <img src="{% static 'icons/Exito.svg' %}" alt="Éxito">
       <p>Rutina de {{paciente.first_name}} {{paciente.last_name}} Creada con exito</p>
+  </div>
+</div>
+
+<!-- Modal Popup para mostrar mensaje de no hay rutina creada para editar -->
+<div id="modalErrorEditRutina" class="modal">
+  <div class="contenido-modal-mensaje">
+      <img src="{% static 'icons/Alert.svg' %}" alt="Éxito">
+      <p>El paciente {{paciente.first_name}} {{paciente.last_name}} no tiene rutinas creadas</p>
+  </div>
+</div>
+
+<!-- Modal Popup para mostrar mensaje de éxito al editar rutina -->
+<div id="modalExitoRutinaEditada" class="modal">
+  <div class="contenido-modal-mensaje">
+      <img src="{% static 'icons/Exito.svg' %}" alt="Éxito">
+      <p>Rutina de {{paciente.first_name}} {{paciente.last_name}} actualizada con exito</p>
   </div>
 </div>
 
@@ -327,6 +345,8 @@
     <p>Guardando rutina, por favor espera...</p>
   </div>
 </div>
+
+
 {% endblock %}
 
 {% block extra_js %}
