@@ -645,6 +645,7 @@ def eliminar_observacion(request, observacion_id):
     
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
+
 def perfil(request):
     
     terapeuta = get_object_or_404(Terapeuta, user=request.user)
