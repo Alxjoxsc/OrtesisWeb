@@ -2,6 +2,9 @@ import json
 import re
 import csv
 import pandas as pd
+from decimal import Decimal
+from datetime import date
+from itertools import cycle
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 from autenticacion.decorators import role_required
@@ -331,7 +334,7 @@ def carga_masiva_pacientes(request):
     registros_subidos = 0
     registros_no_subidos = 0
     registros_no_validos = []
-    
+
     if request.method == 'POST':
         if 'archivo_csv' not in request.FILES:
             messages.error(request, 'No se subió ningún archivo')
@@ -347,37 +350,92 @@ def carga_masiva_pacientes(request):
             return redirect('listar_pacientes_activos')
 
         for index, row in data.iterrows():
+            errores = []  # Lista de errores para la fila actual
+
             try:
-                paciente = Paciente(
-                    rut=row['Rut'],
-                    first_name=row['Nombre'],
-                    last_name=row['Apellido'],
-                    fecha_nacimiento=row['Fecha Nacimiento'],
-                    sexo=row['Sexo'],
-                    telefono=row['Telefono'],
-                    email=row['Email'],
-                    contacto_emergencia=row['Contacto Emergencia'],
-                    telefono_emergencia=row['Telefono Emergencia'],
-                    patologia=row['Patologia'],
-                    descripcion_patologia=row['Descripcion Patologia'],
-                    medicamentos=row['Medicamentos'],
-                    alergias=row['Alergias'],
-                    actividad_fisica=row['Actividad Fisica'],
-                    peso=row['Peso'],
-                    altura=row['Altura'],
-                    region=Region.objects.get(id=row['Region']) if not pd.isna(row['Region']) else None,
-                    provincia=Provincia.objects.get(id=row['Provincia']) if not pd.isna(row['Provincia']) else None,
-                    comuna=Comuna.objects.get(id=row['Comuna']) if not pd.isna(row['Comuna']) else None,
-                    calle=row['Calle']
-                )
+                # Validación de Rut
+                rut = row['Rut']
+                if not re.match(r'^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$', rut):
+                    errores.append(f'El RUT "{rut}" debe estar en el formato XX.XXX.XXX-X')
+                
+                # Validación de dígito verificador
+                clean_rut = rut.replace(".", "").replace("-", "")
+                num_part = clean_rut[:-1]
+                dv = clean_rut[-1].upper()
+                reversed_digits = map(int, reversed(num_part))
+                factors = cycle(range(2, 8))
+                s = sum(d * f for d, f in zip(reversed_digits, factors))
+                verificador = 'K' if (-s) % 11 == 10 else str((-s) % 11)
+                if dv != verificador:
+                    errores.append(f'El dígito verificador del RUT "{rut}" no es válido')
+                
+                # Validación de nombres y apellidos
+                first_name = row['Nombre']
+                if not re.match(r'^[a-zA-Z]+( [a-zA-Z]+){0,2}$', first_name):
+                    errores.append(f'El nombre "{first_name}" solo puede contener letras y hasta 3 nombres separados por espacios')
+                
+                last_name = row['Apellido']
+                if not re.match(r'^[a-zA-Z]+( [a-zA-Z]+)?$', last_name):
+                    errores.append(f'El apellido "{last_name}" solo puede contener letras y hasta 2 apellidos separados por un espacio')
+                
+                # Validación de correo electrónico
+                email = row['Email']
+                if not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
+                    errores.append(f'El correo "{email}" no es válido')
+                
+                # Validación de teléfono
+                telefono = row['Telefono']
+                if not re.match(r'^\d{1} \d{4} \d{4}$', telefono):
+                    errores.append(f'El teléfono "{telefono}" debe tener el formato: 9 1234 5678')
+                
+                # Validación de fecha de nacimiento
+                fecha_nacimiento = pd.to_datetime(row['Fecha Nacimiento'], errors='coerce').date()
+                if not fecha_nacimiento or fecha_nacimiento >= date.today():
+                    errores.append(f'La fecha de nacimiento "{row["Fecha Nacimiento"]}" debe ser anterior a la fecha actual')
+                
+                # Validación de sexo
+                sexo = row['Sexo'].capitalize()
+                if sexo not in ['Masculino', 'Femenino']:
+                    errores.append(f'El sexo "{sexo}" debe ser "Masculino" o "Femenino"')
+                
+                # Validación de peso y altura
+                peso = Decimal(str(row['Peso']).replace(',', '.'))
+                altura = Decimal(str(row['Altura']).replace(',', '.'))
 
                 # Verificación de duplicados
-                if Paciente.objects.filter(rut=paciente.rut).exists():
-                    registros_no_subidos += 1
-                    registros_no_validos.append(f'El rut {paciente.rut} ya está registrado')
-                else:
+                if Paciente.objects.filter(rut=rut).exists():
+                    errores.append(f'El RUT "{rut}" ya está registrado')
+                
+                # Si no hay errores, se guarda el paciente
+                if not errores:
+                    paciente = Paciente(
+                        rut=rut,
+                        first_name=first_name,
+                        last_name=last_name,
+                        fecha_nacimiento=fecha_nacimiento,
+                        sexo=sexo,
+                        telefono=telefono,
+                        email=email,
+                        contacto_emergencia=row['Contacto Emergencia'],
+                        telefono_emergencia=row['Telefono Emergencia'],
+                        patologia=row['Patologia'],
+                        descripcion_patologia=row['Descripcion Patologia'],
+                        medicamentos=row['Medicamentos'],
+                        alergias=row['Alergias'],
+                        actividad_fisica=row['Actividad Fisica'],
+                        peso=peso,
+                        altura=altura,
+                        region=Region.objects.get(id=row['Region']) if not pd.isna(row['Region']) else None,
+                        provincia=Provincia.objects.get(id=row['Provincia']) if not pd.isna(row['Provincia']) else None,
+                        comuna=Comuna.objects.get(id=row['Comuna']) if not pd.isna(row['Comuna']) else None,
+                        calle=row['Calle']
+                    )
                     paciente.save()
                     registros_subidos += 1
+                else:
+                    # Si hay errores, no se guarda el paciente y se acumulan los mensajes de error
+                    registros_no_subidos += 1
+                    registros_no_validos.extend(errores)
 
             except Exception as e:
                 registros_no_subidos += 1
@@ -387,12 +445,13 @@ def carga_masiva_pacientes(request):
         if registros_no_validos:
             for mensaje in registros_no_validos:
                 messages.error(request, mensaje)
-        
+
         return redirect('listar_pacientes_activos')
     
     else:
         messages.error(request, 'No se subió ningún archivo')
         return redirect('listar_pacientes_activos')
+
 
 ##################################################      ADMIN RECEPCIONISTAS      ########################################################
 
