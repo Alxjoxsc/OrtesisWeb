@@ -88,6 +88,21 @@
     </div>
 </div>
 
+<!-- Modal Popup para mostrar mensaje de éxito al editar rutina -->
+<div id="modalExitoCorreoActualizado" class="modal-men" style="display: none;">
+    <div class="contenido-modal-mensaje">
+        <img src="{% static 'icons/Exito.svg' %}" alt="Éxito">
+        <p>Correo electronico del terapeuta {{terapeuta.user.first_name}} {{terapeuta.user.last_name}} actualizado con éxito</p>
+    </div>
+</div>
+  <!-- Modal de Carga -->
+  <div id="modalCarga" class="modal-men" style="display: none;">
+    <div class="contenido-modal-mensaje">
+      <div class="spinner"></div>
+      <p>Guardando rutina, por favor espera...</p>
+    </div>
+  </div>
+
 {% endblock %}
 
 {% block extra_js %}
@@ -216,39 +231,50 @@
     function guardarNuevoEmail() {
         const nuevoEmail = document.getElementById('email-input').value;
         const terapeutaId = '{{ terapeuta.id }}';
-
+      
         // Validar el formato del correo electrónico
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(nuevoEmail)) {
-            alert('Por favor, ingresa un correo electrónico válido.');
-            return;
+          alert('Por favor, ingresa un correo electrónico válido.');
+          return;
         }
-
+      
+        // Mostrar el modal de carga
+        mostrarModalCarga();
+      
         // Enviar el nuevo correo al servidor
         fetch("{% url 'actualizar_email_terapeuta' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}',
-            },
-            body: JSON.stringify({ 'terapeuta_id': terapeutaId, 'nuevo_email': nuevoEmail })
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}',
+          },
+          body: JSON.stringify({ 'terapeuta_id': terapeutaId, 'nuevo_email': nuevoEmail })
         })
         .then(response => response.json())
         .then(data => {
-            if (data.status === 'success') {
-                // Actualizar el correo en la interfaz
-                document.getElementById('email-display').textContent = nuevoEmail;
-                cancelarEdicionEmail();
-                // Mostrar mensaje de éxito
-                alert('Correo electrónico actualizado correctamente.');
-            } else {
-                alert('Error al actualizar el correo electrónico: ' + data.message);
-            }
+          // Ocultar el modal de carga
+          ocultarModalCarga();
+      
+          if (data.status === 'success') {
+            // Actualizar el correo en la interfaz
+            document.getElementById('email-display').textContent = nuevoEmail;
+            cancelarEdicionEmail();
+            // Mostrar el modal de éxito
+            mostrarModalExito();
+          } else {
+            alert('Error al actualizar el correo electrónico: ' + data.message);
+          }
         })
         .catch(error => {
-            console.error('Error:', error);
+          // Ocultar el modal de carga
+          ocultarModalCarga();
+      
+          console.error('Error:', error);
+          alert('Ocurrió un error al actualizar el correo electrónico.');
         });
-    }
+      }
+      
 
     // Asignar eventos a los botones
     document.getElementById('edit-email-button').addEventListener('click', showPasswordModal);
@@ -265,6 +291,25 @@
 
     window.verificarAdminPassword = verificarAdminPassword;
     window.cerrarPasswordModal = cerrarPasswordModal;
+
+    // Función para mostrar el modal de carga
+    function mostrarModalCarga() {
+        document.getElementById('modalCarga').style.display = 'block';
+    }
+  
+    // Función para ocultar el modal de carga
+    function ocultarModalCarga() {
+        document.getElementById('modalCarga').style.display = 'none';
+    }
+    
+    // Función para mostrar el modal de éxito
+    function mostrarModalExito() {
+        document.getElementById('modalExitoCorreoActualizado').style.display = 'block';
+        // Ocultar el modal de éxito después de 3 segundos
+        setTimeout(function() {
+        document.getElementById('modalExitoCorreoActualizado').style.display = 'none';
+        }, 3000);
+    }
 </script>
     
 
