@@ -229,6 +229,69 @@ strong {
     background-color: #008F85;
 }
 
+.email-container {
+    display: flex;
+    align-items: center; 
+    gap: 9px;
+    font-size: 20px;
+    margin-top: -25px;
+    margin-bottom: -10px;
+}
+
+.edit-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.edit-icon-svg {
+    width: 20px;
+    height: 20px;
+}
+
+.edit-button:hover .edit-icon-svg {
+    filter: brightness(0.8);
+}
+
+/* Estilos para los botones de edición, guardar y cancelar */
+.save-button, .cancel-button {
+    width: 20%;
+    background-color: #008CAB;
+    color: white;
+    border: none; 
+    padding: 8px 12px; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    font-size: 14px; 
+    margin-bottom: 0px;
+    margin-top: 15px;
+}
+
+.save-button:hover {
+    background-color: #006f85; 
+}
+
+/* Estilos específicos para el botón de cancelar */
+.cancel-button {
+    background-color: #f44336; 
+}
+
+.cancel-button:hover {
+    background-color: #d32f2f;
+}
+
+/* Estilos para el campo de entrada de correo electrónico */
+#email-input {
+    width: 100%;
+    max-width: 300px;
+    padding: 6px 8px;
+    margin-top: 5px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+
 @media screen and (max-width:1200px){
     .columna p{
         font-size: 20px;

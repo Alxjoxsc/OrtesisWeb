@@ -16,6 +16,10 @@ from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.contrib import messages
+from django.contrib.auth import authenticate, login
+from django.http import JsonResponse
+from django.core.mail import send_mail
+from django.conf import settings
 
 ############################### LISTAR TERAPEUTAS ################################
 @role_required('Administrador')
@@ -570,3 +574,56 @@ def editar_datos_paciente_admin(request, paciente_id, terapeuta=None):
 @role_required('Administrador')
 def redirigir_asignar_cita(request, terapeuta_id, paciente_id):
     return redirect('calendar_asignar_paciente_administrador', terapeuta_id=terapeuta_id, paciente_id=paciente_id)
+
+def verificar_password_admin(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        password = data.get('password', '')
+
+        user = request.user
+        if user.is_authenticated and user.is_staff:
+            authenticated_user = authenticate(username=user.username, password=password)
+            if authenticated_user is not None:
+                return JsonResponse({'valid': True})
+            else:
+                return JsonResponse({'valid': False})
+        else:
+            return JsonResponse({'valid': False})
+    else:
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+    
+def actualizar_email_terapeuta(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        terapeuta_id = data.get('terapeuta_id')
+        nuevo_email = data.get('nuevo_email')
+
+        try:
+            terapeuta = Terapeuta.objects.get(id=terapeuta_id)
+            usuario = terapeuta.user
+            old_email = usuario.email
+
+            # Verificar que el nuevo correo no esté en uso
+            if User.objects.filter(email=nuevo_email).exclude(id=usuario.id).exists():
+                return JsonResponse({'status': 'error', 'message': 'El correo electrónico ya está en uso.'})
+
+            # Actualizar el correo electrónico
+            usuario.email = nuevo_email
+            usuario.save()
+
+            # Enviar notificación al correo anterior
+            asunto = 'Cambio de correo electrónico'
+            mensaje = f'Su correo electrónico asociado a su cuenta ha sido cambiado a {nuevo_email}. Si usted no realizó este cambio, por favor contacte al administrador.'
+            send_mail(
+                asunto,
+                mensaje,
+                settings.DEFAULT_FROM_EMAIL,
+                [old_email],
+                fail_silently=False,
+            )
+
+            return JsonResponse({'status': 'success'})
+        except Terapeuta.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Terapeuta no encontrado.'})
+    else:
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
