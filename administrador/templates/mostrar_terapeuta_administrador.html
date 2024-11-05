@@ -95,6 +95,16 @@
         <p>Correo electronico del terapeuta {{terapeuta.user.first_name}} {{terapeuta.user.last_name}} actualizado con éxito</p>
     </div>
 </div>
+
+<!-- Modal Popup para mostrar mensaje de éxito al editar rutina -->
+<div id="modalContrasenaIncorrecta" class="modal-men" style="display: none;">
+    <div class="contenido-modal-mensaje">
+        <img src="{% static 'icons/Alert.svg' %}" alt="Éxito">
+        <p>La contraseña ingresada no es valida</p>
+    </div>
+</div>
+
+
   <!-- Modal de Carga -->
   <div id="modalCarga" class="modal-men" style="display: none;">
     <div class="contenido-modal-mensaje">
@@ -198,7 +208,7 @@
                 cerrarPasswordModal();
                 habilitarEdicionEmail();
             } else {
-                alert('Contraseña incorrecta.');
+                mostrarModalErrorPass();
             }
         })
         .catch(error => {
@@ -308,7 +318,16 @@
         // Ocultar el modal de éxito después de 3 segundos
         setTimeout(function() {
         document.getElementById('modalExitoCorreoActualizado').style.display = 'none';
-        }, 3000);
+        }, 2000);
+    }
+
+    // Función para mostrar el modal de contrasena incorrecta
+    function mostrarModalErrorPass() {
+        document.getElementById('modalContrasenaIncorrecta').style.display = 'block';
+        // Ocultar el modal de éxito después de 3 segundos
+        setTimeout(function() {
+        document.getElementById('modalContrasenaIncorrecta').style.display = 'none';
+        }, 2000);
     }
 </script>
     
