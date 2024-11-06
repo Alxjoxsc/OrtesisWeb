@@ -16,6 +16,7 @@ urlpatterns = [
     path('restaurar_recepcionista/', views.restaurar_recepcionista, name='restaurar_recepcionista'),
     path('agregar/', views.agregar_paciente_admin, name='agregar_paciente_admin'),
     path('administrador/agregar_terapeuta/', views.agregar_terapeuta, name='agregar_terapeuta'),
+    path('administrador/agregar_recepcionista/', views.agregar_recepcionista, name='agregar_recepcionista'),
     path('api/provincias/', views.provincias_api, name='provincias_api'),
     path('api/comunas/', views.comunas_api, name='comunas_api'),
     path('mostrar_paciente_administrador/<int:paciente_id>', views.mostrar_paciente_administrador, name='mostrar_paciente_administrador'),

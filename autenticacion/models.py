@@ -32,7 +32,7 @@ class Profile(models.Model):
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True)  # Región
     provincia = models.ForeignKey(Provincia, on_delete=models.SET_NULL, null=True)  # Provincia
     comuna = models.ForeignKey(Comuna, on_delete=models.SET_NULL, null=True)  # Comuna
-    sexo = models.CharField(max_length=1, choices=(('M', 'Masculino'), ('F', 'Femenino')), blank=True, null=True)  # Sexo
+    sexo = models.CharField(max_length=1, choices=(('M', 'Masculino'), ('F', 'Femenino'), ('O', 'Otro')), blank=True, null=True)  # Sexo
     
     def __str__(self):
         return f'{self.user.username} ({self.rut})'
