@@ -682,6 +682,9 @@ def editar_perfil(request, pk):
                         terapeuta.imagen_perfil.delete()
                     terapeuta.imagen_perfil = None
                 elif imagen:
+                    # Elimina la imagen anterior si existe
+                    if terapeuta.imagen_perfil:
+                        terapeuta.imagen_perfil.delete()
                     terapeuta.imagen_perfil = imagen
 
                 terapeuta.save()
