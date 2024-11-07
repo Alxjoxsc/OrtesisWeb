@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from autenticacion.models import Profile
 from datetime import timedelta, date
 from django.utils import timezone
-from autenticacion.models import Region, Provincia, Comuna  # Importamos los modelos de ubicación
+from autenticacion.models import Region, Comuna  # Importamos los modelos de ubicación
 
 class Terapeuta(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
@@ -53,9 +53,8 @@ class Paciente(models.Model):
     peso = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, default=0.0)
     altura = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, default=0.0)
 
-    # Nuevas relaciones con Región, Provincia y Comuna
+    # Nuevas relaciones con Región y Comuna
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True)
-    provincia = models.ForeignKey(Provincia, on_delete=models.SET_NULL, null=True, blank=True)
     comuna = models.ForeignKey(Comuna, on_delete=models.SET_NULL, null=True, blank=True)
 
     # Dirección detallada (Calle)

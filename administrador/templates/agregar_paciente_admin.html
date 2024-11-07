@@ -155,12 +155,6 @@
             </div>
 
             <div class="form-group">
-                <label for="{{ paciente_form.provincia.id_for_label }}">{{ paciente_form.provincia.label }}</label>
-                {{ paciente_form.provincia }}
-                <div class="error">{{ paciente_form.provincia.errors }}</div>
-            </div>
-
-            <div class="form-group">
                 <label for="{{ paciente_form.comuna.id_for_label }}">{{ paciente_form.comuna.label }}</label>
                 {{ paciente_form.comuna }}
                 <div class="error">{{ paciente_form.comuna.errors }}</div>
@@ -195,37 +189,17 @@
         var mensajeExito = document.getElementById("mensaje-exito");
         mensajeExito.style.display = "none"; // Ocultar el modal
     }
-</script>
-<script>
+    
     document.addEventListener("DOMContentLoaded", function() {
         var regionField = document.getElementById("id_region");
-        var provinciaField = document.getElementById("id_provincia");
         var comunaField = document.getElementById("id_comuna");
 
         regionField.addEventListener("change", function() {
             var regionId = this.value;
-            provinciaField.innerHTML = ""; // Limpiar opciones anteriores
             comunaField.innerHTML = ""; // Limpiar opciones anteriores
 
             if (regionId) {
-                fetch(`/api/provincias/?region=${regionId}`)
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(provincia => {
-                        var option = document.createElement("option");
-                        option.value = provincia.id;
-                        option.textContent = provincia.nombre;
-                        provinciaField.appendChild(option);
-                    });
-                });
-            }
-        });
-        provinciaField.addEventListener("change", function() {
-            var provinciaId = this.value;
-            comunaField.innerHTML = ""; // Limpiar opciones anteriores
-
-            if (provinciaId) {
-                fetch(`/api/comunas/?provincia=${provinciaId}`)
+                fetch(`/api/comunas/?region=${regionId}`)
                 .then(response => response.json())
                 .then(data => {
                     // Actualizar opciones del campo de selección de comuna
@@ -240,6 +214,7 @@
         });
     });
 </script>
+
 <script>
     document.getElementById("boton-cancelar").addEventListener("click", function(){
         window.location.href = "{% url 'listar_pacientes_activos' %}";

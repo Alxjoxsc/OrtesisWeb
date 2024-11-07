@@ -1,6 +1,6 @@
 from django import forms
 from terapeuta.models import Paciente
-from autenticacion.models import Region, Provincia, Comuna  # Importamos los modelos de ubicación
+from autenticacion.models import Region, Comuna  # Importamos los modelos de ubicación
 from django.utils import timezone  # Para manejar la fecha y hora actual
 from decimal import Decimal
 from itertools import cycle
@@ -146,13 +146,6 @@ class CrearPacienteForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'campo-formulario'})
     )
 
-    provincia = forms.ModelChoiceField(
-        queryset=Provincia.objects.all(),  # Cargamos todas las provincias
-        label='Provincia (*)',
-        required=True,
-        widget=forms.Select(attrs={'class': 'campo-formulario'})
-    )
-
     comuna = forms.ModelChoiceField(
         queryset=Comuna.objects.all(),  # Cargamos todas las comunas
         label='Comuna (*)',
@@ -187,7 +180,6 @@ class CrearPacienteForm(forms.ModelForm):
             'peso', 
             'altura', 
             'region',  # Añadido campo región
-            'provincia',  # Añadido campo provincia
             'comuna',  # Añadido campo comuna
             'calle',  # Añadido campo calle
         ]
@@ -211,7 +203,6 @@ class CrearPacienteForm(forms.ModelForm):
             peso=self.cleaned_data['peso'],
             altura=self.cleaned_data['altura'],
             region=self.cleaned_data['region'],
-            provincia=self.cleaned_data['provincia'],
             comuna=self.cleaned_data['comuna'],
             calle=self.cleaned_data['calle'],  # Calle agregada manualmente
             motivo_desvinculacion='',
@@ -226,21 +217,17 @@ class CrearPacienteForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        # Filtrar las comunas según la región seleccionada
         if 'region' in self.data:
             try:
-                self.fields['provincia'].queryset = Provincia.objects.filter(region_id=self.data['region'])
+                self.fields['comuna'].queryset = Comuna.objects.filter(region_id=self.data['region'])
             except (ValueError, TypeError):
                 pass  # Manejo de errores si la región no es válida
         elif self.instance.pk:
-            self.fields['provincia'].queryset = self.instance.region.provincia_set.all()
+            # Si ya existe la instancia, cargar las comunas de la región asociada
+            self.fields['comuna'].queryset = self.instance.region.comuna_set.all()
 
-        if 'provincia' in self.data:
-            try:
-                self.fields['comuna'].queryset = Comuna.objects.filter(provincia_id=self.data['provincia'])
-            except (ValueError, TypeError):
-                pass  # Manejo de errores si la provincia no es válida
-        elif self.instance.pk:
-            self.fields['comuna'].queryset = self.instance.provincia.comuna_set.all()
     
     def clean_rut(self):
         rut = self.cleaned_data.get('rut')
@@ -465,13 +452,6 @@ class EditarPacienteForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'campo-formulario'})
     )
 
-    provincia = forms.ModelChoiceField(
-        queryset=Provincia.objects.all(),  # Cargamos todas las provincias
-        label='Provincia (*)',
-        required=True,
-        widget=forms.Select(attrs={'class': 'campo-formulario'})
-    )
-
     comuna = forms.ModelChoiceField(
         queryset=Comuna.objects.all(),  # Cargamos todas las comunas
         label='Comuna (*)',
@@ -505,7 +485,6 @@ class EditarPacienteForm(forms.ModelForm):
             'peso', 
             'altura', 
             'region',  
-            'provincia',  
             'comuna',  
             'calle',  
         ]
@@ -520,23 +499,16 @@ class EditarPacienteForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        self.fields['rut'].widget.attrs['readonly'] = True
-        
+        # Filtrar las comunas según la región seleccionada
         if 'region' in self.data:
             try:
-                self.fields['provincia'].queryset = Provincia.objects.filter(region_id=self.data['region'])
+                self.fields['comuna'].queryset = Comuna.objects.filter(region_id=self.data['region'])
             except (ValueError, TypeError):
                 pass  # Manejo de errores si la región no es válida
         elif self.instance.pk:
-            self.fields['provincia'].queryset = self.instance.region.provincia_set.all()
+            # Si ya existe la instancia, cargar las comunas de la región asociada
+            self.fields['comuna'].queryset = self.instance.region.comuna_set.all()
 
-        if 'provincia' in self.data:
-            try:
-                self.fields['comuna'].queryset = Comuna.objects.filter(provincia_id=self.data['provincia'])
-            except (ValueError, TypeError):
-                pass  # Manejo de errores si la provincia no es válida
-        elif self.instance.pk:
-            self.fields['comuna'].queryset = self.instance.provincia.comuna_set.all()
             
     def clean_peso(self):
         peso = self.cleaned_data.get('peso')
