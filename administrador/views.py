@@ -344,7 +344,7 @@ def carga_masiva_pacientes(request):
             return redirect('listar_pacientes_activos')
 
         try:
-            data = pd.read_csv(request.FILES['archivo_csv'], encoding='utf-8')
+            data = pd.read_csv(request.FILES['archivo_csv'], delimiter=',', encoding='utf-8')
             # Validación de la cantidad de columnas
             if len(data.columns) != COLUMNAS_ESPERADAS:
                 messages.error(request, f'El archivo debe tener exactamente {COLUMNAS_ESPERADAS} columnas. '
@@ -358,18 +358,13 @@ def carga_masiva_pacientes(request):
             messages.error(request, f'Error al leer el archivo: {str(e)}')
             return redirect('listar_pacientes_activos')
 
+        fila = 0  # Variable para contar las filas (empezamos desde 1)
         for index, row in data.iterrows():
+            fila += 1 # Incrementa el contador de filas
             errores = []  # Lista de errores para la fila actual
-
-            # Validación de la cantidad de columnas por fila
-            if len(row) != COLUMNAS_ESPERADAS:
-                errores.append(f'La fila {index + 1} tiene {len(row)} columnas, '
-                                f'pero se esperaban {COLUMNAS_ESPERADAS} columnas.')
-                registros_no_subidos += 1
-                registros_no_validos.extend(errores)
-                continue  # Pasamos a la siguiente fila si hay error en la cantidad de columnas
-
+            
             try:
+                
                 # Validación de Rut
                 rut = row['Rut']
                 if not re.match(r'^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$', rut):
@@ -496,10 +491,8 @@ def carga_masiva_pacientes(request):
                     registros_no_validos.extend(errores)
 
             except Exception as e:
-                print(type(e))
-                print(e)
                 registros_no_subidos += 1
-                registros_no_validos.append(f'Error en la fila {index + 1}: {str(e)}')
+                registros_no_validos.append(f'Error en la fila {fila}: {str(e)}')
 
         messages.success(request, f'Carga masiva finalizada. Registros subidos: {registros_subidos}. Registros no subidos: {registros_no_subidos}')
         if registros_no_validos:
