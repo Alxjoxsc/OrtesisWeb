@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 from autenticacion.decorators import role_required
 from .forms import CrearTerapeutaForm, HorarioFormSet, CrearPacienteForm, EditarPacienteForm
-from autenticacion.models import Provincia, Comuna
+from autenticacion.models import Comuna
 from django.http import JsonResponse
 from terapeuta.models import Paciente, Terapeuta, Cita, Horario
 from recepcionista.models import Recepcionista
@@ -435,22 +435,16 @@ def agregar_terapeuta(request):
         'modulo_terapeutas': True,
     })
 
-#### CARGA DE DATOS DE REGIONES, PROVINCIAS Y COMUNAS ####
-def provincias_api(request):
+#### CARGA DE DATOS DE REGIONES Y COMUNAS ####
+def comunas_api(request):
     region_id = request.GET.get("region")
     if region_id:
-        provincias = Provincia.objects.filter(region_id=region_id).values("id", "nombre")
-        return JsonResponse(list(provincias), safe=False)
-    else:
-        return JsonResponse([], safe=False)
-    
-def comunas_api(request):
-    provincia_id = request.GET.get("provincia")
-    if provincia_id:
-        comunas = Comuna.objects.filter(provincia_id=provincia_id).values("id", "nombre")
+        # Filtrar comunas directamente por región
+        comunas = Comuna.objects.filter(region_id=region_id).values("id", "nombre")
         return JsonResponse(list(comunas), safe=False)
     else:
         return JsonResponse([], safe=False)
+
     
 @role_required('Administrador')
 def mostrar_paciente_administrador(request, paciente_id):

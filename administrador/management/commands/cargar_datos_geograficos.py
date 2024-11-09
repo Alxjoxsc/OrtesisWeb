@@ -1,14 +1,14 @@
 import json
 import os
 from django.core.management.base import BaseCommand
-from autenticacion.models import Region, Provincia, Comuna
+from autenticacion.models import Region, Comuna
 
 class Command(BaseCommand):
     help = 'Carga datos desde un archivo JSON a la base de datos'
 
     def handle(self, *args, **kwargs):
         # Ruta fija al archivo JSON
-        json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../data/datos_geograficos.json')
+        json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../data/datos_geograficos1.json')
 
         # Verifica si el archivo existe
         if not os.path.exists(json_path):
@@ -27,19 +27,13 @@ class Command(BaseCommand):
                 else:
                     self.stdout.write(self.style.WARNING(f'Región existente: {region.nombre}'))
 
-                for provincia_data in region_data['provincias']:
-                    provincia, created = Provincia.objects.get_or_create(nombre=provincia_data['name'], region=region)
+                # Asumiendo que ahora 'comunas' está directamente bajo la región
+                for comuna_data in region_data['comunas']:
+                    comuna, created = Comuna.objects.get_or_create(nombre=comuna_data['name'], region=region)
                     if created:
-                        self.stdout.write(self.style.SUCCESS(f'Provincia creada: {provincia.nombre}'))
+                        self.stdout.write(self.style.SUCCESS(f'Comuna creada: {comuna.nombre}'))
                     else:
-                        self.stdout.write(self.style.WARNING(f'Provincia existente: {provincia.nombre}'))
-
-                    for comuna_data in provincia_data['comunas']:
-                        comuna, created = Comuna.objects.get_or_create(nombre=comuna_data['name'], provincia=provincia)
-                        if created:
-                            self.stdout.write(self.style.SUCCESS(f'Comuna creada: {comuna.nombre}'))
-                        else:
-                            self.stdout.write(self.style.WARNING(f'Comuna existente: {comuna.nombre}'))
+                        self.stdout.write(self.style.WARNING(f'Comuna existente: {comuna.nombre}'))
 
             self.stdout.write(self.style.SUCCESS("Datos cargados exitosamente."))
         except json.JSONDecodeError as e:
