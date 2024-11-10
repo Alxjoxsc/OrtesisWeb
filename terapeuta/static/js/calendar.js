@@ -484,6 +484,7 @@ function abrirEditar(cita_id, fecha, hora_inicio = null, hora_final = null, titu
             confirmarEliminarModal.style.display = 'none';
         }
     });
+    
 
     updateCalendar();
 });
