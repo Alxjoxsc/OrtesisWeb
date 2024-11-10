@@ -507,4 +507,44 @@ button:hover {
     }
 }
 
+@media (max-width: 480px) {
+    .week-view {
+        display: none;
+    }
+
+    .week-view-mobile {
+        display: block;
+    }
+
+    .day-block {
+        border: 1px solid #ddd;
+        margin-bottom: 10px;
+    }
+
+    .day-block h3 {
+        background-color: #008CAB;
+        color: white;
+        padding: 5px;
+        margin: 0;
+    }
+
+    .hour-block {
+        padding: 5px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .hour-block:last-child {
+        border-bottom: none;
+    }
+
+    .cita-semana {
+        background-color: #5596a5;
+        color: white;
+        padding: 2px 5px;
+        border-radius: 4px;
+        font-size: 12px;
+        margin-top: 2px;
+        display: block;
+    }
+}
 

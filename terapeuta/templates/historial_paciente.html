@@ -61,8 +61,13 @@
   </div>
   <div class="contenedor-inferior">
     <div class="info-cita">
-        <p>Próxima Cita: 30/08 <i class="fas fa-calendar-alt"></i></p>
-    </div>
+      {% if next_cita %}
+          <p>Próxima Cita: {{ next_cita.fecha|date:"d/m/y" }} - {{ next_cita.hora_inicio|time:"H:i" }}</p>
+      {% else %}
+          <p>Próxima Cita: N/A </p>
+      {% endif %}
+  </div>
+  
     <div class="acciones-paciente">
         <button class="btn-observaciones" onclick="window.location.href='{% url 'observaciones_paciente' paciente.id %}'">Observaciones</button>
         <button class="btn-añadir-rutina"><i class="fas fa-plus"></i> Añadir Rutina</button>

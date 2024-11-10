@@ -25,6 +25,9 @@ from datetime import timedelta
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth import update_session_auth_hash
+from datetime import datetime
+from django.utils import timezone
+
 
 
 #-------------------------------------AGENDA-------------------------------------
@@ -195,16 +198,30 @@ def historial_paciente_view(request, paciente_id):
             # Obtiene las últimas dos sesiones de la rutina, ordenadas por fecha de sesión
             rutina.ultimas_sesiones = Sesion.objects.filter(rutina=rutina).order_by('-fecha')[:2]
 
-        context = {
-            'paciente': paciente,
-            'terapeuta': terapeuta,
-            'rutinas': rutinas,
-            'modulo_pacientes': True,
-        }
-        return render(request, 'historial_paciente.html', context)
-    else:
-        # Si el usuario no es terapeuta ni superusuario, mostrar mensaje de error o redirigir
-        return render(request, 'error.html', {'mensaje': 'No tienes permiso para acceder a esta página.'})
+    citas = Cita.objects.filter(
+        paciente=paciente,
+        fecha__gte=timezone.now().date()
+    ).order_by('fecha', 'hora_inicio')
+
+    next_cita = None
+    current_datetime = timezone.now()
+
+    for cita in citas:
+        cita_datetime = datetime.combine(cita.fecha, cita.hora_inicio)
+        cita_datetime = timezone.make_aware(cita_datetime, timezone.get_current_timezone())
+
+        if cita_datetime > current_datetime:
+            next_cita = cita
+            break
+
+    context = {
+        'paciente': paciente,
+        'terapeuta': terapeuta,
+        'rutinas': rutinas,
+        'next_cita': next_cita,
+        'modulo_pacientes': True,
+    }
+    return render(request, 'historial_paciente.html', context)
 
 def obtener_grafico_sesion_paciente(request, sesion_id):
     sesion = get_object_or_404(Sesion, id=sesion_id)

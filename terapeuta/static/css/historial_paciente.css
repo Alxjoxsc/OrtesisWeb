@@ -776,7 +776,48 @@
     }
 }
 
-/* ... Estilos existentes ... */
+@media screen and (max-width: 1050px) {
+    .contenedor-header {
+        flex-direction: column; 
+        align-items: center;    
+    }
+
+    .contenedor-header h1 {
+        margin-bottom: 20px;    
+        text-align: center;     
+        font-size: 40px;       
+    }
+
+    .desvincular-btn {
+        width: auto;           
+    }
+}
+
+@media screen and (max-width: 1050px) {
+    .contenedor-header {
+        flex-direction: column; 
+        align-items: center;    
+    }
+
+    .contenedor-header h1 {
+        margin-bottom: 20px;    
+        text-align: center;     
+        font-size: 40px;       
+    }
+
+    .desvincular-btn {
+        width: auto;           
+    }
+}
+
+@media screen and (max-width: 550px){
+    .contenedor-header h1 {
+        margin-bottom: 20px;    
+        text-align: center;     
+        font-size: 30px;       
+    }
+}
+
 
 /* Media Queries */
 @media screen and (max-width: 1020px) {
@@ -846,32 +887,5 @@
     .acciones-paciente button {
         width: 80%; /* Ocupar el 80% del ancho */
         max-width: 300px; /* Máximo ancho */
-    }
-}
-
-@media screen and (max-width: 480px) {
-    .progreso-paciente-btn {
-        padding: 15px;
-    }
-
-    .progreso-paciente-content h3 {
-        font-size: 14px;
-    }
-
-    .progreso-icono i {
-        font-size: 30px;
-    }
-
-    .nombre-paciente h2 {
-        font-size: 24px;
-    }
-
-    .detalles-paciente {
-        font-size: 18px;
-        gap: 10px;
-    }
-
-    .acciones-paciente button {
-        width: 100%; /* Ocupar todo el ancho */
     }
 }
