@@ -39,6 +39,23 @@
     
 }
 
+.btn-editar-credenciales {
+    width: 200px;
+    display: flex;
+    justify-content: center;
+    background-color: #008CAB;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    font-size: 16px; 
+    color: white; 
+}
+
+.btn-editar-credenciales:hover {
+    background-color: #029fc2;
+}
 /* Estilos para la información de contacto */
 .contact-info {
     display: flex;

@@ -24,6 +24,9 @@ urlpatterns = [
     path('editar-observacion/<int:observacion_id>/', views.editar_observacion, name='editar_observacion'),
     path('eliminar_observacion/<int:observacion_id>/', eliminar_observacion, name='eliminar_observacion'),
     path('perfil/', views.perfil, name='perfil'),
+    path('editar_credenciales/', views.editar_credenciales, name='editar_credenciales'),
+    path('verificar_contraseña/', views.verificar_contraseña, name='verificar_contraseña'),
+
     path('editar_perfil/<int:pk>/', views.editar_perfil, name='editar_perfil'),
     path('historial_sesiones/<int:paciente_id>/', views.historial_sesiones, name='historial_sesiones'),
     path('obtener_notificaciones/', obtener_notificaciones, name='obtener_notificaciones'),

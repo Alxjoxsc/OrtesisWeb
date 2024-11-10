@@ -5,6 +5,8 @@ from django.db import transaction
 from autenticacion.decorators import role_required
 from .forms import CrearTerapeutaForm, HorarioFormSet, CrearPacienteForm, EditarPacienteForm, CrearRecepcionistaForm
 from autenticacion.models import Provincia, Comuna
+from .forms import CrearTerapeutaForm, HorarioFormSet, CrearPacienteForm, EditarPacienteForm
+from autenticacion.models import Comuna
 from django.http import JsonResponse
 from terapeuta.models import Paciente, Terapeuta, Cita, Horario
 from recepcionista.models import Recepcionista
@@ -16,6 +18,13 @@ from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.contrib import messages
+from django.contrib.auth import authenticate, login
+from django.http import JsonResponse
+from django.core.mail import send_mail
+from django.conf import settings
+import string
+import random
+from django.contrib.auth.hashers import make_password
 
 ############################### LISTAR TERAPEUTAS ################################
 @role_required('Administrador')
@@ -431,22 +440,16 @@ def agregar_terapeuta(request):
         'modulo_terapeutas': True,
     })
 
-#### CARGA DE DATOS DE REGIONES, PROVINCIAS Y COMUNAS ####
-def provincias_api(request):
+#### CARGA DE DATOS DE REGIONES Y COMUNAS ####
+def comunas_api(request):
     region_id = request.GET.get("region")
     if region_id:
-        provincias = Provincia.objects.filter(region_id=region_id).values("id", "nombre")
-        return JsonResponse(list(provincias), safe=False)
-    else:
-        return JsonResponse([], safe=False)
-    
-def comunas_api(request):
-    provincia_id = request.GET.get("provincia")
-    if provincia_id:
-        comunas = Comuna.objects.filter(provincia_id=provincia_id).values("id", "nombre")
+        # Filtrar comunas directamente por región
+        comunas = Comuna.objects.filter(region_id=region_id).values("id", "nombre")
         return JsonResponse(list(comunas), safe=False)
     else:
         return JsonResponse([], safe=False)
+
     
 @role_required('Administrador')
 def mostrar_paciente_administrador(request, paciente_id):
@@ -598,3 +601,154 @@ def agregar_recepcionista(request):
         'success': success, # Variable para indicar que el terapeuta no fue creado exitosamente
         'modulo_recepcionistas': True,
     })
+
+def verificar_password_admin(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        password = data.get('password', '')
+
+        user = request.user
+        if user.is_authenticated and user.is_staff:
+            authenticated_user = authenticate(username=user.username, password=password)
+            if authenticated_user is not None:
+                return JsonResponse({'valid': True})
+            else:
+                return JsonResponse({'valid': False})
+        else:
+            return JsonResponse({'valid': False})
+    else:
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+    
+def actualizar_email_terapeuta(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        terapeuta_id = data.get('terapeuta_id')
+        nuevo_email = data.get('nuevo_email')
+
+        try:
+            terapeuta = Terapeuta.objects.get(id=terapeuta_id)
+            usuario = terapeuta.user
+            old_email = usuario.email
+
+            # Verificar que el nuevo correo no esté en uso
+            if User.objects.filter(email=nuevo_email).exclude(id=usuario.id).exists():
+                return JsonResponse({'status': 'error', 'message': 'El correo electrónico ya está en uso.'})
+
+            # Actualizar el correo electrónico
+            usuario.email = nuevo_email
+            usuario.save()
+
+            # Enviar notificación al correo anterior
+            asunto = 'Cambio de correo electrónico'
+            mensaje = f'Su correo electrónico asociado a su cuenta ha sido cambiado a {nuevo_email}. Si usted no realizó este cambio, por favor contacte al administrador.'
+            send_mail(
+                asunto,
+                mensaje,
+                settings.DEFAULT_FROM_EMAIL,
+                [old_email],
+                fail_silently=False,
+            )
+
+            return JsonResponse({'status': 'success'})
+        except Terapeuta.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Terapeuta no encontrado.'})
+    else:
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+    
+def actualizar_credenciales_terapeuta(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        terapeuta_id = data.get('terapeuta_id')
+
+        try:
+            terapeuta = Terapeuta.objects.get(id=terapeuta_id)
+            usuario = terapeuta.user
+
+            # Generar una nueva contraseña aleatoria
+            nueva_contrasena = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+            usuario.password = make_password(nueva_contrasena)
+            usuario.save()
+
+            # Enviar correo electrónico al terapeuta con la nueva contraseña
+            asunto = 'Actualización de Credenciales de Acceso'
+            mensaje = f'Estimado/a {usuario.first_name},\n\nSus credenciales de acceso han sido actualizadas. Su nueva contraseña es: {nueva_contrasena}\n\nPor favor, inicie sesión y cambie su contraseña por una de su preferencia.\n\nSaludos cordiales.'
+            send_mail(
+                asunto,
+                mensaje,
+                settings.DEFAULT_FROM_EMAIL,
+                [usuario.email],
+                fail_silently=False,
+            )
+
+            return JsonResponse({'status': 'success'})
+        except Terapeuta.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Terapeuta no encontrado.'})
+    else:
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+    
+def actualizar_email_recepcionista(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        recepcionista_id = data.get('recepcionista_id')
+        nuevo_email = data.get('nuevo_email')
+
+        try:
+            recepcionista = Recepcionista.objects.get(id=recepcionista_id)
+            usuario = recepcionista.user
+            old_email = usuario.email
+
+            # Verificar que el nuevo correo no esté en uso
+            if User.objects.filter(email=nuevo_email).exclude(id=usuario.id).exists():
+                return JsonResponse({'status': 'error', 'message': 'El correo electrónico ya está en uso.'})
+
+            # Actualizar el correo electrónico
+            usuario.email = nuevo_email
+            usuario.save()
+
+            # Enviar notificación al correo anterior
+            asunto = 'Cambio de correo electrónico'
+            mensaje = f'Su correo electrónico asociado a su cuenta ha sido cambiado a {nuevo_email}. Si usted no realizó este cambio, por favor contacte al administrador.'
+            send_mail(
+                asunto,
+                mensaje,
+                settings.DEFAULT_FROM_EMAIL,
+                [old_email],
+                fail_silently=False,
+            )
+
+            return JsonResponse({'status': 'success'})
+        except Recepcionista.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Recepcionista no encontrado.'})
+    else:
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+def actualizar_credenciales_recepcionista(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        recepcionista_id = data.get('recepcionista_id')
+
+        try:
+            recepcionista = Recepcionista.objects.get(id=recepcionista_id)
+            usuario = recepcionista.user
+
+            # Generar una nueva contraseña aleatoria
+            nueva_contrasena = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+            usuario.password = make_password(nueva_contrasena)
+            usuario.save()
+
+            # Enviar correo electrónico al recepcionista con la nueva contraseña
+            asunto = 'Actualización de Credenciales de Acceso'
+            mensaje = f'Estimado/a {usuario.first_name},\n\nSus credenciales de acceso han sido actualizadas. Su nueva contraseña es: {nueva_contrasena}\n\nPor favor, inicie sesión y cambie su contraseña por una de su preferencia.\n\nSaludos cordiales.'
+            send_mail(
+                asunto,
+                mensaje,
+                settings.DEFAULT_FROM_EMAIL,
+                [usuario.email],
+                fail_silently=False,
+            )
+
+            return JsonResponse({'status': 'success'})
+        except Recepcionista.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Recepcionista no encontrado.'})
+    else:
+        return JsonResponse({'error': 'Método no permitido'}, status=405)

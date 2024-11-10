@@ -162,7 +162,7 @@ def agregar_paciente(request):
         if paciente_form.is_valid():
             paciente = paciente_form.save()
             paciente_id = paciente.id
-            return redirect('mostrar_paciente_sin_terapeuta', paciente_id = paciente_id)
+            return redirect('mostrar_paciente_recepcionista', paciente_id = paciente_id)
     else:
         paciente_form = CrearPacienteForm()
     
