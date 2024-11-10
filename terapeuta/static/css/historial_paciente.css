@@ -48,7 +48,7 @@
     width: 95%;
     display: flex;
     flex-direction: column;
-    background-color: #D9D9D9;
+    background-color: rgb(199, 199, 199);
     border-top-right-radius: 50px;
     padding: 25px;
     margin: 0 auto;
@@ -59,7 +59,6 @@
     width: 95%;
     display: flex;
     flex-direction: column;
-    background-color: #D9D9D9;
     border-top-right-radius: 50px;
     padding: 25px;
     margin: 0 auto;
@@ -103,7 +102,7 @@
     grid-area: progreso;
     align-self: center;
     display: flex;
-    background-color: #ACC6CC;
+    background-color: #ffffff;
     border: none;
     color: inherit;
     padding: 40px;
@@ -115,14 +114,13 @@
 }
 
 .progreso-paciente-btn:hover {
-    background-color: #bde2dc;
+    background-color: #008CAB;
 }
 
 .progreso-paciente-content {
-    display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 100%;
+    width: 280px;
 }
 
 .progreso-paciente-content h3 {
@@ -133,7 +131,7 @@
 
 .progreso-icono i {
     font-size: 50px;
-    color: #008CAB;
+    color: #000000;
 }
 
 /* Contenedor inferior */
@@ -845,6 +843,7 @@
 
     /* Centrar el botón de progreso del paciente */
     .progreso-paciente-btn {
+        display: flex;
         align-self: center;
         margin-top: 10px;
         padding: 20px; /* Reducir padding */
