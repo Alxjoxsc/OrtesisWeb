@@ -655,3 +655,70 @@ def actualizar_credenciales_terapeuta(request):
             return JsonResponse({'status': 'error', 'message': 'Terapeuta no encontrado.'})
     else:
         return JsonResponse({'error': 'Método no permitido'}, status=405)
+    
+def actualizar_email_recepcionista(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        recepcionista_id = data.get('recepcionista_id')
+        nuevo_email = data.get('nuevo_email')
+
+        try:
+            recepcionista = Recepcionista.objects.get(id=recepcionista_id)
+            usuario = recepcionista.user
+            old_email = usuario.email
+
+            # Verificar que el nuevo correo no esté en uso
+            if User.objects.filter(email=nuevo_email).exclude(id=usuario.id).exists():
+                return JsonResponse({'status': 'error', 'message': 'El correo electrónico ya está en uso.'})
+
+            # Actualizar el correo electrónico
+            usuario.email = nuevo_email
+            usuario.save()
+
+            # Enviar notificación al correo anterior
+            asunto = 'Cambio de correo electrónico'
+            mensaje = f'Su correo electrónico asociado a su cuenta ha sido cambiado a {nuevo_email}. Si usted no realizó este cambio, por favor contacte al administrador.'
+            send_mail(
+                asunto,
+                mensaje,
+                settings.DEFAULT_FROM_EMAIL,
+                [old_email],
+                fail_silently=False,
+            )
+
+            return JsonResponse({'status': 'success'})
+        except Recepcionista.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Recepcionista no encontrado.'})
+    else:
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+def actualizar_credenciales_recepcionista(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        recepcionista_id = data.get('recepcionista_id')
+
+        try:
+            recepcionista = Recepcionista.objects.get(id=recepcionista_id)
+            usuario = recepcionista.user
+
+            # Generar una nueva contraseña aleatoria
+            nueva_contrasena = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+            usuario.password = make_password(nueva_contrasena)
+            usuario.save()
+
+            # Enviar correo electrónico al recepcionista con la nueva contraseña
+            asunto = 'Actualización de Credenciales de Acceso'
+            mensaje = f'Estimado/a {usuario.first_name},\n\nSus credenciales de acceso han sido actualizadas. Su nueva contraseña es: {nueva_contrasena}\n\nPor favor, inicie sesión y cambie su contraseña por una de su preferencia.\n\nSaludos cordiales.'
+            send_mail(
+                asunto,
+                mensaje,
+                settings.DEFAULT_FROM_EMAIL,
+                [usuario.email],
+                fail_silently=False,
+            )
+
+            return JsonResponse({'status': 'success'})
+        except Recepcionista.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Recepcionista no encontrado.'})
+    else:
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
