@@ -48,6 +48,11 @@
             <p><strong>Fecha de Ingreso:</strong><br> <span>{{ terapeuta.fecha_ingreso }}</span></p>
             <p><strong>Fecha de Contratación:</strong><br> <span>{{ terapeuta.fecha_contratacion }}</span></p>
             <p><strong>Título:</strong><br> <span>{{ terapeuta.titulo }}</span></p>
+            <p>
+                <button id="actualizar-credenciales-button" class="btn-actualizar-credenciales">
+                    Actualizar Credenciales de Acceso
+                </button>
+            </p>
 
         </div>
 
@@ -74,44 +79,93 @@
     </div>
 </div>
 
-<!-- Modal para verificar contraseña de administrador -->
-<div id="passwordModal" class="modal" style="display: none;">
+<!-- Modal para verificar contraseña de administrador (Email) -->
+<div id="passwordModalEmail" class="modal" style="display: none;">
     <div class="contenido-modal">
-        <span class="close" onclick="cerrarPasswordModal()">&times;</span>
+        <span class="close" onclick="cerrarPasswordModalEmail()">&times;</span>
         <h2>Verificar Contraseña de Administrador</h2>
         <p>Por favor, ingresa tu contraseña para continuar.</p>
-        <input type="password" id="admin-password-input" placeholder="Contraseña" />
+        <input type="password" id="admin-password-input-email" placeholder="Contraseña" />
         <div class="botones-modal">
-            <button class="boton-cancelar" onclick="cerrarPasswordModal()">Cancelar</button>
-            <button class="boton-confirmar" onclick="verificarAdminPassword()">Confirmar</button>
+            <button class="boton-cancelar" onclick="cerrarPasswordModalEmail()">Cancelar</button>
+            <button class="boton-confirmar" onclick="verificarAdminPasswordEmail()">Confirmar</button>
         </div>
     </div>
 </div>
 
-<!-- Modal Popup para mostrar mensaje de éxito al editar rutina -->
-<div id="modalExitoCorreoActualizado" class="modal-men" style="display: none;">
-    <div class="contenido-modal-mensaje">
+<!-- Modal de carga (Email) -->
+<div id="modalCargaEmail" class="modal" style="display: none;">
+    <div class="contenido-modal">
+        <div class="spinner"></div>
+        <p>Guardando cambios, por favor espera...</p>
+    </div>
+</div>
+
+<!-- Modal de éxito (Email) -->
+<div id="modalExitoCorreoActualizado" class="modal" style="display: none;">
+    <div class="contenido-modal">
         <img src="{% static 'icons/Exito.svg' %}" alt="Éxito">
-        <p>Correo electronico del terapeuta {{terapeuta.user.first_name}} {{terapeuta.user.last_name}} actualizado con éxito</p>
+        <p>Correo electrónico del terapeuta {{terapeuta.user.first_name}} {{terapeuta.user.last_name}} actualizado con éxito</p>
     </div>
 </div>
 
-<!-- Modal Popup para mostrar mensaje de éxito al editar rutina -->
-<div id="modalContrasenaIncorrecta" class="modal-men" style="display: none;">
-    <div class="contenido-modal-mensaje">
-        <img src="{% static 'icons/Alert.svg' %}" alt="Éxito">
-        <p>La contraseña ingresada no es valida</p>
+<!-- Modal de contraseña incorrecta (Email) -->
+<div id="modalContrasenaIncorrectaEmail" class="modal" style="display: none;">
+    <div class="contenido-modal">
+        <img src="{% static 'icons/Alert.svg' %}" alt="Error">
+        <p>La contraseña ingresada no es válida</p>
     </div>
 </div>
 
-
-  <!-- Modal de Carga -->
-  <div id="modalCarga" class="modal-men" style="display: none;">
-    <div class="contenido-modal-mensaje">
-      <div class="spinner"></div>
-      <p>Guardando rutina, por favor espera...</p>
+<!-- Modal para verificar contraseña de administrador (Credenciales) -->
+<div id="passwordModalCredenciales" class="modal" style="display: none;">
+    <div class="contenido-modal">
+        <h2>Verificar Contraseña de Administrador</h2>
+        <p>Por favor, ingresa tu contraseña para continuar.</p>
+        <input type="password" id="admin-password-input-credenciales" placeholder="Contraseña" />
+        <div class="botones-modal">
+            <button class="boton-cancelar" onclick="cerrarModalCredenciales('passwordModalCredenciales')">Cancelar</button>
+            <button class="boton-confirmar" onclick="verificarAdminPasswordCredenciales()">Confirmar</button>
+        </div>
     </div>
-  </div>
+</div>
+
+<!-- Modal para confirmar la acción escribiendo "confirmar" (Credenciales) -->
+<div id="modalConfirmarAccionCredenciales" class="modal" style="display: none;">
+    <div class="contenido-modal">
+        <h2>Confirmar Actualización de Credenciales</h2>
+        <p>Escribe <strong>"confirmar"</strong> para continuar con la actualización.</p>
+        <input type="text" id="confirmacion-input-credenciales" placeholder="Escribe 'confirmar'" />
+        <div class="botones-modal">
+            <button class="boton-cancelar" onclick="cerrarModalCredenciales('modalConfirmarAccionCredenciales')">Cancelar</button>
+            <button class="boton-confirmar" onclick="actualizarCredenciales()">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de carga (Credenciales) -->
+<div id="modalCargaCredenciales" class="modal" style="display: none;">
+    <div class="contenido-modal">
+        <div class="spinner"></div>
+        <p>Actualizando credenciales, por favor espera...</p>
+    </div>
+</div>
+
+<!-- Modal de éxito (Credenciales) -->
+<div id="modalExitoCredenciales" class="modal" style="display: none;">
+    <div class="contenido-modal">
+        <img src="{% static 'icons/Exito.svg' %}" alt="Éxito">
+        <p>Credenciales del usuario {{terapeuta.user.first_name}} {{terapeuta.user.last_name}} actualizadas con éxito</p>
+    </div>
+</div>
+
+<!-- Modal de contraseña incorrecta (credenciales) -->
+<div id="modalContrasenaIncorrectaCredenciales" class="modal" style="display: none;">
+    <div class="contenido-modal">
+        <img src="{% static 'icons/Alert.svg' %}" alt="Error">
+        <p>La contraseña ingresada no es válida</p>
+    </div>
+</div>
 
 {% endblock %}
 
@@ -177,159 +231,270 @@
             cerrarPopUp();
         };
     });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Función para mostrar el modal de contraseña (email)
+        function showPasswordModalEmail() {
+            document.getElementById('passwordModalEmail').style.display = 'block';
+        }
 
-    // Función para mostrar el modal de contraseña
-    function showPasswordModal() {
-        document.getElementById('passwordModal').style.display = 'block';
-    }
+        // Función para cerrar el modal de contraseña (email)
+        function cerrarPasswordModalEmail() {
+            document.getElementById('passwordModalEmail').style.display = 'none';
+            document.getElementById('admin-password-input-email').value = '';
+        }
 
-    // Función para cerrar el modal de contraseña
-    function cerrarPasswordModal() {
-        document.getElementById('passwordModal').style.display = 'none';
-        document.getElementById('admin-password-input').value = '';
-    }
+        // Función para verificar la contraseña del administrador (email)
+        function verificarAdminPasswordEmail() {
+            const password = document.getElementById('admin-password-input-email').value;
 
-    // Función para verificar la contraseña del administrador
-    function verificarAdminPassword() {
-        const password = document.getElementById('admin-password-input').value;
+            // Enviar la contraseña al servidor para verificarla
+            fetch("{% url 'verificar_password_admin' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({ 'password': password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.valid) {
+                    cerrarPasswordModalEmail();
+                    habilitarEdicionEmail();
+                } else {
+                    mostrarModalErrorPassEmail();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
 
-        // Enviar la contraseña al servidor para verificarla
-        fetch("{% url 'verificar_password_admin' %}", {
-            method: 'POST',
-            headers: {
+        // Función para habilitar la edición del correo electrónico
+        function habilitarEdicionEmail() {
+            document.getElementById('email-display').style.display = 'none';
+            document.getElementById('email-input').style.display = 'inline';
+            document.getElementById('save-email-button').style.display = 'inline';
+            document.getElementById('cancel-email-button').style.display = 'inline';
+            document.getElementById('edit-email-button').style.display = 'none';
+        }
+
+        // Función para cancelar la edición del correo electrónico
+        function cancelarEdicionEmail() {
+            document.getElementById('email-display').style.display = 'inline';
+            document.getElementById('email-input').style.display = 'none';
+            document.getElementById('save-email-button').style.display = 'none';
+            document.getElementById('cancel-email-button').style.display = 'none';
+            document.getElementById('edit-email-button').style.display = 'inline';
+            document.getElementById('email-input').value = '{{ terapeuta.user.email }}';
+        }
+
+        // Función para guardar el nuevo correo electrónico
+        function guardarNuevoEmail() {
+            const nuevoEmail = document.getElementById('email-input').value;
+            const terapeutaId = '{{ terapeuta.id }}';
+          
+            // Validar el formato del correo electrónico
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(nuevoEmail)) {
+              alert('Por favor, ingresa un correo electrónico válido.');
+              return;
+            }
+          
+            // Mostrar el modal de carga
+            mostrarModalCargaEmail();
+          
+            // Enviar el nuevo correo al servidor
+            fetch("{% url 'actualizar_email_terapeuta' %}", {
+              method: 'POST',
+              headers: {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': '{{ csrf_token }}',
-            },
-            body: JSON.stringify({ 'password': password })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.valid) {
-                cerrarPasswordModal();
-                habilitarEdicionEmail();
-            } else {
-                mostrarModalErrorPass();
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    }
+              },
+              body: JSON.stringify({ 'terapeuta_id': terapeutaId, 'nuevo_email': nuevoEmail })
+            })
+            .then(response => response.json())
+            .then(data => {
+              // Ocultar el modal de carga
+              ocultarModalCargaEmail();
+          
+              if (data.status === 'success') {
+                // Actualizar el correo en la interfaz
+                document.getElementById('email-display').textContent = nuevoEmail;
+                cancelarEdicionEmail();
+                // Mostrar el modal de éxito
+                mostrarModalExitoEmail();
+              } else {
+                alert('Error al actualizar el correo electrónico: ' + data.message);
+              }
+            })
+            .catch(error => {
+              // Ocultar el modal de carga
+              ocultarModalCargaEmail();
+          
+              console.error('Error:', error);
+              alert('Ocurrió un error al actualizar el correo electrónico.');
+            });
+        }
 
-    // Función para habilitar la edición del correo electrónico
-    function habilitarEdicionEmail() {
-        document.getElementById('email-display').style.display = 'none';
-        document.getElementById('email-input').style.display = 'inline';
-        document.getElementById('save-email-button').style.display = 'inline';
-        document.getElementById('cancel-email-button').style.display = 'inline';
-        document.getElementById('edit-email-button').style.display = 'none';
-    }
+        // Asignar eventos a los botones
+        document.getElementById('edit-email-button').addEventListener('click', showPasswordModalEmail);
+        document.getElementById('save-email-button').addEventListener('click', guardarNuevoEmail);
+        document.getElementById('cancel-email-button').addEventListener('click', cancelarEdicionEmail);
 
-    
-
-    // Función para cancelar la edición del correo electrónico
-    function cancelarEdicionEmail() {
-        document.getElementById('email-display').style.display = 'inline';
-        document.getElementById('email-input').style.display = 'none';
-        document.getElementById('save-email-button').style.display = 'none';
-        document.getElementById('cancel-email-button').style.display = 'none';
-        document.getElementById('edit-email-button').style.display = 'inline';
-        document.getElementById('email-input').value = '{{ terapeuta.user.email }}';
-    }
-
-    // Función para guardar el nuevo correo electrónico
-    function guardarNuevoEmail() {
-        const nuevoEmail = document.getElementById('email-input').value;
-        const terapeutaId = '{{ terapeuta.id }}';
-      
-        // Validar el formato del correo electrónico
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(nuevoEmail)) {
-          alert('Por favor, ingresa un correo electrónico válido.');
-          return;
+        // Función para mostrar el modal de carga (email)
+        function mostrarModalCargaEmail() {
+            document.getElementById('modalCargaEmail').style.display = 'block';
         }
       
-        // Mostrar el modal de carga
-        mostrarModalCarga();
-      
-        // Enviar el nuevo correo al servidor
-        fetch("{% url 'actualizar_email_terapeuta' %}", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}',
-          },
-          body: JSON.stringify({ 'terapeuta_id': terapeutaId, 'nuevo_email': nuevoEmail })
-        })
-        .then(response => response.json())
-        .then(data => {
-          // Ocultar el modal de carga
-          ocultarModalCarga();
-      
-          if (data.status === 'success') {
-            // Actualizar el correo en la interfaz
-            document.getElementById('email-display').textContent = nuevoEmail;
-            cancelarEdicionEmail();
-            // Mostrar el modal de éxito
-            mostrarModalExito();
-          } else {
-            alert('Error al actualizar el correo electrónico: ' + data.message);
-          }
-        })
-        .catch(error => {
-          // Ocultar el modal de carga
-          ocultarModalCarga();
-      
-          console.error('Error:', error);
-          alert('Ocurrió un error al actualizar el correo electrónico.');
-        });
-      }
-      
-
-    // Asignar eventos a los botones
-    document.getElementById('edit-email-button').addEventListener('click', showPasswordModal);
-    document.getElementById('save-email-button').addEventListener('click', guardarNuevoEmail);
-    document.getElementById('cancel-email-button').addEventListener('click', cancelarEdicionEmail);
-
-    // Cerrar el modal al hacer clic fuera de él
-    window.onclick = function(event) {
-        const passwordModal = document.getElementById('passwordModal');
-        if (event.target == passwordModal) {
-            cerrarPasswordModal();
+        // Función para ocultar el modal de carga (email)
+        function ocultarModalCargaEmail() {
+            document.getElementById('modalCargaEmail').style.display = 'none';
         }
-    };
+        
+        // Función para mostrar el modal de éxito (email)
+        function mostrarModalExitoEmail() {
+            document.getElementById('modalExitoCorreoActualizado').style.display = 'block';
+            // Ocultar el modal de éxito después de 2 segundos
+            setTimeout(function() {
+                document.getElementById('modalExitoCorreoActualizado').style.display = 'none';
+            }, 2000);
+        }
 
-    window.verificarAdminPassword = verificarAdminPassword;
-    window.cerrarPasswordModal = cerrarPasswordModal;
+        // Función para mostrar el modal de contraseña incorrecta (email)
+        function mostrarModalErrorPassEmail() {
+            document.getElementById('modalContrasenaIncorrectaEmail').style.display = 'block';
+            // Ocultar el modal después de 2 segundos
+            setTimeout(function() {
+                document.getElementById('modalContrasenaIncorrectaEmail').style.display = 'none';
+            }, 2000);
+        }
 
-    // Función para mostrar el modal de carga
-    function mostrarModalCarga() {
-        document.getElementById('modalCarga').style.display = 'block';
-    }
-  
-    // Función para ocultar el modal de carga
-    function ocultarModalCarga() {
-        document.getElementById('modalCarga').style.display = 'none';
-    }
-    
-    // Función para mostrar el modal de éxito
-    function mostrarModalExito() {
-        document.getElementById('modalExitoCorreoActualizado').style.display = 'block';
-        // Ocultar el modal de éxito después de 3 segundos
-        setTimeout(function() {
-        document.getElementById('modalExitoCorreoActualizado').style.display = 'none';
-        }, 2000);
-    }
-
-    // Función para mostrar el modal de contrasena incorrecta
-    function mostrarModalErrorPass() {
-        document.getElementById('modalContrasenaIncorrecta').style.display = 'block';
-        // Ocultar el modal de éxito después de 3 segundos
-        setTimeout(function() {
-        document.getElementById('modalContrasenaIncorrecta').style.display = 'none';
-        }, 2000);
-    }
+        // Asignar funciones al ámbito global si es necesario
+        window.verificarAdminPasswordEmail = verificarAdminPasswordEmail;
+        window.cerrarPasswordModalEmail = cerrarPasswordModalEmail;
+    });
 </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Función para mostrar un modal (credenciales)
+        function mostrarModalCredenciales(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+    
+        // Función para cerrar un modal (credenciales)
+        function cerrarModalCredenciales(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+    
+        // Función para verificar la contraseña del administrador (credenciales)
+        function verificarAdminPasswordCredenciales() {
+            const password = document.getElementById('admin-password-input-credenciales').value;
+    
+            // Enviar la contraseña al servidor para verificarla
+            fetch("{% url 'verificar_password_admin' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({ 'password': password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.valid) {
+                    cerrarModalCredenciales('passwordModalCredenciales');
+                    mostrarModalCredenciales('modalConfirmarAccionCredenciales');
+                } else {
+                    mostrarModalErrorPassCredenciales();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Función para mostrar el modal de contraseña incorrecta (email)
+        function mostrarModalErrorPassCredenciales() {
+            document.getElementById('modalContrasenaIncorrectaCredenciales').style.display = 'block';
+            // Ocultar el modal después de 2 segundos
+            setTimeout(function() {
+                document.getElementById('modalContrasenaIncorrectaCredenciales').style.display = 'none';
+            }, 2000);
+        }
+    
+        // Función para actualizar las credenciales
+        function actualizarCredenciales() {
+            const confirmacion = document.getElementById('confirmacion-input-credenciales').value.trim().toLowerCase();
+            if (confirmacion !== 'confirmar') {
+                alert('Debe escribir "confirmar" para proceder.');
+                return;
+            }
+    
+            cerrarModalCredenciales('modalConfirmarAccionCredenciales');
+            mostrarModalCargaCredenciales();
+    
+            const terapeutaId = '{{ terapeuta.id }}';
+    
+            // Enviar la solicitud al servidor para actualizar las credenciales
+            fetch("{% url 'actualizar_credenciales_terapeuta' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({ 'terapeuta_id': terapeutaId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                ocultarModalCargaCredenciales();
+                if (data.status === 'success') {
+                    mostrarModalExitoCredenciales();
+                    // Ocultar el modal de éxito después de 3 segundos
+                    setTimeout(function() {
+                        cerrarModalCredenciales('modalExitoCredenciales');
+                    }, 3000);
+                } else {
+                    alert('Error al actualizar las credenciales: ' + data.message);
+                }
+            })
+            .catch(error => {
+                ocultarModalCargaCredenciales();
+                console.error('Error:', error);
+                alert('Ocurrió un error al actualizar las credenciales.');
+            });
+        }
+
+        // Funciones para mostrar y ocultar el modal de carga (credenciales)
+        function mostrarModalCargaCredenciales() {
+            document.getElementById('modalCargaCredenciales').style.display = 'flex';
+        }
+
+        function ocultarModalCargaCredenciales() {
+            document.getElementById('modalCargaCredenciales').style.display = 'none';
+        }
+
+        // Función para mostrar el modal de éxito (credenciales)
+        function mostrarModalExitoCredenciales() {
+            document.getElementById('modalExitoCredenciales').style.display = 'flex';
+        }
+    
+        // Asignar evento al botón "Actualizar Credenciales de Acceso"
+        document.getElementById('actualizar-credenciales-button').addEventListener('click', function() {
+            mostrarModalCredenciales('passwordModalCredenciales');
+        });
+
+        // Asignar funciones al ámbito global si es necesario
+        window.verificarAdminPasswordCredenciales = verificarAdminPasswordCredenciales;
+        window.cerrarModalCredenciales = cerrarModalCredenciales;
+        window.actualizarCredenciales = actualizarCredenciales;
+        window.cerrarPasswordModalEmail = cerrarPasswordModalEmail;
+    });
+</script>
+
     
 
 {% endblock %}

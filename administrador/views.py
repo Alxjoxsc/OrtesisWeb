@@ -20,6 +20,9 @@ from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
 from django.core.mail import send_mail
 from django.conf import settings
+import string
+import random
+from django.contrib.auth.hashers import make_password
 
 ############################### LISTAR TERAPEUTAS ################################
 @role_required('Administrador')
@@ -613,6 +616,37 @@ def actualizar_email_terapeuta(request):
                 mensaje,
                 settings.DEFAULT_FROM_EMAIL,
                 [old_email],
+                fail_silently=False,
+            )
+
+            return JsonResponse({'status': 'success'})
+        except Terapeuta.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Terapeuta no encontrado.'})
+    else:
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+    
+def actualizar_credenciales_terapeuta(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        terapeuta_id = data.get('terapeuta_id')
+
+        try:
+            terapeuta = Terapeuta.objects.get(id=terapeuta_id)
+            usuario = terapeuta.user
+
+            # Generar una nueva contraseña aleatoria
+            nueva_contrasena = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+            usuario.password = make_password(nueva_contrasena)
+            usuario.save()
+
+            # Enviar correo electrónico al terapeuta con la nueva contraseña
+            asunto = 'Actualización de Credenciales de Acceso'
+            mensaje = f'Estimado/a {usuario.first_name},\n\nSus credenciales de acceso han sido actualizadas. Su nueva contraseña es: {nueva_contrasena}\n\nPor favor, inicie sesión y cambie su contraseña por una de su preferencia.\n\nSaludos cordiales.'
+            send_mail(
+                asunto,
+                mensaje,
+                settings.DEFAULT_FROM_EMAIL,
+                [usuario.email],
                 fail_silently=False,
             )
 
