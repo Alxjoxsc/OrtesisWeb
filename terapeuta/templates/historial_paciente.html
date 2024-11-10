@@ -145,10 +145,12 @@
 
     </div>
   {% else %}
-    <p>Aún no hay rutinas para este paciente.</p>
+    <div class="no-rutinas">
+      <p>Aún no hay rutinas para este paciente.</p>
+    </div>
   {% endif %}
 
-<<!-- Modal PopUp para gráfico de las sesiones-->
+<!-- Modal PopUp para gráfico de las sesiones-->
 <div id="popupModal" class="modal" style="display: none;">
   <div class="contenido-modal">
     <span class="close">&times;</span>
@@ -300,7 +302,7 @@
   </div>
 </div>
 
-<!-- MENSAJES DESVINVULAR PACIENTE -->\
+<!-- MENSAJES DESVINVULAR PACIENTE -->
 <!-- Modal Popup para mostrar mensaje de éxito desvinculacion -->
 <div id="modalExito" class="modal">
   <div class="contenido-modal-mensaje">
