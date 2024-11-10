@@ -4,6 +4,7 @@
 {% block extra_head %}
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
   <link rel="stylesheet" href="{% static 'css/historial_paciente.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/modal.css' %}">
 {% endblock %}
 
 {% block title %}
@@ -236,10 +237,11 @@
             <label for="frecuencia_sesiones">Frecuencia de Sesiones</label>
             <div class="frecuencia-inputs">
                 <input type="number" id="frecuencia_cantidad" name="frecuencia_cantidad" required>
+                <p>cada</p>
                 <select id="frecuencia_tipo" name="frecuencia_tipo">
                   <p>cada</p>
-                    <option value="dias">días</option>
-                    <option value="semanas">semanas</option>
+                    <option value="dias">día</option>
+                    <option value="semanas">semana</option>
                 </select>
             </div>
 
@@ -279,9 +281,10 @@
           <label for="edit_frecuencia_sesiones">Frecuencia de Sesiones</label>
           <div class="frecuencia-inputs">
               <input type="number" id="edit_frecuencia_cantidad" name="frecuencia_cantidad" required>
+              <p>cada</p>
               <select id="edit_frecuencia_tipo" name="frecuencia_tipo">
-                  <option value="dias">días</option>
-                  <option value="semanas">semanas</option>
+                  <option value="dias">día</option>
+                  <option value="semanas">semana</option>
               </select>
           </div>
 

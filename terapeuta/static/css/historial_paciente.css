@@ -320,6 +320,9 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     overflow: auto;
+    justify-content: center; /* Centrar horizontalmente */
+    align-items: center; /* Centrar verticalmente */
+    display: flex; /* Flexbox para centrar */
 }
 
 .modal-content {
@@ -331,7 +334,6 @@
     border-radius: 10px;
     width: 50%;
     max-width: 600px;
-    /* Aseguramos que ambos modales tengan el mismo tamaño */
     min-width: 500px;
     max-height: 80%;
     overflow-y: auto;
