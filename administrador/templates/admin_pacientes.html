@@ -181,19 +181,19 @@
 </div>
 
 <!-- Carga masiva -->
-<div id="overlay"></div>
-<div id="popup">
-    <h2 id="titulo_carga">Importar usuarios con archivos CSV</h2>
-    <form action="{% url 'carga_masiva_pacientes' %}" method="POST" enctype="multipart/form-data">
+<div id="overlay" class="modal">
+    <form action="{% url 'carga_masiva_pacientes' %}" method="POST" enctype="multipart/form-data" id="popup">
         {% csrf_token %}
+        <h2 id="titulo_carga">Importar usuarios con archivos CSV</h2>
         <div id="dropzone">
             <p id="dropzone-message">Arrastra tu archivo o haz click para buscar en tu computador</p>
             <input type="file" name="archivo_csv" id="archivo_csv" accept=".csv">
         </div>
         <a id="plantilla_ejemplo" href="{% url 'archivo_csv_ejemplo' %}">Plantilla CSV de muestra</a>
-        <br><br>
-        <button class="boton_subir" id="subir_carga" type="submit">Subir archivo</button>
-        <button id="closePopup">Cancelar</button>
+        <div class="botones-modal">
+            <button id="closePopup" class="boton-cancelar">Cancelar</button>
+            <button class="boton-confirmar" id="subir_carga" type="submit">Subir archivo</button>
+        </div>
     </form>
 </div>
 

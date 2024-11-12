@@ -340,170 +340,215 @@ def carga_masiva_pacientes(request):
 
     if request.method == 'POST':
         if 'archivo_csv' not in request.FILES:
-            messages.error(request, 'No se subió ningún archivo')
+            messages.error(request, 'No se subió ningún archivo.')
             return redirect('listar_pacientes_activos')
+        
+        archivo_csv = request.FILES['archivo_csv']
 
         try:
-            data = pd.read_csv(request.FILES['archivo_csv'], delimiter=',', encoding='utf-8')
-            # Validación de la cantidad de columnas
-            if len(data.columns) != COLUMNAS_ESPERADAS:
-                messages.error(request, f'El archivo debe tener exactamente {COLUMNAS_ESPERADAS} columnas. '
-                                        f'Se encontraron {len(data.columns)} columnas.')
+            archivo_csv.seek(0)  # Reinicia el puntero del archivo
+            contenido = archivo_csv.read()
+
+            if contenido is None:
+                messages.error(request, 'Error: el archivo no contiene datos.')
+                return redirect('listar_pacientes_activos')
+
+            # Intentamos decodificar
+            try:
+                contenido_decodificado = contenido.decode('utf-8')
+
+            except UnicodeDecodeError:
+                messages.error(request, 'Error al decodificar el archivo. Asegúrate de que esté en formato UTF-8.')
                 return redirect('listar_pacientes_activos')
             
-        except pd.errors.ParserError:
-            messages.error(request, 'El archivo no tiene el formato correcto')
-            return redirect('listar_pacientes_activos')
-        except Exception as e:
-            messages.error(request, f'Error al leer el archivo: {str(e)}')
-            return redirect('listar_pacientes_activos')
+            except Exception as e:
+                messages.error(request, f'Error desconocido al decodificar: {e}')
+                return redirect('listar_pacientes_activos')
 
-        fila = 0  # Variable para contar las filas (empezamos desde 1)
-        for index, row in data.iterrows():
-            fila += 1 # Incrementa el contador de filas
-            errores = []  # Lista de errores para la fila actual
-            
+            if not contenido_decodificado:
+                messages.error(request, 'Error: el archivo está vacío después de la decodificación.')
+                return redirect('listar_pacientes_activos')
+
+            # Cargamos el archivo CSV
             try:
+                reader = csv.reader(contenido_decodificado.splitlines())
                 
-                # Validación de Rut
-                rut = row['Rut']
-                if not re.match(r'^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$', rut):
-                    errores.append(f'El RUT "{rut}" debe estar en el formato XX.XXX.XXX-X')
-                
-                # Validación de dígito verificador
-                clean_rut = rut.replace(".", "").replace("-", "")
-                num_part = clean_rut[:-1]
-                dv = clean_rut[-1].upper()
-                reversed_digits = map(int, reversed(num_part))
-                factors = cycle(range(2, 8))
-                s = sum(d * f for d, f in zip(reversed_digits, factors))
-                verificador = 'K' if (-s) % 11 == 10 else str((-s) % 11)
-                if dv != verificador:
-                    errores.append(f'El dígito verificador del RUT "{rut}" no es válido')
-                
-                # Validación para el primer nombre, permite hasta 3 nombres con letras y caracteres especiales
-                first_name = row['Nombre']
-                if not re.match(r'^[a-zA-Z\u00C0-\u017F]+( [a-zA-Z\u00C0-\u017F]+){0,2}$', first_name):
-                    errores.append(f'El nombre "{first_name}" solo puede contener letras y hasta 3 nombres separados por espacios')
+                # Lee la primera fila del archivo (encabezado)
+                encabezado = next(reader)
+                encabezado = [col.lstrip('\ufeff') for col in encabezado]  # Elimina el BOM de todas las columnas
 
-                # Validación para el apellido, permite hasta 2 apellidos con letras y caracteres especiales
-                last_name = row['Apellido']
-                if not re.match(r'^[a-zA-Z\u00C0-\u017F]+( [a-zA-Z\u00C0-\u017F]+)?$', last_name):
-                    errores.append(f'El apellido "{last_name}" solo puede contener letras y hasta 2 apellidos separados por un espacio')
-                
-                # Validación de correo electrónico
-                email = row['Email']
-                if not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
-                    errores.append(f'El correo "{email}" no es válido')
-                
-                # Validación de teléfono
-                telefono = row['Telefono']
-                if not re.match(r'^\d{1} \d{4} \d{4}$', telefono):
-                    errores.append(f'El teléfono "{telefono}" debe tener el formato: 9 1234 5678')
-                
-                # Validación de fecha de nacimiento
-                fecha_nacimiento = pd.to_datetime(row['Fecha Nacimiento'], errors='coerce')
-                if pd.isna(fecha_nacimiento) or fecha_nacimiento.date() >= date.today():
-                    errores.append(f'La fecha de nacimiento "{row["Fecha Nacimiento"]}" debe ser anterior a la fecha actual')
+            except Exception as e:
+                messages.error(request, f'Error al procesar el archivo CSV: {e}')
+                return redirect('listar_pacientes_activos')
+            
+            if len(encabezado) != COLUMNAS_ESPERADAS:
+                messages.error(request, f'El archivo debe tener exactamente {COLUMNAS_ESPERADAS} columnas. '
+                                        f'Se encontraron {len(encabezado)} columnas.')
+                return redirect('listar_pacientes_activos')
 
-                
-                # Validación de sexo
-                sexo = row['Sexo'].capitalize()
-                if sexo not in ['Masculino', 'Femenino']:
-                    errores.append(f'El sexo "{sexo}" debe ser "Masculino" o "Femenino"')
-                
-                contacto_emergencia = row['Contacto Emergencia']
-                if not re.match(r'^[a-zA-Z\u00C0-\u017F]+( [a-zA-Z\u00C0-\u017F]+)?$', contacto_emergencia):
-                    errores.append(f'El contacto de emergencia "{contacto_emergencia}" solo puede contener letras y un apellido opcional separados por un espacio')
+            fila_numero = 1  # Variable para contar las filas (empezamos desde 1)
+            for fila in reader:  # Itera sobre las filas del archivo
+                fila_numero += 1
 
-                telefono_emergencia = row['Telefono Emergencia']
-                if not re.match(r'^\d{1} \d{4} \d{4}$', telefono_emergencia):
-                    errores.append(f'El teléfono de emergencia "{telefono_emergencia}" debe tener el formato: 9 1234 5678')
-                
-                patologia = row['Patologia']
-                if not re.match(r'^[a-zA-Z\u00C0-\u017F ]+$', patologia):
-                    errores.append(f'La patología "{patologia}" solo puede contener letras y espacios')
+                if len(fila) != COLUMNAS_ESPERADAS:
+                    registros_no_subidos += 1
+                    registros_no_validos.append(f'Error en la fila {fila_numero}: La fila tiene {len(fila)} columnas, se esperaban {COLUMNAS_ESPERADAS}')
+                    continue
 
-                
-                descripcion_patologia = row['Descripcion Patologia']
-                if not re.match(r'^[a-zA-Z\u00C0-\u017F ]+$', descripcion_patologia):
-                    errores.append(f'La descripción de la patología "{descripcion_patologia}" solo puede contener letras y espacios')
+                # Convertir la fila en un diccionario y pasarla a pandas para validaciones
+                data_row = dict(zip(encabezado, fila))  # Crea un diccionario con los encabezados y los valores de la fila
+                errores = validar_datos_fila_pacientes(data_row, fila_numero)
 
-                medicamentos = row['Medicamentos']
-                if not re.match(r'^[a-zA-Z\u00C0-\u017F ]+$', str(medicamentos)):
-                    errores.append(f'Los medicamentos "{medicamentos}" solo pueden contener letras y espacios')
-                
-                alergias = row['Alergias']
-                if not re.match(r'^[a-zA-Z\u00C0-\u017F ]+$', str(alergias)):
-                    errores.append(f'Las alergias "{alergias}" solo pueden contener letras y espacios')
-                
-                actividad_fisica = row['Actividad Fisica']
-                if actividad_fisica not in ['Sedentario', 'Moderado', 'Activo']:
-                    errores.append(f'La actividad física "{actividad_fisica}" debe ser "Sedentario", "Moderado" o "Activo"')
-
-                calle = row['Calle']
-                if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s.#\-]+$', calle):
-                    errores.append('La dirección "{direccion}" no permite caracteres especiales, solo se permiten letras, números, espacios, puntos, # y -.')
-                
-                # Validación de peso y altura
-                peso = Decimal(str(row['Peso']).replace(',', '.'))
-                altura = Decimal(str(row['Altura']).replace(',', '.'))
-
-                if peso <= 0:
-                    errores.append(f'El peso "{peso}" debe ser mayor a 0')
-                
-                if altura <= 0:
-                    errores.append(f'La altura "{altura}" debe ser mayor a 0')
-
-                # Verificación de duplicados
-                if Paciente.objects.filter(rut=rut).exists():
-                    errores.append(f'El RUT "{rut}" ya está registrado')
-                
-                # Si no hay errores, se guarda el paciente
                 if not errores:
-                    paciente = Paciente(
-                        rut=rut,
-                        first_name=first_name,
-                        last_name=last_name,
-                        fecha_nacimiento=fecha_nacimiento,
-                        sexo=sexo,
-                        telefono=telefono,
-                        email=email,
-                        contacto_emergencia=contacto_emergencia,
-                        telefono_emergencia=telefono_emergencia,
-                        patologia=patologia,
-                        descripcion_patologia=descripcion_patologia,
-                        medicamentos=medicamentos,
-                        alergias=alergias,
-                        actividad_fisica=actividad_fisica,
-                        peso=peso,
-                        altura=altura,
-                        region=Region.objects.get(id=row['Region']) if not pd.isna(row['Region']) else None,
-                        provincia=Provincia.objects.get(id=row['Provincia']) if not pd.isna(row['Provincia']) else None,
-                        comuna=Comuna.objects.get(id=row['Comuna']) if not pd.isna(row['Comuna']) else None,
-                        calle=calle
-                    )
-                    paciente.save()
+                    guardar_paciente(data_row)
                     registros_subidos += 1
                 else:
-                    # Si hay errores, no se guarda el paciente y se acumulan los mensajes de error
                     registros_no_subidos += 1
                     registros_no_validos.extend(errores)
 
-            except Exception as e:
-                registros_no_subidos += 1
-                registros_no_validos.append(f'Error en la fila {fila}: {str(e)}')
-
+        except Exception as e:
+            messages.error(request, f'Error al leer el archivo: {str(e)}')
+            return redirect('listar_pacientes_activos')
+        
         messages.success(request, f'Carga masiva finalizada. Registros subidos: {registros_subidos}. Registros no subidos: {registros_no_subidos}')
         if registros_no_validos:
             for mensaje in registros_no_validos:
                 messages.error(request, mensaje)
-
+        
         return redirect('listar_pacientes_activos')
     
     else:
         messages.error(request, 'No se subió ningún archivo')
         return redirect('listar_pacientes_activos')
+
+
+def validar_datos_fila_pacientes(row, fila_numero):
+    errores = []
+    rut = row.get('Rut')
+    first_name = row.get('Nombre')
+    last_name = row.get('Apellido')
+    fecha_nacimiento = row.get('Fecha Nacimiento')
+    sexo = row.get('Sexo').capitalize()
+    telefono = row.get('Telefono')
+    email = row.get('Email')
+    contacto_emergencia = row.get('Contacto Emergencia')
+    telefono_emergencia = row.get('Telefono Emergencia')
+    patologia = row.get('Patologia')
+    descripcion_patologia = row.get('Descripcion Patologia')
+    medicamentos = row.get('Medicamentos')
+    alergias = row.get('Alergias')
+    actividad_fisica = row.get('Actividad Fisica')
+    peso = row.get('Peso')
+    altura = row.get('Altura')
+    region = row.get('Region')
+    provincia = row.get('Provincia')
+    comuna = row.get('Comuna')
+    calle = row.get('Calle')
+
+    # Validación de Rut
+    if not re.match(r'^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$', rut):
+        errores.append(f'El RUT "{rut}" debe estar en el formato XX.XXX.XXX-X')
+    
+    # Validación de dígito verificador
+    clean_rut = rut.replace(".", "").replace("-", "")
+    num_part = clean_rut[:-1]
+    dv = clean_rut[-1].upper()
+    reversed_digits = map(int, reversed(num_part))
+    factors = cycle(range(2, 8))
+    s = sum(d * f for d, f in zip(reversed_digits, factors))
+    verificador = 'K' if (-s) % 11 == 10 else str((-s) % 11)
+    if dv != verificador:
+        errores.append(f'El dígito verificador del RUT "{rut}" no es válido')
+    
+    # Validación para el primer nombre, permite hasta 3 nombres con letras y caracteres especiales
+    if not re.match(r'^[a-zA-Z\u00C0-\u017F]+( [a-zA-Z\u00C0-\u017F]+){0,2}$', first_name):
+        errores.append(f'El nombre "{first_name}" solo puede contener letras y hasta 3 nombres separados por espacios')
+
+    # Validación para el apellido, permite hasta 2 apellidos con letras y caracteres especiales
+    if not re.match(r'^[a-zA-Z\u00C0-\u017F]+( [a-zA-Z\u00C0-\u017F]+)?$', last_name):
+        errores.append(f'El apellido "{last_name}" solo puede contener letras y hasta 2 apellidos separados por un espacio')
+    
+    # Validación de correo electrónico
+    if not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
+        errores.append(f'El correo "{email}" no es válido')
+    
+    # Validación de teléfono
+    if not re.match(r'^\d{1} \d{4} \d{4}$', telefono):
+        errores.append(f'El teléfono "{telefono}" debe tener el formato: 9 1234 5678')
+    
+    # Validación de fecha de nacimiento
+    fecha_nacimiento = pd.to_datetime(row['Fecha Nacimiento'], errors='coerce')
+    if pd.isna(fecha_nacimiento) or fecha_nacimiento.date() >= date.today():
+        errores.append(f'La fecha de nacimiento "{row["Fecha Nacimiento"]}" debe ser anterior a la fecha actual')
+
+    # Validación de sexo
+    if sexo not in ['Masculino', 'Femenino']:
+        errores.append(f'El sexo "{sexo}" debe ser "Masculino" o "Femenino"')
+    
+    if not re.match(r'^[a-zA-Z\u00C0-\u017F]+( [a-zA-Z\u00C0-\u017F]+)?$', contacto_emergencia):
+        errores.append(f'El contacto de emergencia "{contacto_emergencia}" solo puede contener letras y un apellido opcional separados por un espacio')
+
+    if not re.match(r'^\d{1} \d{4} \d{4}$', telefono_emergencia):
+        errores.append(f'El teléfono de emergencia "{telefono_emergencia}" debe tener el formato: 9 1234 5678')
+    
+    if not re.match(r'^[a-zA-Z\u00C0-\u017F ]+$', patologia):
+        errores.append(f'La patología "{patologia}" solo puede contener letras y espacios')
+
+    if not re.match(r'^[a-zA-Z\u00C0-\u017F ]+$', descripcion_patologia):
+        errores.append(f'La descripción de la patología "{descripcion_patologia}" solo puede contener letras y espacios')
+
+    if not re.match(r'^[a-zA-Z\u00C0-\u017F ]+$', str(medicamentos)):
+        errores.append(f'Los medicamentos "{medicamentos}" solo pueden contener letras y espacios')
+    
+    if not re.match(r'^[a-zA-Z\u00C0-\u017F ]+$', str(alergias)):
+        errores.append(f'Las alergias "{alergias}" solo pueden contener letras y espacios')
+    
+    if actividad_fisica not in ['Sedentario', 'Moderado', 'Activo']:
+        errores.append(f'La actividad física "{actividad_fisica}" debe ser "Sedentario", "Moderado" o "Activo"')
+
+    if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s.#\-]+$', calle):
+        errores.append(f'La dirección "{calle}" no permite caracteres especiales, solo se permiten letras, números, espacios, puntos, # y -.')
+    
+    # Validación de peso y altura
+    peso = Decimal(str(row['Peso']).replace(',', '.'))
+    altura = Decimal(str(row['Altura']).replace(',', '.'))
+
+    if peso <= 0:
+        errores.append(f'El peso "{peso}" debe ser mayor a 0')
+    
+    if altura <= 0:
+        errores.append(f'La altura "{altura}" debe ser mayor a 0')
+
+    # Verificación de duplicados
+    if Paciente.objects.filter(rut=rut).exists():
+        errores.append(f'El RUT "{rut}" ya está registrado')
+    
+    return errores
+
+def guardar_paciente(row):
+    paciente = Paciente(
+        rut=row.get('Rut', ''),
+        first_name=row.get('Nombre', ''),
+        last_name=row.get('Apellido', ''),
+        fecha_nacimiento=pd.to_datetime(row.get('Fecha Nacimiento', ''), errors='coerce'),
+        sexo=row.get('Sexo', '').capitalize(),
+        telefono=row.get('Telefono', ''),
+        email=row.get('Email', ''),
+        contacto_emergencia=row.get('Contacto Emergencia', ''),
+        telefono_emergencia=row.get('Telefono Emergencia', ''),
+        patologia=row.get('Patologia', ''),
+        descripcion_patologia=row.get('Descripcion Patologia', ''),
+        medicamentos=row.get('Medicamentos', ''),
+        alergias=row.get('Alergias', ''),
+        actividad_fisica=row.get('Actividad Fisica', ''),
+        peso=Decimal(str(row.get('Peso', '0')).replace(',', '.')),
+        altura=Decimal(str(row.get('Altura', '0')).replace(',', '.')),
+        region=Region.objects.get(pk=row.get('Region', '')) if row.get('Region') else None,
+        provincia=Provincia.objects.get(pk=row.get('Provincia', '')) if row.get('Provincia') else None,
+        comuna=Comuna.objects.get(pk=row.get('Comuna', '')) if row.get('Comuna') else None,
+        calle=row.get('Calle', ''),
+    )
+    paciente.save()
 
 
 ##################################################      ADMIN RECEPCIONISTAS      ########################################################

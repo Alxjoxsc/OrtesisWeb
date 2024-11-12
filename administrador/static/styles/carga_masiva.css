@@ -27,131 +27,102 @@
 }
 
 #popup {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 55%;
-    transform: translate(-50%, -50%);
-    background-color: white;
+    display: flex;
     padding: 20px;
-    width: 757px;
-    height: 436px;
-    border-radius: 5px;
-    display: none;
-    z-index: 9999;
-}
-
-#popup h2{
-    margin-bottom: 20px;
-}
-
-#overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 9998;
-}
-
-#closePopup {
-    float: right;
-    position: absolute;
-    bottom: 30px;
-    left: 30%;
-    width: 181px;
-    height: 30px;
-    background-color: red;
-    color: white;
-    transform: translateX(-50%);
-    border-radius: 15px;
-    border-width: 0px;
-    box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.308);
-}
-
-#closePopup:hover{
-    background-color: rgb(191, 22, 22);
-    cursor: pointer;
-}
-
-
-.boton_subir {
-    position: absolute;
-    bottom: 30px;
-    left: 60%;
-    width: 181px;
-    height: 30px;
-    background-color: rgba(61, 186, 50, 1);
-    color: white;
-    transform: translateX(-50%);
-    border-radius: 15px;
-    border-width: 0px;
-    box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.308);
-}
-
-.boton_subir:hover{
-    background-color: rgb(42, 130, 35);
-    cursor: pointer;
-}
-
-#dropzone {
-    position: relative;
-    width: 700px;
-    height: 253px;
-    border: 2px dashed #aaa;
-    overflow: hidden;
-    border-radius: 5px;
-    margin-top: 10px;
-    left: 9px;
-}
-
-#titulo_carga{
-    position: relative;
-    left: 9px;
-}
-
-#plantilla_ejemplo{
-    position: relative;
-    left: 9px;
-}
-
-#dropzone-message {
+    background-color: #fefefe;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+    justify-content: flex-start; /* Asegura que el contenido esté alineado desde la parte superior */
+    text-align: center;
+    border-radius: 0.625rem;
+    width: 46.875rem;
+    height: 28.125rem;
+    margin: auto;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    overflow-y: auto; /* Asegura que si el contenido se excede, se pueda hacer scroll */
+}
+
+#dropzone {
+    display: flex;
+    width: 100%;
+    flex-grow: 1; /* Hace que la dropzone ocupe el espacio restante en el modal */
+    justify-content: center;
+    align-items: center;
+    border: 2px dashed #aaa;
+    overflow: hidden;
+    border-radius: 5px;
+    margin-top: 10px;
+    padding: 20px; /* Añadí algo de padding para darle espacio interno */
+    box-sizing: border-box; /* Asegura que el padding no afecte el tamaño total */
+    position: relative; /* Asegura que el mensaje de la dropzone se posicione correctamente */
+}
+
+#dropzone-message {
+    position: absolute;
     text-align: center;
     width: 100%;
-    font-size: 20px;
+    font-size: 16px; /* Reduje el tamaño de la fuente para que se ajuste mejor */
     color: rgba(0, 0, 0, 0.6);
+    z-index: 1; /* Asegura que el mensaje se muestre sobre otros elementos */
 }
 
 #archivo_csv {
-    position: absolute;
+    position: absolute; /* Lo hacemos absolutamente posicionado dentro de la dropzone */
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    opacity: 0;
+    opacity: 0; /* Lo mantenemos invisible pero funcional */
     cursor: pointer;
-    width: 100%; 
-    height: 100%; 
-    opacity: 0
 }
 
-#dropzone:hover{
+#dropzone:hover {
     background-color: #ccc;
     cursor: pointer;
 }
 
-#message-container{
-    position:fixed;
-    top: 20px;
-    left: 750px;
-    margin: 0px;
-    z-index: 9999;
+/* Asegura que el modal de fondo esté cubriendo toda la pantalla */
+#overlay.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5); /* Añadí un fondo semi-transparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+#plantilla_ejemplo {
+    display: flex;
+    color: #007bff;
+    text-decoration: none;
+    font-size: 14px;
+    width: 100%;
+}
+
+#plantilla_ejemplo:hover {
+    text-decoration: underline;
+}
+
+#message-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: fixed;  /* Cambié absolute a fixed */
+    top: 0;           /* Pegado a la parte superior */
+    left: 50%;        /* Centrado horizontalmente */
+    transform: translateX(-50%); /* Corrige la alineación horizontal */
+    width: 100%;      /* Asegura que ocupe todo el ancho */
+    z-index: 1000;    /* Asegura que esté por encima de otros elementos */
+    padding-top: 20px; /* Espaciado desde la parte superior */
 }
 
 #message-container .alert {
@@ -161,20 +132,23 @@
     border-radius: 4px;
     position: relative;
     display: block;
-    opacity: 1 !important; /* Asegura que la opacidad esté en 100% */
-    color: #000; /* Color de texto por defecto */
-    background-color: #fff; /* Color de fondo por defecto */
+    opacity: 1 !important;
+    color: #000;
+    background-color: #fff;
 }
+
 #message-container .alert.alert-success {
     background-color: #d4edda !important;
     border-color: #c3e6cb;
     padding-right: 50px;
 }
+
 #message-container .alert.alert-error {
     background-color: #f8d7da !important;
     border-color: #f5c6cb;
     padding-right: 40px;
 }
+
 #message-container .alert .close {
     position: absolute;
     top: 50%;
@@ -186,6 +160,7 @@
     font-size: 20px;
     cursor: pointer;
 }
+
 #message-container .alert #text {
-    margin-right: 30px; /* Ajuste el margen derecho según sea necesario */
+    margin-right: 30px;
 }
