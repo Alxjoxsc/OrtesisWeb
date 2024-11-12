@@ -59,6 +59,20 @@
     padding: 20px; /* Añadí algo de padding para darle espacio interno */
     box-sizing: border-box; /* Asegura que el padding no afecte el tamaño total */
     position: relative; /* Asegura que el mensaje de la dropzone se posicione correctamente */
+    background-color: transparent;
+    transition: background-color 0.3s ease; /* Agregué una transición para suavizar el cambio de color */
+}
+
+#dropzone.drag-hover {
+    background-color: #ccc; /* Color cuando un archivo se arrastra sobre la dropzone */
+}
+
+#dropzone.file-loaded {
+    background-color: #008F85; /* Color cuando un archivo se carga exitosamente */
+}
+
+#dropzone:hover {
+    background-color: #aaa; /* Color de hover cuando no hay archivo cargado */
 }
 
 #dropzone-message {
