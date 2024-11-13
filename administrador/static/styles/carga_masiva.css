@@ -99,20 +99,6 @@
     cursor: pointer;
 }
 
-/* Asegura que el modal de fondo esté cubriendo toda la pantalla */
-#overlay.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5); /* Añadí un fondo semi-transparente */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
 #plantilla_ejemplo {
     display: flex;
     color: #007bff;

@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{% static 'styles/admin_recepcionista.css' %}">
     <link rel="stylesheet" href="{% static 'css/tabla.css' %}">
     <link rel="stylesheet" href="{% static 'styles/modal.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/carga_masiva.css' %}">
 {% endblock %}
 
 
@@ -28,6 +29,19 @@
         </button>
     </form>
 </div>
+<div id="message-container">
+    {% if messages %}
+    {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+            {{ message }}
+            <button type="button" class="close" onclick="this.parentElement.style.display='none';">&times;</button>
+        </div>
+    {% endfor %}
+    {% endif %}
+</div>
+<button id="boton-carga-masiva" onclick="openPopup()">Carga masiva
+    <img src="{% static 'icons/carga-masiva.svg' %}">
+</button>
 <button id="boton-agregar-recepcionista">Agregar Recepcionista
     <img src="{% static 'icons/plus.svg' %}" alt="Agregar">
 </button>
@@ -165,11 +179,42 @@
     </span>
 </div>
 
+<!-- Carga masiva -->
+<div id="overlay" class="modal" style="display:none;">
+    <form action="{% url 'carga_masiva_recepcionistas' %}" method="POST" enctype="multipart/form-data" id="popup">
+        {% csrf_token %}
+        <h2 id="titulo_carga">Importar recepcionistas con archivos CSV</h2>
+        <div id="dropzone">
+            <p id="dropzone-message">Arrastra tu archivo o haz click para buscar en tu computador</p>
+            <input type="file" name="archivo_csv" id="archivo_csv" accept=".csv">
+        </div>
+        <a id="plantilla_ejemplo" href="{% url 'archivo_csv_ejemplo_recepcionistas' %}">Plantilla CSV de muestra</a>
+        <div class="botones-modal">
+            <button id="closePopup" class="boton-cancelar">Cancelar</button>
+            <button class="boton-confirmar" id="subir_carga" type="submit">Subir archivo</button>
+        </div>
+    </form>
+</div>
+
 {% endblock %}
 
 
 
 {% block extra_js %}
+<script>
+    // Desvanecer los mensajes después de 5 segundos
+    setTimeout(function() {
+        let messages = document.querySelectorAll('#message-container .alert');
+        messages.forEach(function(message) {
+            message.style.transition = 'opacity 0.5s ease';
+            message.style.opacity = '0';
+            setTimeout(function() {
+                message.remove();
+            }, 500);
+        });
+    }, 10000);
+</script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const checkboxes = document.querySelectorAll('.recepcionista-checkbox');
@@ -292,5 +337,6 @@
 </script>
 <script src="{% static 'js/filtroListados.js' %}"></script>
 <script src="{% static 'js/admin_buscador_recepcionista.js' %}"></script>
+<script src="{% static 'js/carga_masiva.js' %}"></script>
 {% endblock %}
 
