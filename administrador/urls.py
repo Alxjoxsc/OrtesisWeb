@@ -35,4 +35,6 @@ urlpatterns = [
     path('archivo_csv_ejemplo_pacientes/', views.archivo_csv_ejemplo_pacientes, name='archivo_csv_ejemplo_pacientes'),
     path('carga_masiva_recepcionistas/', views.carga_masiva_recepcionistas, name='carga_masiva_recepcionistas'),
     path('archivo_csv_ejemplo_recepcionistas/', views.archivo_csv_ejemplo_recepcionistas, name='archivo_csv_ejemplo_recepcionistas'),
+    path('carga_masiva_terapeutas/', views.carga_masiva_terapeutas, name='carga_masiva_terapeutas'),
+    path('archivo_csv_ejemplo_terapeutas/', views.archivo_csv_ejemplo_terapeutas, name='archivo_csv_ejemplo_terapeutas'),
 ]
