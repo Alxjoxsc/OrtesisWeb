@@ -1,0 +1,269 @@
+.header {
+    display: flex;
+    width: 100%;
+    flex-flow: column nowrap;
+    align-items: flex-start; 
+}
+
+.main-content {
+    margin: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.contenido-modal-exito {
+    display: flex;
+    background-color: #fefefe;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 0.625rem;
+    width: 18.75rem;
+    height: 14.0625rem;
+    margin: auto; /* Centrar horizontalmente */
+    position: absolute; /* Centrar verticalmente */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.contenido-modal-exito img{
+    width: 75px;
+    height: 75px;
+}
+
+.contenido-modal-exito p{
+    font-size: 1.25rem;
+}
+
+.boton-continuar{
+    background-color: rgba(76, 175, 80, 0.9608);
+    color: white;
+    padding: 0.625rem 1.25rem;
+    border: none;
+    border-radius: 3.125rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+h1{
+    font-weight: normal;
+    font-size: 3rem;
+}
+
+h2{
+    font-weight: normal;
+    width: 18.75rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 0.125rem solid #000;
+    align-self: center;
+    text-align: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.divisor-formulario {
+    display: flex;
+    width: 100%;
+    flex-flow: row wrap;
+}
+
+.datos-columna-izquierda{
+    border-right: 0.0625rem solid #ccc;
+    padding-right: 2rem;
+    width: 50%;
+}
+
+.datos-columna-derecha{
+    padding-left: 1.9375rem;
+    width: 50%;
+}
+
+.form-group {
+    margin: 0.3125rem;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 1em;
+    text-align: left;
+}
+
+.table th, .table td {
+    padding: 12px 15px;
+    border: 1px solid #dddddd;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+}
+
+.table th {
+    background-color: #001058;
+    color: #ffffff;
+}
+
+.table .columna-eliminar{
+    width: 10%;
+}
+
+.table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.table tr:hover {
+    background-color: #f1f1f1;
+}
+
+.table label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="checkbox"] {
+    /* Ajustar el tamaño */
+    width: 20px;
+    height: 20  px;
+    /* Crear bordes redondeados */
+    border-radius: 50%;
+    /* Color del borde */
+    border: 2px solid #ccc;
+    /* Color de fondo inicial */
+    background-color: transparent;
+    /* Ocultar la apariencia predeterminada del checkbox */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    /* Transición suave para el cambio de fondo */
+    transition: background-color 0.3s ease;
+    cursor: pointer; /* Cambia el cursor al pasar sobre el checkbox */
+}
+
+/* Cambiar el fondo cuando el checkbox está seleccionado */
+input[type="checkbox"]:checked {
+    background-color: #001058;
+}
+
+/* Estilo del checkmark */
+input[type="checkbox"]::after {
+    content: "";
+    display: block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%; /* Bordes redondeados*/
+}
+
+.contenedor-botones {
+    width: 18.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    align-self: center;
+    margin: 1.25rem 0 1.25rem 0;
+}
+
+.boton-azul{
+    background-color: #001058;
+    color: white;
+    padding: 0.625rem 1.25rem;
+    border: none;
+    border-radius: 3.125rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.boton-azul:hover{
+    background-color: #1a2a80;
+    color: white;
+}
+
+.boton-cancelar{
+    background-color: #7a7a7a;
+    color: white;
+    padding: 0.625rem 1.25rem;
+    border: none;
+    border-radius: 3.125rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.boton-cancelar:hover{
+    background-color: #5f5f5f;
+    color: white;
+}
+
+@media screen and (max-width: 768px) {
+    .divisor-formulario {
+        flex-direction: column;
+    }
+
+    .datos-columna-izquierda{
+        border-right: none;
+        padding-right: 0;
+        width: 100%;
+    }
+
+    .datos-columna-derecha{
+        padding-left: 0;
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 600px){
+    html{
+        font-size: 12px;
+    }
+}
+/* Estilos para campos de formulario */
+.campo-formulario {
+    width: 100%;
+    padding: 0.5rem;
+    margin: 0.3125rem 0;
+    box-sizing: border-box;
+    border: 0.0625rem solid #ccc;
+    border-radius: 0.25rem;
+}
+
+/* Estilos para selecciones */
+.seleccion {
+    width: 100%;
+    padding: 0.5rem;
+    margin: 0.3125rem 0;
+    box-sizing: border-box;
+    border: 0.0625rem solid #ccc;
+    border-radius: 0.25rem;
+    background-color: #f8f8f8; /* Color de fondo */
+}
+
+/* Estilos para textarea */
+textarea.campo-formulario {
+    height: 6.25rem;
+}
+
+.form-check-input {
+    margin-top: 0.25rem;
+}
+
+.errorlist{
+    color: #d40909;
+    font-size: 0.875rem;
+    margin-top: 0.1563rem;
+    margin-bottom: 0.1563rem;
+    list-style: none;
+}
+input[type="date"] {
+    width: 100%;
+    padding: 0.5rem;
+    margin: 0.3125rem 0;
+    box-sizing: border-box;
+    border: 0.0625rem solid #ccc;
+    border-radius: 0.25rem;
+}

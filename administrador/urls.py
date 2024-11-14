@@ -37,4 +37,5 @@ urlpatterns = [
     path('actualizar_email_recepcionista/', views.actualizar_email_recepcionista, name='actualizar_email_recepcionista'),
     path('actualizar_credenciales_recepcionista/', views.actualizar_credenciales_recepcionista, name='actualizar_credenciales_recepcionista'),
     path('administrador/agregar_recepcionista/', views.agregar_recepcionista, name='agregar_recepcionista'),
+    path('editar_datos_terapeuta_admin/<int:terapeuta_id>', views.editar_datos_terapeuta_admin, name='editar_datos_terapeuta_admin'),
 ]

@@ -23,7 +23,7 @@
 <div class="container-paciente">
     <div class="card-paciente">
         {% if terapeuta.user.is_active %}
-            <div class="icon-container" onclick="window.location.href=#">
+            <div class="icon-container" onclick="window.location.href='{% url 'editar_datos_terapeuta_admin' terapeuta.id %}'">
                 <img src="{% static 'icons/lapiz.svg' %}" class="icon">
             </div>
         {% else %}

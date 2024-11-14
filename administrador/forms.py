@@ -1270,3 +1270,240 @@ class CrearRecepcionistaForm(forms.ModelForm):
             raise forms.ValidationError('La experiencia debe ser un número positivo o igual a 0.')
         
         return experiencia
+    
+class EditarTerapeutaForm(forms.ModelForm):
+    # Campos de User
+    first_name = forms.CharField(
+        max_length=30,
+        label='Nombres (*)',
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'campo-formulario', 'placeholder': 'Ej: Juan Alberto'})
+    )
+    
+    last_name = forms.CharField(
+        max_length=30,
+        label='Apellidos (*)',
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'campo-formulario', 'placeholder': 'Ej: Pérez González'})
+    )
+    
+    # Campos de Terapeuta
+    especialidad = forms.CharField(
+        max_length=30,
+        label='Especialidad (*)',
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'campo-formulario', 'placeholder': 'Ej: Articulaciones Superiores'})
+    )
+    
+    titulo = forms.CharField(
+        max_length=30,
+        label='Título (*)',
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'campo-formulario', 'placeholder': 'Ej: Licenciado en Terapia Ocupacional'})
+    )
+    
+    experiencia = forms.IntegerField(
+        label='Experiencia', 
+        required=True,
+        widget=forms.NumberInput(attrs={'class':'campo-formulario'})
+    )
+    
+    presentacion = forms.CharField(
+        max_length=500, 
+        label='Presentación', 
+        required=False,
+        widget=forms.Textarea(attrs={'class':'campo-formulario','rows': 3})
+    )
+    
+    correo_contacto = forms.EmailField(
+        label='Correo electrónico de contacto (*)',
+        required=True,
+        widget=forms.EmailInput(attrs={'class': 'campo-formulario', 'placeholder': 'correodejemplo@ejemplos.com'})
+    )
+    
+    fecha_ingreso = forms.CharField(
+        label='Fecha de ingreso', 
+        required=True,
+        widget=forms.TextInput(attrs={'class':'campo-formulario', 'type': 'date', 'readonly': 'readonly'})
+    )
+    
+    disponibilidad = forms.CharField(
+        max_length=30,
+        label='Disponibilidad',
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'campo-formulario', 'readonly': 'readonly'})
+    )
+
+    # Campos de Profile
+    rut = forms.CharField(
+        max_length=12,
+        label='Rut',
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'campo-formulario', 'placeholder': 'Ej: XX.XXX.XXX-X'})
+    )
+
+    telefono = forms.CharField(
+        max_length=15,
+        label='Teléfono (*)',
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'campo-formulario', 'placeholder': 'Ej: 9 1234 5678'})
+    )
+
+    fecha_nacimiento = forms.CharField(
+        label='Fecha de nacimiento', 
+        required=True,
+        widget=forms.TextInput(attrs={'class':'campo-formulario', 'type': 'date', 'readonly': 'readonly'})
+    )
+
+    direccion = forms.CharField(
+        max_length=255,
+        label='Dirección (*)',
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'campo-formulario', 'placeholder': 'Ej: Calle 123'})
+    )
+
+    sexo = forms.ChoiceField(
+        choices=[('M', 'Masculino'), ('F', 'Femenino'), ('O', 'Otro')],
+        label='Sexo (*)',
+        required=True,
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'})
+    )
+    
+    region = forms.ModelChoiceField(
+        queryset=Region.objects.all(),  # Cargamos todas las regiones
+        label='Región',
+        required=True,
+        widget=forms.Select(attrs={'class': 'campo-formulario'})
+    )
+
+    comuna = forms.ModelChoiceField(
+        queryset=Comuna.objects.all(),  # Cargamos todas las comunas
+        label='Comuna (*)',
+        required=True,
+        widget=forms.Select(attrs={'class': 'campo-formulario'})
+    )
+
+    class Meta:
+        model = Terapeuta
+        fields = [
+            'especialidad', 
+            'fecha_ingreso', 
+            'disponibilidad', 
+            'fecha_contratacion', 
+            'titulo', 
+            'experiencia', 
+            'presentacion', 
+            'correo_contacto',
+            # Campos de User
+            'first_name',
+            'last_name',
+            # Campos de Profile
+            'rut',
+            'telefono',
+            'fecha_nacimiento',
+            'direccion',
+            'sexo',
+            'comuna',
+            'region',
+        ]
+
+    def save(self, commit=True):
+        terapeuta = super().save(commit=False)
+        # Guarda la instancia del terapeuta
+        if commit:
+            terapeuta.save()
+        
+        # Actualiza el usuario asociado
+        user = terapeuta.user
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
+        user.save()
+
+        # Actualiza el perfil asociado
+        profile = user.profile
+        profile.rut = self.cleaned_data['rut']
+        profile.telefono = self.cleaned_data['telefono']
+        profile.fecha_nacimiento = self.cleaned_data['fecha_nacimiento']
+        profile.direccion = self.cleaned_data['direccion']
+        profile.sexo = self.cleaned_data['sexo']
+        profile.comuna = self.cleaned_data['comuna']
+        profile.region = self.cleaned_data['region']
+        profile.save()
+
+        return terapeuta
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        self.fields['rut'].widget.attrs['readonly'] = True
+        
+        if 'region' in self.data:
+            try:
+                region_id = int(self.data.get('region'))
+                self.fields['comuna'].queryset = Comuna.objects.filter(region_id=region_id).order_by('nombre')
+            except (ValueError, TypeError):
+                pass  # Manejo de errores si la región no es válida
+        elif self.instance.pk:
+            self.fields['comuna'].queryset = self.instance.region.comuna_set.order_by('nombre')
+            
+        
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name')
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+( [a-zA-ZáéíóúÁÉÍÓÚñÑ]+){0,2}$', first_name):
+            raise forms.ValidationError('El nombre solo puede contener letras (incluyendo tildes y espacios)')
+        return first_name
+    
+    def clean_last_name(self):
+        last_name = self.cleaned_data.get('last_name')
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+( [a-zA-ZáéíóúÁÉÍÓÚñÑ]+)?$', last_name):
+            raise forms.ValidationError('El apellido solo puede contener letras (incluyendo tildes y espacios)')
+        return last_name
+    
+    def clean_correo_contacto(self):
+        correo_contacto = self.cleaned_data.get('correo_contacto')
+        if not is_valid_email(correo_contacto):
+            raise forms.ValidationError('Por favor, ingrese una dirección de correo electrónico válida.')
+
+        # Verificar si ya existe otro User con este email, excluyendo al User que estamos editando
+        if Terapeuta.objects.filter(correo_contacto=correo_contacto).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError('Ya existe un terapeuta con este correo electrónico.')
+        return correo_contacto
+    
+    
+    def clean_telefono(self):
+        telefono = self.cleaned_data['telefono']
+        # Validar el formato del teléfono con una expresión regular
+        if not re.match(r'^\d{1} \d{4} \d{4}$', telefono):
+            raise forms.ValidationError('El formato del teléfono debe ser: 9 1234 5678')
+        
+        return telefono
+    
+    def clean_direccion(self):
+        direccion = self.cleaned_data.get('direccion')
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s.#\-]+$', direccion):
+            raise forms.ValidationError('La dirección no permite caracteres especiales, solo se permiten letras, números, espacios, puntos, # y -.')
+
+        return direccion
+    
+    def clean_especialidad(self):
+        especialidad = self.cleaned_data.get('especialidad')
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9 ]+$', especialidad):
+            raise forms.ValidationError('La especialidad solo puede contener letras, números y espacios.')
+        return especialidad
+    
+    def clean_titulo(self):
+        titulo = self.cleaned_data.get('titulo')
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9 ]+$', titulo):
+            raise forms.ValidationError('El título solo puede contener letras, números y espacios.')
+        return titulo
+    
+    def clean_experiencia(self):
+        experiencia = self.cleaned_data.get('experiencia')
+        if experiencia is not None:
+            if not isinstance(experiencia, int):
+                raise forms.ValidationError('Los años de experiencia deben ser un número entero')
+            if experiencia < 0:
+                raise forms.ValidationError('Los años de experiencia no pueden ser negativos')
+            if experiencia > 50:
+                raise forms.ValidationError('Los años de experiencia exceden el límite asignado')
+        return experiencia
