@@ -5,6 +5,7 @@
 {% block title %}Gestión de recepcionistas{% endblock %}
 
 {% block extra_head%}
+
 <link rel="stylesheet" href="{% static 'styles/agregar_recepcionista.css' %}">
 <link rel="stylesheet" href="{% static 'styles/formularios.css' %}">
 <link rel="stylesheet" href="{% static 'styles/modal.css' %}">
@@ -34,7 +35,7 @@
     {% csrf_token %}
     <h2> Datos del recepcionista </h2>
 
-    <!-- DATOS DEL RECEPCIONISTA -->
+    {% comment %} DATOS DEL RECEPCIONISTA COLUMNA IZQUIERDA {% endcomment %}
     <div class="divisor-formulario">
         <div class="datos-columna-izquierda">
 
@@ -44,82 +45,111 @@
                 {{ recepcionista_form.rut }}
                 <div class="error">{{ recepcionista_form.rut.errors }}</div>
             </div>
-
+    
             <!-- Campo Nombre -->
             <div class="form-group">
                 <label for="{{ recepcionista_form.first_name.id_for_label }}">{{ recepcionista_form.first_name.label }}</label>
                 {{ recepcionista_form.first_name }}
                 <div class="error">{{ recepcionista_form.first_name.errors }}</div>
             </div>
-
+    
             <!-- Campo Apellido -->
             <div class="form-group">
                 <label for="{{ recepcionista_form.last_name.id_for_label }}">{{ recepcionista_form.last_name.label }}</label>
                 {{ recepcionista_form.last_name }}
                 <div class="error">{{ recepcionista_form.last_name.errors }}</div>
             </div>
-
+    
             <!-- Campo Email -->
             <div class="form-group">
                 <label for="{{ recepcionista_form.email.id_for_label }}">{{ recepcionista_form.email.label }}</label>
                 {{ recepcionista_form.email }}
                 <div class="error">{{ recepcionista_form.email.errors }}</div>
             </div>
-
+    
             <!-- Campo Teléfono -->
             <div class="form-group">
                 <label for="{{ recepcionista_form.telefono.id_for_label }}">{{ recepcionista_form.telefono.label }}</label>
                 {{ recepcionista_form.telefono }}
                 <div class="error">{{ recepcionista_form.telefono.errors }}</div>
             </div>
-
-        </div>
-
-        <div class="datos-columna-derecha">
-
+    
             <!-- Campo Fecha de Nacimiento -->
             <div class="form-group">
                 <label for="{{ recepcionista_form.fecha_nacimiento.id_for_label }}">{{ recepcionista_form.fecha_nacimiento.label }}</label>
                 {{ recepcionista_form.fecha_nacimiento }}
                 <div class="error">{{ recepcionista_form.fecha_nacimiento.errors }}</div>
             </div>
-
-            <!-- Campo Sexo -->
-            <div class="form-group">
-                <label for="{{ recepcionista_form.sexo.id_for_label }}">{{ recepcionista_form.sexo.label }}</label>
-                {{ recepcionista_form.sexo }}
-                <div class="error">{{ recepcionista_form.sexo.errors }}</div>
-            </div>
-
+    
             <!-- Campo Dirección -->
             <div class="form-group">
                 <label for="{{ recepcionista_form.direccion.id_for_label }}">{{ recepcionista_form.direccion.label }}</label>
                 {{ recepcionista_form.direccion }}
                 <div class="error">{{ recepcionista_form.direccion.errors }}</div>
             </div>
-
+    
             <!-- Campo Región -->
             <div class="form-group">
                 <label for="{{ recepcionista_form.region.id_for_label }}">{{ recepcionista_form.region.label }}</label>
                 {{ recepcionista_form.region }}
                 <div class="error">{{ recepcionista_form.region.errors }}</div>
             </div>
-
+    
             <!-- Campo Comuna -->
             <div class="form-group">
                 <label for="{{ recepcionista_form.comuna.id_for_label }}">{{ recepcionista_form.comuna.label }}</label>
                 {{ recepcionista_form.comuna }}
                 <div class="error">{{ recepcionista_form.comuna.errors }}</div>
             </div>
-
+    
         </div>
-    </div>
+    
+        {% comment %} DATOS DEL RECEPCIONISTA COLUMNA DERECHA {% endcomment %}
+    
+        <div class="datos-columna-derecha">
+    
+            <!-- Campo Sexo -->
+            <div class="form-group">
+                <label for="{{ recepcionista_form.sexo.id_for_label }}">{{ recepcionista_form.sexo.label }}</label>
+                {{ recepcionista_form.sexo }}
+                <div class="error">{{ recepcionista_form.sexo.errors }}</div>
+            </div>
+    
+            <!-- Campo Formacion Academica -->
+            <div class="form-group">
+                <label for="{{ recepcionista_form.formacion_academica.id_for_label }}">{{ recepcionista_form.formacion_academica.label }}</label>
+                {{ recepcionista_form.formacion_academica }}
+                <div class="error">{{ recepcionista_form.formacion_academica.errors }}</div>
+            </div>
+    
+            <!-- Campo Fecha de Contratación -->
+            <div class="form-group">
+                <label for="{{ recepcionista_form.fecha_contratacion.id_for_label }}">{{ recepcionista_form.fecha_contratacion.label }}</label>
+                {{ recepcionista_form.fecha_contratacion }}
+                <div class="error">{{ recepcionista_form.fecha_contratacion.errors }}</div>
+            </div>
+    
+            <!-- Campo Experiencia -->
+            <div class="form-group">
+                <label for="{{ recepcionista_form.experiencia.id_for_label }}">{{ recepcionista_form.experiencia.label }}</label>
+                {{ recepcionista_form.experiencia }}
+                <div class="error">{{ recepcionista_form.experiencia.errors }}</div>
+            </div>
 
+            <!-- Campo Turno -->
+            <div class="form-group">
+                <label for="{{ recepcionista_form.turno.id_for_label }}">{{ recepcionista_form.turno.label }}</label>
+                {{ recepcionista_form.turno }}
+                <div class="error">{{ recepcionista_form.turno.errors }}</div>
+            </div>
+        </div>
+    </div>  
+    
     <div class="contenedor-botones">
-        <button class="boton-cancelar" id="boton-cancelar" type="button">Cancelar</button>
+        <button class="boton-cancelar" id="boton-cancelar">Cancelar</button>
         <button class="boton-azul" type="submit">Agregar recepcionista</button>
     </div>
-
+    
 </form>
 
 <script>
@@ -136,13 +166,9 @@
         var mensajeExito = document.getElementById("mensaje-exito");
         mensajeExito.style.display = "none"; // Ocultar el modal
     }
+</script>
 
-    // Redirigir al hacer clic en cancelar
-    document.getElementById("boton-cancelar").addEventListener("click", function(){
-        window.location.href = "{% url 'listar_recepcionistas_activos' %}";
-    });
-
-    // Cargar comunas basadas en la región seleccionada
+<script>
     document.addEventListener("DOMContentLoaded", function() {
         var regionField = document.getElementById("id_region");
         var comunaField = document.getElementById("id_comuna");
@@ -167,8 +193,12 @@
         });
     });
 </script>
+<script>
+    document.getElementById("boton-cancelar").addEventListener("click", function(){
+        window.location.href = "{% url 'listar_recepcionistas_activos' %}";
+    });
+</script>
 {% endblock %}
-
 {% block extra_js %}
 <script src="{% static 'js/formatear-rut.js' %}"></script>
 <script src="{% static 'js/formatear-telefono.js' %}"></script>

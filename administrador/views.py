@@ -736,7 +736,7 @@ def agregar_recepcionista(request):
                 recepcionista = recepcionista_form.save()
 
             success = True # Variable para indicar que el recepcionista fue creado exitosamente
-            return render(request, 'agregar_recepcionista.html', {
+            return render(request, 'agregar_recepcionista_admin.html', {
                 'success': success,
                 'recepcionista_form': CrearRecepcionistaForm(), # Creamos un nuevo formulario vacío
                 'modulo_recepcionistas': True,
