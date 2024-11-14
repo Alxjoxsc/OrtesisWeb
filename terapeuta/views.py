@@ -57,6 +57,7 @@ def agenda(request):
                 'titulo': cita.titulo,
                 'hora_inicio': cita.hora_inicio.strftime('%H:%M'),
                 'hora_final': cita.hora_final.strftime('%H:%M'),
+                'tipo_cita': cita.tipo_cita,  # Añadido el campo tipo_cita
                 'detalle': cita.detalle,
                 'sala': cita.sala,
                 'paciente': {
@@ -71,7 +72,8 @@ def agenda(request):
         'pacientes': pacientes,
         'fechas_citas': fechas_citas,
         'citas': citas,
-        'modulo_agenda': True})
+        'modulo_agenda': True
+    })
 
 def obtener_fechas_citas(request):
     if request.method == "GET":
@@ -84,6 +86,7 @@ def obtener_fechas_citas(request):
                 'titulo': cita.titulo,
                 'hora_inicio': cita.hora_inicio.strftime('%H:%M'),
                 'hora_final': cita.hora_final.strftime('%H:%M'),
+                'tipo_cita': cita.tipo_cita,  # Añadido el campo tipo_cita
                 'descripcion': cita.detalle,
                 'paciente': {
                     'id': cita.paciente.id,
@@ -93,6 +96,7 @@ def obtener_fechas_citas(request):
         return JsonResponse({'citas': citas_list})
     else:
         return JsonResponse({'error': 'Método no permitido'}, status=405)
+
     
 @role_required('Terapeuta')
 
@@ -285,6 +289,7 @@ def agendar_cita(request):
             fecha = request.POST['fecha']
             hora_inicio = request.POST['hora_inicio']
             hora_final = request.POST['hora_final']
+            tipo_cita = request.POST.get('tipo_cita')
             sala = request.POST['sala']
             detalle = request.POST['detalle']
         
@@ -299,6 +304,7 @@ def agendar_cita(request):
                 fecha = fecha,
                 hora_inicio = hora_inicio,
                 hora_final = hora_final,
+                tipo_cita = tipo_cita,
                 sala = sala,
                 detalle = detalle
             )
@@ -323,6 +329,7 @@ def editar_cita(request):
         cita.fecha = request.POST["fecha_editar"]
         cita.hora_inicio = request.POST["hora_inicio_editar"]
         cita.hora_final = request.POST["hora_final_editar"]
+        Cita.tipo_cita = request.POST.get('tipo_cita_editar')
         cita.sala = request.POST["sala_editar"]
         cita.detalle = request.POST["detalle_editar"]
         cita.save()

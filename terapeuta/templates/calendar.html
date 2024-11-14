@@ -35,6 +35,7 @@
         <h2>Agendar Cita</h2>
         <form id="formNuevaCita" action="{% url 'agendar_cita' %}" method="POST">
             {% csrf_token %}
+
             <label for="titulo">Título</label>
             <input type="text" id="titulo" name="titulo" required>
 
@@ -59,6 +60,19 @@
                     <label for="hora_final">Hora Final</label>
                     <input class="hora_final" type="time" id="hora_final" name="hora_final" required>
                 </div>
+            </div>
+
+            <!-- Nuevo campo para seleccionar el tipo de cita -->
+            <label>Tipo de Cita</label>
+            <div class="tipo-cita-container">
+                <label for="tipo_presencial">
+                    <input type="radio" id="tipo_presencial" name="tipo_cita" value="presencial" checked>
+                    Presencial
+                </label>
+                <label for="tipo_online">
+                    <input type="radio" id="tipo_online" name="tipo_cita" value="online">
+                    Online
+                </label>
             </div>
 
             <label for="sala">Sala</label>
@@ -111,6 +125,18 @@
                     <label for="hora_final_editar">Hora Final</label>
                     <input type="time" id="hora_final_editar" name="hora_final_editar" required>
                 </div>
+            </div>
+            
+            <label>Tipo de Cita</label>
+            <div class="tipo-cita-container">
+                <label for="tipo_presencial_editar">
+                    <input type="radio" id="tipo_presencial_editar" name="tipo_cita_editar" value="presencial">
+                    Presencial
+                </label>
+                <label for="tipo_online_editar">
+                    <input type="radio" id="tipo_online_editar" name="tipo_cita_editar" value="online">
+                    Online
+                </label>
             </div>
 
             <label for="sala_editar">Sala</label>

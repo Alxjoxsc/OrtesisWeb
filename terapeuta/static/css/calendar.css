@@ -393,8 +393,39 @@ button:hover {
     color: white; 
 }
 
+/* Estilo para las citas en la vista semanal */
+.cita-semana {
+    background-color: #4CAF50; 
+    color: white;
+    padding: 2px;
+    border-radius: 2px;
+    text-align: center;
+    font-size: 0.8em;
+    cursor: pointer;
+    position: relative;
+    height: 100%;
+}
 
+/* Estilo adicional para citas online */
+.cita-online {
+    background-color: #2196F3; 
+    height: 50%; 
+    top: 25%; 
+}
 
+.tipo-cita-container {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center; 
+    width: 100%;
+}
+
+.tipo-cita-container label {
+    display: flex;
+    align-items: center; 
+    gap: 7px; 
+    margin-top: 7px;
+}
 
 @media (max-width: 320px) {
     .modal-content {

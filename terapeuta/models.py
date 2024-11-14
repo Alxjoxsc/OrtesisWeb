@@ -89,6 +89,11 @@ class Paciente(models.Model):
 
         return edad
 
+TIPO_CITA_CHOICES = (
+    ('presencial', 'Presencial'),
+    ('online', 'Online'),
+)
+
 class Cita(models.Model):
     terapeuta = models.ForeignKey(Terapeuta, on_delete=models.CASCADE, null=True, blank=True)
     paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, null=True, blank=True)
@@ -96,8 +101,10 @@ class Cita(models.Model):
     fecha = models.DateField()
     hora_inicio = models.TimeField()
     hora_final = models.TimeField()
+    tipo_cita = models.CharField(max_length=20, choices=TIPO_CITA_CHOICES, default='presencial')  # Nuevo campo
     sala = models.CharField(max_length=50)
     detalle = models.CharField(max_length=100)
+
     def __str__(self):
         terapeuta_nombre = f"{self.terapeuta.user.first_name} {self.terapeuta.user.last_name}" if self.terapeuta else "Sin terapeuta"
         paciente_nombre = f"{self.paciente.first_name} {self.paciente.last_name}" if self.paciente else "Sin paciente"
