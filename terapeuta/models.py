@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from autenticacion.models import Profile
 from datetime import timedelta, date
 from django.utils import timezone
-from autenticacion.models import Region, Provincia, Comuna  # Importamos los modelos de ubicación
+from autenticacion.models import Region, Comuna  # Importamos los modelos de ubicación
 
 class Terapeuta(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
@@ -53,9 +53,8 @@ class Paciente(models.Model):
     peso = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, default=0.0)
     altura = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, default=0.0)
 
-    # Nuevas relaciones con Región, Provincia y Comuna
+    # Nuevas relaciones con Región y Comuna
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, blank=True)
-    provincia = models.ForeignKey(Provincia, on_delete=models.SET_NULL, null=True, blank=True)
     comuna = models.ForeignKey(Comuna, on_delete=models.SET_NULL, null=True, blank=True)
 
     # Dirección detallada (Calle)
@@ -90,6 +89,11 @@ class Paciente(models.Model):
 
         return edad
 
+TIPO_CITA_CHOICES = (
+    ('presencial', 'Presencial'),
+    ('online', 'Online'),
+)
+
 class Cita(models.Model):
     terapeuta = models.ForeignKey(Terapeuta, on_delete=models.CASCADE, null=True, blank=True)
     paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, null=True, blank=True)
@@ -97,8 +101,10 @@ class Cita(models.Model):
     fecha = models.DateField()
     hora_inicio = models.TimeField()
     hora_final = models.TimeField()
+    tipo_cita = models.CharField(max_length=20, choices=TIPO_CITA_CHOICES, default='presencial')  # Nuevo campo
     sala = models.CharField(max_length=50)
     detalle = models.CharField(max_length=100)
+
     def __str__(self):
         terapeuta_nombre = f"{self.terapeuta.user.first_name} {self.terapeuta.user.last_name}" if self.terapeuta else "Sin terapeuta"
         paciente_nombre = f"{self.paciente.first_name} {self.paciente.last_name}" if self.paciente else "Sin paciente"

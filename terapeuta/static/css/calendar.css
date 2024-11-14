@@ -5,11 +5,11 @@
     padding: 20px; 
     display: flex;
     flex-direction: column;
-    width: 100%;
-    max-width: 1200px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); 
-    margin-top: 20px;
+    width: 100%; 
+    margin-top: 40px; 
+    margin-bottom: 10px; 
 }
+
 
 .button-container,
 .view-options {
@@ -19,12 +19,19 @@
 }
 
 .calendar-header {
+    flex: 0 0 auto; /* No crecer ni encoger */
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-right: 80px; /* Igual que en el primer CSS */
-    margin-top: -140px; /* Añadido para alinearse con el primer CSS */
 }
+
+#calendar {
+    flex: 1 1 auto; /* Ocupa el espacio restante */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Oculta el desbordamiento si es necesario */
+}
+
 
 .month-header {
     font-size: 1.5em;
@@ -56,8 +63,8 @@ button:hover {
 /* Vista mensual */
 .calendar-grid {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: repeat(7, 55px);
+    grid-template-columns: repeat(7, 2fr);
+    grid-template-rows: repeat(7, 70px);
     gap: 2px;
     margin-top: 20px;
 }
@@ -78,9 +85,6 @@ button:hover {
     border-color: #399fb6;
 }
 
-.weekend {
-    color: red;
-}
 
 .today {
     background-color: #008CAB;
@@ -105,28 +109,34 @@ button:hover {
 
 /* Vista semanal */
 .week-view-container {
-    height: 450px;
+    flex: 1 1 auto; /* Ocupa el espacio restante */
     overflow-y: auto;
+    overflow-x: auto; /* Agregar scroll horizontal */
     border: 1px solid #ddd;
     border-radius: 5px;
 }
 
 .week-view {
     width: 100%;
+    height: 100%; 
     border-collapse: collapse;
+}
+
+.week-view tbody tr {
+    height: auto 
 }
 
 .week-view th, .week-view td {
     border: 1px solid #ddd;
-    padding: 5px; /* Igual que en el primer CSS */
+    padding: 5px;
     text-align: center;
-    height: 40px; /* Ajustado para coincidir con el primer CSS */
     transition: background-color 0.3s ease;
 }
 
 .week-view th {
     background-color: #008CAB;
     color: white;
+    height: auto;
 }
 
 .time-slot {
@@ -134,8 +144,10 @@ button:hover {
     color: #333;
     font-weight: bold;
     font-size: 10px;
-    width: 80px;
+    width: 100px;
+    height: 100%;
 }
+
 
 /* Estilos para popups y modales */
 .popup, 
@@ -358,10 +370,6 @@ button:hover {
     text-overflow: ellipsis;
 }
 
-.cita-semana:hover {
-    background-color: #008CAB;
-}
-
 .day {
     position: relative;
 }
@@ -381,9 +389,49 @@ button:hover {
     color: white; 
 }
 
+.tipo-cita-container {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center; 
+    width: 100%;
+}
 
+.tipo-cita-container label {
+    display: flex;
+    align-items: center; 
+    gap: 7px; 
+    margin-top: 7px;
+}
 
+/* Estilo base para las citas en la vista semanal */
+.cita-semana {
+    background-color: #06074b; 
+    color: white;
+    padding: 2px;
+    border-radius: 2px;
+    text-align: center;
+    font-size: 0.8em;
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
 
+.cita-semana:hover {
+    background-color: #0b0c72;
+}
+
+/* Estilo específico para citas online */
+.cita-online {
+    background-color: #008CAB; 
+    height: 50%; 
+    top: 0; 
+}
+.cita-online:hover {
+    background-color: #1ba9c9;
+}
 @media (max-width: 320px) {
     .modal-content {
         width: 70%;
@@ -464,3 +512,75 @@ button:hover {
         font-size: 20px;
     }
 }
+
+/* Para pantallas menores a 768px */
+@media (max-width: 768px) {
+    .week-view th,
+    .week-view td {
+        min-width: 80px;
+        font-size: 12px;
+        padding: 3px;
+    }
+
+    .time-slot {
+        width: 50px;
+        font-size: 10px;
+    }
+}
+
+/* Para pantallas menores a 480px */
+@media (max-width: 480px) {
+    .week-view th,
+    .week-view td {
+        min-width: 60px;
+        font-size: 10px;
+        padding: 2px;
+    }
+
+    .time-slot {
+        width: 40px;
+        font-size: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .week-view {
+        display: none;
+    }
+
+    .week-view-mobile {
+        display: block;
+    }
+
+    .day-block {
+        border: 1px solid #ddd;
+        margin-bottom: 10px;
+    }
+
+    .day-block h3 {
+        background-color: #008CAB;
+        color: white;
+        padding: 5px;
+        margin: 0;
+    }
+
+    .hour-block {
+        padding: 5px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .hour-block:last-child {
+        border-bottom: none;
+    }
+
+    .cita-semana {
+        background-color: #5596a5;
+        color: white;
+        padding: 2px 5px;
+        border-radius: 4px;
+        font-size: 12px;
+        margin-top: 2px;
+        display: block;
+    }
+}
+

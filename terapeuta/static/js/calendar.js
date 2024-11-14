@@ -21,6 +21,68 @@ document.addEventListener('DOMContentLoaded', function () {
     const confirmarEliminarCitaBtn = document.getElementById('confirmarEliminarCitaBtn');
     const citaIdInput = document.getElementById('cita_id'); // El input hidden que tiene el cita_id
 
+    // Referencias a los elementos del modal de nueva cita
+    const tipoCitaPresencial = document.getElementById('tipo_presencial');
+    const tipoCitaOnline = document.getElementById('tipo_online');
+    const horaInicioInput = document.getElementById('hora_inicio');
+    const horaFinalInput = document.getElementById('hora_final');
+
+    // Referencias a los elementos del modal de editar cita
+    const tipoCitaPresencialEditar = document.getElementById('tipo_presencial_editar');
+    const tipoCitaOnlineEditar = document.getElementById('tipo_online_editar');
+    const horaInicioEditarInput = document.getElementById('hora_inicio_editar');
+    const horaFinalEditarInput = document.getElementById('hora_final_editar');
+
+    // Función para actualizar la hora final según el tipo de cita
+    function actualizarHoraFinal(modalType) {
+        if (modalType === 'nueva') {
+            if (tipoCitaOnline.checked) {
+                ajustarHoraFinal(horaInicioInput, horaFinalInput);
+                horaFinalInput.readOnly = true;
+            } else {
+                horaFinalInput.readOnly = false;
+            }
+        } else if (modalType === 'editar') {
+            if (tipoCitaOnlineEditar.checked) {
+                ajustarHoraFinal(horaInicioEditarInput, horaFinalEditarInput);
+                horaFinalEditarInput.readOnly = true;
+            } else {
+                horaFinalEditarInput.readOnly = false;
+            }
+        }
+    }
+
+    function ajustarHoraFinal(horaInicioElem, horaFinalElem) {
+        const horaInicio = horaInicioElem.value;
+        if (horaInicio) {
+            const [hours, minutes] = horaInicio.split(':');
+            const inicioDate = new Date(0, 0, 0, parseInt(hours), parseInt(minutes));
+            const finDate = new Date(inicioDate.getTime() + 30 * 60000); // Añadir 30 minutos
+
+            const finHours = String(finDate.getHours()).padStart(2, '0');
+            const finMinutes = String(finDate.getMinutes()).padStart(2, '0');
+            horaFinalElem.value = `${finHours}:${finMinutes}`;
+        }
+    }
+
+    // Eventos para el modal de nueva cita
+    tipoCitaPresencial.addEventListener('change', function() { actualizarHoraFinal('nueva'); });
+    tipoCitaOnline.addEventListener('change', function() { actualizarHoraFinal('nueva'); });
+    horaInicioInput.addEventListener('change', function() {
+        if (tipoCitaOnline.checked) {
+            actualizarHoraFinal('nueva');
+        }
+    });
+
+    // Eventos para el modal de editar cita
+    tipoCitaPresencialEditar.addEventListener('change', function() { actualizarHoraFinal('editar'); });
+    tipoCitaOnlineEditar.addEventListener('change', function() { actualizarHoraFinal('editar'); });
+    horaInicioEditarInput.addEventListener('change', function() {
+        if (tipoCitaOnlineEditar.checked) {
+            actualizarHoraFinal('editar');
+        }
+    });
+
 
     // Verificar que 'citas' está definida
     if (typeof citas === 'undefined') {
@@ -222,14 +284,18 @@ document.addEventListener('DOMContentLoaded', function () {
             const cell = document.querySelector(`.week-hour[data-date="${fechaFormateada}"][data-hour-inicio="${horaInicio}"]`);
     
             if (cell) {
-                console.log(`Cita encontrada en cell: ${cell}`);
-    
                 // Crear un elemento para la cita
                 const citaDiv = document.createElement('div');
                 citaDiv.classList.add('cita-semana');
+
+                // Si la cita es online, añadir una clase adicional
+                if (cita.tipo_cita === 'online') {
+                    citaDiv.classList.add('cita-online');
+                }
+
                 citaDiv.textContent = cita.titulo;
                 citaDiv.title = `Título: ${cita.titulo}\nPaciente: ${cita.paciente.nombre}\nSala: ${cita.sala}\nDetalle: ${cita.detalle}`;
-    
+
                 // Agregar evento de clic para ver detalles
                 citaDiv.addEventListener('click', function(event) {
                     event.stopPropagation(); // Evitar que se abra el modal de crear cita
@@ -242,10 +308,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         cita.paciente.id,
                         cita.paciente.nombre,
                         cita.sala,
-                        cita.detalle
+                        cita.detalle,
+                        cita.tipo_cita  // Pasar el tipo de cita
                     );
                 });
-    
+
                 cell.appendChild(citaDiv);
             } else {
                 console.warn(`No se encontró la celda para la cita: ${cita.titulo} en ${fechaFormateada} a las ${horaInicio}`);
@@ -325,6 +392,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const fechaISO = fecha.split('/').reverse().join('-');
         console.log(`Fecha ISO: ${fechaISO}`);
         document.getElementById("fecha").value = fechaISO;
+        tipoCitaPresencial.checked = true;
+        tipoCitaOnline.checked = false;
+        horaFinalInput.readOnly = false;
     
         // Asignar hora de inicio si existe
         if (hora_inicio) {
@@ -353,42 +423,55 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById("paciente").value = '';
         document.getElementById("sala").value = '';
         document.getElementById("detalle").value = '';
+
+        actualizarHoraFinal('nueva');
     }
 
-// Reasignación de IDs en abrirEditar
-function abrirEditar(cita_id, fecha, hora_inicio = null, hora_final = null, titulo = null, paciente_id = null, paciente_nombre = null, sala = null, detalle = null) {
-    modal_editar.style.display = "block";
+    // Reasignación de IDs en abrirEditar
+    function abrirEditar(cita_id, fecha, hora_inicio = null, hora_final = null, titulo = null, paciente_id = null, paciente_nombre = null, sala = null, detalle = null) {
+        modal_editar.style.display = "block";
 
-    const fechaISO = fecha.split('/').reverse().join('-');
-    document.getElementById("cita_id").value = cita_id;
-    document.getElementById("fecha_editar").value = fechaISO;
-    document.getElementById("hora_inicio_editar").value = hora_inicio || '';
-    document.getElementById("hora_final_editar").value = hora_final || '';
-    document.getElementById("titulo_editar").value = titulo || '';
+        const fechaISO = fecha.split('/').reverse().join('-');
+        document.getElementById("cita_id").value = cita_id;
+        document.getElementById("fecha_editar").value = fechaISO;
+        document.getElementById("hora_inicio_editar").value = hora_inicio || '';
+        document.getElementById("hora_final_editar").value = hora_final || '';
+        document.getElementById("titulo_editar").value = titulo || '';
+        const pacienteSelect = document.getElementById("paciente_editar");
 
-    const pacienteSelect = document.getElementById("paciente_editar");
-
-    // Verificar si el paciente con la ID existe en las opciones del select
-    let optionExists = false;
-    for (let i = 0; i < pacienteSelect.options.length; i++) {
-        if (pacienteSelect.options[i].value === String(paciente_id)) {
-            optionExists = true;
-            break;
+        if (tipo_cita === 'online') {
+            tipoCitaOnlineEditar.checked = true;
+            tipoCitaPresencialEditar.checked = false;
+            horaFinalEditarInput.readOnly = true;
+        } else {
+            tipoCitaPresencialEditar.checked = true;
+            tipoCitaOnlineEditar.checked = false;
+            horaFinalEditarInput.readOnly = false;
         }
-    }
 
-    if (optionExists) {
-        // Si el paciente existe en el select, seleccionarlo
-        pacienteSelect.value = paciente_id;
-    } else {
-        // Si no existe, agregar una opción temporal con el nombre y la ID del paciente
-        let newOption = new Option(paciente_nombre, paciente_id, true, true);
-        pacienteSelect.add(newOption);
-    }
+        // Verificar si el paciente con la ID existe en las opciones del select
+        let optionExists = false;
+        for (let i = 0; i < pacienteSelect.options.length; i++) {
+            if (pacienteSelect.options[i].value === String(paciente_id)) {
+                optionExists = true;
+                break;
+            }
+        }
 
-    document.getElementById("sala_editar").value = sala || '';
-    document.getElementById("detalle_editar").value = detalle || '';
-}
+        if (optionExists) {
+            // Si el paciente existe en el select, seleccionarlo
+            pacienteSelect.value = paciente_id;
+        } else {
+            // Si no existe, agregar una opción temporal con el nombre y la ID del paciente
+            let newOption = new Option(paciente_nombre, paciente_id, true, true);
+            pacienteSelect.add(newOption);
+        }
+
+        document.getElementById("sala_editar").value = sala || '';
+        document.getElementById("detalle_editar").value = detalle || '';
+
+        actualizarHoraFinal('editar');
+    }
 
     function getStartOfWeek(date) {
         const dayOfWeek = date.getDay() === 0 ? 6 : date.getDay() - 1;
@@ -484,6 +567,7 @@ function abrirEditar(cita_id, fecha, hora_inicio = null, hora_final = null, titu
             confirmarEliminarModal.style.display = 'none';
         }
     });
+    
 
     updateCalendar();
 });

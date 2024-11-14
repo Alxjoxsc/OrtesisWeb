@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
      // Manejar el envío del formulario de nueva rutina
-    if (nuevaRutinaForm) {
+     if (nuevaRutinaForm) {
         nuevaRutinaForm.addEventListener('submit', function (event) {
             event.preventDefault(); // Prevenir el envío por defecto del formulario
 
@@ -50,6 +50,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Obtener los datos del formulario
             const formData = new FormData(nuevaRutinaForm);
+
+            // Mostrar el modal de carga
+            const modalCarga = document.getElementById('modalCarga');
+            modalCarga.style.display = 'flex';
 
             // Enviar los datos al backend usando fetch
             fetch(`/paciente/${pacienteId}/crear_rutina/`, {
@@ -61,10 +65,19 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .then(response => response.json())
             .then(data => {
+                // Ocultar el modal de carga
+                modalCarga.style.display = 'none';
+
                 if (data.status === 'success') {
-                    alert('Rutina creada exitosamente.');
-                    // Puedes actualizar la página o la lista de rutinas aquí
-                    window.location.reload();
+                    // Mostrar el modal de éxito
+                    const modalExitoRutina = document.getElementById('modalExitoRutina');
+                    modalExitoRutina.style.display = 'flex';
+
+                    // Ocultar el modal de éxito después de 2 segundos y recargar la página
+                    setTimeout(() => {
+                        modalExitoRutina.style.display = 'none';
+                        window.location.reload();
+                    }, 2000);
                 } else {
                     alert('Error al crear la rutina: ' + data.message);
                 }
@@ -72,9 +85,11 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(error => {
                 console.error('Error al crear la rutina:', error);
                 alert('Ocurrió un error al crear la rutina.');
+                // Ocultar el modal de carga
+                modalCarga.style.display = 'none';
             });
 
-            // Ocultar el modal después de enviar los datos
+            // Ocultar el modal de creación de rutina después de enviar los datos
             nuevaRutinaModal.style.display = 'none';
         });
     }
@@ -86,7 +101,10 @@ document.addEventListener("DOMContentLoaded", function () {
             const motivo = motivoTextarea.value;
 
             if (motivo.trim() === "") {
-                alert("Debe ingresar un motivo para inactivar al paciente.");
+                modalError.style.display = 'flex';
+                setTimeout(() => {
+                    modalError.style.display = 'none';
+                }, 2000); // 2 segundos
                 return;
             }
 
@@ -102,8 +120,12 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    alert(data.message);
-                    window.location.href = '/pacientes_terapeuta/';
+                    modalExito.style.display = 'flex';
+                    setTimeout(() => {
+                        modalExito.style.display = 'none';
+                        // Redireccionar si lo deseas
+                        window.location.href = '/pacientes_terapeuta/';
+                    }, 2000); // 2 segundos
                 } else {
                     alert(data.message);
                 }
@@ -178,7 +200,14 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch(error => {
                 console.error('Error al obtener los datos de la rutina:', error);
-                alert('Ocurrió un error al obtener los datos de la rutina.');
+                const modalErrorEditRutina = document.getElementById('modalErrorEditRutina');
+                modalErrorEditRutina.style.display = 'flex';
+
+                    // Ocultar el modal de éxito después de 2 segundos y recargar la página
+                    setTimeout(() => {
+                        modalErrorEditRutina.style.display = 'none';
+                        window.location.reload();
+                    }, 2000);
             });
         };
     }
@@ -206,6 +235,9 @@ document.addEventListener("DOMContentLoaded", function () {
             // Obtener los datos del formulario
             const formData = new FormData(editarRutinaForm);
 
+            const modalCarga = document.getElementById('modalCarga');
+            modalCarga.style.display = 'flex';
+
             fetch(`/rutina/${rutinaId}/editar/`, {
                 method: 'POST',
                 headers: {
@@ -217,10 +249,14 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    alert('Rutina actualizada exitosamente.');
                     editarRutinaModal.style.display = 'none';
-                    // Puedes actualizar la página o la lista de rutinas aquí
-                    window.location.reload();
+                    modalCarga.style.display = 'none';
+                    const modalExitoRutinaEditada = document.getElementById('modalExitoRutinaEditada');
+                    modalExitoRutinaEditada.style.display = 'flex';
+                    setTimeout(() => {
+                        modalExitoRutinaEditada.style.display = 'none';
+                        window.location.reload();
+                    }, 2000);
                 } else {
                     alert('Error al actualizar la rutina: ' + data.message);
                 }

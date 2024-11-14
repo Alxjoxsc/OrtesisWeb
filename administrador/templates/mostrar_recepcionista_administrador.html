@@ -34,8 +34,23 @@
         {% endif %}
         <div class="columna izquierda">
             <p><strong>Rut:</strong><br> <span>{{ recepcionista.user.username }}</span></p>
-            <p><strong>Correo Electrónico:</strong><br> <span>{{ recepcionista.user.email }}</span></p>
+            <p><strong>Correo Electrónico:</strong><br>
+                <div class="email-container">
+                    <span id="email-display">{{ recepcionista.user.email }}</span>
+                    <input type="email" id="email-input" value="{{ recepcionista.user.email }}" style="display: none;" />
+                    <button id="edit-email-button" class="edit-button">
+                        <img src="{% static 'icons/lapiz.svg' %}" alt="Editar" class="edit-icon-svg">
+                    </button>
+                </div>
+                <button id="save-email-button" class="save-button" style="display: none;">Aceptar</button>
+                <button id="cancel-email-button" class="cancel-button" style="display: none;">Cancelar</button>
+            </p>
             <p><strong>Formación Académica:</strong><br> <span>{{ recepcionista.formacion_academica}}</span></p>
+            <p>
+                <button id="actualizar-credenciales-button" class="btn-actualizar-credenciales">
+                    Actualizar Credenciales de Acceso
+                </button>
+            </p>            
 
         </div>
 
@@ -66,6 +81,96 @@
             <button class="boton-cancelar" onclick="cerrarPopUp()">Cancelar</button>
             <button class="boton-confirmar" id="confirmButton" onclick="confirmarCambioEstado()">Confirmar</button>
         </div>
+    </div>
+</div>
+
+<!-- Modal para verificar contraseña de administrador (Email Recepcionista) -->
+<div id="passwordModalEmailRecepcionista" class="modal" style="display: none;">
+    <div class="contenido-modal">
+        <span class="close" onclick="cerrarPasswordModalEmailRecepcionista()">&times;</span>
+        <h2>Verificar Contraseña de Administrador</h2>
+        <p>Por favor, ingresa tu contraseña para continuar.</p>
+        <input type="password" id="admin-password-input-email-recepcionista" placeholder="Contraseña" />
+        <div class="botones-modal">
+            <button class="boton-cancelar" onclick="cerrarPasswordModalEmailRecepcionista()">Cancelar</button>
+            <button class="boton-confirmar" onclick="verificarAdminPasswordEmailRecepcionista()">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de carga (Email Recepcionista) -->
+<div id="modalCargaEmailRecepcionista" class="modal" style="display: none;">
+    <div class="contenido-modal">
+        <div class="spinner"></div>
+        <p>Guardando cambios, por favor espera...</p>
+    </div>
+</div>
+
+<!-- Modal de éxito (Email Recepcionista) -->
+<div id="modalExitoCorreoActualizadoRecepcionista" class="modal" style="display: none;">
+    <div class="contenido-modal">
+        <img src="{% static 'icons/Exito.svg' %}" alt="Éxito">
+        <p>Correo electrónico actualizado con éxito</p>
+    </div>
+</div>
+
+<!-- Modal de contraseña incorrecta (Email Recepcionista) -->
+<div id="modalContrasenaIncorrectaEmailRecepcionista" class="modal" style="display: none;">
+    <div class="contenido-modal">
+        <img src="{% static 'icons/Alert.svg' %}" alt="Error">
+        <p>La contraseña ingresada no es válida</p>
+    </div>
+</div>
+
+<!-- Modal para verificar contraseña de administrador (Credenciales Recepcionista) -->
+<div id="passwordModalCredencialesRecepcionista" class="modal" style="display: none;">
+    <div class="contenido-modal">
+        <span class="close" onclick="cerrarModalCredencialesRecepcionista('passwordModalCredencialesRecepcionista')">&times;</span>
+        <h2>Verificar Contraseña de Administrador</h2>
+        <p>Por favor, ingresa tu contraseña para continuar.</p>
+        <input type="password" id="admin-password-input-credenciales-recepcionista" placeholder="Contraseña" />
+        <div class="botones-modal">
+            <button class="boton-cancelar" onclick="cerrarModalCredencialesRecepcionista('passwordModalCredencialesRecepcionista')">Cancelar</button>
+            <button class="boton-confirmar" onclick="verificarAdminPasswordCredencialesRecepcionista()">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para confirmar la acción escribiendo "confirmar" (Credenciales Recepcionista) -->
+<div id="modalConfirmarAccionCredencialesRecepcionista" class="modal" style="display: none;">
+    <div class="contenido-modal">
+        <span class="close" onclick="cerrarModalCredencialesRecepcionista('modalConfirmarAccionCredencialesRecepcionista')">&times;</span>
+        <h2>Confirmar Actualización de Credenciales</h2>
+        <p>Escribe <strong>"confirmar"</strong> para continuar con la actualización.</p>
+        <input type="text" id="confirmacion-input-credenciales-recepcionista" placeholder="Escribe 'confirmar'" />
+        <div class="botones-modal">
+            <button class="boton-cancelar" onclick="cerrarModalCredencialesRecepcionista('modalConfirmarAccionCredencialesRecepcionista')">Cancelar</button>
+            <button class="boton-confirmar" onclick="actualizarCredencialesRecepcionista()">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de carga (Credenciales Recepcionista) -->
+<div id="modalCargaCredencialesRecepcionista" class="modal" style="display: none;">
+    <div class="contenido-modal">
+        <div class="spinner"></div>
+        <p>Actualizando credenciales, por favor espera...</p>
+    </div>
+</div>
+
+<!-- Modal de éxito (Credenciales Recepcionista) -->
+<div id="modalExitoCredencialesRecepcionista" class="modal" style="display: none;">
+    <div class="contenido-modal">
+        <img src="{% static 'icons/Exito.svg' %}" alt="Éxito">
+        <p>Credenciales actualizadas con éxito</p>
+    </div>
+</div>
+
+<!-- Modal de contraseña incorrecta (Credenciales Recepcionista) -->
+<div id="modalContrasenaIncorrectaCredencialesRecepcionista" class="modal" style="display: none;">
+    <div class="contenido-modal">
+        <img src="{% static 'icons/Alert.svg' %}" alt="Error">
+        <p>La contraseña ingresada no es válida</p>
     </div>
 </div>
 
@@ -135,6 +240,270 @@
         };
     });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Función para mostrar el modal de contraseña (email recepcionista)
+        function showPasswordModalEmailRecepcionista() {
+            document.getElementById('passwordModalEmailRecepcionista').style.display = 'flex';
+        }
+    
+        // Función para cerrar el modal de contraseña (email recepcionista)
+        function cerrarPasswordModalEmailRecepcionista() {
+            document.getElementById('passwordModalEmailRecepcionista').style.display = 'none';
+            document.getElementById('admin-password-input-email-recepcionista').value = '';
+        }
+    
+        // Función para verificar la contraseña del administrador (email recepcionista)
+        function verificarAdminPasswordEmailRecepcionista() {
+            const password = document.getElementById('admin-password-input-email-recepcionista').value;
+    
+            // Enviar la contraseña al servidor para verificarla
+            fetch("{% url 'verificar_password_admin' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({ 'password': password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.valid) {
+                    cerrarPasswordModalEmailRecepcionista();
+                    habilitarEdicionEmailRecepcionista();
+                } else {
+                    mostrarModalErrorPassEmailRecepcionista();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    
+        // Función para habilitar la edición del correo electrónico
+        function habilitarEdicionEmailRecepcionista() {
+            document.getElementById('email-display').style.display = 'none';
+            document.getElementById('email-input').style.display = 'inline';
+            document.getElementById('save-email-button').style.display = 'inline';
+            document.getElementById('cancel-email-button').style.display = 'inline';
+            document.getElementById('edit-email-button').style.display = 'none';
+        }
+    
+        // Función para cancelar la edición del correo electrónico
+        function cancelarEdicionEmailRecepcionista() {
+            document.getElementById('email-display').style.display = 'inline';
+            document.getElementById('email-input').style.display = 'none';
+            document.getElementById('save-email-button').style.display = 'none';
+            document.getElementById('cancel-email-button').style.display = 'none';
+            document.getElementById('edit-email-button').style.display = 'inline';
+            document.getElementById('email-input').value = '{{ recepcionista.user.email }}';
+        }
+    
+        // Función para guardar el nuevo correo electrónico
+        function guardarNuevoEmailRecepcionista() {
+            const nuevoEmail = document.getElementById('email-input').value;
+            const recepcionistaId = '{{ recepcionista.id }}';
+          
+            // Validar el formato del correo electrónico
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(nuevoEmail)) {
+              alert('Por favor, ingresa un correo electrónico válido.');
+              return;
+            }
+          
+            // Mostrar el modal de carga
+            mostrarModalCargaEmailRecepcionista();
+          
+            // Enviar el nuevo correo al servidor
+            fetch("{% url 'actualizar_email_recepcionista' %}", {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+              },
+              body: JSON.stringify({ 'recepcionista_id': recepcionistaId, 'nuevo_email': nuevoEmail })
+            })
+            .then(response => response.json())
+            .then(data => {
+              // Ocultar el modal de carga
+              ocultarModalCargaEmailRecepcionista();
+          
+              if (data.status === 'success') {
+                // Actualizar el correo en la interfaz
+                document.getElementById('email-display').textContent = nuevoEmail;
+                cancelarEdicionEmailRecepcionista();
+                // Mostrar el modal de éxito
+                mostrarModalExitoEmailRecepcionista();
+              } else {
+                alert('Error al actualizar el correo electrónico: ' + data.message);
+              }
+            })
+            .catch(error => {
+              // Ocultar el modal de carga
+              ocultarModalCargaEmailRecepcionista();
+          
+              console.error('Error:', error);
+              alert('Ocurrió un error al actualizar el correo electrónico.');
+            });
+        }
+    
+        // Funciones para mostrar y ocultar el modal de carga (email recepcionista)
+        function mostrarModalCargaEmailRecepcionista() {
+            document.getElementById('modalCargaEmailRecepcionista').style.display = 'flex';
+        }
+    
+        function ocultarModalCargaEmailRecepcionista() {
+            document.getElementById('modalCargaEmailRecepcionista').style.display = 'none';
+        }
+    
+        // Función para mostrar el modal de éxito (email recepcionista)
+        function mostrarModalExitoEmailRecepcionista() {
+            document.getElementById('modalExitoCorreoActualizadoRecepcionista').style.display = 'flex';
+            // Ocultar el modal después de 2 segundos
+            setTimeout(function() {
+                document.getElementById('modalExitoCorreoActualizadoRecepcionista').style.display = 'none';
+            }, 2000);
+        }
+    
+        // Función para mostrar el modal de contraseña incorrecta (email recepcionista)
+        function mostrarModalErrorPassEmailRecepcionista() {
+            document.getElementById('modalContrasenaIncorrectaEmailRecepcionista').style.display = 'flex';
+            // Ocultar el modal después de 2 segundos
+            setTimeout(function() {
+                document.getElementById('modalContrasenaIncorrectaEmailRecepcionista').style.display = 'none';
+            }, 2000);
+        }
+    
+        // Asignar eventos a los botones
+        document.getElementById('edit-email-button').addEventListener('click', showPasswordModalEmailRecepcionista);
+        document.getElementById('save-email-button').addEventListener('click', guardarNuevoEmailRecepcionista);
+        document.getElementById('cancel-email-button').addEventListener('click', cancelarEdicionEmailRecepcionista);
+
+        // Exponer funciones al ámbito global
+        window.cerrarPasswordModalEmailRecepcionista = cerrarPasswordModalEmailRecepcionista;
+        window.verificarAdminPasswordEmailRecepcionista = verificarAdminPasswordEmailRecepcionista;
+        window.mostrarModalErrorPassEmailRecepcionista = mostrarModalErrorPassEmailRecepcionista;
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Función para mostrar un modal (credenciales recepcionista)
+        function mostrarModalCredencialesRecepcionista(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+    
+        // Función para cerrar un modal (credenciales recepcionista)
+        function cerrarModalCredencialesRecepcionista(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+    
+        // Función para verificar la contraseña del administrador (credenciales recepcionista)
+        function verificarAdminPasswordCredencialesRecepcionista() {
+            const password = document.getElementById('admin-password-input-credenciales-recepcionista').value;
+    
+            // Enviar la contraseña al servidor para verificarla
+            fetch("{% url 'verificar_password_admin' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({ 'password': password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.valid) {
+                    cerrarModalCredencialesRecepcionista('passwordModalCredencialesRecepcionista');
+                    mostrarModalCredencialesRecepcionista('modalConfirmarAccionCredencialesRecepcionista');
+                } else {
+                    mostrarModalErrorPassCredencialesRecepcionista();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    
+        // Función para mostrar el modal de contraseña incorrecta (credenciales recepcionista)
+        function mostrarModalErrorPassCredencialesRecepcionista() {
+            document.getElementById('modalContrasenaIncorrectaCredencialesRecepcionista').style.display = 'flex';
+            // Ocultar el modal después de 2 segundos
+            setTimeout(function() {
+                document.getElementById('modalContrasenaIncorrectaCredencialesRecepcionista').style.display = 'none';
+            }, 2000);
+        }
+    
+        // Función para actualizar las credenciales
+        function actualizarCredencialesRecepcionista() {
+            const confirmacion = document.getElementById('confirmacion-input-credenciales-recepcionista').value.trim().toLowerCase();
+            if (confirmacion !== 'confirmar') {
+                alert('Debe escribir "confirmar" para proceder.');
+                return;
+            }
+    
+            cerrarModalCredencialesRecepcionista('modalConfirmarAccionCredencialesRecepcionista');
+            mostrarModalCargaCredencialesRecepcionista();
+    
+            const recepcionistaId = '{{ recepcionista.id }}';
+    
+            // Enviar la solicitud al servidor para actualizar las credenciales
+            fetch("{% url 'actualizar_credenciales_recepcionista' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({ 'recepcionista_id': recepcionistaId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                ocultarModalCargaCredencialesRecepcionista();
+                if (data.status === 'success') {
+                    mostrarModalExitoCredencialesRecepcionista();
+                    // Ocultar el modal de éxito después de 3 segundos
+                    setTimeout(function() {
+                        cerrarModalCredencialesRecepcionista('modalExitoCredencialesRecepcionista');
+                    }, 3000);
+                } else {
+                    alert('Error al actualizar las credenciales: ' + data.message);
+                }
+            })
+            .catch(error => {
+                ocultarModalCargaCredencialesRecepcionista();
+                console.error('Error:', error);
+                alert('Ocurrió un error al actualizar las credenciales.');
+            });
+        }
+    
+        // Funciones para mostrar y ocultar el modal de carga (credenciales recepcionista)
+        function mostrarModalCargaCredencialesRecepcionista() {
+            document.getElementById('modalCargaCredencialesRecepcionista').style.display = 'flex';
+        }
+    
+        function ocultarModalCargaCredencialesRecepcionista() {
+            document.getElementById('modalCargaCredencialesRecepcionista').style.display = 'none';
+        }
+    
+        // Función para mostrar el modal de éxito (credenciales recepcionista)
+        function mostrarModalExitoCredencialesRecepcionista() {
+            document.getElementById('modalExitoCredencialesRecepcionista').style.display = 'flex';
+        }
+    
+        // Asignar evento al botón "Actualizar Credenciales de Acceso"
+        document.getElementById('actualizar-credenciales-button').addEventListener('click', function() {
+            mostrarModalCredencialesRecepcionista('passwordModalCredencialesRecepcionista');
+        });
+
+        // Exponer funciones al ámbito global
+        window.cerrarModalCredencialesRecepcionista = cerrarModalCredencialesRecepcionista;
+        window.verificarAdminPasswordCredencialesRecepcionista = verificarAdminPasswordCredencialesRecepcionista;
+        window.mostrarModalErrorPassCredencialesRecepcionista = mostrarModalErrorPassCredencialesRecepcionista;
+        window.actualizarCredencialesRecepcionista = actualizarCredencialesRecepcionista;
+    });
+</script>
+
+    
     
 
 {% endblock %}

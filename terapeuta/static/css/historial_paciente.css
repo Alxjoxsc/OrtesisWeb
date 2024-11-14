@@ -48,7 +48,17 @@
     width: 95%;
     display: flex;
     flex-direction: column;
-    background-color: #D9D9D9;
+    background-color: rgb(199, 199, 199);
+    border-top-right-radius: 50px;
+    padding: 25px;
+    margin: 0 auto;
+}
+
+/* Contenedor superior que incluye información y progreso */
+.contenedor-principal {
+    width: 95%;
+    display: flex;
+    flex-direction: column;
     border-top-right-radius: 50px;
     padding: 25px;
     margin: 0 auto;
@@ -57,11 +67,11 @@
 /* Contenedor superior que incluye información y progreso */
 .contenedor-superior {
     display: grid;
-    grid-template-columns: 1fr auto; /* Dos columnas: flexible y autoajustada */
-    grid-template-rows: auto auto;    /* Dos filas */
+    grid-template-columns: 1fr auto; /* Dos columnas */
+    grid-template-rows: auto auto;
     grid-template-areas:
         "nombre progreso"
-        "detalles progreso";          /* Áreas definidas */
+        "detalles progreso";
     gap: 10px;
     margin-bottom: 10px;
     margin-right: 15px;
@@ -90,9 +100,9 @@
 /* Botón de progreso del paciente */
 .progreso-paciente-btn {
     grid-area: progreso;
-    align-self: center; /* Centrar verticalmente en el espacio disponible */
+    align-self: center;
     display: flex;
-    background-color: #ACC6CC;
+    background-color: #ffffff;
     border: none;
     color: inherit;
     padding: 40px;
@@ -104,14 +114,13 @@
 }
 
 .progreso-paciente-btn:hover {
-    background-color: #bde2dc;
+    background-color: #008CAB;
 }
 
 .progreso-paciente-content {
-    display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 100%;
+    width: 280px;
 }
 
 .progreso-paciente-content h3 {
@@ -122,10 +131,10 @@
 
 .progreso-icono i {
     font-size: 50px;
-    color: #008CAB;
+    color: #000000;
 }
 
-/* -------------------CONTENEDOR INFERIOR------------------- */
+/* Contenedor inferior */
 .contenedor-inferior {
     width: 100%;
     display: flex;
@@ -138,6 +147,10 @@
     font-size: 28px;
     font-weight: 400;
     color: #000000;
+}
+
+.info-cita i {
+    color: #008CAB;
 }
 
 /* Botones */
@@ -160,10 +173,6 @@
 .btn-añadir-rutina:hover {
     background-color: #008CAB;
     color: #ffffff;
-}
-
-.info-cita i {
-    color: #008CAB;
 }
 
 /* -------- Boton Modificar Rutina --------------- */
@@ -311,6 +320,9 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     overflow: auto;
+    justify-content: center; /* Centrar horizontalmente */
+    align-items: center; /* Centrar verticalmente */
+    display: flex; /* Flexbox para centrar */
 }
 
 .modal-content {
@@ -322,7 +334,6 @@
     border-radius: 10px;
     width: 50%;
     max-width: 600px;
-    /* Aseguramos que ambos modales tengan el mismo tamaño */
     min-width: 500px;
     max-height: 80%;
     overflow-y: auto;
@@ -495,6 +506,16 @@
     gap: 5px;
     margin: 0 auto;
     width: 80%;
+}
+
+.no-rutinas {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    font-size: 20px;
+    font-weight: 500;
+    color: #666;
 }
 
 /* Estilos para menu desplegable de sesiones */
@@ -678,6 +699,74 @@
     width: 80%;
 }
 
+/* Modal Popup para mostrar mensaje de éxito */
+
+.contenido-modal-mensaje {
+    display: flex;
+    background-color: #fefefe;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 0.625rem;
+    width: 18.75rem;
+    height: 14.0625rem;
+    margin: auto; /* Centrar horizontalmente */
+    position: absolute; /* Centrar verticalmente */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.contenido-modal-mensaje img{
+    width: 75px;
+    height: 75px;
+}
+
+.contenido-modal-mensaje p{
+    font-size: 1.25rem;
+}
+
+/* Estilos para el modal de carga */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+}
+
+.contenido-carga {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 60%;
+    max-width: 300px;
+    text-align: center;
+}
+
+.spinner {
+    border: 8px solid #f3f3f3; /* Light grey */
+    border-top: 8px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
+
 @media screen and (max-width: 768px){
     .contenido-modal {
         width: 600px;
@@ -694,5 +783,120 @@
     .contenido-modal {
         width: 475px;
         height: 400px;
+    }
+}
+
+@media screen and (max-width: 1050px) {
+    .contenedor-header {
+        flex-direction: column; 
+        align-items: center;    
+    }
+
+    .contenedor-header h1 {
+        margin-bottom: 20px;    
+        text-align: center;     
+        font-size: 40px;       
+    }
+
+    .desvincular-btn {
+        width: auto;           
+    }
+}
+
+@media screen and (max-width: 1050px) {
+    .contenedor-header {
+        flex-direction: column; 
+        align-items: center;    
+    }
+
+    .contenedor-header h1 {
+        margin-bottom: 20px;    
+        text-align: center;     
+        font-size: 40px;       
+    }
+
+    .desvincular-btn {
+        width: auto;           
+    }
+}
+
+@media screen and (max-width: 550px){
+    .contenedor-header h1 {
+        margin-bottom: 20px;    
+        text-align: center;     
+        font-size: 30px;       
+    }
+}
+
+
+/* Media Queries */
+@media screen and (max-width: 1020px) {
+    /* Ajustar el contenedor principal para pantallas pequeñas */
+    .contenedor-principal {
+        padding: 15px;
+    }
+
+    /* Ajustar el contenedor superior */
+    .contenedor-superior {
+        display: flex;
+        flex-direction: column; /* Cambiar a columna */
+        margin-right: 0;
+    }
+
+    /* Centrar el botón de progreso del paciente */
+    .progreso-paciente-btn {
+        display: flex;
+        align-self: center;
+        margin-top: 10px;
+        padding: 20px; /* Reducir padding */
+    }
+
+    .progreso-paciente-content h3 {
+        font-size: 16px;
+    }
+
+    .progreso-icono i {
+        font-size: 40px;
+    }
+
+    /* Ajustar el tamaño del nombre del paciente */
+    .nombre-paciente h2 {
+        font-size: 28px;
+        text-align: center;
+    }
+
+    /* Ajustar detalles del paciente */
+    .detalles-paciente {
+        justify-content: center;
+        gap: 20px;
+        font-size: 20px;
+        margin-top: 10px;
+    }
+
+    /* Ajustar el contenedor inferior */
+    .contenedor-inferior {
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .info-cita {
+        font-size: 22px;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    /* Ajustar acciones del paciente */
+    .acciones-paciente {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .acciones-paciente button {
+        width: 80%; /* Ocupar el 80% del ancho */
+        max-width: 300px; /* Máximo ancho */
     }
 }

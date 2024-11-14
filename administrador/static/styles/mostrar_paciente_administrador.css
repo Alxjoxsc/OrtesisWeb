@@ -175,6 +175,19 @@ strong {
     text-align: left; /* Alineación del texto al centro */
 }
 
+.btn-actualizar-credenciales {
+    background-color: #FF6161; /* Color azul */
+    color: white;
+    font-size: 16px;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-actualizar-credenciales:hover {
+    background-color: #f67272; /* Azul más oscuro al pasar el mouse */
+}
 
 .contenido-modal {
     display: flex;
@@ -228,6 +241,114 @@ strong {
 .boton-confirmar:hover {
     background-color: #008F85;
 }
+
+.email-container {
+    display: flex;
+    align-items: center; 
+    gap: 9px;
+    font-size: 20px;
+    margin-top: -25px;
+    margin-bottom: -10px;
+}
+
+.edit-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.edit-icon-svg {
+    width: 20px;
+    height: 20px;
+}
+
+.edit-button:hover .edit-icon-svg {
+    filter: brightness(0.8);
+}
+
+/* Estilos para los botones de edición, guardar y cancelar */
+.save-button, .cancel-button {
+    width: 20%;
+    background-color: #008CAB;
+    color: white;
+    border: none; 
+    padding: 8px 12px; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    font-size: 14px; 
+    margin-bottom: 0px;
+    margin-top: 15px;
+}
+
+.save-button:hover {
+    background-color: #006f85; 
+}
+
+/* Estilos específicos para el botón de cancelar */
+.cancel-button {
+    background-color: #f44336; 
+}
+
+.cancel-button:hover {
+    background-color: #d32f2f;
+}
+
+/* Estilos para el campo de entrada de correo electrónico */
+#email-input {
+    width: 100%;
+    max-width: 300px;
+    padding: 6px 8px;
+    margin-top: 5px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.modal-men {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Cambiado de 'auto' a 'hidden' para evitar scrollbars */
+    background-color: rgba(0,0,0,0.4);
+    justify-content: center;
+    align-items: center;
+}
+
+
+.contenido-modal-mensaje {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    max-width: 300px;
+    width: 100%;
+}
+
+.spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border-left-color: #09f;
+    animation: spin 1s ease infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.contenido-modal img {
+    width: 75px;
+    height: 75px;
+    margin-bottom: 15px;
+}
+
 
 @media screen and (max-width:1200px){
     .columna p{

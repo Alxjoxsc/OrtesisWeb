@@ -94,14 +94,7 @@
                 {{ terapeuta_form.region }}
                 <div class="error">{{ terapeuta_form.region.errors }}</div>
             </div>
-    
-            <!-- Campo Provincia -->
-            <div class="form-group">
-                <label for="{{ terapeuta_form.provincia.id_for_label }}">{{ terapeuta_form.provincia.label }}</label>
-                {{ terapeuta_form.provincia }}
-                <div class="error">{{ terapeuta_form.provincia.errors }}</div>
-            </div>
-    
+
             <!-- Campo Comuna -->
             <div class="form-group">
                 <label for="{{ terapeuta_form.comuna.id_for_label }}">{{ terapeuta_form.comuna.label }}</label>
@@ -296,40 +289,18 @@
             return td;
         }
     });
-    </script>
-    
-    
-
+</script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         var regionField = document.getElementById("id_region");
-        var provinciaField = document.getElementById("id_provincia");
         var comunaField = document.getElementById("id_comuna");
 
         regionField.addEventListener("change", function() {
             var regionId = this.value;
-            provinciaField.innerHTML = ""; // Limpiar opciones anteriores
             comunaField.innerHTML = ""; // Limpiar opciones anteriores
 
             if (regionId) {
-                fetch(`/api/provincias/?region=${regionId}`)
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(provincia => {
-                        var option = document.createElement("option");
-                        option.value = provincia.id;
-                        option.textContent = provincia.nombre;
-                        provinciaField.appendChild(option);
-                    });
-                });
-            }
-        });
-        provinciaField.addEventListener("change", function() {
-            var provinciaId = this.value;
-            comunaField.innerHTML = ""; // Limpiar opciones anteriores
-
-            if (provinciaId) {
-                fetch(`/api/comunas/?provincia=${provinciaId}`)
+                fetch(`/api/comunas/?region=${regionId}`)
                 .then(response => response.json())
                 .then(data => {
                     // Actualizar opciones del campo de selección de comuna

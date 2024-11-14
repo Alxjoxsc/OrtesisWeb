@@ -22,6 +22,12 @@ from django.core.files.storage import FileSystemStorage
 from django.core.mail import send_mail
 from django.conf import settings
 from datetime import timedelta
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
+from django.contrib.auth import update_session_auth_hash
+from datetime import datetime
+from django.utils import timezone
+
 
 
 #-------------------------------------AGENDA-------------------------------------
@@ -51,6 +57,7 @@ def agenda(request):
                 'titulo': cita.titulo,
                 'hora_inicio': cita.hora_inicio.strftime('%H:%M'),
                 'hora_final': cita.hora_final.strftime('%H:%M'),
+                'tipo_cita': cita.tipo_cita,  # Añadido el campo tipo_cita
                 'detalle': cita.detalle,
                 'sala': cita.sala,
                 'paciente': {
@@ -65,7 +72,8 @@ def agenda(request):
         'pacientes': pacientes,
         'fechas_citas': fechas_citas,
         'citas': citas,
-        'modulo_agenda': True})
+        'modulo_agenda': True
+    })
 
 def obtener_fechas_citas(request):
     if request.method == "GET":
@@ -78,6 +86,7 @@ def obtener_fechas_citas(request):
                 'titulo': cita.titulo,
                 'hora_inicio': cita.hora_inicio.strftime('%H:%M'),
                 'hora_final': cita.hora_final.strftime('%H:%M'),
+                'tipo_cita': cita.tipo_cita,  # Añadido el campo tipo_cita
                 'descripcion': cita.detalle,
                 'paciente': {
                     'id': cita.paciente.id,
@@ -87,6 +96,7 @@ def obtener_fechas_citas(request):
         return JsonResponse({'citas': citas_list})
     else:
         return JsonResponse({'error': 'Método no permitido'}, status=405)
+
     
 @role_required('Terapeuta')
 
@@ -192,16 +202,30 @@ def historial_paciente_view(request, paciente_id):
             # Obtiene las últimas dos sesiones de la rutina, ordenadas por fecha de sesión
             rutina.ultimas_sesiones = Sesion.objects.filter(rutina=rutina).order_by('-fecha')[:2]
 
-        context = {
-            'paciente': paciente,
-            'terapeuta': terapeuta,
-            'rutinas': rutinas,
-            'modulo_pacientes': True,
-        }
-        return render(request, 'historial_paciente.html', context)
-    else:
-        # Si el usuario no es terapeuta ni superusuario, mostrar mensaje de error o redirigir
-        return render(request, 'error.html', {'mensaje': 'No tienes permiso para acceder a esta página.'})
+    citas = Cita.objects.filter(
+        paciente=paciente,
+        fecha__gte=timezone.now().date()
+    ).order_by('fecha', 'hora_inicio')
+
+    next_cita = None
+    current_datetime = timezone.now()
+
+    for cita in citas:
+        cita_datetime = datetime.combine(cita.fecha, cita.hora_inicio)
+        cita_datetime = timezone.make_aware(cita_datetime, timezone.get_current_timezone())
+
+        if cita_datetime > current_datetime:
+            next_cita = cita
+            break
+
+    context = {
+        'paciente': paciente,
+        'terapeuta': terapeuta,
+        'rutinas': rutinas,
+        'next_cita': next_cita,
+        'modulo_pacientes': True,
+    }
+    return render(request, 'historial_paciente.html', context)
 
 def obtener_grafico_sesion_paciente(request, sesion_id):
     sesion = get_object_or_404(Sesion, id=sesion_id)
@@ -265,6 +289,7 @@ def agendar_cita(request):
             fecha = request.POST['fecha']
             hora_inicio = request.POST['hora_inicio']
             hora_final = request.POST['hora_final']
+            tipo_cita = request.POST.get('tipo_cita')
             sala = request.POST['sala']
             detalle = request.POST['detalle']
         
@@ -279,6 +304,7 @@ def agendar_cita(request):
                 fecha = fecha,
                 hora_inicio = hora_inicio,
                 hora_final = hora_final,
+                tipo_cita = tipo_cita,
                 sala = sala,
                 detalle = detalle
             )
@@ -303,6 +329,7 @@ def editar_cita(request):
         cita.fecha = request.POST["fecha_editar"]
         cita.hora_inicio = request.POST["hora_inicio_editar"]
         cita.hora_final = request.POST["hora_final_editar"]
+        Cita.tipo_cita = request.POST.get('tipo_cita_editar')
         cita.sala = request.POST["sala_editar"]
         cita.detalle = request.POST["detalle_editar"]
         cita.save()
@@ -585,7 +612,7 @@ def observaciones_paciente(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
     
     # Obtener las observaciones relacionadas con el paciente, ordenadas por fecha
-    observaciones = Observacion.objects.filter(paciente=paciente).order_by('-fecha')
+    observaciones = Observacion.objects.filter(paciente=paciente).order_by('-id')
     context = {
         'paciente': paciente,
         'observaciones': observaciones,
@@ -642,6 +669,7 @@ def eliminar_observacion(request, observacion_id):
     
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
+
 def perfil(request):
     
     terapeuta = get_object_or_404(Terapeuta, user=request.user)
@@ -678,6 +706,9 @@ def editar_perfil(request, pk):
                         terapeuta.imagen_perfil.delete()
                     terapeuta.imagen_perfil = None
                 elif imagen:
+                    # Elimina la imagen anterior si existe
+                    if terapeuta.imagen_perfil:
+                        terapeuta.imagen_perfil.delete()
                     terapeuta.imagen_perfil = imagen
 
                 terapeuta.save()
@@ -782,3 +813,61 @@ def marcar_notificacion_como_leida(request, notificacion_id):
         except Notificacion.DoesNotExist:
             raise Http404("Notificación no encontrada.")
     return JsonResponse({'success': False}, status=400)
+
+def editar_credenciales(request):
+    if request.method == 'POST':
+        nuevo_email = request.POST.get('email')
+        nueva_password = request.POST.get('nueva_password')
+        confirmar_password = request.POST.get('confirmar_password')
+
+        user = request.user
+        cambios_realizados = []
+
+        # Verificar si el usuario ha modificado el correo electrónico
+        if nuevo_email and nuevo_email != user.email:
+            # Validar que el nuevo correo no esté en uso
+            if User.objects.filter(email=nuevo_email).exclude(pk=user.pk).exists():
+                messages.error(request, 'El correo electrónico ya está en uso.')
+                return redirect('editar_credenciales')
+            else:
+                user.email = nuevo_email
+                cambios_realizados.append('correo electrónico')
+
+        # Verificar si el usuario desea cambiar la contraseña
+        if nueva_password:
+            if nueva_password != confirmar_password:
+                messages.error(request, 'Las contraseñas no coinciden.')
+                return redirect('editar_credenciales')
+            else:
+                user.set_password(nueva_password)
+                cambios_realizados.append('contraseña')
+                # Actualizar la sesión para mantener al usuario autenticado
+                update_session_auth_hash(request, user)
+
+        user.save()
+
+        if cambios_realizados:
+            mensaje = 'Se han actualizado: ' + ', '.join(cambios_realizados) + '.'
+            messages.success(request, mensaje)
+        else:
+            messages.info(request, 'No se realizaron cambios.')
+
+        return redirect('perfil')
+    else:
+        return render(request, 'editar_credenciales.html')
+
+
+
+def verificar_contraseña(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        password_actual = data.get('password_actual')
+
+        # Verificar la contraseña actual
+        user = authenticate(username=request.user.username, password=password_actual)
+        if user is not None:
+            return JsonResponse({'valid': True})
+        else:
+            return JsonResponse({'valid': False})
+    else:
+        return JsonResponse({'error': 'Método no permitido.'}, status=405)

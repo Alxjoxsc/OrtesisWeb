@@ -4,6 +4,7 @@
 {% block extra_head %}
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
   <link rel="stylesheet" href="{% static 'css/historial_paciente.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/modal.css' %}">
 {% endblock %}
 
 {% block title %}
@@ -39,42 +40,46 @@
 {% endblock %}
 
 {% block content %}
-  <div class="contenedor-principal">
-    <div class="contenedor-superior">
-      <!-- Primera columna -->
-      <div class="nombre-paciente">
-          <h2>{{ paciente.first_name }} {{ paciente.last_name }} | {{ paciente.rut }}</h2>
+<div class="contenedor-principal">
+  <div class="contenedor-superior">
+    <!-- Primera columna -->
+    <div class="nombre-paciente">
+      <h2>{{ paciente.first_name }} {{ paciente.last_name }} | {{ paciente.rut }}</h2>
+    </div>
+    <div class="detalles-paciente">
+      <p>Edad: {{ paciente.edad }}</p>
+      <p>Patología: {{ paciente.patologia }}</p>
+    </div>
+    <!-- Segunda columna -->
+    <button class="progreso-paciente-btn" onclick="redirigirAGrafico({{ paciente.id }})">
+      <div class="progreso-paciente-content">
+          <h3>PROGRESO DEL PACIENTE</h3>
+          <span class="progreso-icono">
+            <i class="fa-solid fa-chart-line"></i>
+          </span>
       </div>
-      <div class="detalles-paciente">
-          <p>Edad: {{ paciente.edad }}</p>
-          <p>Patología: {{ paciente.patologia }}</p>
-      </div>
-      <!-- Segunda columna -->
-      <button class="progreso-paciente-btn" onclick="redirigirAGrafico({{ paciente.id }})">
-          <div class="progreso-paciente-content">
-              <h3>PROGRESO DEL PACIENTE</h3>
-              <span class="progreso-icono">
-                  <i class="fas fa-chart-bar"></i>
-              </span>
-          </div>
-      </button>
+    </button>
   </div>
-
-    <div class="contenedor-inferior">
-        <div class="info-cita">
-            <p>Próxima Cita: 30/08 <i class="fas fa-calendar-alt"></i></p>
-        </div>
-        <div class="acciones-paciente">
-            <button class="btn-observaciones" onclick="window.location.href='{% url 'observaciones_paciente' paciente.id %}'">Observaciones</button>
-            <button class="btn-añadir-rutina"><i class="fas fa-plus"></i> Añadir Rutina</button>
-        </div>
+  <div class="contenedor-inferior">
+    <div class="info-cita">
+      {% if next_cita %}
+          <p>Próxima Cita: {{ next_cita.fecha|date:"d/m/y" }} - {{ next_cita.hora_inicio|time:"H:i" }}</p>
+      {% else %}
+          <p>Próxima Cita: N/A </p>
+      {% endif %}
+  </div>
+  
+    <div class="acciones-paciente">
+        <button class="btn-observaciones" onclick="window.location.href='{% url 'observaciones_paciente' paciente.id %}'">Observaciones</button>
+        <button class="btn-añadir-rutina"><i class="fas fa-plus"></i> Añadir Rutina</button>
     </div>
   </div>
+</div>
 
-  <div class="modificar-rutina">
-    <button id="editarRutinaBtn" class="btn-modificar-rutina" data-rutina-id="{{ rutinas.0.id }}">
-        Modificar rutina actual <i class="fas fa-edit"></i>
-    </button>
+<div class="modificar-rutina">
+  <button id="editarRutinaBtn" class="btn-modificar-rutina" data-rutina-id="{{ rutinas.0.id }}">
+    Modificar rutina actual <i class="fas fa-edit"></i>
+  </button>
 </div>
 
  <!-- Aquí comienza la sección de rutinas -->
@@ -141,10 +146,12 @@
 
     </div>
   {% else %}
-    <p>Aún no hay rutinas para este paciente.</p>
+    <div class="no-rutinas">
+      <p>Aún no hay rutinas para este paciente.</p>
+    </div>
   {% endif %}
 
-<<!-- Modal PopUp para gráfico de las sesiones-->
+<!-- Modal PopUp para gráfico de las sesiones-->
 <div id="popupModal" class="modal" style="display: none;">
   <div class="contenido-modal">
     <span class="close">&times;</span>
@@ -230,10 +237,11 @@
             <label for="frecuencia_sesiones">Frecuencia de Sesiones</label>
             <div class="frecuencia-inputs">
                 <input type="number" id="frecuencia_cantidad" name="frecuencia_cantidad" required>
+                <p>cada</p>
                 <select id="frecuencia_tipo" name="frecuencia_tipo">
                   <p>cada</p>
-                    <option value="dias">días</option>
-                    <option value="semanas">semanas</option>
+                    <option value="dias">día</option>
+                    <option value="semanas">semana</option>
                 </select>
             </div>
 
@@ -273,9 +281,10 @@
           <label for="edit_frecuencia_sesiones">Frecuencia de Sesiones</label>
           <div class="frecuencia-inputs">
               <input type="number" id="edit_frecuencia_cantidad" name="frecuencia_cantidad" required>
+              <p>cada</p>
               <select id="edit_frecuencia_tipo" name="frecuencia_tipo">
-                  <option value="dias">días</option>
-                  <option value="semanas">semanas</option>
+                  <option value="dias">día</option>
+                  <option value="semanas">semana</option>
               </select>
           </div>
 
@@ -295,6 +304,57 @@
       </form>
   </div>
 </div>
+
+<!-- MENSAJES DESVINVULAR PACIENTE -->
+<!-- Modal Popup para mostrar mensaje de éxito desvinculacion -->
+<div id="modalExito" class="modal">
+  <div class="contenido-modal-mensaje">
+      <img src="{% static 'icons/Exito.svg' %}" alt="Éxito">
+      <p>Paciente {{paciente.first_name}} {{paciente.last_name}} desvinculado con exito</p>
+  </div>
+</div>
+
+<!-- Modal Popup para mostrar mensaje de rellene motivo de desvinculacion -->
+<div id="modalError" class="modal">
+  <div class="contenido-modal-mensaje">
+      <img src="{% static 'icons/Alert.svg' %}" alt="Éxito">
+      <p>Ingrese un motivo para la desvinculacion</p>
+  </div>
+</div>
+
+<!-- MENSAJES RUTINAS PACIENTE -->
+<!-- Modal Popup para mostrar mensaje de éxito -->
+<div id="modalExitoRutina" class="modal">
+  <div class="contenido-modal-mensaje">
+      <img src="{% static 'icons/Exito.svg' %}" alt="Éxito">
+      <p>Rutina de {{paciente.first_name}} {{paciente.last_name}} Creada con exito</p>
+  </div>
+</div>
+
+<!-- Modal Popup para mostrar mensaje de no hay rutina creada para editar -->
+<div id="modalErrorEditRutina" class="modal">
+  <div class="contenido-modal-mensaje">
+      <img src="{% static 'icons/Alert.svg' %}" alt="Éxito">
+      <p>El paciente {{paciente.first_name}} {{paciente.last_name}} no tiene rutinas creadas</p>
+  </div>
+</div>
+
+<!-- Modal Popup para mostrar mensaje de éxito al editar rutina -->
+<div id="modalExitoRutinaEditada" class="modal">
+  <div class="contenido-modal-mensaje">
+      <img src="{% static 'icons/Exito.svg' %}" alt="Éxito">
+      <p>Rutina de {{paciente.first_name}} {{paciente.last_name}} actualizada con exito</p>
+  </div>
+</div>
+
+<!-- Modal de Carga -->
+<div id="modalCarga" class="modal" style="display: none;">
+  <div class="contenido-modal-mensaje">
+    <div class="spinner"></div>
+    <p>Guardando rutina, por favor espera...</p>
+  </div>
+</div>
+
 
 {% endblock %}
 

@@ -216,6 +216,12 @@
 </script>
 
 <script>
+    document.getElementById("boton-agregar-recepcionista").addEventListener("click", function(){
+        window.location.href = "{% url 'agregar_recepcionista' %}";
+    });
+</script>
+
+<script>
     document.addEventListener('DOMContentLoaded', function() {
         const checkboxes = document.querySelectorAll('.recepcionista-checkbox');
         const selectAllCheckbox = document.getElementById('select-all');
@@ -337,6 +343,10 @@
 </script>
 <script src="{% static 'js/filtroListados.js' %}"></script>
 <script src="{% static 'js/admin_buscador_recepcionista.js' %}"></script>
+<<<<<<< HEAD
 <script src="{% static 'js/carga_masiva.js' %}"></script>
 {% endblock %}
 
+=======
+{% endblock %}
+>>>>>>> main
