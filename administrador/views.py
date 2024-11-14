@@ -4,7 +4,7 @@ import csv
 from django.conf import settings
 import pandas as pd
 from decimal import Decimal
-from datetime import date
+from datetime import date, datetime
 from itertools import cycle
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
@@ -271,61 +271,71 @@ def validar_datos_fila_terapeutas(row, fila_numero):
     s = sum(d * f for d, f in zip(reversed_digits, factors))
     verificador = 'K' if (-s) % 11 == 10 else str((-s) % 11)
     if dv != verificador:
-        errores.append(f'El dígito verificador del RUT "{rut}" no es válido')
+        errores.append(f'Fila {fila_numero}: Fila {fila_numero}: El dígito verificador del RUT "{rut}" no es válido')
 
         # Validación para el primer nombre, permite hasta 3 nombres con letras y caracteres especiales
     if not re.match(r'^[a-zA-Z\u00C0-\u017F]+( [a-zA-Z\u00C0-\u017F]+){0,2}$', first_name):
-        errores.append(f'El nombre "{first_name}" solo puede contener letras y hasta 3 nombres separados por espacios')
+        errores.append(f'Fila {fila_numero}: El nombre "{first_name}" solo puede contener letras y hasta 3 nombres separados por espacios')
     
     # Validación para el apellido, permite hasta 2 apellidos con letras y caracteres especiales
     if not re.match(r'^[a-zA-Z\u00C0-\u017F]+( [a-zA-Z\u00C0-\u017F]+)?$', last_name):
-        errores.append(f'El apellido "{last_name}" solo puede contener letras y hasta 2 apellidos separados por un espacio')
+        errores.append(f'Fila {fila_numero}: El apellido "{last_name}" solo puede contener letras y hasta 2 apellidos separados por un espacio')
     
     # Validación de correo electrónico
     if not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
-        errores.append(f'El correo "{email}" no es válido')
+        errores.append(f'Fila {fila_numero}: El correo "{email}" no es válido')
     
     # Validación de teléfono
     if not re.match(r'^\d{1} \d{4} \d{4}$', telefono):
-        errores.append(f'El teléfono "{telefono}" debe tener el formato: 9 1234 5678')
+        errores.append(f'Fila {fila_numero}: El teléfono "{telefono}" debe tener el formato: 9 1234 5678')
 
     # Validación de fecha de nacimiento
-    fecha_nacimiento = pd.to_datetime(row['Fecha Nacimiento'], errors='coerce')
-    if pd.isna(fecha_nacimiento) or fecha_nacimiento.date() >= date.today():
-        errores.append(f'La fecha de nacimiento "{row["Fecha Nacimiento"]}" debe ser anterior a la fecha actual')
+    try:
+        fecha_valida_nacimiento = datetime.strptime(fecha_nacimiento, '%Y-%m-%d')
+        if fecha_valida_nacimiento.date() >= date.today():
+            errores.append(f'Fila {fila_numero}: La fecha de nacimiento "{fecha_nacimiento}" debe ser anterior a la fecha actual')
+    except ValueError:
+        errores.append(f'Fila {fila_numero}: La fecha de nacimiento "{fecha_nacimiento}" debe tener el formato YYYY-MM-DD y ser una fecha válida.')
     
     # Validación de sexo
     if sexo not in ['Masculino', 'Femenino']:
-        errores.append(f'El sexo "{sexo}" debe ser "Masculino" o "Femenino"')
+        errores.append(f'Fila {fila_numero}: El sexo "{sexo}" debe ser "Masculino" o "Femenino"')
     
     #Validación de dirección
     if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s.#\-]+$', direccion):
-        errores.append(f'La dirección "{direccion}" no permite caracteres especiales, solo se permiten letras, números, espacios, puntos, # y -.')
+        errores.append(f'Fila {fila_numero}: La dirección "{direccion}" no permite caracteres especiales, solo se permiten letras, números, espacios, puntos, # y -.')
 
     #Validación de especialidad
     if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', especialidad):
-        errores.append(f'La especialidad "{especialidad}" solo puede contener letras y espacios')
+        errores.append(f'Fila {fila_numero}: La especialidad "{especialidad}" solo puede contener letras y espacios')
     
     #Validación de disponibilidad
     if disponibilidad not in ['Disponible', 'Medianamente disponible', 'No disponible']:
-        errores.append(f'La disponibilidad "{disponibilidad}" debe ser "Disponible", "Medianamente disponible" o "No disponible"')
+        errores.append(f'Fila {fila_numero}: La disponibilidad "{disponibilidad}" debe ser "Disponible", "Medianamente disponible" o "No disponible"')
 
-    #Validación de fecha de contrato
-    fecha_contrato = pd.to_datetime(row['Fecha Contrato'], errors='coerce')
-    if pd.isna(fecha_contrato) or fecha_contrato.date() >= date.today():
-        errores.append(f'La fecha de contrato "{row["Fecha Contrato"]}" debe ser anterior a la fecha actual')
+    # Validación de fecha de contrato
+    try:
+        fecha_valida_contrato = datetime.strptime(fecha_contrato, '%Y-%m-%d')
+        if fecha_valida_contrato.date() >= date.today():
+            errores.append(f'Fila {fila_numero}: La fecha de contrato "{fecha_contrato}" debe ser anterior a la fecha actual')
+    except ValueError:
+        errores.append(f'Fila {fila_numero}: La fecha de contrato "{fecha_contrato}" debe tener el formato YYYY-MM-DD y ser una fecha válida.')
     
     #Validación de título
     if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', titulo):
-        errores.append(f'El título "{titulo}" solo puede contener letras y espacios')
+        errores.append(f'Fila {fila_numero}: El título "{titulo}" solo puede contener letras y espacios')
     
     #Validación de experiencia
     if experiencia < 0:
-        errores.append(f'La experiencia "{experiencia}" debe ser un número positivo')
+        errores.append(f'Fila {fila_numero}: La experiencia "{experiencia}" debe ser un número positivo')
     
     #Validación de correo de contacto
     if not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', correo_contacto):
-        errores.append(f'El correo de contacto "{correo_contacto}" no es válido')
+        errores.append(f'Fila {fila_numero}: El correo de contacto "{correo_contacto}" no es válido')
+
+    # Verificación de duplicados
+    if Profile.objects.filter(rut=rut).exists():
+        errores.append(f'Fila {fila_numero}: El RUT "{rut}" ya está registrado')
     
     return errores
 
@@ -367,7 +377,7 @@ def guardar_terapeuta(row):
         user=user,
         especialidad=row.get('Especialidad', ''),
         disponibilidad=row.get('Disponibilidad', ''),
-        fecha_contrato=pd.to_datetime(row.get('Fecha Contrato', ''), errors='coerce'),
+        fecha_contratacion=pd.to_datetime(row.get('Fecha Contrato', ''), errors='coerce'),
         titulo=row.get('Titulo', ''),
         experiencia=int(row.get('Experiencia', 0)),
         correo_contacto=row.get('Correo de contacto', ''),
@@ -722,70 +732,73 @@ def validar_datos_fila_pacientes(row, fila_numero):
     s = sum(d * f for d, f in zip(reversed_digits, factors))
     verificador = 'K' if (-s) % 11 == 10 else str((-s) % 11)
     if dv != verificador:
-        errores.append(f'El dígito verificador del RUT "{rut}" no es válido')
+        errores.append(f'Fila {fila_numero}: El dígito verificador del RUT "{rut}" no es válido')
     
     # Validación para el primer nombre, permite hasta 3 nombres con letras y caracteres especiales
     if not re.match(r'^[a-zA-Z\u00C0-\u017F]+( [a-zA-Z\u00C0-\u017F]+){0,2}$', first_name):
-        errores.append(f'El nombre "{first_name}" solo puede contener letras y hasta 3 nombres separados por espacios')
+        errores.append(f'Fila {fila_numero}: El nombre "{first_name}" solo puede contener letras y hasta 3 nombres separados por espacios')
 
     # Validación para el apellido, permite hasta 2 apellidos con letras y caracteres especiales
     if not re.match(r'^[a-zA-Z\u00C0-\u017F]+( [a-zA-Z\u00C0-\u017F]+)?$', last_name):
-        errores.append(f'El apellido "{last_name}" solo puede contener letras y hasta 2 apellidos separados por un espacio')
+        errores.append(f'Fila {fila_numero}: El apellido "{last_name}" solo puede contener letras y hasta 2 apellidos separados por un espacio')
     
     # Validación de correo electrónico
     if not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
-        errores.append(f'El correo "{email}" no es válido')
+        errores.append(f'Fila {fila_numero}: El correo "{email}" no es válido')
     
     # Validación de teléfono
     if not re.match(r'^\d{1} \d{4} \d{4}$', telefono):
-        errores.append(f'El teléfono "{telefono}" debe tener el formato: 9 1234 5678')
+        errores.append(f'Fila {fila_numero}: El teléfono "{telefono}" debe tener el formato: 9 1234 5678')
     
     # Validación de fecha de nacimiento
-    fecha_nacimiento = pd.to_datetime(row['Fecha Nacimiento'], errors='coerce')
-    if pd.isna(fecha_nacimiento) or fecha_nacimiento.date() >= date.today():
-        errores.append(f'La fecha de nacimiento "{row["Fecha Nacimiento"]}" debe ser anterior a la fecha actual')
+    try:
+        fecha_valida_nacimiento = datetime.strptime(fecha_nacimiento, '%Y-%m-%d')
+        if fecha_valida_nacimiento.date() >= date.today():
+            errores.append(f'Fila {fila_numero}: La fecha de nacimiento "{fecha_nacimiento}" debe ser anterior a la fecha actual')
+    except ValueError:
+        errores.append(f'Fila {fila_numero}: La fecha de nacimiento "{fecha_nacimiento}" debe tener el formato YYYY-MM-DD y ser una fecha válida.')
 
     # Validación de sexo
     if sexo not in ['Masculino', 'Femenino']:
-        errores.append(f'El sexo "{sexo}" debe ser "Masculino" o "Femenino"')
+        errores.append(f'Fila {fila_numero}: El sexo "{sexo}" debe ser "Masculino" o "Femenino"')
     
     if not re.match(r'^[a-zA-Z\u00C0-\u017F]+( [a-zA-Z\u00C0-\u017F]+)?$', contacto_emergencia):
-        errores.append(f'El contacto de emergencia "{contacto_emergencia}" solo puede contener letras y un apellido opcional separados por un espacio')
+        errores.append(f'Fila {fila_numero}: El contacto de emergencia "{contacto_emergencia}" solo puede contener letras y un apellido opcional separados por un espacio')
 
     if not re.match(r'^\d{1} \d{4} \d{4}$', telefono_emergencia):
-        errores.append(f'El teléfono de emergencia "{telefono_emergencia}" debe tener el formato: 9 1234 5678')
+        errores.append(f'Fila {fila_numero}: El teléfono de emergencia "{telefono_emergencia}" debe tener el formato: 9 1234 5678')
     
     if not re.match(r'^[a-zA-Z\u00C0-\u017F ]+$', patologia):
-        errores.append(f'La patología "{patologia}" solo puede contener letras y espacios')
+        errores.append(f'Fila {fila_numero}: La patología "{patologia}" solo puede contener letras y espacios')
 
     if not re.match(r'^[a-zA-Z\u00C0-\u017F ]+$', descripcion_patologia):
-        errores.append(f'La descripción de la patología "{descripcion_patologia}" solo puede contener letras y espacios')
+        errores.append(f'Fila {fila_numero}: La descripción de la patología "{descripcion_patologia}" solo puede contener letras y espacios')
 
     if not re.match(r'^[a-zA-Z\u00C0-\u017F ]+$', str(medicamentos)):
-        errores.append(f'Los medicamentos "{medicamentos}" solo pueden contener letras y espacios')
+        errores.append(f'Fila {fila_numero}: Los medicamentos "{medicamentos}" solo pueden contener letras y espacios')
     
     if not re.match(r'^[a-zA-Z\u00C0-\u017F ]+$', str(alergias)):
-        errores.append(f'Las alergias "{alergias}" solo pueden contener letras y espacios')
+        errores.append(f'Fila {fila_numero}: Las alergias "{alergias}" solo pueden contener letras y espacios')
     
     if actividad_fisica not in ['Sedentario', 'Moderado', 'Activo']:
-        errores.append(f'La actividad física "{actividad_fisica}" debe ser "Sedentario", "Moderado" o "Activo"')
+        errores.append(f'Fila {fila_numero}: La actividad física "{actividad_fisica}" debe ser "Sedentario", "Moderado" o "Activo"')
 
     if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s.#\-]+$', calle):
-        errores.append(f'La dirección "{calle}" no permite caracteres especiales, solo se permiten letras, números, espacios, puntos, # y -.')
+        errores.append(f'Fila {fila_numero}: La dirección "{calle}" no permite caracteres especiales, solo se permiten letras, números, espacios, puntos, # y -.')
     
     # Validación de peso y altura
     peso = Decimal(str(row['Peso']).replace(',', '.'))
     altura = Decimal(str(row['Altura']).replace(',', '.'))
 
     if peso <= 0:
-        errores.append(f'El peso "{peso}" debe ser mayor a 0')
+        errores.append(f'Fila {fila_numero}: El peso "{peso}" debe ser mayor a 0')
     
     if altura <= 0:
-        errores.append(f'La altura "{altura}" debe ser mayor a 0')
+        errores.append(f'Fila {fila_numero}: La altura "{altura}" debe ser mayor a 0')
 
     # Verificación de duplicados
     if Paciente.objects.filter(rut=rut).exists():
-        errores.append(f'El RUT "{rut}" ya está registrado')
+        errores.append(f'Fila {fila_numero}: El RUT "{rut}" ya está registrado')
     
     return errores
 
@@ -1229,61 +1242,67 @@ def validar_datos_fila_recepcionistas(row, fila_numero):
     s = sum(d * f for d, f in zip(reversed_digits, factors))
     verificador = 'K' if (-s) % 11 == 10 else str((-s) % 11)
     if dv != verificador:
-        errores.append(f'El dígito verificador del RUT "{rut}" no es válido')
+        errores.append(f'Fila {fila_numero}: El dígito verificador del RUT "{rut}" no es válido')
     
     # Validación para el primer nombre, permite hasta 3 nombres con letras y caracteres especiales
     if not re.match(r'^[a-zA-Z\u00C0-\u017F]+( [a-zA-Z\u00C0-\u017F]+){0,2}$', first_name):
-        errores.append(f'El nombre "{first_name}" solo puede contener letras y hasta 3 nombres separados por espacios')
+        errores.append(f'Fila {fila_numero}: El nombre "{first_name}" solo puede contener letras y hasta 3 nombres separados por espacios')
     
     # Validación para el apellido, permite hasta 2 apellidos con letras y caracteres especiales
     if not re.match(r'^[a-zA-Z\u00C0-\u017F]+( [a-zA-Z\u00C0-\u017F]+)?$', last_name):
-        errores.append(f'El apellido "{last_name}" solo puede contener letras y hasta 2 apellidos separados por un espacio')
+        errores.append(f'Fila {fila_numero}: El apellido "{last_name}" solo puede contener letras y hasta 2 apellidos separados por un espacio')
     
     # Validación de correo electrónico
     if not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
-        errores.append(f'El correo "{email}" no es válido')
+        errores.append(f'Fila {fila_numero}: El correo "{email}" no es válido')
     
     # Validación de teléfono
     if not re.match(r'^\d{1} \d{4} \d{4}$', telefono):
-        errores.append(f'El teléfono "{telefono}" debe tener el formato: 9 1234 5678')
+        errores.append(f'Fila {fila_numero}: El teléfono "{telefono}" debe tener el formato: 9 1234 5678')
 
     # Validación de fecha de nacimiento
-    fecha_nacimiento = pd.to_datetime(row['Fecha Nacimiento'], errors='coerce')
-    if pd.isna(fecha_nacimiento) or fecha_nacimiento.date() >= date.today():
-        errores.append(f'La fecha de nacimiento "{row["Fecha Nacimiento"]}" debe ser anterior a la fecha actual')
+    try:
+        fecha_valida_nacimiento = datetime.strptime(fecha_nacimiento, '%Y-%m-%d')
+        if fecha_valida_nacimiento.date() >= date.today():
+            errores.append(f'Fila {fila_numero}: La fecha de nacimiento "{fecha_nacimiento}" debe ser anterior a la fecha actual')
+    except ValueError:
+        errores.append(f'Fila {fila_numero}: La fecha de nacimiento "{fecha_nacimiento}" debe tener el formato YYYY-MM-DD y ser una fecha válida.')
     
     # Validación de sexo
     if sexo not in ['Masculino', 'Femenino']:
-        errores.append(f'El sexo "{sexo}" debe ser "Masculino" o "Femenino"')
+        errores.append(f'Fila {fila_numero}: El sexo "{sexo}" debe ser "Masculino" o "Femenino"')
     
     #Validación de dirección
     if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s.#\-]+$', direccion):
-        errores.append(f'La dirección "{direccion}" no permite caracteres especiales, solo se permiten letras, números, espacios, puntos, # y -.')
+        errores.append(f'Fila {fila_numero}: La dirección "{direccion}" no permite caracteres especiales, solo se permiten letras, números, espacios, puntos, # y -.')
     
     # Validación de fecha de contrato
-    fecha_contrato = pd.to_datetime(row['Fecha Contrato'], errors='coerce')
-    if pd.isna(fecha_contrato) or fecha_contrato.date() >= date.today():
-        errores.append(f'La fecha de contrato "{row["Fecha Contrato"]}" debe ser anterior a la fecha actual')
+    try:
+        fecha_valida_contrato = datetime.strptime(fecha_contrato, '%Y-%m-%d')
+        if fecha_valida_contrato.date() >= date.today():
+            errores.append(f'Fila {fila_numero}: La fecha de contrato "{fecha_contrato}" debe ser anterior a la fecha actual')
+    except ValueError:
+        errores.append(f'Fila {fila_numero}: La fecha de contrato "{fecha_contrato}" debe tener el formato YYYY-MM-DD y ser una fecha válida.')
     
     # Validación de turno
     if turno not in ['Mañana', 'Tarde', 'Noche']:
-        errores.append(f'El turno "{turno}" debe ser "Mañana", "Tarde" o "Noche"')
+        errores.append(f'Fila {fila_numero}: El turno "{turno}" debe ser "Mañana", "Tarde" o "Noche"')
     
     # Validación de experiencia
     if experiencia < 0:
-        errores.append(f'La experiencia "{experiencia}" debe ser mayor o igual a 0')
+        errores.append(f'Fila {fila_numero}: La experiencia "{experiencia}" debe ser mayor o igual a 0')
 
     # Validación de formación académica
     if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', formacion_academica):
-        errores.append(f'La formación académica "{formacion_academica}" solo puede contener letras y caracteres especiales como tíldes.')
+        errores.append(f'Fila {fila_numero}: La formación académica "{formacion_academica}" solo puede contener letras y caracteres especiales como tíldes.')
     
     # Validación de supervisor
     if supervisor not in ['Si', 'No']:
-        errores.append(f'El supervisor "{supervisor}" debe ser "Si" o "No"')
+        errores.append(f'Fila {fila_numero}: El supervisor "{supervisor}" debe ser "Si" o "No"')
     
     # Verificación de duplicados
     if Profile.objects.filter(rut=rut).exists():
-        errores.append(f'El RUT "{rut}" ya está registrado')
+        errores.append(f'Fila {fila_numero}: El RUT "{rut}" ya está registrado')
     
     return errores
 
