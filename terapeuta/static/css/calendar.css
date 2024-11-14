@@ -370,10 +370,6 @@ button:hover {
     text-overflow: ellipsis;
 }
 
-.cita-semana:hover {
-    background-color: #008CAB;
-}
-
 .day {
     position: relative;
 }
@@ -393,26 +389,6 @@ button:hover {
     color: white; 
 }
 
-/* Estilo para las citas en la vista semanal */
-.cita-semana {
-    background-color: #4CAF50; 
-    color: white;
-    padding: 2px;
-    border-radius: 2px;
-    text-align: center;
-    font-size: 0.8em;
-    cursor: pointer;
-    position: relative;
-    height: 100%;
-}
-
-/* Estilo adicional para citas online */
-.cita-online {
-    background-color: #2196F3; 
-    height: 50%; 
-    top: 25%; 
-}
-
 .tipo-cita-container {
     display: flex;
     justify-content: space-evenly;
@@ -427,6 +403,35 @@ button:hover {
     margin-top: 7px;
 }
 
+/* Estilo base para las citas en la vista semanal */
+.cita-semana {
+    background-color: #06074b; 
+    color: white;
+    padding: 2px;
+    border-radius: 2px;
+    text-align: center;
+    font-size: 0.8em;
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.cita-semana:hover {
+    background-color: #0b0c72;
+}
+
+/* Estilo específico para citas online */
+.cita-online {
+    background-color: #008CAB; 
+    height: 50%; 
+    top: 0; 
+}
+.cita-online:hover {
+    background-color: #1ba9c9;
+}
 @media (max-width: 320px) {
     .modal-content {
         width: 70%;
