@@ -757,11 +757,9 @@ def editar_datos_terapeuta_admin(request, terapeuta_id):
 
     if request.method == 'POST':
         form = EditarTerapeutaForm(request.POST, instance=terapeuta)
-        horario_formset = HorarioFormSet(request.POST, instance=terapeuta)
 
-        if form.is_valid() and horario_formset.is_valid():
+        if form.is_valid():
             form.save()
-            horario_formset.save()
             messages.success(request, 'Datos guardados exitosamente.')
             # Redirigir a la misma página con un parámetro de éxito en la URL
             return redirect('editar_datos_terapeuta_admin', terapeuta_id=terapeuta_id)
@@ -788,12 +786,10 @@ def editar_datos_terapeuta_admin(request, terapeuta_id):
                 'correo_contacto': terapeuta.correo_contacto,
             }
         )
-        horario_formset = HorarioFormSet(instance=terapeuta)
 
     return render(request, 'editar_datos_terapeuta_admin.html', {
         'terapeuta': terapeuta,
         'terapeuta_form': form,
-        'horario_formset': horario_formset,
         'modulo_terapeutas': True,
         'messages': messages.get_messages(request),
     })

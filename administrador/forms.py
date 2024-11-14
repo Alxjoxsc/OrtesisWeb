@@ -1363,7 +1363,7 @@ class EditarTerapeutaForm(forms.ModelForm):
     )
 
     sexo = forms.ChoiceField(
-        choices=[('M', 'Masculino'), ('F', 'Femenino'), ('Otro', 'Otro')],
+        choices=[('M', 'Masculino'), ('F', 'Femenino'), ('O', 'Otro')],
         label='Sexo (*)',
         required=True,
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'})

@@ -155,30 +155,6 @@
         </div>
     </div>
 
-    <h2>Horarios del Terapeuta</h2>
-    
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Día</th>
-                <th>Hora de Inicio</th>
-                <th>Hora de Fin</th>
-                <th>Eliminar</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{ horario_formset.management_form }}
-            {% for form in horario_formset %}
-                <tr>
-                    <td>{{ form.dia }}</td>
-                    <td>{{ form.hora_inicio }}</td>
-                    <td>{{ form.hora_final }}</td>
-                    <td>{{ form.DELETE }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
     <div class="contenedor-botones">
         <button type="button" class="boton-cancelar" id="boton-cancelar">Cancelar</button>
         <button class="boton-azul" type="submit">Confirmar Cambios</button>
