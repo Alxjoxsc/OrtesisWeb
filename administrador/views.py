@@ -3,7 +3,7 @@ import re
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 from autenticacion.decorators import role_required
-from .forms import CrearTerapeutaForm, HorarioFormSet, CrearPacienteForm, EditarPacienteForm, CrearRecepcionistaForm
+from .forms import CrearTerapeutaForm, HorarioFormSet, CrearPacienteForm, EditarPacienteForm, CrearRecepcionistaForm, EditarTerapeutaForm
 from autenticacion.models import Comuna
 from django.http import JsonResponse
 from terapeuta.models import Paciente, Terapeuta, Cita, Horario
@@ -749,4 +749,51 @@ def agregar_recepcionista(request):
         'recepcionista_form': recepcionista_form,
         'success': success, # Variable para indicar que el terapeuta no fue creado exitosamente
         'modulo_recepcionistas': True,
+    })
+    
+@role_required('Administrador')
+def editar_datos_terapeuta_admin(request, terapeuta_id):
+    terapeuta = get_object_or_404(Terapeuta, id=terapeuta_id)
+
+    if request.method == 'POST':
+        form = EditarTerapeutaForm(request.POST, instance=terapeuta)
+        horario_formset = HorarioFormSet(request.POST, instance=terapeuta)
+
+        if form.is_valid() and horario_formset.is_valid():
+            form.save()
+            horario_formset.save()
+            messages.success(request, 'Datos guardados exitosamente.')
+            # Redirigir a la misma página con un parámetro de éxito en la URL
+            return redirect('editar_datos_terapeuta_admin', terapeuta_id=terapeuta_id)
+
+    else:
+        form = EditarTerapeutaForm(
+            initial={
+                'first_name': terapeuta.user.first_name,
+                'last_name': terapeuta.user.last_name,
+                'rut': terapeuta.user.profile.rut,
+                'telefono': terapeuta.user.profile.telefono,
+                'fecha_nacimiento': terapeuta.user.profile.fecha_nacimiento,
+                'direccion': terapeuta.user.profile.direccion,
+                'sexo': terapeuta.user.profile.sexo,
+                'comuna': terapeuta.user.profile.comuna,
+                'region': terapeuta.user.profile.region,
+                'especialidad': terapeuta.especialidad,
+                'fecha_ingreso': terapeuta.fecha_ingreso,
+                'disponibilidad': terapeuta.disponibilidad,
+                'fecha_contratacion': terapeuta.fecha_contratacion,
+                'titulo': terapeuta.titulo,
+                'experiencia': terapeuta.experiencia,
+                'presentacion': terapeuta.presentacion,
+                'correo_contacto': terapeuta.correo_contacto,
+            }
+        )
+        horario_formset = HorarioFormSet(instance=terapeuta)
+
+    return render(request, 'editar_datos_terapeuta_admin.html', {
+        'terapeuta': terapeuta,
+        'terapeuta_form': form,
+        'horario_formset': horario_formset,
+        'modulo_terapeutas': True,
+        'messages': messages.get_messages(request),
     })
