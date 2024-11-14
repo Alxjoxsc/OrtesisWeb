@@ -33,6 +33,12 @@
                     <button type="submit" name="role" value="{{ role.name }}" class="btn">{{ role.name }}</button>
                 {% endfor %}
             </div>
+            <div class="logout">
+                <a href="{% url 'logout' %}" class="logout-link">
+                    <img src="{% static 'icons/log-out.svg' %}" alt="Cerrar sesión">
+                    Cerrar Sesión
+                </a>
+            </div>
         </form>
 
         <div class="iconos-inferiores">

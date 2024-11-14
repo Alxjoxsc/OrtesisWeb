@@ -16,3 +16,86 @@ h3 {
     align-items: center;
     margin: 1em 0; /* important */
 }
+
+/* Estilos generales de logout */
+.logout {
+    width: 40%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.logout a {
+    text-decoration: none;
+    color: #ffffff;
+    padding: 1vw 1.5vw;
+    display: flex;
+    align-items: center;
+    font-size: 1.2em;
+    font-weight: 500;
+    max-width: 100%;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    white-space: nowrap;
+    font-size: clamp(16px, 1.2vw, 24px);
+}
+
+.logout a:hover {
+    background-color: #d9534f;
+    color: white;
+}
+
+.logout a img {
+    width: 30px;
+    height: 30px;
+    margin-right: 14px;
+}
+
+@media screen and (max-width: 1200px) {
+    .logout {
+        width: 50%;
+    }
+
+    .logout a {
+        font-size: clamp(14px, 1vw, 24px);
+        font-weight: 500;
+    }
+
+    .logout a img {
+        width: 25px;
+        height: 25px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .logout {
+        width: 70%;
+    }
+
+    .logout a {
+        font-size: clamp(12px, 0.9vw, 20px);
+        font-weight: 500;
+    }
+
+    .logout a img {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .logout {
+        width: 90%;
+    }
+
+    .logout a {
+        font-size: clamp(10px, 0.8vw, 20px);
+        font-weight: 500;
+    }
+
+    .logout a img {
+        width: 20px;
+        height: 20px;
+    }
+}
