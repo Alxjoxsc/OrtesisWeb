@@ -172,6 +172,13 @@
                     <th class="columna-eliminar">Eliminar</th>
                 </tr>
             </thead>
+
+            <label for="fulltime-checkbox">Horario Fulltime</label>
+            <input class="fulltime-checkbox" type="checkbox" id="fulltime-checkbox" name="fulltime-checkbox">
+            <label for="fulltime-checkbox">Horario Part Time (Fin de Semana)</label>
+            <input class= "weekend-parttime-checkbox" type="checkbox" id="weekend-parttime-checkbox" name="weekend-parttime-checkbox">
+
+
             <tbody id="horarios-tbody">
                 {{ horario_formset.management_form }}
                 {% for form in horario_formset %}
@@ -184,7 +191,7 @@
                         <td>{{ form.hora_final }}</td>
                         <!-- Campo para eliminar -->
                         <td>
-                            {{ form.DELETE }}
+                            <button type="button" class="delete-row-btn">Eliminar</button>
                         </td>
                     </tr>
                 {% endfor %}
@@ -223,73 +230,137 @@
 </script>
 
 <!-- Script para añadir un nuevo formulario de horario -->
-
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const addScheduleButton = document.getElementById('agregar-horario');
         const horariosTbody = document.getElementById('horarios-tbody');
         const totalFormsInput = document.getElementById('id_horario_set-TOTAL_FORMS');
-        let scheduleIndex = parseInt(totalFormsInput.value); // Establecer el índice inicial
-    
+        let scheduleIndex = parseInt(totalFormsInput.value);  // Usar el valor de TOTAL_FORMS inicial
+        
+        const fullTimeCheckbox = document.getElementById('fulltime-checkbox');
+        const weekendPartTimeCheckbox = document.getElementById('weekend-parttime-checkbox');
+        
+        fullTimeCheckbox.addEventListener('change', function () {
+            if (fullTimeCheckbox.checked) {
+                clearScheduleRows();
+                const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+                days.forEach(day => {
+                    addScheduleRow(day, '08:00', '18:00');
+                });
+            } else {
+                clearScheduleRows();
+                addScheduleRow(); // Deja una fila en blanco
+            }
+        });
+        
+        weekendPartTimeCheckbox.addEventListener('change', function () {
+            if (weekendPartTimeCheckbox.checked) {
+                clearScheduleRows();
+                const days = ['Sábado', 'Domingo'];
+                days.forEach(day => {
+                    addScheduleRow(day, '08:00', '18:00');
+                });
+            } else {
+                clearScheduleRows();
+                addScheduleRow(); // Deja una fila en blanco
+            }
+        });
+        
         addScheduleButton.addEventListener('click', function () {
-            // Crear una nueva fila para el nuevo horario
+            addScheduleRow();
+        });
+        
+        function addScheduleRow(day = '---------', horaInicio = '', horaFin = '') {
             const newRow = document.createElement('tr');
             newRow.className = 'horario-row';
-    
-            // Crear los elementos de formulario
+        
             const diaSelect = document.createElement('select');
             diaSelect.name = `horario_set-${scheduleIndex}-dia`;
             diaSelect.className = 'seleccion';
             diaSelect.id = `id_horario_set-${scheduleIndex}-dia`;
-    
-            // Agregar las opciones al select
+        
             const days = ['---------', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-            days.forEach(day => {
+            days.forEach(d => {
                 const option = document.createElement('option');
-                option.value = day;
-                option.textContent = day;
+                option.value = d;
+                option.textContent = d;
+                if (d === day) {
+                    option.selected = true;
+                }
                 diaSelect.appendChild(option);
             });
-    
+        
             const horaInicioInput = document.createElement('input');
             horaInicioInput.type = 'time';
             horaInicioInput.name = `horario_set-${scheduleIndex}-hora_inicio`;
             horaInicioInput.className = 'campo-formulario';
             horaInicioInput.id = `id_horario_set-${scheduleIndex}-hora_inicio`;
-    
+            horaInicioInput.value = horaInicio;
+        
             const horaFinInput = document.createElement('input');
             horaFinInput.type = 'time';
             horaFinInput.name = `horario_set-${scheduleIndex}-hora_final`;
             horaFinInput.className = 'campo-formulario';
             horaFinInput.id = `id_horario_set-${scheduleIndex}-hora_final`;
-    
-            // Crear campo para eliminar
-            const deleteInput = document.createElement('input');
-            deleteInput.type = 'checkbox';
-            deleteInput.name = `horario_set-${scheduleIndex}-DELETE`;
-            deleteInput.id = `id_horario_set-${scheduleIndex}-DELETE`;
-
-            // Agregar los campos a la nueva fila
+            horaFinInput.value = horaFin;
+        
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Eliminar';
+            deleteButton.type = 'button';
+            deleteButton.className = 'delete-row-btn';
+            deleteButton.addEventListener('click', function () {
+                if (horariosTbody.childElementCount > 1) {
+                    horariosTbody.removeChild(newRow);
+                    updateTotalForms();
+                    toggleDeleteButtons();
+                }
+            });
+        
             newRow.appendChild(tdElement(diaSelect));
             newRow.appendChild(tdElement(horaInicioInput));
             newRow.appendChild(tdElement(horaFinInput));
-            newRow.appendChild(tdElement(deleteInput));
-    
-            // Agregar la nueva fila al tbody
+            newRow.appendChild(tdElement(deleteButton));
+        
             horariosTbody.appendChild(newRow);
-    
-            // Incrementar el índice para el siguiente formulario
-            totalFormsInput.value = scheduleIndex + 1;
-            scheduleIndex++;
-        });
-    
+        
+            totalFormsInput.value = scheduleIndex + 1;  // Actualizar TOTAL_FORMS
+            scheduleIndex++;  // Incrementar el índice para el próximo formulario
+            toggleDeleteButtons();
+        }
+        
+        function clearScheduleRows() {
+            while (horariosTbody.firstChild) {
+                horariosTbody.removeChild(horariosTbody.firstChild);
+            }
+            scheduleIndex = 0;
+            totalFormsInput.value = scheduleIndex;  // Resetear TOTAL_FORMS
+        }
+        
         function tdElement(...children) {
             const td = document.createElement('td');
             children.forEach(child => td.appendChild(child));
             return td;
         }
+        
+        function updateTotalForms() {
+            totalFormsInput.value = horariosTbody.childElementCount;  // Actualizar el total de formularios
+            scheduleIndex = parseInt(totalFormsInput.value);  // Sincronizar el índice con TOTAL_FORMS
+        }
+        
+        function toggleDeleteButtons() {
+            const deleteButtons = document.querySelectorAll('.delete-row-btn');
+            deleteButtons.forEach(button => {
+                button.disabled = horariosTbody.childElementCount <= 1; // Deshabilitar si solo hay una fila
+            });
+        }
+        
+        // Verificar el estado inicial del botón de eliminación al cargar la página
+        toggleDeleteButtons();
     });
+    
+    
 </script>
+
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         var regionField = document.getElementById("id_region");
@@ -315,6 +386,7 @@
         });
     });
 </script>
+
 <script>
     document.getElementById("boton-cancelar").addEventListener("click", function(){
         window.location.href = "{% url 'listar_terapeutas_activos' %}";
