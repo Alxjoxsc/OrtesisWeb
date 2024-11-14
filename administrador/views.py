@@ -143,13 +143,13 @@ def archivo_csv_ejemplo_terapeutas(request):
 
     writer.writerow([
         'Rut', 'Nombre', 'Apellido', 'Fecha Nacimiento', 'Sexo', 'Telefono', 
-        'Email', 'Dirección', 'Region', 'Provincia', 'Comuna', 'Especialidad', 'Disponibilidad',
+        'Email', 'Dirección', 'Region', 'Comuna', 'Especialidad', 'Disponibilidad',
         'Fecha Contrato', 'Titulo', 'Experiencia', 'Correo de contacto'
     ])
     
     writer.writerow([
         '18.424.681-3', 'Ignacio', 'Núñez', '1990-01-01', 'Masculino', '9 1234 5678', 
-        'correo@example.com', 'Los Alamos 1234', '1', '1', '1', 'Lesión muscular', 'Disponible',
+        'correo@example.com', 'Los Alamos 1234', '1', '1', 'Lesión muscular', 'Disponible',
         '2024-01-14', 'Terapia ocupacional', '5', 'correocontacto@example.com'
     ])
     
@@ -159,7 +159,7 @@ def carga_masiva_terapeutas(request):
     registros_subidos = 0
     registros_no_subidos = 0
     registros_no_validos = []
-    COLUMNAS_ESPERADAS = 17
+    COLUMNAS_ESPERADAS = 16
 
     if request.method == 'POST':
         if 'archivo_csv' not in request.FILES:
@@ -255,7 +255,6 @@ def validar_datos_fila_terapeutas(row, fila_numero):
     email = row.get('Email')
     direccion = row.get('Dirección')
     region = row.get('Region')
-    provincia = row.get('Provincia')
     comuna = row.get('Comuna')
     especialidad = row.get('Especialidad')
     disponibilidad = row.get('Disponibilidad')
@@ -368,7 +367,6 @@ def guardar_terapeuta(row):
         telefono=row.get('Telefono', ''),
         direccion=row.get('Dirección', ''),
         region=Region.objects.get(pk=row.get('Region', '')) if row.get('Region') else None,
-        provincia=Provincia.objects.get(pk=row.get('Provincia', '')) if row.get('Provincia') else None,
         comuna=Comuna.objects.get(pk=row.get('Comuna', '')) if row.get('Comuna') else None,
     )
 
@@ -600,14 +598,14 @@ def archivo_csv_ejemplo_pacientes(request):
         'Rut', 'Nombre', 'Apellido', 'Fecha Nacimiento', 'Sexo', 'Telefono', 
         'Email', 'Contacto Emergencia', 'Telefono Emergencia', 'Patologia', 
         'Descripcion Patologia', 'Medicamentos', 'Alergias', 'Actividad Fisica', 
-        'Peso', 'Altura', 'Region', 'Provincia', 'Comuna', 'Calle'
+        'Peso', 'Altura', 'Region', 'Comuna', 'Calle'
     ])
     
     writer.writerow([
         '8.895.157-3', 'Exequiel', 'Hurtado', '1990-01-01', 'Masculino', '9 1234 5678', 
         'correo@example.com', 'Contacto Emergencia', '9 8765 4321', 'Diabetes', 
         'Descripcion de la patologia', 'Insulina', 'Penicilina', 'Activo', 
-        '75.5', '1.78', '1', '1', '1', 'Calle falsa 123'
+        '75.5', '1.78', '1', '1', 'Calle falsa 123'
     ])
     
     return response
@@ -616,7 +614,7 @@ def carga_masiva_pacientes(request):
     registros_subidos = 0
     registros_no_subidos = 0
     registros_no_validos = []
-    COLUMNAS_ESPERADAS = 20
+    COLUMNAS_ESPERADAS = 19
 
     if request.method == 'POST':
         if 'archivo_csv' not in request.FILES:
@@ -721,7 +719,6 @@ def validar_datos_fila_pacientes(row, fila_numero):
     peso = row.get('Peso')
     altura = row.get('Altura')
     region = row.get('Region')
-    provincia = row.get('Provincia')
     comuna = row.get('Comuna')
     calle = row.get('Calle')
 
@@ -827,7 +824,6 @@ def guardar_paciente(row):
         peso=Decimal(str(row.get('Peso', '0')).replace(',', '.')),
         altura=Decimal(str(row.get('Altura', '0')).replace(',', '.')),
         region=Region.objects.get(pk=row.get('Region', '')) if row.get('Region') else None,
-        provincia=Provincia.objects.get(pk=row.get('Provincia', '')) if row.get('Provincia') else None,
         comuna=Comuna.objects.get(pk=row.get('Comuna', '')) if row.get('Comuna') else None,
         calle=row.get('Calle', ''),
     )
@@ -1109,13 +1105,13 @@ def archivo_csv_ejemplo_recepcionistas(request):
     
     writer.writerow([
         'Rut', 'Nombre', 'Apellido', 'Fecha Nacimiento', 'Sexo', 'Telefono', 
-        'Email', 'Dirección', 'Region', 'Provincia', 'Comuna', 'Fecha Contrato',
+        'Email', 'Dirección', 'Region', 'Comuna', 'Fecha Contrato',
         'Turno', 'Experiencia', 'Formación Académica', 'Supervisor'
     ])
     
     writer.writerow([
         '16.379.436-5', 'Álvaro', 'Cepeda', '1990-01-01', 'Masculino', '9 1234 5678', 
-        'correo@example.com', 'Los Alamos 1234', '1', '1', '1', '2023-02-20', 'Mañana',
+        'correo@example.com', 'Los Alamos 1234', '1', '1', '2023-02-20', 'Mañana',
         '3', 'Profesional en Actividades Administrativas en la Relación con el Cliente', 'No'
     ])
     
@@ -1125,7 +1121,7 @@ def carga_masiva_recepcionistas(request):
     registros_subidos = 0
     registros_no_subidos = 0
     registros_no_validos = []
-    COLUMNAS_ESPERADAS = 16
+    COLUMNAS_ESPERADAS = 15
 
     if request.method == 'POST':
         if 'archivo_csv' not in request.FILES:
@@ -1221,7 +1217,6 @@ def validar_datos_fila_recepcionistas(row, fila_numero):
     email = row.get('Email')
     direccion = row.get('Dirección')
     region = row.get('Region')
-    provincia = row.get('Provincia')
     comuna = row.get('Comuna')
     fecha_contrato = row.get('Fecha Contrato')
     turno = row.get('Turno')
@@ -1328,7 +1323,6 @@ def guardar_recepcionista(row):
         telefono=row.get('Telefono', ''),
         direccion=row.get('Dirección', ''),
         region=Region.objects.get(pk=row.get('Region', '')) if row.get('Region') else None,
-        provincia=Provincia.objects.get(pk=row.get('Provincia', '')) if row.get('Provincia') else None,
         comuna=Comuna.objects.get(pk=row.get('Comuna', '')) if row.get('Comuna') else None,
     )
 
