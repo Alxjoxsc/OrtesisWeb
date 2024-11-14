@@ -161,7 +161,7 @@
     </div>
 
     <h2> Horarios del terapeuta </h2>
-    
+    {{ horario_formset.management_form }}
     <div class="datos-inferiores">
         <table class="table">
             <thead>
@@ -180,7 +180,6 @@
 
 
             <tbody id="horarios-tbody">
-                {{ horario_formset.management_form }}
                 {% for form in horario_formset %}
                     <tr>
                         <!-- Campo Día -->
@@ -234,9 +233,9 @@
     document.addEventListener('DOMContentLoaded', function () {
         const addScheduleButton = document.getElementById('agregar-horario');
         const horariosTbody = document.getElementById('horarios-tbody');
-        const totalFormsInput = document.getElementById('id_horario_set-TOTAL_FORMS');
-        let scheduleIndex = parseInt(totalFormsInput.value);  // Usar el valor de TOTAL_FORMS inicial
-        
+        const totalFormsInput = document.querySelector('input[name="horario_set-TOTAL_FORMS"]');
+        let scheduleIndex = parseInt(totalFormsInput.value) || 0;
+
         const fullTimeCheckbox = document.getElementById('fulltime-checkbox');
         const weekendPartTimeCheckbox = document.getElementById('weekend-parttime-checkbox');
         
