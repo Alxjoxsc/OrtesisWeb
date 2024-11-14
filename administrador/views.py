@@ -3,7 +3,7 @@ import re
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 from autenticacion.decorators import role_required
-from .forms import CrearTerapeutaForm, HorarioFormSet, CrearPacienteForm, EditarPacienteForm
+from .forms import CrearTerapeutaForm, HorarioFormSet, CrearPacienteForm, EditarPacienteForm, CrearRecepcionistaForm
 from autenticacion.models import Comuna
 from django.http import JsonResponse
 from terapeuta.models import Paciente, Terapeuta, Cita, Horario
@@ -722,3 +722,31 @@ def actualizar_credenciales_recepcionista(request):
             return JsonResponse({'status': 'error', 'message': 'Recepcionista no encontrado.'})
     else:
         return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+@role_required('Administrador')
+def agregar_recepcionista(request):
+
+    success = False # Variable para indicar que el recepcionista no fue creado exitosamente
+
+    if request.method == 'POST':
+        recepcionista_form = CrearRecepcionistaForm(request.POST)
+
+        if recepcionista_form.is_valid():
+            with transaction.atomic(): # Para que si algo falla, no se guarde nada, asegura que todas las operaciones se realicen correctamente
+                recepcionista = recepcionista_form.save()
+
+            success = True # Variable para indicar que el recepcionista fue creado exitosamente
+            return render(request, 'agregar_recepcionista_admin.html', {
+                'success': success,
+                'recepcionista_form': CrearRecepcionistaForm(), # Creamos un nuevo formulario vacío
+                'modulo_recepcionistas': True,
+            })
+
+    else:
+        recepcionista_form = CrearRecepcionistaForm()
+
+    return render(request, 'agregar_recepcionista_admin.html', {
+        'recepcionista_form': recepcionista_form,
+        'success': success, # Variable para indicar que el terapeuta no fue creado exitosamente
+        'modulo_recepcionistas': True,
+    })
