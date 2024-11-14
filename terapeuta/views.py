@@ -605,7 +605,7 @@ def observaciones_paciente(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
     
     # Obtener las observaciones relacionadas con el paciente, ordenadas por fecha
-    observaciones = Observacion.objects.filter(paciente=paciente).order_by('-fecha')
+    observaciones = Observacion.objects.filter(paciente=paciente).order_by('-id')
     context = {
         'paciente': paciente,
         'observaciones': observaciones,

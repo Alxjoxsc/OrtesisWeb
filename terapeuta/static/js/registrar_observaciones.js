@@ -6,16 +6,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Evento para abrir el popup al hacer clic en "Añadir Observación"
     btnAnadir.addEventListener("click", function() {
-        popup.style.display = "block"; // Muestra el popup
+        popup.style.display = "block";
     });
 
-    //Cerrar popup
+    // Cerrar popup de añadir
     closePopup.addEventListener("click", function() {
         popup.style.display = "none";
     });
 
     btnCancelar.addEventListener("click", function() {
-        popup.style.display = "none"; 
+        popup.style.display = "none";
     });
 
     window.addEventListener("click", function(event) {
@@ -23,45 +23,92 @@ document.addEventListener("DOMContentLoaded", function() {
             popup.style.display = "none";
         }
     });
-});
 
-// Funcionalidad para abrir el popup de edición y cargar datos de la observación
-document.querySelectorAll('.editar-observacion').forEach(function(editBtn) {
-    editBtn.addEventListener('click', function() {
-        var observacionId = this.dataset.id; // Obtener el ID de la observación
-        var observacionTexto = this.closest('.observacion-card').querySelector('p').innerText;
+    // Delegación de eventos para edición y eliminación
+    document.addEventListener('click', function(event) {
+        // Abrir popup de edición
+        if (event.target.classList.contains('editar-observacion')) {
+            const observacionId = event.target.getAttribute('data-id');
+            const observacionTexto = event.target.closest('.observacion-card').querySelector('p').innerText;
 
-        // Precargar el textarea con el contenido de la observación
-        document.getElementById('edit-contenido-observacion').value = observacionTexto;
+            document.getElementById('edit-contenido-observacion').value = observacionTexto;
+            document.getElementById('edit-observacion-form').action = `/editar-observacion/${observacionId}/`;
 
-        // Establecer la acción del formulario para que envíe la solicitud al servidor
-        document.getElementById('edit-observacion-form').action = '/editar-observacion/' + observacionId + '/';
+            document.getElementById('edit-popup').style.display = 'block';
+        }
 
-        // Mostrar el popup de edición
-        document.getElementById('edit-popup').style.display = 'block';
+        // Abrir popup de eliminación
+        if (event.target.classList.contains('eliminar-observacion')) {
+            popupEliminar.style.display = 'block';
+            observacionIdEliminar = event.target.getAttribute('data-id');
+        }
+    });
+
+    // Cerrar popup de edición
+    document.getElementById('close-edit-popup').addEventListener('click', function() {
+        document.getElementById('edit-popup').style.display = 'none';
+    });
+
+    document.getElementById('cancel-edit').addEventListener('click', function() {
+        document.getElementById('edit-popup').style.display = 'none';
+    });
+
+    // Variables para gestionar la eliminación de observaciones
+    const popupEliminar = document.getElementById('popup-eliminar');
+    const closeEliminarBtn = document.getElementById('close-popup-eliminar');
+    const cancelarEliminarBtn = document.getElementById('cancelar-eliminar');
+    const confirmarEliminarBtn = document.getElementById('confirmar-eliminar');
+
+    // Obtener el token CSRF
+    const csrftoken = getCookie('csrftoken');
+
+    // Cerrar popup de eliminación
+    closeEliminarBtn.addEventListener('click', () => {
+        popupEliminar.style.display = 'none';
+    });
+
+    cancelarEliminarBtn.addEventListener('click', () => {
+        popupEliminar.style.display = 'none';
+    });
+
+    // Confirmar eliminación
+    confirmarEliminarBtn.addEventListener('click', () => {
+        if (observacionIdEliminar) {
+            fetch(`/eliminar_observacion/${observacionIdEliminar}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    console.error('Error al eliminar la observación');
+                }
+            });
+        }
+    });
+
+    // Buscar observaciones por palabras clave
+    document.querySelector('.busca-observaciones').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const observacionCards = document.querySelectorAll('.observacion-card');
+
+        observacionCards.forEach(function(card) {
+            const observacionText = card.querySelector('p').innerText.toLowerCase();
+            const fechaText = card.querySelector('h3').innerText.toLowerCase();
+
+            if (observacionText.includes(searchTerm) || fechaText.includes(searchTerm)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
     });
 });
 
-// Cerrar el popup de edición
-document.getElementById('close-edit-popup').addEventListener('click', function() {
-    document.getElementById('edit-popup').style.display = 'none'; // Oculta el popup de edición
-});
-
-document.getElementById('cancel-edit').addEventListener('click', function() {
-    document.getElementById('edit-popup').style.display = 'none'; // Oculta el popup de edición
-});
-
-// Variables para gestionar la eliminación de observaciones
-const iconosEliminar = document.querySelectorAll('.eliminar-observacion');
-const popupEliminar = document.getElementById('popup-eliminar');
-const closeEliminarBtn = document.getElementById('close-popup-eliminar');
-const cancelarEliminarBtn = document.getElementById('cancelar-eliminar');
-const confirmarEliminarBtn = document.getElementById('confirmar-eliminar');
-
-// Almacenar el ID de la observación a eliminar
-let observacionIdEliminar = null;
-
-// Función para obtener el CSRF token del documento
+// Función para obtener el token CSRF
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -76,60 +123,3 @@ function getCookie(name) {
     }
     return cookieValue;
 }
-
-const csrftoken = getCookie('csrftoken'); // Obtener el token CSRF
-
-// Abrir el popup de eliminación al hacer clic en el ícono de eliminar
-iconosEliminar.forEach((icono) => {
-    icono.addEventListener('click', function() {
-        popupEliminar.style.display = 'block';
-        observacionIdEliminar = this.getAttribute('data-id');
-    });
-});
-
-// Cerrar el popup de eliminación
-closeEliminarBtn.addEventListener('click', () => {
-    popupEliminar.style.display = 'none';
-});
-
-cancelarEliminarBtn.addEventListener('click', () => {
-    popupEliminar.style.display = 'none';
-});
-
-// Confirmar eliminación y realizar la solicitud al servidor
-confirmarEliminarBtn.addEventListener('click', () => {
-    if (observacionIdEliminar) {
-        // Realiza la petición para eliminar la observación usando fetch
-        fetch(`/eliminar_observacion/${observacionIdEliminar}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': csrftoken,
-                'Content-Type': 'application/json'
-            }
-        }).then(response => {
-            if (response.ok) {
-                location.reload();
-            } else {
-                console.error('Error al eliminar la observación');
-            }
-        });
-    }
-});
-
-// Evento para buscar observaciones por palabras clave
-document.querySelector('.busca-observaciones').addEventListener('input', function() {
-    const searchTerm = this.value.toLowerCase(); // Obtener el texto de búsqueda y convertirlo a minúsculas
-    const observacionCards = document.querySelectorAll('.observacion-card'); // Obtener todas las tarjetas de observación
-
-    observacionCards.forEach(function(card) {
-        const observacionText = card.querySelector('p').innerText.toLowerCase(); // Obtener el texto de la observación en minúsculas
-        const fechaText = card.querySelector('h3').innerText.toLowerCase(); // Obtener el texto de la fecha en minúsculas
-
-        // Comprobar si el texto de búsqueda está presente en el texto de la observación o en la fecha
-        if (observacionText.includes(searchTerm) || fechaText.includes(searchTerm)) {
-            card.style.display = ''; // Mostrar la tarjeta si hay una coincidencia
-        } else {
-            card.style.display = 'none'; // Ocultar la tarjeta si no hay coincidencia
-        }
-    });
-});
