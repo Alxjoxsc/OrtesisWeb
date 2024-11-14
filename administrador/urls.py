@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('listar_terapeutas_activos/', views.listar_terapeutas_activos, name='listar_terapeutas_activos'),
+     path('listar_terapeutas_activos/', views.listar_terapeutas_activos, name='listar_terapeutas_activos'),
     path('listar_terapeutas_inactivos/', views.listar_terapeutas_inactivos, name='listar_terapeutas_inactivos'),
     path('inactivar_terapeuta/', views.cambiar_estado_inactivo_terapeuta, name='cambiar_estado_inactivo_terapeuta'),
     path('restaurar_terapeuta/', views.restaurar_terapeuta, name='restaurar_terapeuta'),
@@ -16,7 +16,6 @@ urlpatterns = [
     path('restaurar_recepcionista/', views.restaurar_recepcionista, name='restaurar_recepcionista'),
     path('agregar/', views.agregar_paciente_admin, name='agregar_paciente_admin'),
     path('administrador/agregar_terapeuta/', views.agregar_terapeuta, name='agregar_terapeuta'),
-    path('administrador/agregar_recepcionista/', views.agregar_recepcionista, name='agregar_recepcionista'),
     path('api/comunas/', views.comunas_api, name='comunas_api'),
     path('mostrar_paciente_administrador/<int:paciente_id>', views.mostrar_paciente_administrador, name='mostrar_paciente_administrador'),
     path('mostrar_recepcionista_administrador/<int:recepcionista_id>', views.mostrar_recepcionista_administrador, name='mostrar_recepcionista_administrador'),
@@ -30,5 +29,12 @@ urlpatterns = [
     path('mostrar_paciente_sin_terapeuta/<int:paciente_id>/', views.mostrar_paciente_sin_terapeuta, name='mostrar_paciente_sin_terapeuta'),
     path('editar_datos_paciente_admin/<int:paciente_id>', views.editar_datos_paciente_admin, name='editar_datos_paciente_admin'),
     path('calendar_asignar_paciente_administrador/<int:terapeuta_id>/<int:paciente_id>', views.calendar_asignar_paciente_administrador, name='calendar_asignar_paciente_administrador'),
-    path('agendar_cita_administrador/',views.agendar_cita_administrador, name='agendar_cita_administrador' )
+    path('agendar_cita_administrador/',views.agendar_cita_administrador, name='agendar_cita_administrador' ),
+     path('verificar_password_admin/', views.verificar_password_admin, name='verificar_password_admin'),
+    path('actualizar_email_terapeuta/', views.actualizar_email_terapeuta, name='actualizar_email_terapeuta'),
+    path('verificar_password_admin/', views.verificar_password_admin, name='verificar_password_admin'),
+    path('actualizar_credenciales_terapeuta/', views.actualizar_credenciales_terapeuta, name='actualizar_credenciales_terapeuta'),
+    path('actualizar_email_recepcionista/', views.actualizar_email_recepcionista, name='actualizar_email_recepcionista'),
+    path('actualizar_credenciales_recepcionista/', views.actualizar_credenciales_recepcionista, name='actualizar_credenciales_recepcionista'),
+    path('administrador/agregar_recepcionista/', views.agregar_recepcionista, name='agregar_recepcionista'),
 ]
