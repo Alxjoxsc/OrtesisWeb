@@ -109,12 +109,12 @@
     border-bottom-left-radius: 50px;
     border-top-right-radius: 50px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.2s ease;
     min-width: 200px;
 }
 
 .progreso-paciente-btn:hover {
-    background-color: #008CAB;
+    background-color: #8bbeca;
 }
 
 .progreso-paciente-content {
