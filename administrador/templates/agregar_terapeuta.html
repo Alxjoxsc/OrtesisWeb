@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="{% static 'styles/agregar_terapeuta.css' %}">
 <link rel="stylesheet" href="{% static 'styles/formularios.css' %}">
 <link rel="stylesheet" href="{% static 'styles/modal.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 {% endblock %}
 
 {% block header %}
@@ -21,14 +22,6 @@
 {% endblock %}
 
 {% block content %}
-<!-- Contenedor para el mensaje de éxito -->
-<div id="mensaje-exito" class="modal">
-    <div class="contenido-modal-exito">
-        <img src="{% static 'icons/Exito.svg' %}" alt="Éxito">
-        <p>¡Terapeuta agregado con éxito!</p>
-        <button class="boton-continuar" onclick="cerrarModal()">Continuar</button>
-    </div>
-</div>
 
 <!-- Formulario para agregar un terapeuta -->
 <form action="{% url 'agregar_terapeuta' %}" method="POST" onsubmit="return mostrarMensajeExito()">
@@ -207,19 +200,34 @@
 </form>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Mostrar el modal si 'success' es verdadero
-        {% if success %}
-            var mensajeExito = document.getElementById("mensaje-exito");
-            mensajeExito.style.display = "block"; // Mostrar el modal
+    document.addEventListener('DOMContentLoaded', function () {
+        {% if messages %}
+            {% for message in messages %}
+                Swal.fire({
+                    title: '¡Éxito al Guardar!',
+                    icon: 'success',
+                    confirmButtonText: 'Aceptar',
+                    confirmButtonColor: '#3085d6',
+                    background: '#f0f0f0',
+                    color: '#333', // Color del texto del popup
+                    timer: 3000,
+                    customClass: {
+                        popup: 'custom-popup',
+                        title: 'custom-title',
+                        content: 'custom-content',
+                        confirmButton: 'custom-button'
+                    },
+                    didOpen: () => {
+                        // Centrar el título a lo largo del popup
+                        const title = document.querySelector('.swal2-title');
+                        title.style.textAlign = 'center';
+                        title.style.width = '100%';
+                        title.style.border = 'none';
+                    }
+                });
+            {% endfor %}
         {% endif %}
     });
-
-    // Función para cerrar el modal
-    function cerrarModal() {
-        var mensajeExito = document.getElementById("mensaje-exito");
-        mensajeExito.style.display = "none"; // Ocultar el modal
-    }
 </script>
 
 <!-- Script para añadir un nuevo formulario de horario -->
@@ -324,4 +332,5 @@
 {% block extra_js %}
 <script src="{% static 'js/formatear-rut.js' %}"></script>
 <script src="{% static 'js/formatear-telefono.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 {% endblock %}
