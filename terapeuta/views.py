@@ -745,7 +745,7 @@ def historial_sesiones(request, paciente_id):
         rutina_seleccionada = rutinas.first()  # Selecciona la rutina más reciente si no se especifica
     
     # Obtener las sesiones de la rutina seleccionada
-    sesiones = Sesion.objects.filter(rutina=rutina_seleccionada).order_by('-fecha')
+    sesiones = Sesion.objects.filter(rutina=rutina_seleccionada).order_by('fecha')
     
     context = {
         'paciente': paciente,
