@@ -174,11 +174,26 @@
                     confirmButtonText: 'Aceptar',
                     confirmButtonColor: '#3085d6',
                     background: '#f0f0f0',
+                    color: '#333',
                     timer: 2000,
+                    customClass: {
+                        popup: 'custom-popup',
+                        title: 'custom-title',
+                        content: 'custom-content',
+                        confirmButton: 'custom-button'
+                    },
+                    didOpen: () => {
+                        // Centrar el título a lo largo del popup
+                        const title = document.querySelector('.swal2-title');
+                        title.style.textAlign = 'center';
+                        title.style.width = '100%';
+                        title.style.border = 'none';
+                    }
                 });
             {% endfor %}
         {% endif %}
     });
+
 
 
     document.getElementById("boton-cancelar").addEventListener("click", function(){
