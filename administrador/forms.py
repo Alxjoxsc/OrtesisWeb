@@ -378,7 +378,7 @@ HorarioFormSet = inlineformset_factory(
 )
 
 # Creamos el formset para los horarios del terapeuta (inlineformset)
-HorarioFormSet_editar = inlineformset_factory(
+HorarioFormSetEditar = inlineformset_factory(
     Terapeuta,
     Horario,
     form=HorarioForm,

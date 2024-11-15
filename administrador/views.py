@@ -3,7 +3,7 @@ import re
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 from autenticacion.decorators import role_required
-from .forms import CrearTerapeutaForm, HorarioFormSet, CrearPacienteForm, EditarPacienteForm, CrearRecepcionistaForm, EditarTerapeutaForm, HorarioFormSet_editar
+from .forms import CrearTerapeutaForm, HorarioFormSet, CrearPacienteForm, EditarPacienteForm, CrearRecepcionistaForm, EditarTerapeutaForm, HorarioFormSetEditar
 from autenticacion.models import Comuna
 from django.http import JsonResponse
 from terapeuta.models import Paciente, Terapeuta, Cita, Horario
@@ -757,7 +757,7 @@ def editar_datos_terapeuta_admin(request, terapeuta_id):
 
     if request.method == 'POST':
         form = EditarTerapeutaForm(request.POST, instance=terapeuta)
-        horario_formset = HorarioFormSet_editar(request.POST, instance=terapeuta)  # FormSet para los horarios
+        horario_formset = HorarioFormSet(request.POST, instance=terapeuta)  # FormSet para los horarios
 
         if form.is_valid() and horario_formset.is_valid():
             form.save()
@@ -786,7 +786,7 @@ def editar_datos_terapeuta_admin(request, terapeuta_id):
                 'correo_contacto': terapeuta.correo_contacto,
             }
         )
-        horario_formset = HorarioFormSet_editar(instance=terapeuta)  # FormSet para cargar los horarios existentes
+        horario_formset = HorarioFormSetEditar(instance=terapeuta)  # FormSet para cargar los horarios existentes
 
     return render(request, 'editar_datos_terapeuta_admin.html', {
         'terapeuta': terapeuta,
