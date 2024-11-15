@@ -1511,31 +1511,26 @@ def actualizar_credenciales_recepcionista(request):
 
 @role_required('Administrador')
 def agregar_recepcionista(request):
-
-    success = False # Variable para indicar que el recepcionista no fue creado exitosamente
-
     if request.method == 'POST':
         recepcionista_form = CrearRecepcionistaForm(request.POST)
-
         if recepcionista_form.is_valid():
-            with transaction.atomic(): # Para que si algo falla, no se guarde nada, asegura que todas las operaciones se realicen correctamente
-                recepcionista = recepcionista_form.save()
-
-            success = True # Variable para indicar que el recepcionista fue creado exitosamente
+            with transaction.atomic():
+                recepcionista_form.save()
+            # Enviar mensaje de éxito
+            messages.success(request, 'El recepcionista ha sido creado exitosamente.')
             return render(request, 'agregar_recepcionista_admin.html', {
-                'success': success,
-                'recepcionista_form': CrearRecepcionistaForm(), # Creamos un nuevo formulario vacío
+                'recepcionista_form': CrearRecepcionistaForm(),
                 'modulo_recepcionistas': True,
             })
-
     else:
         recepcionista_form = CrearRecepcionistaForm()
 
     return render(request, 'agregar_recepcionista_admin.html', {
         'recepcionista_form': recepcionista_form,
-        'success': success, # Variable para indicar que el terapeuta no fue creado exitosamente
         'modulo_recepcionistas': True,
     })
+
+
     
 @role_required('Administrador')
 def editar_datos_terapeuta_admin(request, terapeuta_id):
