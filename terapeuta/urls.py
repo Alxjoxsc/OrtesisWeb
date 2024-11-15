@@ -31,4 +31,5 @@ urlpatterns = [
     path('historial_sesiones/<int:paciente_id>/', views.historial_sesiones, name='historial_sesiones'),
     path('obtener_notificaciones/', obtener_notificaciones, name='obtener_notificaciones'),
     path('marcar-notificacion-como-leida/<int:notificacion_id>/', views.marcar_notificacion_como_leida, name='marcar_notificacion_como_leida'),
+    path('obtener_datos_rutina/<int:rutina_id>/', obtener_datos_rutina, name='obtener_datos_rutina'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -491,6 +491,9 @@ def crear_rutina(request, paciente_id):
                 paciente=paciente,
                 fecha_inicio=fecha_inicio_date,
                 fecha_termino=fecha_termino_date,
+                cantidad_sesiones = cantidad_sesiones,
+                frecuencia_cantidad = frecuencia_cantidad,
+                frecuencia_tipo = frecuencia_tipo,
                 angulo_inicial=angulo_inicial,
                 angulo_final=angulo_final,
                 repeticiones=repeticiones,
@@ -507,6 +510,8 @@ def crear_rutina(request, paciente_id):
                 f"Ángulo inicial: {nueva_rutina.angulo_inicial}\n"
                 f"Ángulo final: {nueva_rutina.angulo_final}\n"
                 f"Repeticiones: {nueva_rutina.repeticiones}\n"
+                f"Frecuencia: {nueva_rutina.frecuencia_cantidad} vez cada {nueva_rutina.frecuencia_tipo} \n"
+                f"Cantidad de Sesiones: {nueva_rutina.cantidad_sesiones}\n"
                 f"Velocidad: {nueva_rutina.velocidad}\n\n"
                 f"Saludos,\nOrtesis Web"
             )
@@ -559,6 +564,9 @@ def editar_rutina(request, rutina_id):
             angulo_final_str = request.POST.get('angulo_final')
             velocidad_str = request.POST.get('velocidad')
             repeticiones_str = request.POST.get('repeticiones')
+            cantidad_sesiones_str = request.POST.get('cantidad_sesiones')
+            frecuencia_cantidad_str = request.POST.get('frecuencia_cantidad')
+            frecuencia_tipo_str = request.POST.get('frecuencia_tipo')
 
             # Convertir a los tipos correctos
             from datetime import datetime
@@ -567,6 +575,9 @@ def editar_rutina(request, rutina_id):
             rutina.angulo_final = int(angulo_final_str)
             rutina.velocidad = int(velocidad_str)
             rutina.repeticiones = int(repeticiones_str)
+            rutina.cantidad_sesiones = int(cantidad_sesiones_str)
+            rutina.frecuencia_cantidad = int(frecuencia_cantidad_str)
+            rutina.frecuencia_tipo = frecuencia_tipo_str
 
             # Recalcular fecha de término si es necesario
             # Aquí puedes agregar lógica para fecha_termino
@@ -583,6 +594,8 @@ def editar_rutina(request, rutina_id):
                 f"Ángulo inicial: {rutina.angulo_inicial}\n"
                 f"Ángulo final: {rutina.angulo_final}\n"
                 f"Repeticiones: {rutina.repeticiones}\n"
+                f"Frecuencia: {rutina.frecuencia_cantidad} vez cada {rutina.frecuencia_tipo} \n"
+                f"Cantidad de Sesiones: {rutina.cantidad_sesiones}\n"
                 f"Velocidad: {rutina.velocidad}\n\n"
                 f"Saludos,\nOrtesis Web"
             )
@@ -604,6 +617,30 @@ def editar_rutina(request, rutina_id):
         except Exception as e:
             print("Error al actualizar la rutina:", e)
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
+
+@login_required
+def obtener_datos_rutina(request, rutina_id):
+    if request.method == 'GET':
+        try:
+            rutina = Rutina.objects.get(id=rutina_id)
+            data = {
+                'status': 'success',
+                'rutina': {
+                    'fecha_inicio': rutina.fecha_inicio.strftime('%Y-%m-%d'),
+                    'cantidad_sesiones': rutina.cantidad_sesiones,
+                    'repeticiones': rutina.repeticiones,
+                    'frecuencia_cantidad': rutina.frecuencia_cantidad,
+                    'frecuencia_tipo': rutina.frecuencia_tipo,
+                    'angulo_inicial': rutina.angulo_inicial,
+                    'angulo_final': rutina.angulo_final,
+                    'velocidad': rutina.velocidad,
+                }
+            }
+            return JsonResponse(data)
+        except Rutina.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Rutina no encontrada'}, status=404)
     else:
         return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
 
