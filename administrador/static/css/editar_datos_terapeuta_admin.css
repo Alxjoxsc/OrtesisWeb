@@ -267,3 +267,9 @@ input[type="date"] {
     border: 0.0625rem solid #ccc;
     border-radius: 0.25rem;
 }
+
+.fulltime-checkbox,
+.weekend-parttime-checkbox {
+    margin-left: 15px;
+    margin-right: 15px;
+}
