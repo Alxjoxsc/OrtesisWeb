@@ -184,7 +184,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (data.status === 'success') {
                     // Llenar los campos del formulario con los datos de la rutina
                     document.getElementById('edit_fecha_inicio').value = data.rutina.fecha_inicio;
+                    document.getElementById('edit_cantidad_sesiones').value = data.rutina.cantidad_sesiones;
                     document.getElementById('edit_repeticiones').value = data.rutina.repeticiones;
+                    document.getElementById('edit_frecuencia_cantidad').value = data.rutina.frecuencia_cantidad;
+                    document.getElementById('edit_frecuencia_tipo').value = data.rutina.frecuencia_tipo;
                     document.getElementById('edit_angulo_inicial').value = data.rutina.angulo_inicial;
                     document.getElementById('edit_angulo_final').value = data.rutina.angulo_final;
                     document.getElementById('edit_velocidad').value = data.rutina.velocidad;
@@ -274,4 +277,41 @@ document.addEventListener("DOMContentLoaded", function () {
             editarRutinaModal.style.display = 'none';
         }
     };
+
+    
+    console.log('Datos de la rutina:', data.rutina.frecuencia_cantidad);
+
+    function cargarDatosRutina(rutinaId) {
+        fetch(`/obtener_datos_rutina/${rutinaId}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                document.querySelector('#fechaInicioInput').value = data.rutina.fecha_inicio;
+                document.querySelector('#cantidadSesionesInput').value = data.rutina.cantidad_sesiones;
+                document.querySelector('#repeticionesInput').value = data.rutina.repeticiones;
+                document.querySelector('#frecuenciaCantidadInput').value = data.rutina.frecuencia_cantidad;
+                document.querySelector('#frecuenciaTipoInput').value = data.rutina.frecuencia_tipo;
+                document.querySelector('#anguloInicialInput').value = data.rutina.angulo_inicial;
+                document.querySelector('#anguloFinalInput').value = data.rutina.angulo_final;
+                document.querySelector('#velocidadInput').value = data.rutina.velocidad;
+            } else {
+                alert('Error al cargar la rutina: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error al obtener los datos de la rutina:', error);
+        });
+    }
+
+    // Evento para editar rutina que llama a la función de carga de datos
+    if (editarRutinaBtn) {
+        editarRutinaBtn.onclick = function () {
+            const rutinaId = editarRutinaBtn.getAttribute('data-rutina-id');
+            cargarDatosRutina(rutinaId); // Llamar a la función de carga de datos
+
+            // Mostrar el modal de edición después de cargar los datos
+            editarRutinaModal.style.display = 'block';
+        };
+    }
+
 });

@@ -1,13 +1,21 @@
 import json
 import re
+import csv
+from django.conf import settings
+import pandas as pd
+from decimal import Decimal
+from datetime import date, datetime
+from itertools import cycle
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 from autenticacion.decorators import role_required
 from .forms import CrearTerapeutaForm, HorarioFormSet, CrearPacienteForm, EditarPacienteForm, CrearRecepcionistaForm, EditarTerapeutaForm, HorarioFormSetEditar
-from autenticacion.models import Comuna
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
+from autenticacion.models import Comuna, Region
 from terapeuta.models import Paciente, Terapeuta, Cita, Horario
 from recepcionista.models import Recepcionista
+from autenticacion.models import Profile
+from django.contrib.auth.models import User, Group
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
@@ -16,9 +24,10 @@ from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.contrib import messages
+from django.utils.crypto import get_random_string
+from django.core.mail import send_mail
 from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
-from django.core.mail import send_mail
 from django.conf import settings
 import string
 import random
@@ -26,7 +35,7 @@ from django.contrib.auth.hashers import make_password
 
 ############################### LISTAR TERAPEUTAS ################################
 @role_required('Administrador')
-def listar_terapeutas_activos(request):
+def listar_terapeutas_activos(request): 
     query = request.GET.get('search')
     order_by = request.GET.get('order_by', 'user__first_name')
     terapeutas_list = Terapeuta.objects.filter(user__is_active=True)
@@ -123,6 +132,273 @@ def restaurar_terapeuta(request):
             'status': 'success',
             'terapeutas_restaurados': [terapeuta.id for terapeuta in terapeutas]
         })
+    
+#                   CARGA MASIVA TERAPEUTAS                 #
+def archivo_csv_ejemplo_terapeutas(request):
+    response =  HttpResponse(content_type='text/ charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="ejemplo_carga_masiva_terapeutas.csv"'
+    response.write('\ufeff'.encode('utf8'))  # Escribe el BOM para UTF-8
+
+    writer = csv.writer(response)
+
+    writer.writerow([
+        'Rut', 'Nombre', 'Apellido', 'Fecha Nacimiento', 'Sexo', 'Telefono', 
+        'Email', 'Dirección', 'Region', 'Comuna', 'Especialidad', 'Disponibilidad',
+        'Fecha Contrato', 'Titulo', 'Experiencia', 'Correo de contacto'
+    ])
+    
+    writer.writerow([
+        '18.424.681-3', 'Ignacio', 'Núñez', '1990-01-01', 'Masculino', '9 1234 5678', 
+        'correo@example.com', 'Los Alamos 1234', '1', '1', 'Lesión muscular', 'Disponible',
+        '2024-01-14', 'Terapia ocupacional', '5', 'correocontacto@example.com'
+    ])
+    
+    return response
+
+def carga_masiva_terapeutas(request):
+    registros_subidos = 0
+    registros_no_subidos = 0
+    registros_no_validos = []
+    COLUMNAS_ESPERADAS = 16
+
+    if request.method == 'POST':
+        if 'archivo_csv' not in request.FILES:
+            messages.error(request, 'No se subió ningún archivo.')
+            return redirect('listar_terapeutas_activos')
+        
+        archivo_csv = request.FILES['archivo_csv']
+
+        try:
+            archivo_csv.seek(0)  # Reinicia el puntero del archivo
+            contenido = archivo_csv.read()
+
+            if contenido is None:
+                messages.error(request, 'Error: el archivo no contiene datos.')
+                return redirect('listar_terapeutas_activos')
+
+            # Intentamos decodificar
+            try:
+                contenido_decodificado = contenido.decode('utf-8')
+
+            except UnicodeDecodeError:
+                messages.error(request, 'Error al decodificar el archivo. Asegúrate de que esté en formato UTF-8.')
+                return redirect('listar_terapeutas_activos')
+            
+            except Exception as e:
+                messages.error(request, f'Error desconocido al decodificar: {e}')
+                return redirect('listar_terapeutas_activos')
+
+            if not contenido_decodificado:
+                messages.error(request, 'Error: el archivo está vacío después de la decodificación.')
+                return redirect('listar_terapeutas_activos')
+
+            # Cargamos el archivo CSV
+            try:
+                reader = csv.reader(contenido_decodificado.splitlines())
+                
+                # Lee la primera fila del archivo (encabezado)
+                encabezado = next(reader)
+                encabezado = [col.lstrip('\ufeff') for col in encabezado]  # Elimina el BOM de todas las columnas
+
+            except Exception as e:
+                messages.error(request, f'Error al procesar el archivo CSV: {e}')
+                return redirect('listar_terapeutas_activos')
+            
+            if len(encabezado) != COLUMNAS_ESPERADAS:
+                messages.error(request, f'El archivo debe tener exactamente {COLUMNAS_ESPERADAS} columnas. '
+                                        f'Se encontraron {len(encabezado)} columnas.')
+                return redirect('listar_terapeutas_activos')
+
+            fila_numero = 1  # Variable para contar las filas (empezamos desde 1)
+            for fila in reader:  # Itera sobre las filas del archivo
+                fila_numero += 1
+
+                if len(fila) != COLUMNAS_ESPERADAS:
+                    registros_no_subidos += 1
+                    registros_no_validos.append(f'Error en la fila {fila_numero}: La fila tiene {len(fila)} columnas, se esperaban {COLUMNAS_ESPERADAS}')
+                    continue
+
+                # Convertir la fila en un diccionario y pasarla a pandas para validaciones
+                data_row = dict(zip(encabezado, fila))  # Crea un diccionario con los encabezados y los valores de la fila
+                errores = validar_datos_fila_terapeutas(data_row, fila_numero)
+
+                if not errores:
+                    guardar_terapeuta(data_row)
+                    registros_subidos += 1
+                else:
+                    registros_no_subidos += 1
+                    registros_no_validos.extend(errores)
+
+        except Exception as e:
+            messages.error(request, f'Error al leer el archivo: {str(e)}')
+            return redirect('listar_terapeutas_activos')
+    
+        messages.success(request, f'Carga masiva finalizada. Registros subidos: {registros_subidos}. Registros no subidos: {registros_no_subidos}')
+        if registros_no_validos:
+            for mensaje in registros_no_validos:
+                messages.error(request, mensaje)
+        
+        return redirect('listar_terapeutas_activos')
+    
+    else:
+        messages.error(request, 'No se subió ningún archivo')
+        return redirect('listar_terapeutas_activos')
+    
+def validar_datos_fila_terapeutas(row, fila_numero):
+    errores = []
+    rut = row.get('Rut')
+    first_name = row.get('Nombre')
+    last_name = row.get('Apellido')
+    fecha_nacimiento = row.get('Fecha Nacimiento')
+    sexo = row.get('Sexo').capitalize()
+    telefono = row.get('Telefono')
+    email = row.get('Email')
+    direccion = row.get('Dirección')
+    region = row.get('Region')
+    comuna = row.get('Comuna')
+    especialidad = row.get('Especialidad')
+    disponibilidad = row.get('Disponibilidad')
+    fecha_contrato = row.get('Fecha Contrato')
+    titulo = row.get('Titulo')
+    experiencia = int(row.get('Experiencia'))
+    correo_contacto = row.get('Correo de contacto')
+
+    # Validación de Rut
+    if not re.match(r'^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$', rut):
+        errores.append(f'El RUT "{rut}" debe estar en el formato XX.XXX.XXX-X')
+
+    # Validación de dígito verificador
+    clean_rut = rut.replace(".", "").replace("-", "")
+    num_part = clean_rut[:-1]
+    dv = clean_rut[-1].upper()
+    reversed_digits = map(int, reversed(num_part))
+    factors = cycle(range(2, 8))
+    s = sum(d * f for d, f in zip(reversed_digits, factors))
+    verificador = 'K' if (-s) % 11 == 10 else str((-s) % 11)
+    if dv != verificador:
+        errores.append(f'Fila {fila_numero}: Fila {fila_numero}: El dígito verificador del RUT "{rut}" no es válido')
+
+        # Validación para el primer nombre, permite hasta 3 nombres con letras y caracteres especiales
+    if not re.match(r'^[a-zA-Z\u00C0-\u017F]+( [a-zA-Z\u00C0-\u017F]+){0,2}$', first_name):
+        errores.append(f'Fila {fila_numero}: El nombre "{first_name}" solo puede contener letras y hasta 3 nombres separados por espacios')
+    
+    # Validación para el apellido, permite hasta 2 apellidos con letras y caracteres especiales
+    if not re.match(r'^[a-zA-Z\u00C0-\u017F]+( [a-zA-Z\u00C0-\u017F]+)?$', last_name):
+        errores.append(f'Fila {fila_numero}: El apellido "{last_name}" solo puede contener letras y hasta 2 apellidos separados por un espacio')
+    
+    # Validación de correo electrónico
+    if not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
+        errores.append(f'Fila {fila_numero}: El correo "{email}" no es válido')
+    
+    # Validación de teléfono
+    if not re.match(r'^\d{1} \d{4} \d{4}$', telefono):
+        errores.append(f'Fila {fila_numero}: El teléfono "{telefono}" debe tener el formato: 9 1234 5678')
+
+    # Validación de fecha de nacimiento
+    try:
+        fecha_valida_nacimiento = datetime.strptime(fecha_nacimiento, '%Y-%m-%d')
+        if fecha_valida_nacimiento.date() >= date.today():
+            errores.append(f'Fila {fila_numero}: La fecha de nacimiento "{fecha_nacimiento}" debe ser anterior a la fecha actual')
+    except ValueError:
+        errores.append(f'Fila {fila_numero}: La fecha de nacimiento "{fecha_nacimiento}" debe tener el formato YYYY-MM-DD y ser una fecha válida.')
+    
+    # Validación de sexo
+    if sexo not in ['Masculino', 'Femenino']:
+        errores.append(f'Fila {fila_numero}: El sexo "{sexo}" debe ser "Masculino" o "Femenino"')
+    
+    #Validación de dirección
+    if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s.#\-]+$', direccion):
+        errores.append(f'Fila {fila_numero}: La dirección "{direccion}" no permite caracteres especiales, solo se permiten letras, números, espacios, puntos, # y -.')
+
+    #Validación de especialidad
+    if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', especialidad):
+        errores.append(f'Fila {fila_numero}: La especialidad "{especialidad}" solo puede contener letras y espacios')
+    
+    #Validación de disponibilidad
+    if disponibilidad not in ['Disponible', 'Medianamente disponible', 'No disponible']:
+        errores.append(f'Fila {fila_numero}: La disponibilidad "{disponibilidad}" debe ser "Disponible", "Medianamente disponible" o "No disponible"')
+
+    # Validación de fecha de contrato
+    try:
+        fecha_valida_contrato = datetime.strptime(fecha_contrato, '%Y-%m-%d')
+        if fecha_valida_contrato.date() >= date.today():
+            errores.append(f'Fila {fila_numero}: La fecha de contrato "{fecha_contrato}" debe ser anterior a la fecha actual')
+    except ValueError:
+        errores.append(f'Fila {fila_numero}: La fecha de contrato "{fecha_contrato}" debe tener el formato YYYY-MM-DD y ser una fecha válida.')
+    
+    #Validación de título
+    if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', titulo):
+        errores.append(f'Fila {fila_numero}: El título "{titulo}" solo puede contener letras y espacios')
+    
+    #Validación de experiencia
+    if experiencia < 0:
+        errores.append(f'Fila {fila_numero}: La experiencia "{experiencia}" debe ser un número positivo')
+    
+    #Validación de correo de contacto
+    if not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', correo_contacto):
+        errores.append(f'Fila {fila_numero}: El correo de contacto "{correo_contacto}" no es válido')
+
+    # Verificación de duplicados
+    if Profile.objects.filter(rut=rut).exists():
+        errores.append(f'Fila {fila_numero}: El RUT "{rut}" ya está registrado')
+    
+    return errores
+
+
+def guardar_terapeuta(row):
+    user = User(
+        username=row.get('Rut', ''),
+        first_name=row.get('Nombre', ''),
+        last_name=row.get('Apellido', ''),
+        email=row.get('Email', ''),
+        is_active=True,
+        password=get_random_string(12),
+    )
+    user.save()
+
+    #Agregar el usuario al grupo 'Recepcionista'
+    group = Group.objects.get(name='Recepcionista')
+    user.groups.add(group)
+
+    profile = Profile(
+        user=user,
+        rut=row.get('Rut', ''),
+        fecha_nacimiento=pd.to_datetime(row.get('Fecha Nacimiento', ''), errors='coerce'),
+        telefono=row.get('Telefono', ''),
+        direccion=row.get('Dirección', ''),
+        region=Region.objects.get(pk=row.get('Region', '')) if row.get('Region') else None,
+        comuna=Comuna.objects.get(pk=row.get('Comuna', '')) if row.get('Comuna') else None,
+    )
+
+    if row.get('Sexo', '').capitalize() == 'Masculino':
+        profile.sexo = 'M'
+    else:
+        profile.sexo = 'F'
+
+    profile.save()
+
+    terapeuta = Terapeuta(
+        user=user,
+        especialidad=row.get('Especialidad', ''),
+        disponibilidad=row.get('Disponibilidad', ''),
+        fecha_contratacion=pd.to_datetime(row.get('Fecha Contrato', ''), errors='coerce'),
+        titulo=row.get('Titulo', ''),
+        experiencia=int(row.get('Experiencia', 0)),
+        correo_contacto=row.get('Correo de contacto', ''),
+    )
+
+    terapeuta.save()
+
+    #Enviar correo electrónico al usuario
+    send_mail(
+    'Bienvenido/a a la plataforma',
+    f'Estimado/a {user.first_name} {user.last_name}, su cuenta ha sido creada,\n'
+    f'Usuario: {user.profile.rut}\nContraseña: {user.password}\n\n'
+    'Le recomendamos cambiar su contraseña al ingresar a la plataforma.',
+    settings.DEFAULT_FROM_EMAIL,
+    [user.email],
+    fail_silently=False,
+    )
 
 ################### ADMIN PACIENTES ##################
 @role_required('Administrador')
@@ -308,6 +584,252 @@ def listar_pacientes_inactivos(request):
         'order_by': order_by,  # Para saber el orden actual en el HTML
         'modulo_pacientes': True
     })
+
+#                       CARGA MASIVA DE PACIENTES                     #
+
+def archivo_csv_ejemplo_pacientes(request):
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="ejemplo_carga_masiva_paciente.csv"'
+    response.write('\ufeff'.encode('utf8'))  # Escribe el BOM para UTF-8
+
+    writer = csv.writer(response)
+    
+    writer.writerow([
+        'Rut', 'Nombre', 'Apellido', 'Fecha Nacimiento', 'Sexo', 'Telefono', 
+        'Email', 'Contacto Emergencia', 'Telefono Emergencia', 'Patologia', 
+        'Descripcion Patologia', 'Medicamentos', 'Alergias', 'Actividad Fisica', 
+        'Peso', 'Altura', 'Region', 'Comuna', 'Calle'
+    ])
+    
+    writer.writerow([
+        '8.895.157-3', 'Exequiel', 'Hurtado', '1990-01-01', 'Masculino', '9 1234 5678', 
+        'correo@example.com', 'Contacto Emergencia', '9 8765 4321', 'Diabetes', 
+        'Descripcion de la patologia', 'Insulina', 'Penicilina', 'Activo', 
+        '75.5', '1.78', '1', '1', 'Calle falsa 123'
+    ])
+    
+    return response
+
+def carga_masiva_pacientes(request):
+    registros_subidos = 0
+    registros_no_subidos = 0
+    registros_no_validos = []
+    COLUMNAS_ESPERADAS = 19
+
+    if request.method == 'POST':
+        if 'archivo_csv' not in request.FILES:
+            messages.error(request, 'No se subió ningún archivo.')
+            return redirect('listar_pacientes_activos')
+        
+        archivo_csv = request.FILES['archivo_csv']
+
+        try:
+            archivo_csv.seek(0)  # Reinicia el puntero del archivo
+            contenido = archivo_csv.read()
+
+            if contenido is None:
+                messages.error(request, 'Error: el archivo no contiene datos.')
+                return redirect('listar_pacientes_activos')
+
+            # Intentamos decodificar
+            try:
+                contenido_decodificado = contenido.decode('utf-8')
+
+            except UnicodeDecodeError:
+                messages.error(request, 'Error al decodificar el archivo. Asegúrate de que esté en formato UTF-8.')
+                return redirect('listar_pacientes_activos')
+            
+            except Exception as e:
+                messages.error(request, f'Error desconocido al decodificar: {e}')
+                return redirect('listar_pacientes_activos')
+
+            if not contenido_decodificado:
+                messages.error(request, 'Error: el archivo está vacío después de la decodificación.')
+                return redirect('listar_pacientes_activos')
+
+            # Cargamos el archivo CSV
+            try:
+                reader = csv.reader(contenido_decodificado.splitlines())
+                
+                # Lee la primera fila del archivo (encabezado)
+                encabezado = next(reader)
+                encabezado = [col.lstrip('\ufeff') for col in encabezado]  # Elimina el BOM de todas las columnas
+
+            except Exception as e:
+                messages.error(request, f'Error al procesar el archivo CSV: {e}')
+                return redirect('listar_pacientes_activos')
+            
+            if len(encabezado) != COLUMNAS_ESPERADAS:
+                messages.error(request, f'El archivo debe tener exactamente {COLUMNAS_ESPERADAS} columnas. '
+                                        f'Se encontraron {len(encabezado)} columnas.')
+                return redirect('listar_pacientes_activos')
+
+            fila_numero = 1  # Variable para contar las filas (empezamos desde 1)
+            for fila in reader:  # Itera sobre las filas del archivo
+                fila_numero += 1
+
+                if len(fila) != COLUMNAS_ESPERADAS:
+                    registros_no_subidos += 1
+                    registros_no_validos.append(f'Error en la fila {fila_numero}: La fila tiene {len(fila)} columnas, se esperaban {COLUMNAS_ESPERADAS}')
+                    continue
+
+                # Convertir la fila en un diccionario y pasarla a pandas para validaciones
+                data_row = dict(zip(encabezado, fila))  # Crea un diccionario con los encabezados y los valores de la fila
+                errores = validar_datos_fila_pacientes(data_row, fila_numero)
+
+                if not errores:
+                    guardar_paciente(data_row)
+                    registros_subidos += 1
+                else:
+                    registros_no_subidos += 1
+                    registros_no_validos.extend(errores)
+
+        except Exception as e:
+            messages.error(request, f'Error al leer el archivo: {str(e)}')
+            return redirect('listar_pacientes_activos')
+        
+        messages.success(request, f'Carga masiva finalizada. Registros subidos: {registros_subidos}. Registros no subidos: {registros_no_subidos}')
+        if registros_no_validos:
+            for mensaje in registros_no_validos:
+                messages.error(request, mensaje)
+        
+        return redirect('listar_pacientes_activos')
+    
+    else:
+        messages.error(request, 'No se subió ningún archivo')
+        return redirect('listar_pacientes_activos')
+
+
+def validar_datos_fila_pacientes(row, fila_numero):
+    errores = []
+    rut = row.get('Rut')
+    first_name = row.get('Nombre')
+    last_name = row.get('Apellido')
+    fecha_nacimiento = row.get('Fecha Nacimiento')
+    sexo = row.get('Sexo').capitalize()
+    telefono = row.get('Telefono')
+    email = row.get('Email')
+    contacto_emergencia = row.get('Contacto Emergencia')
+    telefono_emergencia = row.get('Telefono Emergencia')
+    patologia = row.get('Patologia')
+    descripcion_patologia = row.get('Descripcion Patologia')
+    medicamentos = row.get('Medicamentos')
+    alergias = row.get('Alergias')
+    actividad_fisica = row.get('Actividad Fisica')
+    peso = row.get('Peso')
+    altura = row.get('Altura')
+    region = row.get('Region')
+    comuna = row.get('Comuna')
+    calle = row.get('Calle')
+
+    # Validación de Rut
+    if not re.match(r'^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$', rut):
+        errores.append(f'El RUT "{rut}" debe estar en el formato XX.XXX.XXX-X')
+    
+    # Validación de dígito verificador
+    clean_rut = rut.replace(".", "").replace("-", "")
+    num_part = clean_rut[:-1]
+    dv = clean_rut[-1].upper()
+    reversed_digits = map(int, reversed(num_part))
+    factors = cycle(range(2, 8))
+    s = sum(d * f for d, f in zip(reversed_digits, factors))
+    verificador = 'K' if (-s) % 11 == 10 else str((-s) % 11)
+    if dv != verificador:
+        errores.append(f'Fila {fila_numero}: El dígito verificador del RUT "{rut}" no es válido')
+    
+    # Validación para el primer nombre, permite hasta 3 nombres con letras y caracteres especiales
+    if not re.match(r'^[a-zA-Z\u00C0-\u017F]+( [a-zA-Z\u00C0-\u017F]+){0,2}$', first_name):
+        errores.append(f'Fila {fila_numero}: El nombre "{first_name}" solo puede contener letras y hasta 3 nombres separados por espacios')
+
+    # Validación para el apellido, permite hasta 2 apellidos con letras y caracteres especiales
+    if not re.match(r'^[a-zA-Z\u00C0-\u017F]+( [a-zA-Z\u00C0-\u017F]+)?$', last_name):
+        errores.append(f'Fila {fila_numero}: El apellido "{last_name}" solo puede contener letras y hasta 2 apellidos separados por un espacio')
+    
+    # Validación de correo electrónico
+    if not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
+        errores.append(f'Fila {fila_numero}: El correo "{email}" no es válido')
+    
+    # Validación de teléfono
+    if not re.match(r'^\d{1} \d{4} \d{4}$', telefono):
+        errores.append(f'Fila {fila_numero}: El teléfono "{telefono}" debe tener el formato: 9 1234 5678')
+    
+    # Validación de fecha de nacimiento
+    try:
+        fecha_valida_nacimiento = datetime.strptime(fecha_nacimiento, '%Y-%m-%d')
+        if fecha_valida_nacimiento.date() >= date.today():
+            errores.append(f'Fila {fila_numero}: La fecha de nacimiento "{fecha_nacimiento}" debe ser anterior a la fecha actual')
+    except ValueError:
+        errores.append(f'Fila {fila_numero}: La fecha de nacimiento "{fecha_nacimiento}" debe tener el formato YYYY-MM-DD y ser una fecha válida.')
+
+    # Validación de sexo
+    if sexo not in ['Masculino', 'Femenino']:
+        errores.append(f'Fila {fila_numero}: El sexo "{sexo}" debe ser "Masculino" o "Femenino"')
+    
+    if not re.match(r'^[a-zA-Z\u00C0-\u017F]+( [a-zA-Z\u00C0-\u017F]+)?$', contacto_emergencia):
+        errores.append(f'Fila {fila_numero}: El contacto de emergencia "{contacto_emergencia}" solo puede contener letras y un apellido opcional separados por un espacio')
+
+    if not re.match(r'^\d{1} \d{4} \d{4}$', telefono_emergencia):
+        errores.append(f'Fila {fila_numero}: El teléfono de emergencia "{telefono_emergencia}" debe tener el formato: 9 1234 5678')
+    
+    if not re.match(r'^[a-zA-Z\u00C0-\u017F ]+$', patologia):
+        errores.append(f'Fila {fila_numero}: La patología "{patologia}" solo puede contener letras y espacios')
+
+    if not re.match(r'^[a-zA-Z\u00C0-\u017F ]+$', descripcion_patologia):
+        errores.append(f'Fila {fila_numero}: La descripción de la patología "{descripcion_patologia}" solo puede contener letras y espacios')
+
+    if not re.match(r'^[a-zA-Z\u00C0-\u017F ]+$', str(medicamentos)):
+        errores.append(f'Fila {fila_numero}: Los medicamentos "{medicamentos}" solo pueden contener letras y espacios')
+    
+    if not re.match(r'^[a-zA-Z\u00C0-\u017F ]+$', str(alergias)):
+        errores.append(f'Fila {fila_numero}: Las alergias "{alergias}" solo pueden contener letras y espacios')
+    
+    if actividad_fisica not in ['Sedentario', 'Moderado', 'Activo']:
+        errores.append(f'Fila {fila_numero}: La actividad física "{actividad_fisica}" debe ser "Sedentario", "Moderado" o "Activo"')
+
+    if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s.#\-]+$', calle):
+        errores.append(f'Fila {fila_numero}: La dirección "{calle}" no permite caracteres especiales, solo se permiten letras, números, espacios, puntos, # y -.')
+    
+    # Validación de peso y altura
+    peso = Decimal(str(row['Peso']).replace(',', '.'))
+    altura = Decimal(str(row['Altura']).replace(',', '.'))
+
+    if peso <= 0:
+        errores.append(f'Fila {fila_numero}: El peso "{peso}" debe ser mayor a 0')
+    
+    if altura <= 0:
+        errores.append(f'Fila {fila_numero}: La altura "{altura}" debe ser mayor a 0')
+
+    # Verificación de duplicados
+    if Paciente.objects.filter(rut=rut).exists():
+        errores.append(f'Fila {fila_numero}: El RUT "{rut}" ya está registrado')
+    
+    return errores
+
+def guardar_paciente(row):
+    paciente = Paciente(
+        rut=row.get('Rut', ''),
+        first_name=row.get('Nombre', ''),
+        last_name=row.get('Apellido', ''),
+        fecha_nacimiento=pd.to_datetime(row.get('Fecha Nacimiento', ''), errors='coerce'),
+        sexo=row.get('Sexo', '').capitalize(),
+        telefono=row.get('Telefono', ''),
+        email=row.get('Email', ''),
+        contacto_emergencia=row.get('Contacto Emergencia', ''),
+        telefono_emergencia=row.get('Telefono Emergencia', ''),
+        patologia=row.get('Patologia', ''),
+        descripcion_patologia=row.get('Descripcion Patologia', ''),
+        medicamentos=row.get('Medicamentos', ''),
+        alergias=row.get('Alergias', ''),
+        actividad_fisica=row.get('Actividad Fisica', ''),
+        peso=Decimal(str(row.get('Peso', '0')).replace(',', '.')),
+        altura=Decimal(str(row.get('Altura', '0')).replace(',', '.')),
+        region=Region.objects.get(pk=row.get('Region', '')) if row.get('Region') else None,
+        comuna=Comuna.objects.get(pk=row.get('Comuna', '')) if row.get('Comuna') else None,
+        calle=row.get('Calle', ''),
+    )
+    paciente.save()
+
+
 ##################################################      ADMIN RECEPCIONISTAS      ########################################################
 
 @role_required('Administrador')
@@ -406,9 +928,6 @@ def restaurar_recepcionista(request):
 
 @role_required('Administrador')
 def agregar_terapeuta(request):
-
-    success = False # Variable para indicar que el terapeuta no fue creado exitosamente
-
     if request.method == 'POST':
         terapeuta_form = CrearTerapeutaForm(request.POST)
         horario_formset = HorarioFormSet(request.POST)
@@ -419,9 +938,8 @@ def agregar_terapeuta(request):
                 horario_formset.instance = terapeuta # Asignamos el terapeuta a los horarios
                 horario_formset.save()
             
-            success = True # Variable para indicar que el terapeuta fue creado exitosamente
+            messages.success(request, 'El recepcionista ha sido creado exitosamente.')
             return render(request, 'agregar_terapeuta.html', {
-                'success': success,
                 'terapeuta_form': CrearTerapeutaForm(), # Creamos un nuevo formulario vacío
                 'horario_formset': HorarioFormSet(queryset=Horario.objects.none()),
                 'modulo_terapeutas': True,
@@ -434,7 +952,6 @@ def agregar_terapeuta(request):
     return render(request, 'agregar_terapeuta.html', {
         'terapeuta_form': terapeuta_form,
         'horario_formset': horario_formset,
-        'success': success, # Variable para indicar que el terapeuta no fue creado exitosamente
         'modulo_terapeutas': True,
     })
 
@@ -572,6 +1089,270 @@ def editar_datos_paciente_admin(request, paciente_id, terapeuta=None):
 def redirigir_asignar_cita(request, terapeuta_id, paciente_id):
     return redirect('calendar_asignar_paciente_administrador', terapeuta_id=terapeuta_id, paciente_id=paciente_id)
 
+#                       CARGA MASIVA DE RECEPCIONISTAS                     #
+
+def archivo_csv_ejemplo_recepcionistas(request):
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="ejemplo_carga_masiva_recepcionista.csv"'
+    response.write('\ufeff'.encode('utf8'))  # Escribe el BOM para UTF-8
+
+    writer = csv.writer(response)
+    
+    writer.writerow([
+        'Rut', 'Nombre', 'Apellido', 'Fecha Nacimiento', 'Sexo', 'Telefono', 
+        'Email', 'Dirección', 'Region', 'Comuna', 'Fecha Contrato',
+        'Turno', 'Experiencia', 'Formación Académica', 'Supervisor'
+    ])
+    
+    writer.writerow([
+        '16.379.436-5', 'Álvaro', 'Cepeda', '1990-01-01', 'Masculino', '9 1234 5678', 
+        'correo@example.com', 'Los Alamos 1234', '1', '1', '2023-02-20', 'Mañana',
+        '3', 'Profesional en Actividades Administrativas en la Relación con el Cliente', 'No'
+    ])
+    
+    return response
+
+def carga_masiva_recepcionistas(request):
+    registros_subidos = 0
+    registros_no_subidos = 0
+    registros_no_validos = []
+    COLUMNAS_ESPERADAS = 15
+
+    if request.method == 'POST':
+        if 'archivo_csv' not in request.FILES:
+            messages.error(request, 'No se subió ningún archivo.')
+            return redirect('listar_recepcionistas_activos')
+        
+        archivo_csv = request.FILES['archivo_csv']
+
+        try:
+            archivo_csv.seek(0)  # Reinicia el puntero del archivo
+            contenido = archivo_csv.read()
+
+            if contenido is None:
+                messages.error(request, 'Error: el archivo no contiene datos.')
+                return redirect('listar_recepcionistas_activos')
+
+            # Intentamos decodificar
+            try:
+                contenido_decodificado = contenido.decode('utf-8')
+
+            except UnicodeDecodeError:
+                messages.error(request, 'Error al decodificar el archivo. Asegúrate de que esté en formato UTF-8.')
+                return redirect('listar_recepcionistas_activos')
+            
+            except Exception as e:
+                messages.error(request, f'Error desconocido al decodificar: {e}')
+                return redirect('listar_recepcionistas_activos')
+
+            if not contenido_decodificado:
+                messages.error(request, 'Error: el archivo está vacío después de la decodificación.')
+                return redirect('listar_recepcionistas_activos')
+
+            # Cargamos el archivo CSV
+            try:
+                reader = csv.reader(contenido_decodificado.splitlines())
+                
+                # Lee la primera fila del archivo (encabezado)
+                encabezado = next(reader)
+                encabezado = [col.lstrip('\ufeff') for col in encabezado]  # Elimina el BOM de todas las columnas
+
+            except Exception as e:
+                messages.error(request, f'Error al procesar el archivo CSV: {e}')
+                return redirect('listar_recepcionistas_activos')
+            
+            if len(encabezado) != COLUMNAS_ESPERADAS:
+                messages.error(request, f'El archivo debe tener exactamente {COLUMNAS_ESPERADAS} columnas. '
+                                        f'Se encontraron {len(encabezado)} columnas.')
+                return redirect('listar_recepcionistas_activos')
+
+            fila_numero = 1  # Variable para contar las filas (empezamos desde 1)
+            for fila in reader:  # Itera sobre las filas del archivo
+                fila_numero += 1
+
+                if len(fila) != COLUMNAS_ESPERADAS:
+                    registros_no_subidos += 1
+                    registros_no_validos.append(f'Error en la fila {fila_numero}: La fila tiene {len(fila)} columnas, se esperaban {COLUMNAS_ESPERADAS}')
+                    continue
+
+                # Convertir la fila en un diccionario y pasarla a pandas para validaciones
+                data_row = dict(zip(encabezado, fila))  # Crea un diccionario con los encabezados y los valores de la fila
+                errores = validar_datos_fila_recepcionistas(data_row, fila_numero)
+
+                if not errores:
+                    guardar_recepcionista(data_row)
+                    registros_subidos += 1
+                else:
+                    registros_no_subidos += 1
+                    registros_no_validos.extend(errores)
+                
+        except Exception as e:
+            messages.error(request, f'Error al leer el archivo: {str(e)}')
+            return redirect('listar_recepcionistas_activos')
+        
+        messages.success(request, f'Carga masiva finalizada. Registros subidos: {registros_subidos}. Registros no subidos: {registros_no_subidos}')
+        if registros_no_validos:
+            for mensaje in registros_no_validos:
+                messages.error(request, mensaje)
+        
+        return redirect('listar_recepcionistas_activos')
+    
+    else:
+        messages.error(request, 'No se subió ningún archivo')
+        return redirect('listar_recepcionistas_activos')
+
+def validar_datos_fila_recepcionistas(row, fila_numero):
+    errores = []
+    rut = row.get('Rut')
+    first_name = row.get('Nombre')
+    last_name = row.get('Apellido')
+    fecha_nacimiento = row.get('Fecha Nacimiento')
+    sexo = row.get('Sexo').capitalize()
+    telefono = row.get('Telefono')
+    email = row.get('Email')
+    direccion = row.get('Dirección')
+    region = row.get('Region')
+    comuna = row.get('Comuna')
+    fecha_contrato = row.get('Fecha Contrato')
+    turno = row.get('Turno')
+    experiencia = int(row.get('Experiencia'))
+    formacion_academica = row.get('Formación Académica')
+    supervisor = row.get('Supervisor').capitalize()
+
+    # Validación de Rut
+    if not re.match(r'^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$', rut):
+        errores.append(f'El RUT "{rut}" debe estar en el formato XX.XXX.XXX-X')
+
+    # Validación de dígito verificador
+    clean_rut = rut.replace(".", "").replace("-", "")
+    num_part = clean_rut[:-1]
+    dv = clean_rut[-1].upper()
+    reversed_digits = map(int, reversed(num_part))
+    factors = cycle(range(2, 8))
+    s = sum(d * f for d, f in zip(reversed_digits, factors))
+    verificador = 'K' if (-s) % 11 == 10 else str((-s) % 11)
+    if dv != verificador:
+        errores.append(f'Fila {fila_numero}: El dígito verificador del RUT "{rut}" no es válido')
+    
+    # Validación para el primer nombre, permite hasta 3 nombres con letras y caracteres especiales
+    if not re.match(r'^[a-zA-Z\u00C0-\u017F]+( [a-zA-Z\u00C0-\u017F]+){0,2}$', first_name):
+        errores.append(f'Fila {fila_numero}: El nombre "{first_name}" solo puede contener letras y hasta 3 nombres separados por espacios')
+    
+    # Validación para el apellido, permite hasta 2 apellidos con letras y caracteres especiales
+    if not re.match(r'^[a-zA-Z\u00C0-\u017F]+( [a-zA-Z\u00C0-\u017F]+)?$', last_name):
+        errores.append(f'Fila {fila_numero}: El apellido "{last_name}" solo puede contener letras y hasta 2 apellidos separados por un espacio')
+    
+    # Validación de correo electrónico
+    if not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
+        errores.append(f'Fila {fila_numero}: El correo "{email}" no es válido')
+    
+    # Validación de teléfono
+    if not re.match(r'^\d{1} \d{4} \d{4}$', telefono):
+        errores.append(f'Fila {fila_numero}: El teléfono "{telefono}" debe tener el formato: 9 1234 5678')
+
+    # Validación de fecha de nacimiento
+    try:
+        fecha_valida_nacimiento = datetime.strptime(fecha_nacimiento, '%Y-%m-%d')
+        if fecha_valida_nacimiento.date() >= date.today():
+            errores.append(f'Fila {fila_numero}: La fecha de nacimiento "{fecha_nacimiento}" debe ser anterior a la fecha actual')
+    except ValueError:
+        errores.append(f'Fila {fila_numero}: La fecha de nacimiento "{fecha_nacimiento}" debe tener el formato YYYY-MM-DD y ser una fecha válida.')
+    
+    # Validación de sexo
+    if sexo not in ['Masculino', 'Femenino']:
+        errores.append(f'Fila {fila_numero}: El sexo "{sexo}" debe ser "Masculino" o "Femenino"')
+    
+    #Validación de dirección
+    if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s.#\-]+$', direccion):
+        errores.append(f'Fila {fila_numero}: La dirección "{direccion}" no permite caracteres especiales, solo se permiten letras, números, espacios, puntos, # y -.')
+    
+    # Validación de fecha de contrato
+    try:
+        fecha_valida_contrato = datetime.strptime(fecha_contrato, '%Y-%m-%d')
+        if fecha_valida_contrato.date() >= date.today():
+            errores.append(f'Fila {fila_numero}: La fecha de contrato "{fecha_contrato}" debe ser anterior a la fecha actual')
+    except ValueError:
+        errores.append(f'Fila {fila_numero}: La fecha de contrato "{fecha_contrato}" debe tener el formato YYYY-MM-DD y ser una fecha válida.')
+    
+    # Validación de turno
+    if turno not in ['Mañana', 'Tarde', 'Noche']:
+        errores.append(f'Fila {fila_numero}: El turno "{turno}" debe ser "Mañana", "Tarde" o "Noche"')
+    
+    # Validación de experiencia
+    if experiencia < 0:
+        errores.append(f'Fila {fila_numero}: La experiencia "{experiencia}" debe ser mayor o igual a 0')
+
+    # Validación de formación académica
+    if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', formacion_academica):
+        errores.append(f'Fila {fila_numero}: La formación académica "{formacion_academica}" solo puede contener letras y caracteres especiales como tíldes.')
+    
+    # Validación de supervisor
+    if supervisor not in ['Si', 'No']:
+        errores.append(f'Fila {fila_numero}: El supervisor "{supervisor}" debe ser "Si" o "No"')
+    
+    # Verificación de duplicados
+    if Profile.objects.filter(rut=rut).exists():
+        errores.append(f'Fila {fila_numero}: El RUT "{rut}" ya está registrado')
+    
+    return errores
+
+def guardar_recepcionista(row):
+    user = User(
+        username=row.get('Rut', ''),
+        first_name=row.get('Nombre', ''),
+        last_name=row.get('Apellido', ''),
+        email=row.get('Email', ''),
+        is_active=True,
+        password=get_random_string(12),
+    )
+    user.save()
+
+    #Agregar el usuario al grupo 'Recepcionista'
+    group = Group.objects.get(name='Recepcionista')
+    user.groups.add(group)
+
+    profile = Profile(
+        user=user,
+        rut=row.get('Rut', ''),
+        fecha_nacimiento=pd.to_datetime(row.get('Fecha Nacimiento', ''), errors='coerce'),
+        telefono=row.get('Telefono', ''),
+        direccion=row.get('Dirección', ''),
+        region=Region.objects.get(pk=row.get('Region', '')) if row.get('Region') else None,
+        comuna=Comuna.objects.get(pk=row.get('Comuna', '')) if row.get('Comuna') else None,
+    )
+
+    if row.get('Sexo', '').capitalize() == 'Masculino':
+        profile.sexo = 'M'
+    else:
+        profile.sexo = 'F'
+
+    profile.save()
+
+    recepcionista = Recepcionista(
+        user=user,
+        fecha_contratacion=pd.to_datetime(row.get('Fecha Contrato', ''), errors='coerce'),
+        turno=row.get('Turno', ''),
+        experiencia=int(row.get('Experiencia', 0)),
+        formacion_academica=row.get('Formación Académica', ''),
+    )
+
+    if row.get('Supervisor', '').capitalize() == 'Si':
+        recepcionista.supervisor = True
+    else:
+        recepcionista.supervisor = False
+
+    recepcionista.save()
+
+    #Enviar correo electrónico al usuario
+    send_mail(
+    'Bienvenido/a a la plataforma',
+    f'Estimado/a {user.first_name} {user.last_name}, su cuenta ha sido creada,\n'
+    f'Usuario: {user.profile.rut}\nContraseña: {user.password}\n\n'
+    'Le recomendamos cambiar su contraseña al ingresar a la plataforma.',
+    settings.DEFAULT_FROM_EMAIL,
+    [user.email],
+    fail_silently=False,
+    )
 def verificar_password_admin(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -725,31 +1506,26 @@ def actualizar_credenciales_recepcionista(request):
 
 @role_required('Administrador')
 def agregar_recepcionista(request):
-
-    success = False # Variable para indicar que el recepcionista no fue creado exitosamente
-
     if request.method == 'POST':
         recepcionista_form = CrearRecepcionistaForm(request.POST)
-
         if recepcionista_form.is_valid():
-            with transaction.atomic(): # Para que si algo falla, no se guarde nada, asegura que todas las operaciones se realicen correctamente
-                recepcionista = recepcionista_form.save()
-
-            success = True # Variable para indicar que el recepcionista fue creado exitosamente
+            with transaction.atomic():
+                recepcionista_form.save()
+            # Enviar mensaje de éxito
+            messages.success(request, 'El recepcionista ha sido creado exitosamente.')
             return render(request, 'agregar_recepcionista_admin.html', {
-                'success': success,
-                'recepcionista_form': CrearRecepcionistaForm(), # Creamos un nuevo formulario vacío
+                'recepcionista_form': CrearRecepcionistaForm(),
                 'modulo_recepcionistas': True,
             })
-
     else:
         recepcionista_form = CrearRecepcionistaForm()
 
     return render(request, 'agregar_recepcionista_admin.html', {
         'recepcionista_form': recepcionista_form,
-        'success': success, # Variable para indicar que el terapeuta no fue creado exitosamente
         'modulo_recepcionistas': True,
     })
+
+
     
 @role_required('Administrador')
 def editar_datos_terapeuta_admin(request, terapeuta_id):

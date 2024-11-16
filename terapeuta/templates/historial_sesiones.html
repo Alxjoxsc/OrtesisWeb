@@ -12,7 +12,7 @@
 
 {% block header %}
   <!-- Botón para volver -->
-  <a href="{% url 'paciente_terapeuta' %}" class="back-button"><i class="fas fa-arrow-left"></i></a>
+  <a href="{% url 'historial_paciente' paciente.id %}" class="back-button"><i class="fas fa-arrow-left"></i></a>
   <div class="contenedor-header">
     <h1>Historial sesiones</h1>
   </div>

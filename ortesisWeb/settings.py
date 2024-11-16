@@ -82,7 +82,7 @@ DATABASES = {
     "default": {
         "HOST": "localhost",
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "ortesisweb_test4",
+        "NAME": "ortesisweb_test5",
         "USER": "postgres",
         "PASSWORD": "Falaciado1#.",
         "PORT": "5432",
@@ -114,7 +114,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "es"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "America/Santiago"
 
 USE_I18N = True
 
