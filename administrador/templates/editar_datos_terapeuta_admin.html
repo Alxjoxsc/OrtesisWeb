@@ -169,9 +169,9 @@
             </thead>
 
             <label for="fulltime-checkbox">Horario Fulltime</label>
-            <input class="fulltime-checkbox" type="checkbox" id="fulltime-checkbox" name="fulltime-checkbox">
+            <input class="fulltime-checkbox" type="checkbox" id="fulltime-checkbox" name="fulltime-checkbox" onclick="toggleCheckbox('fullTime', 'partTime')">
             <label for="fulltime-checkbox">Horario Part Time (Fin de Semana)</label>
-            <input class= "weekend-parttime-checkbox" type="checkbox" id="weekend-parttime-checkbox" name="weekend-parttime-checkbox">
+            <input class= "weekend-parttime-checkbox" type="checkbox" id="weekend-parttime-checkbox" name="weekend-parttime-checkbox" onclick="toggleCheckbox('partTime', 'fullTime')">
 
 
             <tbody id="horarios-tbody">
@@ -273,6 +273,7 @@
         const weekendPartTimeCheckbox = document.getElementById('weekend-parttime-checkbox');
     
         fullTimeCheckbox.addEventListener('change', function () {
+            toggleCheckbox('fulltime-checkbox', 'weekend-parttime-checkbox');
             if (fullTimeCheckbox.checked) {
                 clearScheduleRows();
                 const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
@@ -280,11 +281,12 @@
                     addScheduleRow(day, '08:00', '18:00');
                 });
             } else {
-                resetScheduleToExistingData(); // Cargar los datos actuales en lugar de limpiar
+                resetScheduleToExistingData();
             }
         });
-    
+        
         weekendPartTimeCheckbox.addEventListener('change', function () {
+            toggleCheckbox('weekend-parttime-checkbox', 'fulltime-checkbox');
             if (weekendPartTimeCheckbox.checked) {
                 clearScheduleRows();
                 const days = ['Sábado', 'Domingo'];
@@ -295,6 +297,7 @@
                 resetScheduleToExistingData();
             }
         });
+        
     
         addScheduleButton.addEventListener('click', function () {
             addScheduleRow();
@@ -392,6 +395,15 @@
             deleteButtons.forEach(button => {
                 button.disabled = horariosTbody.childElementCount <= 1;
             });
+        }
+
+        function toggleCheckbox(selectedId, otherId) {
+            const selectedCheckbox = document.getElementById(selectedId);
+            const otherCheckbox = document.getElementById(otherId);
+        
+            if (selectedCheckbox.checked) {
+                otherCheckbox.checked = false;
+            }
         }
     
         toggleDeleteButtons();
