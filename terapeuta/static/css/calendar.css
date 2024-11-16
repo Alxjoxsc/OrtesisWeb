@@ -81,8 +81,7 @@ button:hover {
 
 .day:hover,
 .week-view td:hover {
-    background-color: #82b2bd;
-    border-color: #399fb6;
+    background-color: #b2dbe4;
 }
 
 
@@ -109,9 +108,11 @@ button:hover {
 
 /* Vista semanal */
 .week-view-container {
-    flex: 1 1 auto; /* Ocupa el espacio restante */
+    margin-top: 20px;
+    max-height: 502px;
+    flex: 1 1 auto; 
     overflow-y: auto;
-    overflow-x: auto; /* Agregar scroll horizontal */
+    overflow-x: auto; 
     border: 1px solid #ddd;
     border-radius: 5px;
 }
@@ -353,21 +354,22 @@ button:hover {
 
 /* Estilos para las citas en la vista semanal */
 .cita-semana {
-    background-color: #5596a5; /* Azul */
-    color: white;
+    background-color: #c4c4c4;
+    color: rgb(0, 0, 0);
+    height: 90%;
     padding: 2px 5px;
-    border-radius: 4px;
-    font-size: 12px;
-    margin-bottom: 2px;
+    text-align: center;
+    font-size: 0.8em;
     cursor: pointer;
     position: absolute;
+    top: 2px;
     left: 2px;
     right: 2px;
-    top: 2px;
     bottom: 2px;
     overflow: hidden;
     white-space: nowrap;
-    text-overflow: ellipsis;
+    text-overflow: ellipsis; 
+    transition: background-color 0.3s ease;
 }
 
 .day {
@@ -377,6 +379,8 @@ button:hover {
 .week-hour {
     position: relative;
     height: 40px; 
+    padding: 2px;
+    box-sizing: border-box;
 }
 
 /* Resaltar la columna del día actual en la vista semanal */
@@ -403,31 +407,17 @@ button:hover {
     margin-top: 7px;
 }
 
-/* Estilo base para las citas en la vista semanal */
-.cita-semana {
-    background-color: #06074b; 
-    color: white;
-    padding: 2px;
-    border-radius: 2px;
-    text-align: center;
-    font-size: 0.8em;
-    cursor: pointer;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-}
 
 .cita-semana:hover {
-    background-color: #0b0c72;
+    background-color: #aaa9a9;
 }
 
 /* Estilo específico para citas online */
 .cita-online {
     background-color: #008CAB; 
-    height: 50%; 
-    top: 0; 
+    color: white;
+    height: 90%; 
+    transition: background-color 0.3s ease;
 }
 .cita-online:hover {
     background-color: #1ba9c9;
@@ -577,7 +567,6 @@ button:hover {
         background-color: #5596a5;
         color: white;
         padding: 2px 5px;
-        border-radius: 4px;
         font-size: 12px;
         margin-top: 2px;
         display: block;
