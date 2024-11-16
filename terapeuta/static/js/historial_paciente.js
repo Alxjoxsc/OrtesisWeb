@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const modal = document.getElementById("desvincularModal");
     const cancelarBtn = document.getElementById("cancelarDesvinculacion");
     const confirmarBtn = document.getElementById("confirmarDesvinculacion");
+    const cerrarDesvincular = document.getElementById("cerrarDesvincular");
     const motivoTextarea = document.getElementById("motivo");
 
     // Elementos para la funcionalidad de añadir rutina
@@ -30,6 +31,12 @@ document.addEventListener("DOMContentLoaded", function () {
     // Ocultar popup cuando se presiona "Cancelar" en desvinculación
     if (cancelarBtn) {
         cancelarBtn.addEventListener("click", function () {
+            modal.style.display = "none";
+        });
+    }
+
+    if (cerrarDesvincular) {
+        cerrarDesvincular.addEventListener("click", function () {
             modal.style.display = "none";
         });
     }

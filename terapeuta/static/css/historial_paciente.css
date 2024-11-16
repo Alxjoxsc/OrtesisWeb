@@ -545,7 +545,7 @@
     overflow: hidden; 
     justify-content: center; 
     align-items: center; 
-    background-color: rgba(0,0,0,0.4); /* Fondo semitransparente */
+    background-color: rgba(0,0,0,0.4); 
 }
 
 /* Estilos para el contenido del modal */
@@ -553,7 +553,7 @@
     background-color: #fefefe;
     padding: 20px;
     border: 1px solid #888;
-    width: 500px; /* Ajusta el ancho según tus necesidades */
+    width: 500px; 
     position: relative;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     border-radius: 5px;
@@ -584,13 +584,14 @@
 
 /* Estilos para las etiquetas y valores */
 #desvincularModal .label-value {
+    width: 500px;
     display: flex;
     margin-bottom: 10px;
 }
 
 #desvincularModal .label-value .label {
     font-weight: bold;
-    width: 150px; /* Ajusta el ancho según tus necesidades */
+    width: 170px; 
 }
 
 #desvincularModal .label-value .value {
@@ -599,7 +600,7 @@
 
 /* Estilos para el campo de motivo de inactivación */
 #desvincularModal .motivo-inactivacion {
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
 #desvincularModal .motivo-inactivacion label {
@@ -616,14 +617,12 @@
     resize: vertical; /* Permitir cambiar el tamaño verticalmente */
 }
 
-/* Estilos para el mensaje al terapeuta */
 #desvincularModal .mensaje-terapeuta {
     margin-top: 10px;
     font-style: italic;
     color: #666;
 }
 
-/* Estilos para el footer del modal */
 #desvincularModal .modal-footer {
     display: flex;
     justify-content: space-evenly;

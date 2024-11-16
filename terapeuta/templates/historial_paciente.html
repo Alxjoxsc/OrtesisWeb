@@ -370,34 +370,41 @@
         const url = `/grafico_progreso_paciente/${paciente_id}/`;
         window.location.href = url;
     }
-  document.addEventListener("DOMContentLoaded", function() {
-    // Obtener todos los botones con la clase "btn-ver-sesiones"
-    const botones = document.querySelectorAll('.btn-ver-sesiones');
-  
-    botones.forEach(function(boton) {
-      boton.addEventListener('click', function() {
-        // Encontrar el contenedor de sesiones correspondiente
-        const contenedorSesiones = document.querySelector('.contenedor-sesiones');
-  
-        // Mostrar u ocultar el contenedor de sesiones
-        if (contenedorSesiones.style.display === 'none' || contenedorSesiones.style.display === '') {
-          contenedorSesiones.style.display = 'block';
-        } else {
-          contenedorSesiones.style.display = 'none';
-        }
-  
-        // Cambiar el icono de la flecha hacia arriba o hacia abajo
-        const icono = this.querySelector('i');
-        if (contenedorSesiones.style.display === 'block') {
-          icono.classList.remove('fa-chevron-down');
-          icono.classList.add('fa-chevron-up');
-        } else {
-          icono.classList.remove('fa-chevron-up');
-          icono.classList.add('fa-chevron-down');
-        }
+    document.addEventListener("DOMContentLoaded", function() {
+      // Obtener todos los botones con la clase "btn-ver-sesiones"
+      const botones = document.querySelectorAll('.btn-ver-sesiones');
+    
+      botones.forEach(function(boton) {
+        boton.addEventListener('click', function() {
+          // Encontrar el contenedor de sesiones correspondiente
+          const rutinaCard = boton.closest('.rutina-card');
+    
+          // El contenedor de sesiones es el siguiente elemento hermano de rutinaCard
+          const contenedorSesiones = rutinaCard.nextElementSibling;
+    
+          // Verificar que el contenedor de sesiones exista y tenga la clase 'contenedor-sesiones'
+          if (contenedorSesiones && contenedorSesiones.classList.contains('contenedor-sesiones')) {
+            // Mostrar u ocultar el contenedor de sesiones
+            if (contenedorSesiones.style.display === 'none' || contenedorSesiones.style.display === '') {
+              contenedorSesiones.style.display = 'block';
+            } else {
+              contenedorSesiones.style.display = 'none';
+            }
+    
+            // Cambiar el icono de la flecha hacia arriba o hacia abajo
+            const icono = boton.querySelector('i');
+            if (contenedorSesiones.style.display === 'block') {
+              icono.classList.remove('fa-chevron-down');
+              icono.classList.add('fa-chevron-up');
+            } else {
+              icono.classList.remove('fa-chevron-up');
+              icono.classList.add('fa-chevron-down');
+            }
+          }
+        });
       });
     });
-  });
+    
   
 </script>
 <script>
