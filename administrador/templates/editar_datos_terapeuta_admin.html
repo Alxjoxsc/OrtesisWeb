@@ -263,55 +263,71 @@
 </script>
 
 <script>
+    let originalSchedule = []; // Variable para almacenar el horario original
+
     document.addEventListener('DOMContentLoaded', function () {
         const addScheduleButton = document.getElementById('agregar-horario');
         const horariosTbody = document.getElementById('horarios-tbody');
         const totalFormsInput = document.querySelector('input[name="horario_set-TOTAL_FORMS"]');
         let scheduleIndex = parseInt(totalFormsInput.value) || 0;
-    
+
         const fullTimeCheckbox = document.getElementById('fulltime-checkbox');
         const weekendPartTimeCheckbox = document.getElementById('weekend-parttime-checkbox');
-    
+
+        // Captura el horario original al cargar la página
+        document.querySelectorAll('.horario-row').forEach(row => {
+            const day = row.querySelector('select').value;
+            const startTime = row.querySelector('input[type="time"]').value;
+            const endTime = row.querySelectorAll('input[type="time"]')[1].value;
+            originalSchedule.push({ day, startTime, endTime });
+        });
+
+        console.log("Horario original almacenado:", originalSchedule);
+
         fullTimeCheckbox.addEventListener('change', function () {
-            toggleCheckbox('fulltime-checkbox', 'weekend-parttime-checkbox');
             if (fullTimeCheckbox.checked) {
+                toggleCheckbox('fulltime-checkbox', 'weekend-parttime-checkbox');
                 clearScheduleRows();
                 const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
                 days.forEach(day => {
                     addScheduleRow(day, '08:00', '18:00');
                 });
             } else {
-                resetScheduleToExistingData();
+                resetScheduleToOriginal();
             }
         });
-        
+
         weekendPartTimeCheckbox.addEventListener('change', function () {
-            toggleCheckbox('weekend-parttime-checkbox', 'fulltime-checkbox');
             if (weekendPartTimeCheckbox.checked) {
+                toggleCheckbox('weekend-parttime-checkbox', 'fulltime-checkbox');
                 clearScheduleRows();
                 const days = ['Sábado', 'Domingo'];
                 days.forEach(day => {
                     addScheduleRow(day, '08:00', '18:00');
                 });
             } else {
-                resetScheduleToExistingData();
+                resetScheduleToOriginal();
             }
         });
-        
-    
-        addScheduleButton.addEventListener('click', function () {
-            addScheduleRow();
-        });
-    
+
+        function resetScheduleToOriginal() {
+            // Limpia las filas actuales y restaura las originales
+            clearScheduleRows();
+            originalSchedule.forEach(schedule => {
+                addScheduleRow(schedule.day, schedule.startTime, schedule.endTime);
+            });
+            console.log("Horario restaurado a:", originalSchedule);
+        }
+
         function addScheduleRow(day = '---------', horaInicio = '', horaFin = '') {
             const newRow = document.createElement('tr');
             newRow.className = 'horario-row';
-    
+
             const diaSelect = document.createElement('select');
             diaSelect.name = `horario_set-${scheduleIndex}-dia`;
             diaSelect.className = 'seleccion';
             diaSelect.id = `id_horario_set-${scheduleIndex}-dia`;
-    
+
             const days = ['---------', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
             days.forEach(d => {
                 const option = document.createElement('option');
@@ -322,21 +338,21 @@
                 }
                 diaSelect.appendChild(option);
             });
-    
+
             const horaInicioInput = document.createElement('input');
             horaInicioInput.type = 'time';
             horaInicioInput.name = `horario_set-${scheduleIndex}-hora_inicio`;
             horaInicioInput.className = 'campo-formulario';
             horaInicioInput.id = `id_horario_set-${scheduleIndex}-hora_inicio`;
             horaInicioInput.value = horaInicio;
-    
+
             const horaFinInput = document.createElement('input');
             horaFinInput.type = 'time';
             horaFinInput.name = `horario_set-${scheduleIndex}-hora_final`;
             horaFinInput.className = 'campo-formulario';
             horaFinInput.id = `id_horario_set-${scheduleIndex}-hora_final`;
             horaFinInput.value = horaFin;
-    
+
             const deleteButton = document.createElement('button');
             deleteButton.textContent = 'Eliminar';
             deleteButton.type = 'button';
@@ -346,19 +362,19 @@
                 updateTotalForms();
                 toggleDeleteButtons();
             });
-    
+
             newRow.appendChild(tdElement(diaSelect));
             newRow.appendChild(tdElement(horaInicioInput));
             newRow.appendChild(tdElement(horaFinInput));
             newRow.appendChild(tdElement(deleteButton));
-    
+
             horariosTbody.appendChild(newRow);
-    
+
             totalFormsInput.value = scheduleIndex + 1;
             scheduleIndex++;
             toggleDeleteButtons();
         }
-    
+
         function clearScheduleRows() {
             while (horariosTbody.firstChild) {
                 horariosTbody.removeChild(horariosTbody.firstChild);
@@ -366,30 +382,18 @@
             scheduleIndex = 0;
             totalFormsInput.value = scheduleIndex;
         }
-    
-        function resetScheduleToExistingData() {
-            const existingRows = document.querySelectorAll('.horario-row-existing');
-            existingRows.forEach(row => {
-                const deleteButton = row.querySelector('.delete-row-btn');
-                deleteButton.addEventListener('click', function () {
-                    horariosTbody.removeChild(row);
-                    updateTotalForms();
-                    toggleDeleteButtons();
-                });
-            });
-        }
-    
+
         function tdElement(...children) {
             const td = document.createElement('td');
             children.forEach(child => td.appendChild(child));
             return td;
         }
-    
+
         function updateTotalForms() {
             totalFormsInput.value = horariosTbody.childElementCount;
             scheduleIndex = parseInt(totalFormsInput.value);
         }
-    
+
         function toggleDeleteButtons() {
             const deleteButtons = document.querySelectorAll('.delete-row-btn');
             deleteButtons.forEach(button => {
@@ -400,15 +404,15 @@
         function toggleCheckbox(selectedId, otherId) {
             const selectedCheckbox = document.getElementById(selectedId);
             const otherCheckbox = document.getElementById(otherId);
-        
+
             if (selectedCheckbox.checked) {
                 otherCheckbox.checked = false;
             }
         }
-    
+
         toggleDeleteButtons();
-        resetScheduleToExistingData();  // Llama a esta función para inicializar el evento de eliminación en filas originales
     });
+
     
     
 </script>
