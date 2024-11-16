@@ -138,10 +138,10 @@ document.addEventListener("DOMContentLoaded", function () {
             modal.style.display = "none";
         });
     }
-    
+
     if (btnNuevaRutina) {
         btnNuevaRutina.onclick = function () {
-            nuevaRutinaModal.style.display = 'block';
+            nuevaRutinaModal.style.display = 'flex';
         };
     }
 
@@ -196,7 +196,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     editarRutinaForm.setAttribute('data-rutina-id', rutinaId);
 
                     // Mostrar el modal
-                    editarRutinaModal.style.display = 'block';
+                    editarRutinaModal.style.display = 'flex';
                 } else {
                     alert('Error al obtener los datos de la rutina: ' + data.message);
                 }
@@ -278,7 +278,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 
-    
+
     console.log('Datos de la rutina:', data.rutina.frecuencia_cantidad);
 
     function cargarDatosRutina(rutinaId) {
@@ -303,15 +303,15 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Evento para editar rutina que llama a la función de carga de datos
-    if (editarRutinaBtn) {
-        editarRutinaBtn.onclick = function () {
-            const rutinaId = editarRutinaBtn.getAttribute('data-rutina-id');
-            cargarDatosRutina(rutinaId); // Llamar a la función de carga de datos
+    // // Evento para editar rutina que llama a la función de carga de datos
+    // if (editarRutinaBtn) {
+    //     editarRutinaBtn.onclick = function () {
+    //         const rutinaId = editarRutinaBtn.getAttribute('data-rutina-id');
+    //         cargarDatosRutina(rutinaId); // Llamar a la función de carga de datos
 
-            // Mostrar el modal de edición después de cargar los datos
-            editarRutinaModal.style.display = 'block';
-        };
-    }
+    //         // Mostrar el modal de edición después de cargar los datos
+    //         editarRutinaModal.style.display = 'block';
+    //     };
+    // }
 
 });

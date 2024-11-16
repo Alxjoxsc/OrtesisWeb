@@ -134,7 +134,9 @@
                 <button class="sesion-grafico-btn" data-id="{{ sesion.id }}" onclick="enviarIdSesion({{ sesion.id }})">Ver gráfico</button>
               </div>
             {% empty %}
+            <div class="no-sesiones">
               <p>No hay sesiones registradas para esta rutina.</p>
+            </div>
             {% endfor %}
             <!-- Botón adicional para ir a historial_paciente.html -->
             <div class="boton-historial">
@@ -263,7 +265,7 @@
 </div>
 
 <!-- Modal Popup para editar rutina actual -->
-<div id="editarRutinaModal" class="modal modal-editar-rutina">
+<div id="editarRutinaModal" class="modal">
   <div class="modal-content">
       <span class="close" id="cerrarEditarRutina">&times;</span>
       <h2>Editar Rutina</h2>
