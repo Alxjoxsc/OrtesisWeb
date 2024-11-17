@@ -772,7 +772,7 @@ def validar_correo(correo):
 
 def historial_sesiones(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
-    rutinas = Rutina.objects.filter(paciente=paciente).order_by('-fecha_inicio')
+    rutinas = Rutina.objects.filter(paciente=paciente).order_by('fecha_inicio')
     
     # Obtener el parámetro 'rutina_id' de la URL
     rutina_id = request.GET.get('rutina_id')
