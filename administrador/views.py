@@ -4,7 +4,7 @@ import csv
 from django.conf import settings
 import pandas as pd
 from decimal import Decimal
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from itertools import cycle
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
@@ -12,7 +12,7 @@ from autenticacion.decorators import role_required
 from django.http import HttpResponse, JsonResponse
 from .forms import CrearTerapeutaForm, HorarioFormSet, CrearPacienteForm, EditarPacienteForm, CrearRecepcionistaForm, EditarTerapeutaForm
 from autenticacion.models import Comuna, Region
-from terapeuta.models import Paciente, Terapeuta, Cita, Horario
+from terapeuta.models import Paciente, Terapeuta, Cita, Horario, Sesion
 from recepcionista.models import Recepcionista
 from autenticacion.models import Profile
 from django.contrib.auth.models import User, Group
@@ -32,6 +32,7 @@ from django.conf import settings
 import string
 import random
 from django.contrib.auth.hashers import make_password
+from django.db.models import Sum, Count, Avg
 
 ############################### LISTAR TERAPEUTAS ################################
 @role_required('Administrador')
@@ -1569,3 +1570,41 @@ def editar_datos_terapeuta_admin(request, terapeuta_id):
         'modulo_terapeutas': True,
         'messages': messages.get_messages(request),
     })
+
+##################################################              REPORTERIA              ########################################################
+
+@role_required('Administrador')
+def reporteria_terapeutas(request):
+    # Fecha de inicio y fin para el mes actual
+    hoy = datetime.now()
+    inicio_mes = datetime(hoy.year, hoy.month, 1)
+    fin_mes = inicio_mes + timedelta(days=31) - timedelta(days=inicio_mes.day + 1)
+
+    # 1. Total de horas trabajadas por terapeuta
+    horas_trabajadas = Terapeuta.objects.values('user__first_name', 'user__last_name').annotate(
+        total_horas=Sum('horas_trabajadas')
+    )
+
+    # 2. Número de pacientes asignados por terapeuta
+    pacientes_asignados = Terapeuta.objects.annotate(
+        total_pacientes=Count('paciente')
+    ).values('user__first_name', 'user__last_name', 'total_pacientes')
+
+    # 3. Especialidades de los terapeutas
+    especialidades = Terapeuta.objects.values('especialidad').annotate(
+        total=Count('id')
+    )
+
+    # 4. Promedio de duración de las sesiones (en minutos)
+    promedio_sesiones = Sesion.objects.filter(fecha__range=[inicio_mes, fin_mes]).values('rutina__terapeuta__user__first_name', 'rutina__terapeuta__user__last_name').annotate(
+        promedio_duracion=Avg('duracion')
+    )
+        
+
+    return render(request, 'reporteria_terapeutas.html', {
+        'modulo_terapeutas': True,
+        'horas_trabajadas': list(horas_trabajadas),
+        'pacientes_asignados': list(pacientes_asignados),
+        'especialidades': list(especialidades),
+        'promedio_sesiones': list(promedio_sesiones),
+        })

@@ -38,6 +38,8 @@
     {% endfor %}
     {% endif %}
 </div>
+<button id="boton-reporteria" onclick="window.location.href='{% url 'reporteria_terapeutas' %}'">Reportes
+    <img src="{% static 'icons/reporteria.svg' %}">
 <button id="boton-carga-masiva" onclick="openPopup()">Carga masiva
     <img src="{% static 'icons/carga-masiva.svg' %}">
 </button>

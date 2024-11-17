@@ -1,0 +1,97 @@
+{% extends 'administrador_base.html' %}
+
+{% load static %}
+
+{% block title%} Reporteria {% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/reporteria.css' %}">
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+{% endblock %}
+
+{% block content %}
+    <!-- 1. Total de horas trabajadas por terapeuta -->
+    <div id="horas-trabajadas-container"></div>
+    <script>
+        const horasTrabajadas = {{ horas_trabajadas|safe }};
+        Highcharts.chart('horas-trabajadas-container', {
+            chart: { type: 'bar' },
+            title: { text: 'Horas trabajadas por terapeuta' },
+            xAxis: {
+                categories: horasTrabajadas.map(item => `${item.user__first_name} ${item.user__last_name}`),
+                title: { text: 'Terapeutas' }
+            },
+            yAxis: {
+                min: 0,
+                title: { text: 'Horas trabajadas' }
+            },
+            series: [{
+                name: 'Horas',
+                data: horasTrabajadas.map(item => item.total_horas)
+            }]
+        });
+    </script>
+
+    <!-- 2. Número de pacientes asignados por terapeuta -->
+    <div id="pacientes-asignados-container"></div>
+    <script>
+        const pacientesAsignados = {{ pacientes_asignados|safe }};
+        Highcharts.chart('pacientes-asignados-container', {
+            chart: { type: 'column' },
+            title: { text: 'Número de pacientes por terapeuta' },
+            xAxis: {
+                categories: pacientesAsignados.map(item => `${item.user__first_name} ${item.user__last_name}`),
+                title: { text: 'Terapeutas' }
+            },
+            yAxis: {
+                min: 0,
+                title: { text: 'Pacientes asignados' }
+            },
+            series: [{
+                name: 'Pacientes',
+                data: pacientesAsignados.map(item => item.total_pacientes)
+            }]
+        });
+    </script>
+
+    <!-- 3. Especialidades de los terapeutas -->
+    <div id="especialidades-container"></div>
+    <script>
+        const especialidades = {{ especialidades|safe }};
+        Highcharts.chart('especialidades-container', {
+            chart: { type: 'pie' },
+            title: { text: 'Especialidades de los terapeutas' },
+            series: [{
+                name: 'Cantidad',
+                colorByPoint: true,
+                data: especialidades.map(item => ({ name: item.especialidad, y: item.total }))
+            }]
+        });
+    </script>
+
+    <!-- 4. Promedio de duración de las sesiones -->
+    <div id="promedio-sesiones-container"></div>
+    <script>
+        const promedioSesiones = {{ promedio_sesiones|safe }};
+        Highcharts.chart('promedio-sesiones-container', {
+            chart: { type: 'line' },
+            title: { text: 'Promedio de duración de las sesiones' },
+            xAxis: {
+                categories: promedioSesiones.map(item => `${item.rutina__terapeuta__user__first_name} ${item.rutina__terapeuta__user__last_name}`),
+                title: { text: 'Terapeutas' }
+            },
+            yAxis: {
+                min: 0,
+                title: { text: 'Duración promedio (minutos)' }
+            },
+            series: [{
+                name: 'Duración promedio',
+                data: promedioSesiones.map(item => item.promedio_duracion)
+            }]
+        });
+    </script>
+{% endblock %}
+
+{% block extra_js %}
+    
+{% endblock %}
