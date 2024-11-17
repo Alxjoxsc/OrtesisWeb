@@ -467,7 +467,7 @@ function minutesToTime(minutes) {
     }
 
     // Reasignación de IDs en abrirEditar
-    function abrirEditar(cita_id, fecha, hora_inicio = null, hora_final = null, titulo = null, paciente_id = null, paciente_nombre = null, sala = null, detalle = null) {
+    function abrirEditar(cita_id, fecha, hora_inicio = null, hora_final = null, titulo = null, paciente_id = null, paciente_nombre = null, sala = null, detalle = null, tipo_cita = null) {
         modal_editar.style.display = "block";
 
         const fechaISO = fecha.split('/').reverse().join('-');

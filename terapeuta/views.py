@@ -282,31 +282,33 @@ def agendar_cita(request):
         user_id = request.user.id
         terapeuta = Terapeuta.objects.get(user_id=user_id)
         terapeuta_id = terapeuta.id
-        print(terapeuta_id)
         if request.method == 'POST':
             titulo = request.POST['titulo']
             paciente_id = request.POST['paciente']
             fecha = request.POST['fecha']
-            hora_inicio = request.POST['hora_inicio']
-            hora_final = request.POST['hora_final']
+            hora_inicio_str = request.POST['hora_inicio']
+            hora_final_str = request.POST['hora_final']
             tipo_cita = request.POST.get('tipo_cita')
             sala = request.POST['sala']
             detalle = request.POST['detalle']
         
             terapeuta_instance = Terapeuta.objects.get(id=terapeuta_id)
-            
             paciente_instance = Paciente.objects.get(id=paciente_id)
             
+            # Convertir las horas a objetos time
+            hora_inicio = datetime.strptime(hora_inicio_str, '%H:%M').time()
+            hora_final = datetime.strptime(hora_final_str, '%H:%M').time()
+            
             cita = Cita(
-                terapeuta = terapeuta_instance,
-                titulo = titulo,
-                paciente = paciente_instance,
-                fecha = fecha,
-                hora_inicio = hora_inicio,
-                hora_final = hora_final,
-                tipo_cita = tipo_cita,
-                sala = sala,
-                detalle = detalle
+                terapeuta=terapeuta_instance,
+                titulo=titulo,
+                paciente=paciente_instance,
+                fecha=fecha,
+                hora_inicio=hora_inicio,
+                hora_final=hora_final,
+                tipo_cita=tipo_cita,
+                sala=sala,
+                detalle=detalle
             )
             cita.save()
             
@@ -314,11 +316,12 @@ def agendar_cita(request):
             Notificacion.objects.create(
                 terapeuta=terapeuta_instance,
                 cita=cita,
-                leida=False  # Inicialmente, la notificación no está leída
+                leida=False
             )
             
             return redirect('agenda')
     return render(request, 'agenda.html', {'modulo_agenda': True})
+
 
 def editar_cita(request):
     if request.method == "POST":
