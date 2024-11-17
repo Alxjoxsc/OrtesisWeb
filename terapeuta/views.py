@@ -46,8 +46,8 @@ def agenda(request):
     terapeuta_id = terapeuta.id
     pacientes = Paciente.objects.filter(terapeuta_id=terapeuta_id)  # Obtener los pacientes del terapeuta
 
-    # Obtención de las citas
-    citas = Cita.objects.all()
+    # Filtrar las citas por el terapeuta actual
+    citas = Cita.objects.filter(terapeuta=terapeuta)
     citas_json = []
     for cita in citas:
         if cita.paciente and cita.paciente.id and cita.paciente.first_name and cita.paciente.last_name:
@@ -57,7 +57,7 @@ def agenda(request):
                 'titulo': cita.titulo,
                 'hora_inicio': cita.hora_inicio.strftime('%H:%M'),
                 'hora_final': cita.hora_final.strftime('%H:%M'),
-                'tipo_cita': cita.tipo_cita,  # Añadido el campo tipo_cita
+                'tipo_cita': cita.tipo_cita,
                 'detalle': cita.detalle,
                 'sala': cita.sala,
                 'paciente': {
@@ -74,6 +74,7 @@ def agenda(request):
         'citas': citas,
         'modulo_agenda': True
     })
+
 
 def obtener_fechas_citas(request):
     if request.method == "GET":
