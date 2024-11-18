@@ -1536,9 +1536,11 @@ def editar_datos_terapeuta_admin(request, terapeuta_id):
 
         if form.is_valid():
             form.save()
-            messages.success(request, 'Datos guardados exitosamente.')
-            # Redirigir a la misma página con un parámetro de éxito en la URL
-            return redirect('editar_datos_terapeuta_admin', terapeuta_id=terapeuta_id)
+            return JsonResponse({
+                'success': True,
+                'message': 'Datos guardados exitosamente.',
+                'terapeuta_id': terapeuta.id
+            })
 
     else:
         form = EditarTerapeutaForm(
