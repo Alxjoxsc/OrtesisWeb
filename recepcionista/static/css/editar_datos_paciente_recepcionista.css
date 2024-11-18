@@ -11,8 +11,10 @@
     flex-direction: column;
 }
 
-.contenido-modal-exito {
+/* Modal de éxito */
+.contenido-modal {
     display: flex;
+    padding: 20px;
     background-color: #fefefe;
     flex-direction: column;
     gap: 1.25rem;
@@ -20,22 +22,39 @@
     justify-content: center;
     text-align: center;
     border-radius: 0.625rem;
-    width: 18.75rem;
-    height: 14.0625rem;
-    margin: auto; /* Centrar horizontalmente */
-    position: absolute; /* Centrar verticalmente */
+    width: 40rem; /* Modal más pequeño */
+    height: 20rem; /* Modal más pequeño */
+    margin: auto;
+    position: fixed; /* Asegura que el modal se mantenga fijo */
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    z-index: 9999; /* Asegura que el modal esté encima de otros elementos */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8); /* Sombra agregada */
 }
 
-.contenido-modal-exito img{
-    width: 75px;
-    height: 75px;
+.contenido-modal img {
+    width: 120px; /* Tamaño ajustado de la imagen */
+    height: auto; 
+    margin-bottom: 1rem;
 }
 
-.contenido-modal-exito p{
-    font-size: 1.25rem;
+.contenido-modal h1, .contenido-modal h2, .contenido-modal p {
+    font-size: 1.75rem; /* Aumento del tamaño de la fuente para los encabezados */
+}
+
+.contenido-modal p {
+    font-size: 1.25rem; /* Aumento del tamaño de la fuente para el mensaje */
+}
+
+.boton-continuar {
+    background-color: rgba(76, 175, 80, 0.9608);
+    color: white;
+    padding: 0.625rem 1.25rem;
+    border: none;
+    border-radius: 3.125rem;
+    font-size: 1rem;
+    cursor: pointer;
 }
 
 .boton-continuar{
@@ -267,4 +286,3 @@ input[type="date"] {
     border: 0.0625rem solid #ccc;
     border-radius: 0.25rem;
 }
-
