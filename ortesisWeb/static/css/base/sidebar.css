@@ -234,7 +234,7 @@
     }
     
     .profile .nombre_usuario p {
-        font-size: 18px;
+        font-size: 16px;
     }
 
     .menu li a {
@@ -249,159 +249,80 @@
 }
 
 
-@media screen and (max-width:768px){
-    
+/* Responsive Sidebar para pantallas menores a 768px */
+@media screen and (max-width: 768px) {
     .sidebar_terapeuta,
     .sidebar_administrador,
     .sidebar_recepcionista {
-        display: flex;
-        width: 100%; /* La barra lateral ocupará todo el ancho de la pantalla */
-        height: 150px; /* Reducir la altura para que parezca una barra horizontal */
+        width: 250px; 
+        transform: translateX(-250px);
+        transition: transform 0.4s ease-in-out;
         position: fixed;
-        flex-direction: row; /* Cambiar la dirección de la barra para que los elementos se alineen horizontalmente */
-        justify-content: space-around; /* Espaciado entre los elementos */
+        left: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 1000;
+    }
+
+    /* Mostrar la sidebar cuando tenga la clase 'sidebar-activa' */
+    .sidebar-activa {
+        transform: translateX(0);
+    }
+
+    /* Botón para abrir/cerrar el menú */
+    .menu-toggle {
+        display: block;
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        background-color: #001058; /* Ajusta el color según sea necesario */
+        color: #ffffff;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        z-index: 1001; /* Por encima de la sidebar */
+        cursor: pointer;
+    }
+
+    .sidebar_terapeuta .logos,
+    .sidebar_administrador .logos,
+    .sidebar_recepcionista .logos,
+    .sidebar_terapeuta .profile,
+    .sidebar_administrador .profile,
+    .sidebar_recepcionista .profile {
+        margin-top: 40px;
+    }
+
+    /* Ajustar los ítems del menú */
+    .menu {
         padding: 0;
     }
 
-    .divider {
-        display: none; /* Ocultar la línea divisoria en pantallas pequeñas */
-    }
-    
-    .logos {
-        display: none; /* Ocultar los logos en pantallas pequeñas */
-    }
-
-    .profile {
-        display: none; /* Ocultar el perfil en pantallas pequeñas */
-    }
-
-    .menu {
-        display: flex;
-        flex-flow: row nowrap; /* Los ítems del menú se colocan en una fila */
-        justify-content: space-around;
-        width: 100%; /* Asegurar que el menú ocupe todo el espacio disponible */
-        align-items: center; /* Centrar los ítems del menú verticalmente */
-        flex-grow: 1;
-        margin: 0;
-    }
-
-    .menu li {
-        width: auto; /* Ajustar los ítems del menú al contenido */
-        height: auto;
-        margin: 0 5px; /* Añadir un pequeño margen entre los ítems del menú */
-    }
-
     .menu li a {
-        padding: 10px; /* Reducir el espacio alrededor de los ítems del menú */
-        font-size: 20px; /* Ajustar el tamaño de la fuente para que se vea mejor en pantallas pequeñas */
+        font-size: 20px;
+        padding: 15px;
     }
 
     .menu li a img {
-        width: 30px; /* Reducir el tamaño de los iconos */
+        width: 30px;
         height: 30px;
-        margin-right: 5px; 
+        margin-right: 10px;
     }
 
+    /* Ajustar el botón de logout */
     .logout {
-        display: flex;
-        width: auto;
-        border: none;
-        border-left: 1px solid rgb(255, 255, 255);
-        padding-left: 25px;
-        margin-right: 25px;
-        height: 80%;
-        align-items: center;
+        margin-top: auto;
     }
 
     .logout a {
-        padding: 10px; /* Reducir el espacio alrededor de los ítems del menú */
-        font-size: 20px; /* Ajustar el tamaño de la fuente para que se vea mejor en pantallas pequeñas */
-        margin-top: 10px;
-        flex-flow: row nowrap;
+        font-size: 20px;
+        padding: 15px;
     }
 
-    .logout a img{
-        width: 30px;
-        height: 30px;
-        margin-right: 5px;
-    }
-}
-
-
-@media screen and (max-width: 600px){
-    
-    .sidebar_terapeuta,
-    .sidebar_administrador,
-    .sidebar_recepcionista {
-        display: flex;
-        width: 100%; /* La barra lateral ocupará todo el ancho de la pantalla */
-        height: 150px; /* Reducir la altura para que parezca una barra horizontal */
-        position: fixed;
-        flex-direction: row; /* Cambiar la dirección de la barra para que los elementos se alineen horizontalmente */
-        justify-content: space-around; /* Espaciado entre los elementos */
-        padding: 0;
-    }
-
-    .divider {
-        display: none; /* Ocultar la línea divisoria en pantallas pequeñas */
-    }
-    
-    .logos {
-        display: none; /* Ocultar los logos en pantallas pequeñas */
-    }
-
-    .profile {
-        display: none; /* Ocultar el perfil en pantallas pequeñas */
-    }
-
-    .menu {
-        display: flex;
-        flex-flow: row wrap; /* Los ítems del menú se colocan en una fila */
-        justify-content: left;
-        width: 100%; /* Asegurar que el menú ocupe todo el espacio disponible */
-        align-items: center; /* Centrar los ítems del menú verticalmente */
-        flex-grow: 1;
-        margin: 0;
-    }
-
-    .menu li {
-        width: auto; /* Ajustar los ítems del menú al contenido */
-        height: auto;
-        margin: 0 5px; /* Añadir un pequeño margen entre los ítems del menú */
-    }
-
-    .menu li a {
-        padding: 10px; /* Reducir el espacio alrededor de los ítems del menú */
-        font-size: 20px; /* Ajustar el tamaño de la fuente para que se vea mejor en pantallas pequeñas */
-    }
-
-    .menu li a img {
-        width: 30px; /* Reducir el tamaño de los iconos */
-        height: 30px;
-        margin-right: 5px; 
-    }
-
-    .logout {
-        display: flex;
-        width: auto;
-        border: none;
-        border-left: 1px solid rgb(255, 255, 255);
-        padding-left: 25px;
-        margin-right: 25px;
-        height: 80%;
-        align-items: center;
-    }
-
-    .logout a {
-        padding: 10px; /* Reducir el espacio alrededor de los ítems del menú */
-        font-size: 20px; /* Ajustar el tamaño de la fuente para que se vea mejor en pantallas pequeñas */
-        margin-top: 10px;
-        flex-flow: row wrap;
-    }
-
-    .logout a img{
-        width: 30px;
-        height: 30px;
-        margin: 0;
+    /* Ajustar el contenido principal */
+    .main-content {
+        margin-left: 0;
+        position: relative;
+        z-index: 0;
     }
 }

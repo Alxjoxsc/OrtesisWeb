@@ -20,6 +20,7 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body>
+    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
     <div class="contenedor-grid">
         <!-- Sidebar -->
         <aside class="sidebar_administrador">
@@ -94,7 +95,11 @@
 
     <!-- JavaScript general -->
     <script src="{% static 'js/activeMenu.js' %}"></script>
-    
+    <script>function toggleSidebar() {
+        const sidebar = document.querySelector('.sidebar_administrador, .sidebar_terapeuta, .sidebar_recepcionista');
+        sidebar.classList.toggle('sidebar-activa');
+    }
+    </script>
     <!-- Bloque adicional para cargar scripts JS específicos -->
     {% block extra_js %}{% endblock %}
 
