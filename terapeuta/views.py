@@ -735,7 +735,7 @@ def editar_perfil(request, pk):
             # valida el correo
             validar_correo(nuevo_correo)
             if Terapeuta.objects.filter(correo_contacto=nuevo_correo).exclude(pk=terapeuta.pk).exists():
-                messages.error(request, 'El correo ya está en uso por otro terapeuta.')
+                return JsonResponse({'success': False, 'message': 'El correo ya está en uso por otro terapeuta.'})
             else:
                 # Actualiza los datos del terapeuta
                 terapeuta.presentacion = nueva_presentacion
@@ -753,11 +753,11 @@ def editar_perfil(request, pk):
                     terapeuta.imagen_perfil = imagen
 
                 terapeuta.save()
-                messages.success(request, 'Perfil actualizado exitosamente.')
-                return redirect('perfil')
+                # Respuesta de éxito en formato JSON
+                return JsonResponse({'success': True, 'message': 'Perfil actualizado exitosamente.'})
 
         except ValidationError as e:
-            messages.error(request, str(e))
+            return JsonResponse({'success': False, 'message': str(e)})
 
     context = {
         'terapeuta': terapeuta,
