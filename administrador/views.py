@@ -1512,13 +1512,11 @@ def agregar_recepcionista(request):
         recepcionista_form = CrearRecepcionistaForm(request.POST)
         if recepcionista_form.is_valid():
             with transaction.atomic():
-                recepcionista_form.save()
-            # Enviar mensaje de éxito
-            messages.success(request, 'El recepcionista ha sido creado exitosamente.')
-            return render(request, 'agregar_recepcionista_admin.html', {
-                'recepcionista_form': CrearRecepcionistaForm(),
-                'modulo_recepcionistas': True,
-            })
+                # Guardamos el recepcionista
+                recepcionista = recepcionista_form.save()
+            
+            # Redirigimos a la vista 'mostrar_recepcionista_administrador' con el ID del recepcionista
+            return redirect('mostrar_recepcionista_administrador', recepcionista_id=recepcionista.id)
     else:
         recepcionista_form = CrearRecepcionistaForm()
 

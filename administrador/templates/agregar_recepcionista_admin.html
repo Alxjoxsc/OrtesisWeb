@@ -8,7 +8,6 @@
 <link rel="stylesheet" href="{% static 'styles/agregar_recepcionista.css' %}">
 <link rel="stylesheet" href="{% static 'styles/formularios.css' %}">
 <link rel="stylesheet" href="{% static 'styles/modal.css' %}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 {% endblock %}
 
 {% block header %}
@@ -147,39 +146,6 @@
 </form>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        {% if messages %}
-            {% for message in messages %}
-                Swal.fire({
-                    title: '¡Éxito al Guardar!',
-                    icon: 'success',
-                    confirmButtonText: 'Aceptar',
-                    confirmButtonColor: '#3085d6',
-                    background: '#f0f0f0',
-                    color: '#333', // Color del texto del popup
-                    timer: 3000,
-                    customClass: {
-                        popup: 'custom-popup',
-                        title: 'custom-title',
-                        content: 'custom-content',
-                        confirmButton: 'custom-button'
-                    },
-                    didOpen: () => {
-                        // Centrar el título a lo largo del popup
-                        const title = document.querySelector('.swal2-title');
-                        title.style.textAlign = 'center';
-                        title.style.width = '100%';
-                        title.style.border = 'none';
-                    }
-                });
-            {% endfor %}
-        {% endif %}
-    });
-
-
-</script>
-
-<script>
     document.addEventListener("DOMContentLoaded", function() {
         var regionField = document.getElementById("id_region");
         var comunaField = document.getElementById("id_comuna");
@@ -213,5 +179,4 @@
 {% block extra_js %}
 <script src="{% static 'js/formatear-rut.js' %}"></script>
 <script src="{% static 'js/formatear-telefono.js' %}"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 {% endblock %}
