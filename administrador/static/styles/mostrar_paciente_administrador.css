@@ -269,7 +269,7 @@ strong {
 
 /* Estilos para los botones de edición, guardar y cancelar */
 .save-button, .cancel-button {
-    width: 20%;
+    width: 30%;
     background-color: #008CAB;
     color: white;
     border: none; 
@@ -350,44 +350,155 @@ strong {
 }
 
 
-@media screen and (max-width:1200px){
+@media screen and (max-width:1200px){ 
     .columna p{
         font-size: 20px;
+    }
+
+    .email-container {
+        align-items: flex-start;
+        font-size: 18px;
+        margin-top: -15px;
+        margin-bottom: -5px;
+    }
+
+    /* Ajustar el tamaño del ícono de edición */
+    .edit-icon-svg {
+        width: 18px;
+        height: 18px;
+
+    }
+
+    /* Ajustar los botones */
+    .save-button, .cancel-button {
+        width: 30%; 
+        font-size: 14px;
+        padding: 10px;
+        margin-top: 10px;
+    }
+
+    /* Ajustar el campo de entrada de email */
+    #email-input {
+        max-width: 100%;
+        font-size: 16px;
+        padding: 8px;
+    }
+
+    .btn-actualizar-credenciales {
+        background-color: #FF6161; /* Color azul */
+        color: white;
+        font-size: 15px;
+        width: 240px;
+        border: none;
+        padding: 10px 5px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+}
+
+@media screen and (max-width:900px){ 
+    .columna p{
+        font-size: 20px;
+    }
+
+    .email-container {
+        flex-direction: column;
+        align-items: flex-start;
+        font-size: 18px;
+        margin-top: -15px;
+        margin-bottom: -5px;
+    }
+
+    /* Ajustar el tamaño del ícono de edición */
+    .edit-icon-svg {
+        width: 18px;
+        height: 18px;
+    }
+
+}
+
+@media screen and (max-width: 768px) {
+    /* Ajustar el tamaño del ícono de edición */
+    .edit-icon-svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    /* Ajustar los botones */
+    .save-button, .cancel-button {
+        width: 30%; 
+        font-size: 14px;
+        padding: 10px;
+        margin-top: 10px;
+    }
+
+    /* Ajustar el campo de entrada de email */
+    #email-input {
+        max-width: 100%;
+        font-size: 16px;
+        padding: 8px;
+    }
+}
+
+/* Media Query para pantallas menores a 576px */
+@media screen and (max-width: 576px) {
+    /* Ajustes adicionales para pantallas más pequeñas */
+    .email-container {
+        font-size: 16px;
+        margin-top: -10px;
+        margin-bottom: 0;
+    }
+
+    .edit-icon-svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .save-button, .cancel-button {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    #email-input {
+        font-size: 14px;
+        padding: 6px;
+    }
+}
+
+/* Media Query para pantallas menores a 400px */
+@media screen and (max-width: 400px) {
+    .email-container {
+        font-size: 14px;
+    }
+
+    .edit-icon-svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .save-button, .cancel-button {
+        font-size: 12px;
+        padding: 6px;
+    }
+
+    #email-input {
+        font-size: 12px;
+        padding: 5px;
     }
 }
 
 
-@media screen and (max-width:768px){
-    .card-paciente{
-        flex-direction: column;
-        justify-content: center;
-        width: 100%;
-    }
-
-    .izquierda{
-        width: 100%;
-    }
-    .derecha{
-        width: 100%;
-    }
-
-    .campo-formulario {
-        background-color: white;
-        color: black;
-        border-radius: 5px;
-        padding: 15px;
-        font-size: 18px;
-        width: 100%; /* Ahora ocupa el 100% del ancho del contenedor */
-        height: 150px;
-        text-align: left;
-        display: block;
-        box-sizing: border-box; /* Asegura que padding y border se incluyan en el ancho */
-        overflow: auto;
-        resize: none;
-    }
-
-    h1{
-        font-size: 2rem;
-    }
+@media screen and (max-width:600px){
     
+    .columna p{
+        font-size: 18px;
+    }
+
+    p span{
+        font-size: 16px;
+        font-weight: 400;
+        display: flex;
+        align-items: center;
+    }
+
 }
