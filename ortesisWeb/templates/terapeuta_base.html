@@ -21,6 +21,7 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body>
+    <button class="menu-toggle-terapeuta" onclick="toggleSidebar()">☰</button>
     <div class="contenedor-grid">
         <!-- Sidebar -->
         <aside class="sidebar_terapeuta">
@@ -125,6 +126,11 @@
 
     <!-- JavaScript general -->
     <script src="{% static 'js/activeMenu.js' %}"></script>
+    <script>function toggleSidebar() {
+        const sidebar = document.querySelector('.sidebar_administrador, .sidebar_terapeuta, .sidebar_recepcionista');
+        sidebar.classList.toggle('sidebar-activa');
+    }
+    </script>
     <script>
 
         document.addEventListener('DOMContentLoaded', function() {

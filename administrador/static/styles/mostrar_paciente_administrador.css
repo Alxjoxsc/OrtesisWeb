@@ -383,6 +383,17 @@ strong {
         font-size: 16px;
         padding: 8px;
     }
+
+    .btn-actualizar-credenciales {
+        background-color: #FF6161; /* Color azul */
+        color: white;
+        font-size: 15px;
+        width: 240px;
+        border: none;
+        padding: 10px 5px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
 }
 
 @media screen and (max-width:900px){ 
@@ -406,8 +417,6 @@ strong {
 
 }
 
-
-/* Media Query para pantallas menores a 768px */
 @media screen and (max-width: 768px) {
     /* Ajustar el tamaño del ícono de edición */
     .edit-icon-svg {

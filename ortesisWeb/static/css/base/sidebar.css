@@ -269,19 +269,30 @@
         transform: translateX(0);
     }
 
-    /* Botón para abrir/cerrar el menú */
-    .menu-toggle {
+    .menu-toggle-admin, 
+    .menu-toggle-terapeuta, 
+    .menu-toggle-recepcionista{
+        width: 10%;
         display: block;
         position: fixed;
         top: 15px;
         left: 15px;
-        background-color: #001058; /* Ajusta el color según sea necesario */
         color: #ffffff;
         padding: 10px;
         border: none;
         border-radius: 5px;
-        z-index: 1001; /* Por encima de la sidebar */
+        z-index: 1001;
         cursor: pointer;
+    }
+    .menu.toggle-admin{
+        background-color: #001058;
+    }
+    .menu-toggle-terapeuta{
+        background-color: #008CAB;
+    }
+
+    .menu-toggle-recepcionista{
+        background-color: #373D58;
     }
 
     .sidebar_terapeuta .logos,
