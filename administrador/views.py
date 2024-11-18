@@ -1068,7 +1068,11 @@ def editar_datos_paciente_admin(request, paciente_id, terapeuta=None):
             form.save()
             messages.success(request, 'Datos guardados exitosamente.')
             # Redirigir a la misma página con un parámetro de éxito en la URL
-            return redirect('editar_datos_paciente_admin', paciente_id=paciente_id)
+            return JsonResponse({
+                'success': True,
+                'message': 'Datos guardados exitosamente.',
+                'paciente_id': paciente.id
+            })
 
 
     
@@ -1083,8 +1087,9 @@ def editar_datos_paciente_admin(request, paciente_id, terapeuta=None):
         'terapeuta_asignado': paciente.terapeuta.id if paciente.terapeuta else None,
         'paciente_form': form,
         'modulo_pacientes': True,
+        'messages': messages.get_messages(request),
     })
-
+    
 @role_required('Administrador')
 def redirigir_asignar_cita(request, terapeuta_id, paciente_id):
     return redirect('calendar_asignar_paciente_administrador', terapeuta_id=terapeuta_id, paciente_id=paciente_id)
@@ -1571,3 +1576,5 @@ def editar_datos_terapeuta_admin(request, terapeuta_id):
         'modulo_terapeutas': True,
         'messages': messages.get_messages(request),
     })
+
+
