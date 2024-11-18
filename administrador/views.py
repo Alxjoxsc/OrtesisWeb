@@ -933,21 +933,19 @@ def agregar_terapeuta(request):
         horario_formset = HorarioFormSet(request.POST)
 
         if terapeuta_form.is_valid() and horario_formset.is_valid():
-            with transaction.atomic(): # Para que si algo falla, no se guarde nada, asegura que todas las operaciones se realicen correctamente
+            with transaction.atomic():
+                # Guardamos el terapeuta
                 terapeuta = terapeuta_form.save()
-                horario_formset.instance = terapeuta # Asignamos el terapeuta a los horarios
+                
+                # Asignamos el terapeuta a los horarios y guardamos el formset
+                horario_formset.instance = terapeuta
                 horario_formset.save()
             
-            messages.success(request, 'El recepcionista ha sido creado exitosamente.')
-            return render(request, 'agregar_terapeuta.html', {
-                'terapeuta_form': CrearTerapeutaForm(), # Creamos un nuevo formulario vacío
-                'horario_formset': HorarioFormSet(queryset=Horario.objects.none()),
-                'modulo_terapeutas': True,
-            })
-        
+            # Redirigimos a la vista 'mostrar_terapeuta_administrador' con el ID del terapeuta
+            return redirect('mostrar_terapeuta_administrador', terapeuta_id=terapeuta.id)
     else:
         terapeuta_form = CrearTerapeutaForm()
-        horario_formset = HorarioFormSet(queryset=Horario.objects.none()) # Creamos un formset vacío, para que no se prellene con datos
+        horario_formset = HorarioFormSet(queryset=Horario.objects.none())  # Formset vacío
     
     return render(request, 'agregar_terapeuta.html', {
         'terapeuta_form': terapeuta_form,
@@ -1066,7 +1064,6 @@ def editar_datos_paciente_admin(request, paciente_id, terapeuta=None):
         form = EditarPacienteForm(request.POST, instance=paciente)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Datos guardados exitosamente.')
             # Redirigir a la misma página con un parámetro de éxito en la URL
             return JsonResponse({
                 'success': True,
