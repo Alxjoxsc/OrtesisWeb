@@ -350,44 +350,23 @@ strong {
 }
 
 
-@media screen and (max-width:1200px){
+@media screen and (max-width:1200px){ 
     .columna p{
         font-size: 20px;
     }
 }
 
-
-@media screen and (max-width:768px){
-    .card-paciente{
-        flex-direction: column;
-        justify-content: center;
-        width: 100%;
-    }
-
-    .izquierda{
-        width: 100%;
-    }
-    .derecha{
-        width: 100%;
-    }
-
-    .campo-formulario {
-        background-color: white;
-        color: black;
-        border-radius: 5px;
-        padding: 15px;
-        font-size: 18px;
-        width: 100%; /* Ahora ocupa el 100% del ancho del contenedor */
-        height: 150px;
-        text-align: left;
-        display: block;
-        box-sizing: border-box; /* Asegura que padding y border se incluyan en el ancho */
-        overflow: auto;
-        resize: none;
-    }
-
-    h1{
-        font-size: 2rem;
-    }
+@media screen and (max-width:600px){
     
+    .columna p{
+        font-size: 18px;
+    }
+
+    p span{
+        font-size: 16px;
+        font-weight: 400;
+        display: flex;
+        align-items: center;
+    }
+
 }
