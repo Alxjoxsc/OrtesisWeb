@@ -280,16 +280,6 @@ input[type="file"]::-webkit-file-upload-button {
     font-size: 1.25rem; /* Aumento del tamaño de la fuente para el mensaje */
 }
 
-.boton-continuar {
-    background-color: rgba(76, 175, 80, 0.9608);
-    color: white;
-    padding: 0.625rem 1.25rem;
-    border: none;
-    border-radius: 3.125rem;
-    font-size: 1rem;
-    cursor: pointer;
-}
-
 /* Ajustes responsivos */
 @media (max-width: 1400px) {
     .profile-container {

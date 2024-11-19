@@ -12,15 +12,6 @@
 <div class="credenciales-container">
     <h1>Editar Credenciales</h1>
 
-    <!-- Contenedor para mensajes de error o éxito -->
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert {% if message.tags %}{{ message.tags }}{% endif %}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-
     <form id="credenciales-form" method="POST" action="{% url 'editar_credenciales' %}">
         {% csrf_token %}
 
@@ -65,6 +56,23 @@
     <p>Nota: Para cambiar tu contraseña o correo, primero debes verificar tu contraseña actual.</p>
 </div>
 
+<!-- Modal de Error -->
+<div id="modalError" class="modal" style="display: {% if modal_error %}block{% else %}none{% endif %};">
+  <div class="contenido-modal-mensaje">
+      <img src="{% static 'icons/Alert.svg' %}" alt="Error">
+      <p>{{ modal_error }}</p> 
+  </div>
+</div>
+
+<!-- Modal de Éxito -->
+<div id="modalExito" class="modal" style="display: {% if modal_exito %}block{% else %}none{% endif %};">
+  <div class="contenido-modal-mensaje">
+      <img src="{% static 'icons/Exito.svg' %}" alt="Éxito">
+      <p>{{ modal_exito }}</p> 
+  </div>
+</div>
+
+
 <script>
     document.getElementById('verificar-btn').addEventListener('click', function() {
         // Obtener la contraseña actual ingresada
@@ -90,7 +98,16 @@
                 // Mostrar los campos para nueva contraseña y confirmación
                 document.getElementById('campos-nuevos').style.display = 'block';
             } else {
-                alert('Contraseña actual incorrecta.');
+                // Mostrar modal de error con el mensaje
+                const modalError = document.getElementById('modalError');
+                const errorMessage = modalError.querySelector('p');
+                errorMessage.textContent = 'Contraseña actual incorrecta.';
+                modalError.style.display = 'block';
+
+                // Cerrar el modal después de 3 segundos
+                setTimeout(() => {
+                    modalError.style.display = 'none';
+                }, 3000);  // Cerrar después de 3 segundos
             }
         })
         .catch(error => {
@@ -104,5 +121,24 @@
         emailField.disabled = false;
         emailField.focus();
     });
-    </script>
+
+    // Mostrar y cerrar modales dinámicamente
+    document.addEventListener('DOMContentLoaded', () => {
+        const modalError = document.getElementById('modalError');
+        const modalExito = document.getElementById('modalExito');
+
+        // Cerrar los modales después de 3 segundos si se están mostrando
+        if (modalError.style.display === 'block') {
+            setTimeout(() => {
+                modalError.style.display = 'none';
+            }, 3000);  // Cerrar después de 3 segundos
+        }
+
+        if (modalExito.style.display === 'block') {
+            setTimeout(() => {
+                modalExito.style.display = 'none';
+            }, 3000);  // Cerrar después de 3 segundos
+        }
+    });
+</script>
 {% endblock %}
