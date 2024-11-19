@@ -400,23 +400,246 @@ input[type="checkbox"] {
     cursor: pointer;
 }
 
-@media screen and (max-width: 1200px){
+/* Media Query para pantallas menores a 1200px */
+@media screen and (max-width: 1200px) {
+    /* Ajustar tamaño de fuente del título */
+    .contenedor-header h1 {
+        font-size: 40px;
+    }
+
+    /* Ajustar ancho de la barra de búsqueda */
+    .search-bar {
+        width: 300px;
+        margin-bottom: 10px;
+    }
+
+    .search-icon{
+        display: none;
+    }
+
+    /* Ajustar padding y tamaño de fuente del botón */
+    #boton-agregar-terapeuta {
+        padding: 3px 15px;
+        font-size: 14px;
+    }
+
+    /* Ajustar ancho del modal */
+    .contenido-modal {
+        width: 30rem;
+    }
+
+    /* Ajustar botones de paginación */
+    .pagination .step-links a,
+    .pagination .current,
+    .disabled {
+        font-size: 13px;
+        padding: 8px 8px;
+    }
+
+    /* Ajustar tamaño de las imágenes en la tabla final */
     .final-tabla a img {
         width: 30px;
         height: 30px;
     }
 }
 
-@media screen and (max-width: 768px){
+/* Media Query para pantallas menores a 992px */
+@media screen and (max-width: 992px) {
+    /* Cambiar la dirección del flex para el encabezado */
+    .contenedor-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    /* La barra de búsqueda ocupa el 100% del ancho */
+    .search-bar {
+        width: 300px;
+        margin-bottom: 10px;
+    }
+
+    .search-icon{
+        display: none;
+    }
+
+    /* Botón de agregar terapeuta ocupa el 100% del ancho */
+    #boton-agregar-terapeuta {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Ajustar tamaño de fuente del título */
+    .contenedor-header h1 {
+        font-size: 36px;
+    }
+
+    /* Ajustar ancho del modal */
+    .contenido-modal {
+        width: 100%;
+        height: auto;
+        padding: 20px;
+    }
+
+    /* Ajustar tamaño de las imágenes en la tabla final */
     .final-tabla a img {
         width: 25px;
         height: 25px;
     }
+
+    /* Ajustar tamaño de los botones */
+    .boton-cancelar,
+    .boton-confirmar {
+        padding: 0.625rem 1.25rem;
+        font-size: 0.9rem;
+    }
 }
 
-@media screen and (max-width: 600px){
+@media screen and (max-width: 768px) {
+    /* Ajustar tamaño de fuente del título */
+    .contenedor-header h1 {
+        font-size: 32px;
+    }
+
+    /* La barra de búsqueda ocupa el 100% del ancho */
+    .search-bar {
+        width: 300px;
+        margin-bottom: 10px;
+    }
+    
+
+    /* Botón de agregar terapeuta ocupa el 100% del ancho */
+    #boton-agregar-terapeuta {
+        width: 100%;
+        padding: 3px 10px;
+    }
+
+    /* Cambiar dirección del flex en filtros */
+    .filtros {
+        flex-direction: row;
+        gap: 5px;
+    }
+
+    /* Botón de filtro ocupa el 100% del ancho */
+    .filtro-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Ajustar botones de paginación */
+    .pagination .step-links a,
+    .pagination .current,
+    .disabled {
+        font-size: 12px;
+        padding: 6px 6px;
+    }
+
+    /* Ajustar tamaño de las imágenes en la tabla final */
+    .final-tabla a img {
+        width: 25px;
+        height: 25px;
+    }
+
+    /* Ajustar padding y tamaño de fuente de botones en el modal */
+    .boton-cancelar,
+    .boton-confirmar {
+        padding: 0.625rem 1rem;
+        font-size: 0.85rem;
+    }
+}
+
+/* Media Query para pantallas menores a 576px */
+@media screen and (max-width: 576px) {
+    /* Ajustar tamaño de fuente del título */
+    .contenedor-header h1 {
+        font-size: 28px;
+    }
+
+    /* Cambiar dirección del flex en el contenedor de búsqueda */
+    .search-container {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    /* La barra de búsqueda ocupa el 100% del ancho y añade margen inferior */
+    .search-bar {
+        width: 300px;
+        margin-bottom: 10px;
+    }
+    .search-icon{
+        display: none;
+    }
+
+    /* Botón de limpiar búsqueda ocupa el 100% del ancho */
+    .clear-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Ajustar filtros */
+    .filtros {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+
+    /* Botón de agregar terapeuta ocupa el 100% del ancho */
+    #boton-agregar-terapeuta {
+        width: 100%;
+        padding: 3px 10px;
+        font-size: 14px;
+    }
+
+    /* Botones en el modal se organizan en columna */
+    .botones-modal {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .boton-cancelar,
+    .boton-confirmar {
+        width: 100%;
+        padding: 0.625rem 0;
+        margin-bottom: 10px;
+    }
+
+    /* Ajustar tamaño de las imágenes en la tabla final */
     .final-tabla a img {
         width: 20px;
         height: 20px;
+    }
+
+    /* Ajustar botones de paginación */
+    .pagination .step-links a,
+    .pagination .current,
+    .disabled {
+        font-size: 11px;
+        padding: 5px 5px;
+    }
+}
+
+/* Media Query para pantallas menores a 400px */
+@media screen and (max-width: 400px) {
+    /* Ajustar tamaño de fuente del título */
+    .contenedor-header h1 {
+        font-size: 24px;
+    }
+
+    /* Botón de agregar terapeuta ajusta tamaño de fuente */
+    #boton-agregar-terapeuta {
+        font-size: 12px;
+    }
+
+    /* Ajustar botones de paginación */
+    .pagination .step-links a,
+    .pagination .current,
+    .disabled {
+        font-size: 10px;
+        padding: 4px 4px;
+    }
+
+    /* Ajustar padding y tamaño de fuente de botones en el modal */
+    .boton-cancelar,
+    .boton-confirmar {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.8rem;
     }
 }

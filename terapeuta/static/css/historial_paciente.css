@@ -1,6 +1,6 @@
 .back-button {
     color: #000;
-    font-size: 24px;
+    font-size: 30px;
     text-decoration: none;
     margin-right: 20px;
     display: flex;
@@ -309,7 +309,13 @@
     background-color: #005f6b;
 }
 
-/* Estilos generales para todos los popups de confirmación */
+.no-sesiones p {
+    font-size: 20px;
+    font-weight: 500;
+    color: #666;
+    text-align: center;
+}
+
 .modal {
     display: none;
     position: fixed;
@@ -318,11 +324,8 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
     overflow: auto;
-    justify-content: center; /* Centrar horizontalmente */
-    align-items: center; /* Centrar verticalmente */
-    display: flex; /* Flexbox para centrar */
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
 }
 
 .modal-content {
@@ -420,93 +423,235 @@
 }
 
 /* Estilos específicos para el formulario Nueva Rutina */
-#nuevaRutinaForm {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+#nuevaRutinaModal {
+    display: none;  
+    position: fixed; 
+    z-index: 1; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: hidden; 
+    justify-content: center; 
+    align-items: center; 
 }
 
-#nuevaRutinaForm label {
-    font-weight: 500;
-    margin-bottom: 0px;
-}
-
-#nuevaRutinaForm input[type="date"],
-#nuevaRutinaForm input[type="number"],
-#nuevaRutinaForm input[type="text"],
-#nuevaRutinaForm select {
-    background-color: #ebeaea;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    font-size: 16px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.frecuencia-inputs {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.frecuencia-inputs input[type="number"] {
-    width: 60px;
-}
-
-.frecuencia-inputs select {
-    width: auto;
-    padding: 10px;
-}
-
-.configuracion-ortesis {
-    display: flex;
-    gap: 20px;
-    justify-content: space-between;
-}
-
-.configuracion-ortesis .detalle {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-}
-
-.configuracion-ortesis input[type="number"] {
-    width: 80px;
-    text-align: center;
-}
-
-
-#desvincularModal .modal-content{
-    width: 50%;
-    max-width: 600px;
-    min-width: 500px;
-    max-height: 80%;
-    overflow-y: auto;
-}
-
-
-#desvincularModal .modal-body{
-    width: 80%;
-    overflow-y: auto;
-}
-
+/* Estilos para el contenido del modal */
 #nuevaRutinaModal .modal-content {
-    display: flex;
-    width: 50%;
-    max-width: 300px;
-    max-height: 90%;
-    overflow-y: auto;
+    background-color: #fefefe;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 500px; /* Puedes ajustar el ancho según tus necesidades */
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    border-radius: 5px;
 }
 
+/* Estilos para el botón de cerrar */
+#nuevaRutinaModal .close {
+    position: absolute;
+    top: 10px; /* Ajusta la distancia desde la parte superior */
+    right: 15px; /* Ajusta la distancia desde la parte derecha */
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#nuevaRutinaModal .close:hover,
+#nuevaRutinaModal .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Estilos para el formulario dentro del modal */
 #nuevaRutinaModal form {
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    margin: 0 auto;
-    width: 80%;
 }
+
+#nuevaRutinaModal label {
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+#nuevaRutinaModal input[type="date"],
+#nuevaRutinaModal input[type="number"],
+#nuevaRutinaModal input[type="text"],
+#nuevaRutinaModal select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#nuevaRutinaModal .frecuencia-inputs {
+    display: flex;
+    align-items: center;
+}
+
+#nuevaRutinaModal .frecuencia-inputs input,
+#nuevaRutinaModal .frecuencia-inputs select {
+    flex: 1;
+}
+
+#nuevaRutinaModal .frecuencia-inputs p {
+    margin: 0 10px;
+}
+
+#nuevaRutinaModal .modal-footer {
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 20px;
+}
+
+#nuevaRutinaModal .cancel-btn,
+#nuevaRutinaModal .confirm-btn {
+    padding: 10px 20px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#nuevaRutinaModal .cancel-btn {
+    background-color: #FF7070;
+}
+
+#nuevaRutinaModal .confirm-btn {
+    background-color: #006A60;
+    color: white;
+}
+
+#nuevaRutinaModal .cancel-btn:hover,
+#nuevaRutinaModal .confirm-btn:hover {
+    opacity: 0.8;
+}
+
+
+
+/* Estilos específicos para el modal de Confirmar Desvinculación */
+#desvincularModal {
+    display: none;  
+    position: fixed; 
+    z-index: 1; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: hidden; 
+    justify-content: center; 
+    align-items: center; 
+    background-color: rgba(0,0,0,0.4); 
+}
+
+/* Estilos para el contenido del modal */
+#desvincularModal .modal-content {
+    background-color: #fefefe;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 500px; 
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    border-radius: 5px;
+}
+
+/* Estilos para el botón de cerrar */
+#desvincularModal .close {
+    position: absolute;
+    top: 10px; /* Ajusta la distancia desde la parte superior */
+    right: 15px; /* Ajusta la distancia desde la parte derecha */
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#desvincularModal .close:hover,
+#desvincularModal .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Estilos para el cuerpo del modal */
+#desvincularModal .modal-body {
+    margin-top: 20px;
+}
+
+/* Estilos para las etiquetas y valores */
+#desvincularModal .label-value {
+    width: 500px;
+    display: flex;
+    margin-bottom: 10px;
+}
+
+#desvincularModal .label-value .label {
+    font-weight: bold;
+    width: 170px; 
+}
+
+#desvincularModal .label-value .value {
+    flex: 1;
+}
+
+/* Estilos para el campo de motivo de inactivación */
+#desvincularModal .motivo-inactivacion {
+    margin-top: 10px;
+}
+
+#desvincularModal .motivo-inactivacion label {
+    font-weight: bold;
+}
+
+#desvincularModal .motivo-inactivacion textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical; /* Permitir cambiar el tamaño verticalmente */
+}
+
+#desvincularModal .mensaje-terapeuta {
+    margin-top: 10px;
+    font-style: italic;
+    color: #666;
+}
+
+#desvincularModal .modal-footer {
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 20px;
+}
+
+#desvincularModal .cancel-btn,
+#desvincularModal .confirm-btn {
+    padding: 10px 20px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#desvincularModal .cancel-btn {
+    background-color: #FF7070;
+}
+
+#desvincularModal .confirm-btn {
+    background-color: #006A60;
+    color: white;
+}
+
+#desvincularModal .cancel-btn:hover,
+#desvincularModal .confirm-btn:hover {
+    opacity: 0.8;
+}
+
 
 .no-rutinas {
     display: flex;
@@ -623,81 +768,114 @@
 }
 
 /* Estilos específicos para el formulario Editar Rutina */
-#editarRutinaForm {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+#editarRutinaModal {
+    display: none;  
+    position: fixed; 
+    z-index: 1; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: hidden; 
+    justify-content: center; 
+    align-items: center; 
 }
 
-#editarRutinaForm label {
-    font-weight: 500;
-    margin-bottom: 0px;
-}
-
-#editarRutinaForm input[type="date"],
-#editarRutinaForm input[type="number"],
-#editarRutinaForm input[type="text"],
-#editarRutinaForm select {
-    background-color: #ebeaea;
-    border: 1px solid #ccc;
+/* Estilos para el contenido del modal */
+#editarRutinaModal .modal-content{
+    background-color: #fefefe;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 500px; /* Puedes ajustar el ancho según tus necesidades */
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     border-radius: 5px;
-    padding: 10px;
-    font-size: 16px;
-    width: 100%;
-    box-sizing: border-box;
 }
 
-#editarRutinaForm .frecuencia-inputs {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+/* Estilos para el botón de cerrar */
+#editarRutinaModal .close {
+    position: absolute;
+    top: 10px; /* Ajusta la distancia desde la parte superior */
+    right: 15px; /* Ajusta la distancia desde la parte derecha */
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
 }
 
-#editarRutinaForm .frecuencia-inputs input[type="number"] {
-    width: 60px;
+#editarRutinaModal .close:hover,
+#editarRutinaModal .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
 }
 
-#editarRutinaForm .frecuencia-inputs select {
-    width: auto;
-    padding: 10px;
-}
-
-#editarRutinaForm .configuracion-ortesis {
-    display: flex;
-    gap: 20px;
-    justify-content: space-between;
-}
-
-#editarRutinaForm .configuracion-ortesis .detalle {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-}
-
-#editarRutinaForm .configuracion-ortesis input[type="number"] {
-    width: 80px;
-    text-align: center;
-}
-
-/* Ajustes para el modal de Editar Rutina */
-#editarRutinaModal .modal-content {
-    display: flex;
-    width: 50%;
-    max-width: 600px;
-    min-width: 500px;
-    max-height: 90%;
-    overflow-y: auto;
-    margin: 0 auto; /* Centrar el modal */
-}
-
+/* Estilos para el formulario dentro del modal */
 #editarRutinaModal form {
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    margin: 0 auto;
-    width: 80%;
 }
+
+#editarRutinaModal label {
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+#editarRutinaModal input[type="date"],
+#editarRutinaModal input[type="number"],
+#editarRutinaModal input[type="text"],
+#editarRutinaModal select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#editarRutinaModal .frecuencia-inputs {
+    display: flex;
+    align-items: center;
+}
+
+#editarRutinaModal .frecuencia-inputs input,
+#editarRutinaModal .frecuencia-inputs select {
+    flex: 1;
+}
+
+#editarRutinaModal .frecuencia-inputs p {
+    margin: 0 10px;
+}
+
+#editarRutinaModal .modal-footer {
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 20px;
+}
+
+#editarRutinaModal .cancel-btn,
+#editarRutinaModal .confirm-btn {
+    padding: 10px 20px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#editarRutinaModal .cancel-btn {
+    background-color: #FF7070;
+}
+
+#editarRutinaModal .confirm-btn {
+    background-color: #006A60;
+    color: white;
+}
+
+#editarRutinaModal .cancel-btn:hover,
+#editarRutinaModal .confirm-btn:hover {
+    opacity: 0.8;
+}
+
 
 /* Modal Popup para mostrar mensaje de éxito */
 
@@ -726,19 +904,6 @@
 
 .contenido-modal-mensaje p{
     font-size: 1.25rem;
-}
-
-/* Estilos para el modal de carga */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
 }
 
 .contenido-carga {

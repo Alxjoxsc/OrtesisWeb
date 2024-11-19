@@ -46,8 +46,8 @@ def agenda(request):
     terapeuta_id = terapeuta.id
     pacientes = Paciente.objects.filter(terapeuta_id=terapeuta_id)  # Obtener los pacientes del terapeuta
 
-    # Obtención de las citas
-    citas = Cita.objects.all()
+    # Filtrar las citas por el terapeuta actual
+    citas = Cita.objects.filter(terapeuta=terapeuta)
     citas_json = []
     for cita in citas:
         if cita.paciente and cita.paciente.id and cita.paciente.first_name and cita.paciente.last_name:
@@ -57,7 +57,7 @@ def agenda(request):
                 'titulo': cita.titulo,
                 'hora_inicio': cita.hora_inicio.strftime('%H:%M'),
                 'hora_final': cita.hora_final.strftime('%H:%M'),
-                'tipo_cita': cita.tipo_cita,  # Añadido el campo tipo_cita
+                'tipo_cita': cita.tipo_cita,
                 'detalle': cita.detalle,
                 'sala': cita.sala,
                 'paciente': {
@@ -74,6 +74,7 @@ def agenda(request):
         'citas': citas,
         'modulo_agenda': True
     })
+
 
 def obtener_fechas_citas(request):
     if request.method == "GET":
@@ -282,31 +283,33 @@ def agendar_cita(request):
         user_id = request.user.id
         terapeuta = Terapeuta.objects.get(user_id=user_id)
         terapeuta_id = terapeuta.id
-        print(terapeuta_id)
         if request.method == 'POST':
             titulo = request.POST['titulo']
             paciente_id = request.POST['paciente']
             fecha = request.POST['fecha']
-            hora_inicio = request.POST['hora_inicio']
-            hora_final = request.POST['hora_final']
+            hora_inicio_str = request.POST['hora_inicio']
+            hora_final_str = request.POST['hora_final']
             tipo_cita = request.POST.get('tipo_cita')
             sala = request.POST['sala']
             detalle = request.POST['detalle']
         
             terapeuta_instance = Terapeuta.objects.get(id=terapeuta_id)
-            
             paciente_instance = Paciente.objects.get(id=paciente_id)
             
+            # Convertir las horas a objetos time
+            hora_inicio = datetime.strptime(hora_inicio_str, '%H:%M').time()
+            hora_final = datetime.strptime(hora_final_str, '%H:%M').time()
+            
             cita = Cita(
-                terapeuta = terapeuta_instance,
-                titulo = titulo,
-                paciente = paciente_instance,
-                fecha = fecha,
-                hora_inicio = hora_inicio,
-                hora_final = hora_final,
-                tipo_cita = tipo_cita,
-                sala = sala,
-                detalle = detalle
+                terapeuta=terapeuta_instance,
+                titulo=titulo,
+                paciente=paciente_instance,
+                fecha=fecha,
+                hora_inicio=hora_inicio,
+                hora_final=hora_final,
+                tipo_cita=tipo_cita,
+                sala=sala,
+                detalle=detalle
             )
             cita.save()
             
@@ -314,11 +317,12 @@ def agendar_cita(request):
             Notificacion.objects.create(
                 terapeuta=terapeuta_instance,
                 cita=cita,
-                leida=False  # Inicialmente, la notificación no está leída
+                leida=False
             )
             
             return redirect('agenda')
     return render(request, 'agenda.html', {'modulo_agenda': True})
+
 
 def editar_cita(request):
     if request.method == "POST":
@@ -772,7 +776,7 @@ def validar_correo(correo):
 
 def historial_sesiones(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
-    rutinas = Rutina.objects.filter(paciente=paciente).order_by('-fecha_inicio')
+    rutinas = Rutina.objects.filter(paciente=paciente).order_by('fecha_inicio')
     
     # Obtener el parámetro 'rutina_id' de la URL
     rutina_id = request.GET.get('rutina_id')

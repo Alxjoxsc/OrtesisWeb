@@ -161,11 +161,11 @@ document.addEventListener('DOMContentLoaded', function () {
         const endOfWeek = new Date(startOfWeek);
         endOfWeek.setDate(endOfWeek.getDate() + 6);
         monthYearLabel.textContent = `${formatDate(startOfWeek)} - ${formatDate(endOfWeek)}`;
-
+    
         // Obtener el día actual
         const today = new Date();
         const todayFormatted = formatDate(today); // 'DD/MM/YYYY'
-
+    
         // Crear un array con los nombres de los días y las fechas correspondientes
         const daysOfWeek = [];
         let todayIndex = -1; // Inicializar con -1 indicando que el día actual no está en la semana mostrada
@@ -181,41 +181,49 @@ document.addEventListener('DOMContentLoaded', function () {
                 todayIndex = i; // Guardar el índice del día actual
             }
         }
-
+    
         let calendarHTML = `
             <div class="week-view-container">
                 <table class="week-view">
                     <thead>
                         <tr>
                             <th>Hora</th>`;
-
+    
         daysOfWeek.forEach((day, index) => {
             // Si el índice coincide con todayIndex, agregamos una clase especial
             const isToday = index === todayIndex;
             calendarHTML += `<th class="${isToday ? 'today-column' : ''}">${day.dayName} ${day.formattedDate}</th>`;
         });
-
+    
         calendarHTML += `
                         </tr>
                     </thead>
                     <tbody>`;
-
-        for (let hour = 8; hour <= 20; hour++) {
-            const horaInicio = String(hour).padStart(2, '0') + ":00";
-            const horaFin = String(hour + 1).padStart(2, '0') + ":00";
-            const horaStr = `${horaInicio} - ${horaFin}`;
-            calendarHTML += `<tr><td class="time-slot">${horaStr}</td>`;
-            for (let day = 0; day < 7; day++) {
-                const date = new Date(startOfWeek);
-                date.setDate(date.getDate() + day);
-                const formattedDate = formatDate(date);
-                // Asignar data-hour-inicio
-                const isToday = day === todayIndex;
-                calendarHTML += `<td class="week-hour ${isToday ? 'today-column' : ''}" data-date="${formattedDate}" data-hour-inicio="${horaInicio}"></td>`;
+    
+        for (let hour = 8; hour < 20; hour++) {
+            for (let minutes = 0; minutes < 60; minutes += 30) {
+                const horaInicio = String(hour).padStart(2, '0') + ":" + String(minutes).padStart(2, '0');
+                let nextHour = hour;
+                let nextMinutes = minutes + 30;
+                if (nextMinutes >= 60) {
+                    nextHour += 1;
+                    nextMinutes = 0;
+                }
+                const horaFin = String(nextHour).padStart(2, '0') + ":" + String(nextMinutes).padStart(2, '0');
+                const horaStr = `${horaInicio} - ${horaFin}`;
+    
+                calendarHTML += `<tr><td class="time-slot">${horaStr}</td>`;
+                for (let day = 0; day < 7; day++) {
+                    const date = new Date(startOfWeek);
+                    date.setDate(date.getDate() + day);
+                    const formattedDate = formatDate(date);
+                    const isToday = day === todayIndex;
+                    calendarHTML += `<td class="week-hour ${isToday ? 'today-column' : ''}" data-date="${formattedDate}" data-hour-inicio="${horaInicio}" data-hour-fin="${horaFin}"></td>`;
+                }
+                calendarHTML += '</tr>';
             }
-            calendarHTML += '</tr>';
         }
-
+    
         calendarHTML += '</tbody></table></div>';
         calendar.innerHTML = calendarHTML;
     
@@ -269,56 +277,87 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function destacarHorasConCita(citas) {
-        citas.forEach(cita => {
-            // Obtener la fecha y hora de la cita
-            const fecha = cita.fecha; // 'YYYY-MM-DD'
-            const horaInicio = cita.hora_inicio; // 'HH:MM'
-    
-            console.log(`Procesando cita: ${cita.titulo} en ${fecha} a las ${horaInicio}`);
-    
-            // Convertir fecha a 'DD/MM/YYYY'
-            const fechaParts = cita.fecha.split('-');
-            const fechaFormateada = `${fechaParts[2]}/${fechaParts[1]}/${fechaParts[0]}`;
-    
-            // Obtener la celda correspondiente al inicio de la cita
-            const cell = document.querySelector(`.week-hour[data-date="${fechaFormateada}"][data-hour-inicio="${horaInicio}"]`);
-    
+    citas.forEach(cita => {
+        // Obtener la fecha y hora de la cita
+        const fecha = cita.fecha; // 'YYYY-MM-DD'
+        const horaInicio = cita.hora_inicio; // 'HH:MM'
+        const horaFin = cita.hora_final; // 'HH:MM'
+
+        console.log(`Procesando cita: ${cita.titulo} en ${fecha} de ${horaInicio} a ${horaFin}`);
+
+        // Convertir fecha a 'DD/MM/YYYY'
+        const fechaParts = cita.fecha.split('-');
+        const fechaFormateada = `${fechaParts[2]}/${fechaParts[1]}/${fechaParts[0]}`;
+
+        // Convertir horas a minutos para calcular la duración
+        function timeToMinutes(timeStr) {
+            const [hours, minutes] = timeStr.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+
+        const inicioMinutes = timeToMinutes(horaInicio);
+        const finMinutes = timeToMinutes(horaFin);
+        const duracion = finMinutes - inicioMinutes;
+
+        // Calcular el número de bloques de 30 minutos
+        const duracionEnBloques = Math.ceil(duracion / 30);
+
+        // Iterar sobre cada bloque que ocupa la cita
+        for (let i = 0; i < duracionEnBloques; i++) {
+            const bloqueMinutes = inicioMinutes + i * 30;
+            const bloqueHoraInicio = minutesToTime(bloqueMinutes);
+
+            // Obtener la celda correspondiente
+            const cell = document.querySelector(`.week-hour[data-date="${fechaFormateada}"][data-hour-inicio="${bloqueHoraInicio}"]`);
+
             if (cell) {
-                // Crear un elemento para la cita
-                const citaDiv = document.createElement('div');
-                citaDiv.classList.add('cita-semana');
+                // Asegurarse de que la celda esté vacía
+                if (!cell.hasChildNodes()) {
+                    const citaDiv = document.createElement('div');
+                    citaDiv.classList.add('cita-semana');
 
-                // Si la cita es online, añadir una clase adicional
-                if (cita.tipo_cita === 'online') {
-                    citaDiv.classList.add('cita-online');
+                    if (cita.tipo_cita === 'online') {
+                        citaDiv.classList.add('cita-online');
+                    }
+
+                    // Solo mostrar el título en la primera celda
+                    
+                                        citaDiv.innerHTML = `${cita.titulo}<br>${cita.paciente.nombre}`;
+                  
+
+                    citaDiv.title = `Título: ${cita.titulo}\nPaciente: ${cita.paciente.nombre}\nSala: ${cita.sala}\nDetalle: ${cita.detalle}`;
+                    citaDiv.addEventListener('click', function(event) {
+                        event.stopPropagation(); 
+                        abrirEditar(
+                            cita.id,
+                            cita.fecha.split('-').reverse().join('/'),
+                            cita.hora_inicio,
+                            cita.hora_final,
+                            cita.titulo,
+                            cita.paciente.id,
+                            cita.paciente.nombre,
+                            cita.sala,
+                            cita.detalle,
+                            cita.tipo_cita 
+                        );
+                    });
+
+                    cell.appendChild(citaDiv);
                 }
-
-                citaDiv.textContent = cita.titulo;
-                citaDiv.title = `Título: ${cita.titulo}\nPaciente: ${cita.paciente.nombre}\nSala: ${cita.sala}\nDetalle: ${cita.detalle}`;
-
-                // Agregar evento de clic para ver detalles
-                citaDiv.addEventListener('click', function(event) {
-                    event.stopPropagation(); // Evitar que se abra el modal de crear cita
-                    abrirEditar(
-                        cita.id,
-                        cita.fecha.split('-').reverse().join('/'),
-                        cita.hora_inicio,
-                        cita.hora_final,
-                        cita.titulo,
-                        cita.paciente.id,
-                        cita.paciente.nombre,
-                        cita.sala,
-                        cita.detalle,
-                        cita.tipo_cita  // Pasar el tipo de cita
-                    );
-                });
-
-                cell.appendChild(citaDiv);
             } else {
-                console.warn(`No se encontró la celda para la cita: ${cita.titulo} en ${fechaFormateada} a las ${horaInicio}`);
+                console.warn(`No se encontró la celda para la cita: ${cita.titulo} en ${fechaFormateada} a las ${bloqueHoraInicio}`);
             }
-        });
-    }
+        }
+    });
+}
+
+// Función auxiliar para convertir minutos a hora en formato HH:MM
+function minutesToTime(minutes) {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return String(hours).padStart(2, '0') + ':' + String(mins).padStart(2, '0');
+}
+
     
 
     //     // Función para destacar horas con citas en vista semanal
@@ -428,7 +467,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Reasignación de IDs en abrirEditar
-    function abrirEditar(cita_id, fecha, hora_inicio = null, hora_final = null, titulo = null, paciente_id = null, paciente_nombre = null, sala = null, detalle = null) {
+    function abrirEditar(cita_id, fecha, hora_inicio = null, hora_final = null, titulo = null, paciente_id = null, paciente_nombre = null, sala = null, detalle = null, tipo_cita = null) {
         modal_editar.style.display = "block";
 
         const fechaISO = fecha.split('/').reverse().join('-');
