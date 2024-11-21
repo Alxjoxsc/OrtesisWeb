@@ -265,9 +265,10 @@ input[type="file"]::-webkit-file-upload-button {
         text-align: center;
     }
 
-    .profile-info p {
+    .profile-info h2 {
+        margin-top: 0px;
         font-size: 18px;
-        text-align: justify;
+        text-align: center;
     }
 
     .doctor-logo {
@@ -332,8 +333,8 @@ input[type="file"]::-webkit-file-upload-button {
         font-size: 22px;
     }
 
-    .profile-info p {
-        font-size: 16px;
+    .profile-info h2 {
+        font-size: 18px;
     }
 
     .contact-item p {
