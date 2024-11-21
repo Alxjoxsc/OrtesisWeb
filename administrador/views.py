@@ -9,7 +9,7 @@ from itertools import cycle
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 from autenticacion.decorators import role_required
-from .forms import CrearTerapeutaForm, HorarioFormSet, CrearPacienteForm, EditarPacienteForm, CrearRecepcionistaForm, EditarTerapeutaForm, HorarioFormSetEditar
+from .forms import CrearTerapeutaForm, HorarioFormSet, CrearPacienteForm, EditarPacienteForm, CrearRecepcionistaForm, EditarTerapeutaForm
 from django.http import HttpResponse, JsonResponse
 from autenticacion.models import Comuna, Region
 from terapeuta.models import Paciente, Terapeuta, Cita, Horario
@@ -1533,13 +1533,13 @@ def editar_datos_terapeuta_admin(request, terapeuta_id):
 
     if request.method == 'POST':
         form = EditarTerapeutaForm(request.POST, instance=terapeuta)
-        horario_formset = HorarioFormSet(request.POST, instance=terapeuta)  # FormSet para los horarios
 
-        if form.is_valid() and horario_formset.is_valid():
+        if form.is_valid():
             form.save()
-            horario_formset.save()  # Guardar los horarios actualizados
             messages.success(request, 'Datos guardados exitosamente.')
+            # Redirigir a la misma página con un parámetro de éxito en la URL
             return redirect('editar_datos_terapeuta_admin', terapeuta_id=terapeuta_id)
+
     else:
         form = EditarTerapeutaForm(
             initial={
@@ -1562,12 +1562,10 @@ def editar_datos_terapeuta_admin(request, terapeuta_id):
                 'correo_contacto': terapeuta.correo_contacto,
             }
         )
-        horario_formset = HorarioFormSetEditar(instance=terapeuta)  # FormSet para cargar los horarios existentes
 
     return render(request, 'editar_datos_terapeuta_admin.html', {
         'terapeuta': terapeuta,
         'terapeuta_form': form,
-        'horario_formset': horario_formset,
         'modulo_terapeutas': True,
         'messages': messages.get_messages(request),
     })

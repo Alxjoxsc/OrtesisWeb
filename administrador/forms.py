@@ -377,15 +377,6 @@ HorarioFormSet = inlineformset_factory(
     can_delete=True # Se pueden eliminar los formularios
 )
 
-# Creamos el formset para los horarios del terapeuta (inlineformset)
-HorarioFormSetEditar = inlineformset_factory(
-    Terapeuta,
-    Horario,
-    form=HorarioForm,
-    extra=0,  # Se envia solo un formularo. pero se pueden agregar más
-    can_delete=True # Se pueden eliminar los formularios
-)
-
 class CrearPacienteForm(forms.ModelForm):
 
     ACTIVIDAD_FISICA_CHOICES = [
