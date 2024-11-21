@@ -82,9 +82,9 @@ DATABASES = {
     "default": {
         "HOST": "localhost",
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "ortesisweb",
+        "NAME": "ortesisweb_test5",
         "USER": "postgres",
-        "PASSWORD": "Admin123",
+        "PASSWORD": "Falaciado1#.",
         "PORT": "5432",
     }
 }
