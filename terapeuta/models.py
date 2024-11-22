@@ -4,6 +4,7 @@ from autenticacion.models import Profile
 from datetime import timedelta, date
 from django.utils import timezone
 from autenticacion.models import Region, Comuna  # Importamos los modelos de ubicación
+from django.core.exceptions import ValidationError
 
 class Terapeuta(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
@@ -161,6 +162,7 @@ class Horario(models.Model):
 
     def __str__(self):
         return f"{self.terapeuta.user.first_name} {self.terapeuta.user.last_name} - {self.dia}"
+    
       
 class Observacion(models.Model):
     paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, related_name='observaciones')

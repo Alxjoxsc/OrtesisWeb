@@ -9,7 +9,7 @@ from itertools import cycle
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 from autenticacion.decorators import role_required
-from .forms import CrearTerapeutaForm, HorarioFormSet, CrearPacienteForm, EditarPacienteForm, CrearRecepcionistaForm, EditarTerapeutaForm
+from .forms import CrearTerapeutaForm, CrearPacienteForm, EditarPacienteForm, CrearRecepcionistaForm, EditarTerapeutaForm
 from django.http import HttpResponse, JsonResponse
 from autenticacion.models import Comuna, Region
 from terapeuta.models import Paciente, Terapeuta, Cita, Horario
@@ -32,6 +32,7 @@ from django.conf import settings
 import string
 import random
 from django.contrib.auth.hashers import make_password
+
 
 ############################### LISTAR TERAPEUTAS ################################
 @role_required('Administrador')
@@ -926,34 +927,72 @@ def restaurar_recepcionista(request):
             'recepcionistas_restaurados': [recepcionista.id for recepcionista in recepcionistas]
         })
 
+
 @role_required('Administrador')
 def agregar_terapeuta(request):
     if request.method == 'POST':
         terapeuta_form = CrearTerapeutaForm(request.POST)
-        horario_formset = HorarioFormSet(request.POST)
 
-        if terapeuta_form.is_valid() and horario_formset.is_valid():
-            with transaction.atomic(): # Para que si algo falla, no se guarde nada, asegura que todas las operaciones se realicen correctamente
-                terapeuta = terapeuta_form.save()
-                horario_formset.instance = terapeuta # Asignamos el terapeuta a los horarios
-                horario_formset.save()
+        if terapeuta_form.is_valid():
+            horarios_data = extract_horarios(request.POST)  # Función para extraer horarios
+
+            try:
+                with transaction.atomic():
+                    # Guardar el terapeuta
+                    terapeuta = terapeuta_form.save()
+
+                    # Validar y guardar los horarios
+                    for horario in horarios_data:
+                        horario_obj = Horario(
+                            terapeuta=terapeuta,
+                            dia=horario['dia'],
+                            hora_inicio=horario['hora_inicio'],
+                            hora_final=horario['hora_final']
+                        )
+                        horario_obj.full_clean()  # Valida el modelo
+                        horario_obj.save()
+
+                messages.success(request, 'El terapeuta y sus horarios han sido creados exitosamente.')
+                return render(request, 'agregar_terapeuta.html', {
+                    'terapeuta_form': CrearTerapeutaForm(),
+                    'modulo_terapeutas': True,
+                })
             
-            messages.success(request, 'El recepcionista ha sido creado exitosamente.')
-            return render(request, 'agregar_terapeuta.html', {
-                'terapeuta_form': CrearTerapeutaForm(), # Creamos un nuevo formulario vacío
-                'horario_formset': HorarioFormSet(queryset=Horario.objects.none()),
-                'modulo_terapeutas': True,
-            })
-        
+            except ValidationError as e:
+                messages.error(request, f'Error al guardar los horarios: {e.message}')
+            except Exception as e:
+                messages.error(request, f'Ocurrió un error inesperado: {str(e)}')
+        else:
+            messages.error(request, 'Por favor corrige los errores del formulario.')
+
     else:
         terapeuta_form = CrearTerapeutaForm()
-        horario_formset = HorarioFormSet(queryset=Horario.objects.none()) # Creamos un formset vacío, para que no se prellene con datos
-    
+
     return render(request, 'agregar_terapeuta.html', {
         'terapeuta_form': terapeuta_form,
-        'horario_formset': horario_formset,
         'modulo_terapeutas': True,
     })
+
+
+def extract_horarios(post_data):
+    """
+    Extrae y valida los datos de horarios desde request.POST.
+    """
+    horarios = []
+    dias = post_data.getlist('dia')
+    horas_inicio = post_data.getlist('hora_inicio')
+    horas_final = post_data.getlist('hora_final')
+
+    for dia, hora_inicio, hora_final in zip(dias, horas_inicio, horas_final):
+        if dia and hora_inicio and hora_final:
+            horarios.append({
+                'dia': dia,
+                'hora_inicio': datetime.strptime(hora_inicio, '%H:%M').time(),
+                'hora_final': datetime.strptime(hora_final, '%H:%M').time(),
+            })
+
+    return horarios
+
 
 #### CARGA DE DATOS DE REGIONES Y COMUNAS ####
 def comunas_api(request):
@@ -1531,13 +1570,54 @@ def agregar_recepcionista(request):
 def editar_datos_terapeuta_admin(request, terapeuta_id):
     terapeuta = get_object_or_404(Terapeuta, id=terapeuta_id)
 
+    # Obtener horarios actuales del terapeuta para mostrarlos en el frontend
+    horarios = [
+        {
+            'dia': horario['dia'],
+            'hora_inicio': horario['hora_inicio'].strftime('%H:%M'),
+            'hora_final': horario['hora_final'].strftime('%H:%M'),
+        }
+        for horario in Horario.objects.filter(terapeuta=terapeuta).values('dia', 'hora_inicio', 'hora_final')
+    ]
+
     if request.method == 'POST':
         form = EditarTerapeutaForm(request.POST, instance=terapeuta)
+        num_horarios = int(request.POST.get('num_horarios', 0))
+
+        # Procesar horarios desde el formulario
+        horarios_data = []
+
+        # Recorrer todos los horarios enviados en el formulario
+        for i in range(num_horarios):
+            dia = request.POST.get(f'horarios[{i}][dia]')
+            hora_inicio = request.POST.get(f'horarios[{i}][hora_inicio]')
+            hora_final = request.POST.get(f'horarios[{i}][hora_final]')
+
+            if dia and hora_inicio and hora_final:  # Asegurarse de que no sean nulos
+                horarios_data.append({
+                    'dia': dia,
+                    'hora_inicio': hora_inicio,
+                    'hora_final': hora_final
+                })
 
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Datos guardados exitosamente.')
-            # Redirigir a la misma página con un parámetro de éxito en la URL
+            with transaction.atomic():
+                # Guardar cambios del terapeuta
+                form.save()
+
+                # Eliminar horarios antiguos
+                Horario.objects.filter(terapeuta=terapeuta).delete()
+
+                # Guardar nuevos horarios
+                for horario in horarios_data:
+                    Horario.objects.create(
+                        terapeuta=terapeuta,
+                        dia=horario['dia'],
+                        hora_inicio=horario['hora_inicio'],
+                        hora_final=horario['hora_final']
+                    )
+
+            messages.success(request, 'Datos y horarios actualizados exitosamente.')
             return redirect('editar_datos_terapeuta_admin', terapeuta_id=terapeuta_id)
 
     else:
@@ -1566,6 +1646,8 @@ def editar_datos_terapeuta_admin(request, terapeuta_id):
     return render(request, 'editar_datos_terapeuta_admin.html', {
         'terapeuta': terapeuta,
         'terapeuta_form': form,
+        'horarios': json.dumps(horarios),
+        'horariosOriginales': horarios,  # Esta es la variable original inyectada en el frontend
         'modulo_terapeutas': True,
         'messages': messages.get_messages(request),
     })
