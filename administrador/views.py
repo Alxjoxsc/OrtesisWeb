@@ -12,7 +12,7 @@ from autenticacion.decorators import role_required
 from django.http import HttpResponse, JsonResponse
 from .forms import CrearTerapeutaForm, HorarioFormSet, CrearPacienteForm, EditarPacienteForm, CrearRecepcionistaForm, EditarTerapeutaForm
 from autenticacion.models import Comuna, Region
-from terapeuta.models import Paciente, Terapeuta, Cita, Horario, Sesion
+from terapeuta.models import Paciente, Terapeuta, Cita, Horario, Sesion, HorasTrabajadas
 from recepcionista.models import Recepcionista
 from autenticacion.models import Profile
 from django.contrib.auth.models import User, Group
@@ -33,6 +33,7 @@ import string
 import random
 from django.contrib.auth.hashers import make_password
 from django.db.models import Sum, Count, Avg
+from django.db.models.functions import TruncMonth
 
 ############################### LISTAR TERAPEUTAS ################################
 @role_required('Administrador')
@@ -1580,15 +1581,34 @@ def reporteria_terapeutas(request):
     inicio_mes = datetime(hoy.year, hoy.month, 1)
     fin_mes = inicio_mes + timedelta(days=31) - timedelta(days=inicio_mes.day + 1)
 
-    # 1. Total de horas trabajadas por terapeuta
-    horas_trabajadas = Terapeuta.objects.values('user__first_name', 'user__last_name').annotate(
-        total_horas=Sum('horas_trabajadas')
+    # Obtener datos de promedios mensuales
+    promedios_mensuales = (
+        HorasTrabajadas.objects.values('año', 'mes')
+        .annotate(promedio_horas=Avg('horas'))
+        .order_by('año', 'mes')
     )
 
-    # 2. Número de pacientes asignados por terapeuta
-    pacientes_asignados = Terapeuta.objects.annotate(
-        total_pacientes=Count('paciente')
-    ).values('user__first_name', 'user__last_name', 'total_pacientes')
+    # Formatear datos para Highcharts
+    meses = [f"{item['mes']}/{item['año']}" for item in promedios_mensuales]
+    promedio_horas = [item['promedio_horas'] for item in promedios_mensuales]
+
+    # Obtener la cantidad de pacientes por terapeuta
+    pacientes_por_terapeuta = (
+        Paciente.objects.filter(is_active=True)  # Solo pacientes activos
+        .values('terapeuta__user__first_name', 'terapeuta__user__last_name')  # Agrupar por terapeuta
+        .annotate(total_pacientes=Count('id'))  # Contar pacientes
+        .order_by('terapeuta__user__first_name', 'terapeuta__user__last_name')  # Ordenar por nombre del terapeuta
+    )
+
+    # Formatear los datos para el gráfico
+    terapeutas = [f"{item['terapeuta__user__first_name']} {item['terapeuta__user__last_name']}" for item in pacientes_por_terapeuta]
+    cantidad_pacientes = [item['total_pacientes'] for item in pacientes_por_terapeuta]
+    
+    # Crear la estructura para Highcharts
+    series_data = [{
+        'name': 'Pacientes por Terapeuta',
+        'data': cantidad_pacientes
+    }]
 
     # 3. Especialidades de los terapeutas
     especialidades = Terapeuta.objects.values('especialidad').annotate(
@@ -1603,8 +1623,11 @@ def reporteria_terapeutas(request):
 
     return render(request, 'reporteria_terapeutas.html', {
         'modulo_terapeutas': True,
-        'horas_trabajadas': list(horas_trabajadas),
-        'pacientes_asignados': list(pacientes_asignados),
+        'meses': meses,
+        'promedio_horas': promedio_horas,
+        'terapeutas': terapeutas,
+        'cantidad_pacientes': cantidad_pacientes,
+        'series_data': series_data,
         'especialidades': list(especialidades),
         'promedio_sesiones': list(promedio_sesiones),
         })
