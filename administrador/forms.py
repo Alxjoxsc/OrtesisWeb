@@ -26,7 +26,7 @@ class CrearTerapeutaForm(forms.ModelForm):
 
     rut = forms.CharField(
         max_length=12,
-        label='Rut', 
+        label='Rut (*)', 
         required=True,
         widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ej: XX.XXX.XXX-X'})
     )
@@ -35,18 +35,18 @@ class CrearTerapeutaForm(forms.ModelForm):
 
     first_name = forms.CharField(
         max_length=150, 
-        label='Nombres', 
+        label='Nombres (*)', 
         required=True,
         widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ej: Juan Alberto'})
     )
     last_name = forms.CharField(
         max_length=150, 
-        label='Apellidos', 
+        label='Apellidos (*)', 
         required=True,
         widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ej: Pérez González'})
     )
     email = forms.EmailField(
-        label='Correo electrónico', 
+        label='Correo electrónico (*)', 
         required=True,
         widget=forms.EmailInput(attrs={'class':'campo-formulario','placeholder': 'correodejemplo@ejemplos.com'})
     )
@@ -55,36 +55,36 @@ class CrearTerapeutaForm(forms.ModelForm):
 
     telefono = forms.CharField(
         max_length=11, 
-        label='Teléfono', 
+        label='Teléfono (*)', 
         required=True,
         widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ej: 9 1234 5678'})
     )
     fecha_nacimiento = forms.DateField(
-        label='Fecha de nacimiento', 
+        label='Fecha de nacimiento (*)', 
         required=True,
         widget=forms.DateInput(attrs={'class':'campo-formulario', 'type': 'date'})
     )
     direccion = forms.CharField(
         max_length=255, 
-        label='Dirección', 
+        label='Dirección (*)', 
         required=True,
         widget=forms.TextInput(attrs={'class':'campo-formulario','placeholder': 'Ej: Calle Ejemplo 123'})
     )
     region = forms.ModelChoiceField(
         queryset=Region.objects.all(), 
-        label='Región', 
+        label='Región (*)', 
         required=True,
         widget=forms.Select(attrs={'class':'campo-formulario'})
     )
     comuna = forms.ModelChoiceField(
         queryset=Comuna.objects.none(), 
-        label='Comuna', 
+        label='Comuna (*)', 
         required=True,
         widget=forms.Select(attrs={'class':'campo-formulario'})
     )
     sexo = forms.ChoiceField(
         choices=(('M', 'Masculino'), ('F', 'Femenino')), 
-        label='Sexo', 
+        label='Sexo (*)', 
         required=True,
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'})
     )
@@ -93,23 +93,23 @@ class CrearTerapeutaForm(forms.ModelForm):
 
     especialidad = forms.CharField(
         max_length=100, 
-        label='Especialidad', 
+        label='Especialidad (*)', 
         required=True,
         widget=forms.TextInput(attrs={'class':'campo-formulario', 'placeholder' :'Ej: Articulaciones Superiores'})
     )
     fecha_contratacion = forms.DateField(
-        label='Fecha de contratación', 
+        label='Fecha de contratación (*)', 
         required=True,
         widget=forms.DateInput(attrs={'class':'campo-formulario', 'type': 'date'})
     )
     titulo = forms.CharField(
         max_length=100, 
-        label='Título', 
+        label='Título (*)', 
         required=True,
         widget=forms.TextInput(attrs={'class':'campo-formulario', 'placeholder': 'Ej: Licenciado en Terapia Ocupacional'})
     )
     experiencia = forms.IntegerField(
-        label='Experiencia', 
+        label='Experiencia (*)', 
         required=True,
         widget=forms.NumberInput(attrs={'class':'campo-formulario'})
     )
@@ -172,8 +172,8 @@ class CrearTerapeutaForm(forms.ModelForm):
             telefono=self.cleaned_data['telefono'],
             fecha_nacimiento=self.cleaned_data['fecha_nacimiento'],
             direccion=self.cleaned_data['direccion'],
-            region=self.cleaned_data['region'],  # Ahora es una instancia de Region
-            comuna=self.cleaned_data['comuna'],  # Ahora es una instancia de Comuna
+            region=self.cleaned_data['region'],
+            comuna=self.cleaned_data['comuna'],
             sexo=self.cleaned_data['sexo']
         )
         if commit:

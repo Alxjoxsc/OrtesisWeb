@@ -952,26 +952,28 @@ def agregar_terapeuta(request):
                         horario_obj.full_clean()  # Valida el modelo
                         horario_obj.save()
 
+                # Mensaje de éxito y redirección para evitar duplicado en envío
                 messages.success(request, 'El terapeuta y sus horarios han sido creados exitosamente.')
-                return render(request, 'agregar_terapeuta.html', {
-                    'terapeuta_form': CrearTerapeutaForm(),
-                    'modulo_terapeutas': True,
-                })
+                return redirect('agregar_terapeuta')
             
             except ValidationError as e:
                 messages.error(request, f'Error al guardar los horarios: {e.message}')
             except Exception as e:
                 messages.error(request, f'Ocurrió un error inesperado: {str(e)}')
         else:
+            # Si hay errores en el formulario, mostrar el formulario con errores
             messages.error(request, 'Por favor corrige los errores del formulario.')
 
     else:
         terapeuta_form = CrearTerapeutaForm()
 
+    # Renderizar la página con los datos que el usuario ingresó y los errores
     return render(request, 'agregar_terapeuta.html', {
         'terapeuta_form': terapeuta_form,
         'modulo_terapeutas': True,
     })
+
+
 
 
 def extract_horarios(post_data):
