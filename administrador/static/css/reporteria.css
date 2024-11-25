@@ -1,0 +1,38 @@
+.main-content {
+    margin: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.header{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.header h1 {
+    font-size: 48px;
+    color: black;
+    font-weight: 500;
+}
+
+.contenedor-superior{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    width: 100%;
+}
+
+@media screen and (max-width: 600px){
+    .contenedor-superior{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 40px;
+        width: 100%;
+    }
+}
