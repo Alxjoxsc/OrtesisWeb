@@ -1576,11 +1576,6 @@ def editar_datos_terapeuta_admin(request, terapeuta_id):
 
 @role_required('Administrador')
 def reporteria_terapeutas(request):
-    # Fecha de inicio y fin para el mes actual
-    hoy = datetime.now()
-    inicio_mes = datetime(hoy.year, hoy.month, 1)
-    fin_mes = inicio_mes + timedelta(days=31) - timedelta(days=inicio_mes.day + 1)
-
     # Obtener datos de promedios mensuales
     promedios_mensuales = (
         HorasTrabajadas.objects.values('año', 'mes')
@@ -1615,12 +1610,6 @@ def reporteria_terapeutas(request):
         total=Count('id')
     )
 
-    # 4. Promedio de duración de las sesiones (en minutos)
-    promedio_sesiones = Sesion.objects.filter(fecha__range=[inicio_mes, fin_mes]).values('rutina__terapeuta__user__first_name', 'rutina__terapeuta__user__last_name').annotate(
-        promedio_duracion=Avg('duracion')
-    )
-        
-
     return render(request, 'reporteria_terapeutas.html', {
         'modulo_terapeutas': True,
         'meses': meses,
@@ -1629,5 +1618,4 @@ def reporteria_terapeutas(request):
         'cantidad_pacientes': cantidad_pacientes,
         'series_data': series_data,
         'especialidades': list(especialidades),
-        'promedio_sesiones': list(promedio_sesiones),
         })
