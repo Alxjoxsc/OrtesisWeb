@@ -1,0 +1,151 @@
+{% extends 'administrador_base.html' %}
+
+{% load static %}
+
+{% block title%} Reporteria {% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/reporteria.css' %}">
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+{% endblock %}
+
+{% block header %}
+    <h1>Reportes de Terapeutas</h1>
+{% endblock %}
+
+{% block content %}
+<div class="contenedor-superior">
+    <div id="grafico-promedio-horas"></div>
+    <div id="especialidades-container"></div>
+</div>
+
+<div id="grafico-terapeutas"></div>
+
+    
+{% endblock %}
+
+{% block extra_js %}
+    <!-- Especialidades de los terapeutas -->
+    <script>
+        const especialidades = {{ especialidades|safe }};
+        Highcharts.chart('especialidades-container', {
+            chart: { type: 'pie' },
+            title: { text: 'Especialidades de los terapeutas' },
+            series: [{
+                name: 'Cantidad',
+                colorByPoint: true,
+                data: especialidades.map(item => ({ name: item.especialidad, y: item.total }))
+            }],
+            credits: { enabled: false },
+            legend: { enabled: false }
+        });
+    </script>
+    <script type="text/javascript">
+        Highcharts.chart('grafico-terapeutas', {
+            chart: {
+                type: 'bar'  // Tipo de gráfico: barras
+            },
+            title: {
+                text: 'Número de Pacientes por Terapeuta'
+            },
+            xAxis: {
+                categories: {{ terapeutas|safe }},  // Lista de terapeutas
+                title: {
+                    text: 'Terapeutas'
+                }
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Número de Pacientes',
+                    align: 'high'
+                },
+                labels: {
+                    overflow: 'justify'
+                }
+            },
+            tooltip: {
+                valueSuffix: ' pacientes'
+            },
+            series: {{ series_data|safe }},  // Los datos de la serie
+            credits: {
+                enabled: false
+            },
+            legend: {
+                enabled: false
+            }
+        });
+    </script>
+    <script>
+        // Datos pasados desde Django
+        const meses = {{ meses|safe }}; // Ejemplo: ["Enero", "Febrero", "Marzo", ...]
+        const promedio_horas = {{ promedio_horas|safe }}; // Ejemplo: [120.5, 110.3, ...]
+    
+        // Configuración del gráfico
+        Highcharts.chart('grafico-promedio-horas', {
+            chart: {
+                type: 'column' // Cambiado a columna
+            },
+            title: {
+                text: 'Promedio de Horas Trabajadas por Mes'
+            },
+            subtitle: {
+                text: 'Datos generados a partir de registros de terapeutas'
+            },
+            xAxis: {
+                categories: meses,
+                title: {
+                    text: 'Mes'
+                },
+                labels: {
+                    autoRotation: [-45, -90],
+                    style: {
+                        fontSize: '13px',
+                        fontFamily: 'Verdana, sans-serif'
+                    }
+                }
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Promedio de Horas Trabajadas'
+                }
+            },
+            legend: {
+                enabled: false // Sin leyenda para un solo conjunto de datos
+            },
+            tooltip: {
+                pointFormat: 'Promedio de horas: <b>{point.y:.1f}</b>'
+            },
+            series: [{
+                name: 'Promedio de Horas',
+                colors: [
+                    '#9b20d9', '#9215ac', '#861ec9', '#7a17e6', '#7010f9', '#691af3',
+                    '#6225ed', '#5b30e7', '#533be1', '#4c46db', '#4551d5', '#3e5ccf'
+                ],
+                colorByPoint: true,
+                groupPadding: 0,
+                data: promedio_horas.map((value, index) => [meses[index], value]),
+                dataLabels: {
+                    enabled: true,
+                    rotation: -90,
+                    color: '#FFFFFF',
+                    inside: true,
+                    verticalAlign: 'top',
+                    format: '{point.y:.1f}', // Una decimal
+                    y: 10, // 10 píxeles hacia abajo desde la parte superior
+                    style: {
+                        fontSize: '13px',
+                        fontFamily: 'Verdana, sans-serif'
+                    }
+                }
+            }],
+            credits: {
+                enabled: false
+            }
+        });
+    </script>
+{% endblock %}

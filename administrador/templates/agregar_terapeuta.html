@@ -153,8 +153,7 @@
         </div>
     </div>
 
-    <h2> Horarios del terapeuta </h2>
-    
+    <h2>Horarios del terapeuta</h2>
     <div class="datos-inferiores">
         <table class="table">
             <thead>
@@ -165,37 +164,24 @@
                     <th class="columna-eliminar">Eliminar</th>
                 </tr>
             </thead>
+
+            <label for="fulltime-checkbox">Horario Fulltime</label>
+            <input class="fulltime-checkbox" type="checkbox" id="fulltime-checkbox" name="fulltime-checkbox">
+            <label for="weekend-parttime-checkbox">Horario Part Time (Fin de Semana)</label>
+            <input class="weekend-parttime-checkbox" type="checkbox" id="weekend-parttime-checkbox" name="weekend-parttime-checkbox">
+
             <tbody id="horarios-tbody">
-                {{ horario_formset.management_form }}
-                {% for form in horario_formset %}
-                    <tr>
-                        <!-- Campo Día -->
-                        <td>{{ form.dia }}</td>
-                        <!-- Campo Hora de Inicio -->
-                        <td>{{ form.hora_inicio }}</td>
-                        <!-- Campo Hora de Fin -->
-                        <td>{{ form.hora_final }}</td>
-                        <!-- Campo para eliminar -->
-                        <td>
-                            {{ form.DELETE }}
-                        </td>
-                    </tr>
-                {% endfor %}
+                <!-- Aquí se agregarán dinámicamente las filas -->
             </tbody>
         </table>
         <button type="button" class="boton-azul" id="agregar-horario">Añadir Horario +</button>
-    
-        {% if horario_formset.non_field_errors %}
-            <div class="error">
-                {{ horario_formset.non_field_errors }}
-            </div>
-        {% endif %}
     </div>    
-    
+
     <div class="contenedor-botones">
         <button class="boton-cancelar" id="boton-cancelar">Cancelar</button>
         <button class="boton-azul" type="submit">Agregar terapeuta</button>
     </div>
+
     
 </form>
 
@@ -231,73 +217,116 @@
 </script>
 
 <!-- Script para añadir un nuevo formulario de horario -->
-
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const addScheduleButton = document.getElementById('agregar-horario');
-        const horariosTbody = document.getElementById('horarios-tbody');
-        const totalFormsInput = document.getElementById('id_horario_set-TOTAL_FORMS');
-        let scheduleIndex = parseInt(totalFormsInput.value); // Establecer el índice inicial
-    
-        addScheduleButton.addEventListener('click', function () {
-            // Crear una nueva fila para el nuevo horario
-            const newRow = document.createElement('tr');
-            newRow.className = 'horario-row';
-    
-            // Crear los elementos de formulario
-            const diaSelect = document.createElement('select');
-            diaSelect.name = `horario_set-${scheduleIndex}-dia`;
-            diaSelect.className = 'seleccion';
-            diaSelect.id = `id_horario_set-${scheduleIndex}-dia`;
-    
-            // Agregar las opciones al select
-            const days = ['---------', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-            days.forEach(day => {
-                const option = document.createElement('option');
-                option.value = day;
-                option.textContent = day;
-                diaSelect.appendChild(option);
-            });
-    
-            const horaInicioInput = document.createElement('input');
-            horaInicioInput.type = 'time';
-            horaInicioInput.name = `horario_set-${scheduleIndex}-hora_inicio`;
-            horaInicioInput.className = 'campo-formulario';
-            horaInicioInput.id = `id_horario_set-${scheduleIndex}-hora_inicio`;
-    
-            const horaFinInput = document.createElement('input');
-            horaFinInput.type = 'time';
-            horaFinInput.name = `horario_set-${scheduleIndex}-hora_final`;
-            horaFinInput.className = 'campo-formulario';
-            horaFinInput.id = `id_horario_set-${scheduleIndex}-hora_final`;
-    
-            // Crear campo para eliminar
-            const deleteInput = document.createElement('input');
-            deleteInput.type = 'checkbox';
-            deleteInput.name = `horario_set-${scheduleIndex}-DELETE`;
-            deleteInput.id = `id_horario_set-${scheduleIndex}-DELETE`;
 
-            // Agregar los campos a la nueva fila
-            newRow.appendChild(tdElement(diaSelect));
-            newRow.appendChild(tdElement(horaInicioInput));
-            newRow.appendChild(tdElement(horaFinInput));
-            newRow.appendChild(tdElement(deleteInput));
+    document.addEventListener('DOMContentLoaded', () => {
+        const tbody = document.getElementById('horarios-tbody');
+        const addButton = document.getElementById('agregar-horario');
+        const fulltimeCheckbox = document.getElementById('fulltime-checkbox');
+        const weekendParttimeCheckbox = document.getElementById('weekend-parttime-checkbox');
     
-            // Agregar la nueva fila al tbody
-            horariosTbody.appendChild(newRow);
+        // Plantilla de fila
+        const createRow = (dia = '', horaInicio = '', horaFinal = '') => `
+            <tr class="horario-fila">
+                <td>
+                    <select class="seleccion" name="dia">
+                        <option value="" ${dia === '' ? 'selected' : ''}>Seleccione un día</option>
+                        <option value="Lunes" ${dia === 'Lunes' ? 'selected' : ''}>Lunes</option>
+                        <option value="Martes" ${dia === 'Martes' ? 'selected' : ''}>Martes</option>
+                        <option value="Miércoles" ${dia === 'Miércoles' ? 'selected' : ''}>Miércoles</option>
+                        <option value="Jueves" ${dia === 'Jueves' ? 'selected' : ''}>Jueves</option>
+                        <option value="Viernes" ${dia === 'Viernes' ? 'selected' : ''}>Viernes</option>
+                        <option value="Sábado" ${dia === 'Sábado' ? 'selected' : ''}>Sábado</option>
+                        <option value="Domingo" ${dia === 'Domingo' ? 'selected' : ''}>Domingo</option>
+                    </select>
+                </td>
+                <td>
+                    <input class="campo-formulario" type="time" name="hora_inicio" value="${horaInicio}">
+                </td>
+                <td>
+                    <input class="campo-formulario" type="time" name="hora_final" value="${horaFinal}">
+                </td>
+                <td class="columna-eliminar">
+                    <button type="button" class="boton-eliminar">Eliminar</button>
+                </td>
+            </tr>
+        `;
     
-            // Incrementar el índice para el siguiente formulario
-            totalFormsInput.value = scheduleIndex + 1;
-            scheduleIndex++;
+        // Función para actualizar el estado del botón "Eliminar"
+        const updateDeleteButtonState = () => {
+            const deleteButtons = tbody.querySelectorAll('.boton-eliminar');
+            deleteButtons.forEach(button => {
+                if (deleteButtons.length === 1) {
+                    button.disabled = true;
+                    button.classList.add('boton-desactivado');
+                } else {
+                    button.disabled = false;
+                    button.classList.remove('boton-desactivado');
+                }
+            });
+        };
+    
+        // Agregar fila al hacer clic en el botón
+        addButton.addEventListener('click', () => {
+            tbody.insertAdjacentHTML('beforeend', createRow());
+            updateDeleteButtonState();
         });
     
-        function tdElement(...children) {
-            const td = document.createElement('td');
-            children.forEach(child => td.appendChild(child));
-            return td;
-        }
+        // Eliminar fila al hacer clic en el botón de eliminar
+        tbody.addEventListener('click', (e) => {
+            if (e.target.classList.contains('boton-eliminar') && !e.target.disabled) {
+                const row = e.target.closest('tr');
+                if (row) {
+                    row.remove();
+                    updateDeleteButtonState();
+                }
+            }
+        });
+    
+        // Rellenar horarios para Full Time
+        fulltimeCheckbox.addEventListener('change', () => {
+            if (fulltimeCheckbox.checked) {
+                weekendParttimeCheckbox.checked = false;
+    
+                // Limpiar horarios actuales y agregar Full Time
+                tbody.innerHTML = '';
+                const diasFullTime = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+                diasFullTime.forEach(dia => {
+                    tbody.insertAdjacentHTML('beforeend', createRow(dia, '08:00', '18:00'));
+                });
+            } else {
+                tbody.innerHTML = ''; // Restablecer horarios
+                tbody.insertAdjacentHTML('beforeend', createRow()); // Agregar una fila vacía
+            }
+            updateDeleteButtonState();
+        });
+    
+        // Rellenar horarios para Part Time
+        weekendParttimeCheckbox.addEventListener('change', () => {
+            if (weekendParttimeCheckbox.checked) {
+                fulltimeCheckbox.checked = false;
+    
+                // Limpiar horarios actuales y agregar Part Time
+                tbody.innerHTML = '';
+                const diasPartTime = ['Sábado', 'Domingo'];
+                diasPartTime.forEach(dia => {
+                    tbody.insertAdjacentHTML('beforeend', createRow(dia, '08:00', '18:00'));
+                });
+            } else {
+                tbody.innerHTML = ''; // Restablecer horarios
+                tbody.insertAdjacentHTML('beforeend', createRow()); // Agregar una fila vacía
+            }
+            updateDeleteButtonState();
+        });
+    
+        // Crear fila inicial al cargar la página
+        tbody.insertAdjacentHTML('beforeend', createRow());
+        updateDeleteButtonState();
     });
+    
+
 </script>
+
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         var regionField = document.getElementById("id_region");
@@ -323,6 +352,7 @@
         });
     });
 </script>
+
 <script>
     document.getElementById("boton-cancelar").addEventListener("click", function(){
         window.location.href = "{% url 'listar_terapeutas_activos' %}";

@@ -40,7 +40,9 @@
                 <div class="fecha-y-eliminar">
                     <h3>Fecha: {{ observacion.fecha|date:"d/m/Y" }}</h3>
                     <div class="iconos">
-                        <i class="fas fa-pencil-alt editar-observacion" data-id="{{ observacion.id }}" title="Editar observación"></i>
+                        <svg class="editar-observacion" data-id="{{ observacion.id }}" title="Editar observación" width="20" height="20" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path class="editar-observacion-path" d="M3.77778 30.2222H6.46944L24.9333 11.7583L22.2417 9.06667L3.77778 27.5306V30.2222ZM0 34V25.9722L24.9333 1.08611C25.3111 0.739815 25.7285 0.472222 26.1857 0.283334C26.6428 0.0944446 27.1225 0 27.625 0C28.1274 0 28.6154 0.0944446 29.0889 0.283334C29.5624 0.472222 29.9716 0.755555 30.3167 1.13333L32.9139 3.77778C33.2917 4.12407 33.5674 4.53333 33.7412 5.00556C33.915 5.47778 34.0012 5.95 34 6.42222C34 6.92593 33.9137 7.40633 33.7412 7.86344C33.5687 8.32056 33.2929 8.73737 32.9139 9.11389L8.02777 34H0ZM23.5639 10.4361L22.2417 9.06667L24.9333 11.7583L23.5639 10.4361Z" fill="currentColor"/>
+                        </svg>
                         <i class="fas fa-trash eliminar-observacion" data-id="{{ observacion.id }}" title="Eliminar observación"></i>
                     </div>
                 </div>

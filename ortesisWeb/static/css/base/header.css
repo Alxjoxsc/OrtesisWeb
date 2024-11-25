@@ -13,6 +13,13 @@
     margin-left: auto;
 }
 
+.notification-container {
+    margin-left: auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
 .notification-icon img {
     width: 40px;
     height: 40px;
@@ -25,10 +32,10 @@
 
 .modal-notificaciones {
     position: absolute;
-    top: 45px;
-    right: 5px;
-    width: auto;
-    max-height: 80%;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 400px;
+    max-height: 400px;
     overflow-y: auto;
     background-color: #fff;
     border-radius: 8px;
@@ -93,12 +100,16 @@
 
 @media (max-width: 770px) and (min-width: 50px) {
     .modal-notificaciones {
-        top: 200px; /* Ajuste específico para este tamaño de pantalla */
-        right: 5px; /* Alineado debajo del icono */
-        width: 250px;
-        max-height: 80%;
-        z-index: 1000;
+        position: absolute;
+        top: calc(100% + 10px);
+        right: 0;
+        width: 300px;
+        max-height: 300px;
+        overflow-y: auto;
+        background-color: #fff;
         border-radius: 8px;
         box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        display: none;
     }
 }

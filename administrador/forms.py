@@ -348,36 +348,6 @@ class CrearTerapeutaForm(forms.ModelForm):
     
 
 
-class HorarioForm(forms.ModelForm):
-    class Meta:
-        model = Horario
-        fields = ['dia', 'hora_inicio', 'hora_final']
-        widgets = {
-            'dia': forms.Select(attrs={'class':'seleccion'}),
-            'hora_inicio': forms.TimeInput(attrs={'class':'campo-formulario', 'type': 'time'}),
-            'hora_final': forms.TimeInput(attrs={'class':'campo-formulario', 'type': 'time'}),
-        }
-    def clean(self):
-        cleaned_data = super().clean()
-        hora_inicio = cleaned_data.get('hora_inicio')
-        hora_final = cleaned_data.get('hora_final')
-
-        # Verificar que la hora de inicio sea anterior a la hora final
-        if hora_inicio and hora_final and hora_inicio >= hora_final:
-            raise ValidationError('La hora de inicio debe ser anterior a la hora final.')
-
-        return cleaned_data
-
-# Creamos el formset para los horarios del terapeuta (inlineformset)
-HorarioFormSet = inlineformset_factory(
-    Terapeuta,
-    Horario,
-    form=HorarioForm,
-    extra=1,  # Se envia solo un formularo. pero se pueden agregar más
-    can_delete=True # Se pueden eliminar los formularios
-)
-
-
 class CrearPacienteForm(forms.ModelForm):
 
     ACTIVIDAD_FISICA_CHOICES = [
