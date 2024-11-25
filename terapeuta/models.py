@@ -4,13 +4,13 @@ from autenticacion.models import Profile
 from datetime import timedelta, date
 from django.utils import timezone
 from autenticacion.models import Region, Comuna  # Importamos los modelos de ubicación
+from django.core.exceptions import ValidationError
 
 class Terapeuta(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     especialidad = models.CharField(max_length=100)
     fecha_ingreso = models.DateField(default=timezone.now)
     disponibilidad = models.CharField(max_length=30, choices=[('Disponible', 'Disponible'), ('Medianamente Disponible', 'Medianamente Disponible'), ('No Disponible', 'No Disponible')], default='Disponible')
-    horas_trabajadas = models.FloatField(default=0)
     fecha_contratacion = models.DateField()
     titulo = models.CharField(max_length=100, default="Sin título")
     experiencia = models.IntegerField(null=True, blank=True)
@@ -20,6 +20,23 @@ class Terapeuta(models.Model):
 
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}"
+
+class HorasTrabajadas(models.Model):
+    terapeuta = models.ForeignKey(Terapeuta, on_delete=models.CASCADE, related_name="horas_trabajadas")
+    año = models.PositiveIntegerField()
+    mes = models.PositiveIntegerField(choices=[
+        (1, 'Enero'), (2, 'Febrero'), (3, 'Marzo'), (4, 'Abril'), 
+        (5, 'Mayo'), (6, 'Junio'), (7, 'Julio'), (8, 'Agosto'), 
+        (9, 'Septiembre'), (10, 'Octubre'), (11, 'Noviembre'), (12, 'Diciembre')
+    ])
+    horas = models.FloatField()
+
+    class Meta:
+        unique_together = ('terapeuta', 'año', 'mes')
+        ordering = ['-año', '-mes']
+
+    def __str__(self):
+        return f"{self.terapeuta} - {self.mes}/{self.año}: {self.horas} horas"
 
 class Paciente(models.Model):
     terapeuta = models.ForeignKey(Terapeuta, on_delete=models.CASCADE, null=True, blank=True)
@@ -161,6 +178,7 @@ class Horario(models.Model):
 
     def __str__(self):
         return f"{self.terapeuta.user.first_name} {self.terapeuta.user.last_name} - {self.dia}"
+    
       
 class Observacion(models.Model):
     paciente = models.ForeignKey(Paciente, on_delete=models.CASCADE, related_name='observaciones')

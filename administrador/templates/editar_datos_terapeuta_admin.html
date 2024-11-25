@@ -155,11 +155,39 @@
         </div>
     </div>
 
-    <div class="contenedor-botones">
-        <button type="button" class="boton-cancelar" id="boton-cancelar">Cancelar</button>
-        <button class="boton-azul" type="submit">Confirmar Cambios</button>
-    </div>
 
+    <h2>Horarios del terapeuta</h2>
+    <div class="datos-inferiores">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Día</th>
+                    <th>Hora de Inicio</th>
+                    <th>Hora de Fin</th>
+                    <th class="columna-eliminar">Eliminar</th>
+                </tr>
+            </thead>
+
+            <label for="fulltime-checkbox">Horario Fulltime</label>
+            <input class="fulltime-checkbox" type="checkbox" id="fulltime-checkbox" name="fulltime-checkbox">
+            <label for="weekend-parttime-checkbox">Horario Part Time (Fin de Semana)</label>
+            <input class="weekend-parttime-checkbox" type="checkbox" id="weekend-parttime-checkbox" name="weekend-parttime-checkbox">
+            <!-- Campo oculto para almacenar el número de filas (horarios) -->
+            <input type="hidden" id="num_horarios" name="num_horarios">
+
+
+            <tbody id="horarios-tbody">
+                <!-- Aquí se agregarán dinámicamente las filas -->
+            </tbody>
+        </table>
+        <button type="button" class="boton-azul" id="agregar-horario">Añadir Horario +</button>
+    </div>    
+
+    <div class="contenedor-botones">
+        <button class="boton-cancelar" id="boton-cancelar">Cancelar</button>
+        <button class="boton-azul" type="submit">Confirmar cambios</button>
+    </div>
+  
     <!-- Modal de éxito -->
     <div id="modalExito" class="modal" style="display: none;">
         <div class="contenido-modal">
@@ -167,7 +195,6 @@
             <p>¡Datos actualizados con éxito!</p>
         </div>
     </div>
-
 </form>
 
 <script>
@@ -223,6 +250,153 @@
             }
         });
     });
+</script>
+
+<script>
+    // Asegúrate de que los horarios sean inyectados correctamente en JavaScript
+    window.horariosOriginales = {{ horarios|safe }};
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const tbody = document.getElementById('horarios-tbody');
+        const addHorarioButton = document.getElementById('agregar-horario');
+        const fullTimeCheckbox = document.getElementById('fulltime-checkbox');
+        const partTimeCheckbox = document.getElementById('weekend-parttime-checkbox');
+        const numHorariosInput = document.getElementById('num_horarios');  // Campo oculto
+    
+        let originalSchedules = {{ horarios|safe }}; // Horarios originales cargados desde el backend
+    
+        // Función para crear una nueva fila vacía
+        const createEmptyRow = () => {
+            const tr = document.createElement('tr');
+            const rowCount = tbody.rows.length;  // Obtener el número de filas actuales
+            tr.innerHTML = `
+                <td>
+                    <select class="seleccion" name="horarios[${rowCount}][dia]">
+                        <option value="" selected disabled>Día</option>
+                        <option value="Lunes">Lunes</option>
+                        <option value="Martes">Martes</option>
+                        <option value="Miércoles">Miércoles</option>
+                        <option value="Jueves">Jueves</option>
+                        <option value="Viernes">Viernes</option>
+                        <option value="Sábado">Sábado</option>
+                        <option value="Domingo">Domingo</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="time" class="hora-inicio campo-formulario" name="horarios[${rowCount}][hora_inicio]">
+                </td>
+                <td>
+                    <input type="time" class="hora-final campo-formulario" name="horarios[${rowCount}][hora_final]">
+                </td>
+                <td>
+                    <button type="button" class="eliminar-horario">Eliminar</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+            updateDeleteButtons();
+            updateNumHorarios();  // Actualizar el número de horarios
+        };
+    
+        // Función para actualizar el número de horarios
+        const updateNumHorarios = () => {
+            numHorariosInput.value = tbody.rows.length;  // Establecer el valor del campo oculto
+        };
+    
+        // Función para cargar horarios originales
+        const loadOriginalSchedules = (schedules) => {
+            originalSchedules = schedules; // Guardar horarios originales
+            tbody.innerHTML = ''; // Limpiar el tbody
+            schedules.forEach((schedule, index) => { // 'index' se usará como el número dinámico
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><select class="seleccion" name="horarios[${index}][dia]">
+                            <option value="Lunes" ${schedule.dia === 'Lunes' ? 'selected' : ''}>Lunes</option>
+                            <option value="Martes" ${schedule.dia === 'Martes' ? 'selected' : ''}>Martes</option>
+                            <option value="Miércoles" ${schedule.dia === 'Miércoles' ? 'selected' : ''}>Miércoles</option>
+                            <option value="Jueves" ${schedule.dia === 'Jueves' ? 'selected' : ''}>Jueves</option>
+                            <option value="Viernes" ${schedule.dia === 'Viernes' ? 'selected' : ''}>Viernes</option>
+                            <option value="Sábado" ${schedule.dia === 'Sábado' ? 'selected' : ''}>Sábado</option>
+                            <option value="Domingo" ${schedule.dia === 'Domingo' ? 'selected' : ''}>Domingo</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="time" class="hora-inicio campo-formulario" name="horarios[${index}][hora_inicio]" value="${schedule.hora_inicio}">
+                    </td>
+                    <td>
+                        <input type="time" class="hora-final campo-formulario" name="horarios[${index}][hora_final]" value="${schedule.hora_final}">
+                    </td>
+                    <td><button type="button" class="eliminar-horario">Eliminar</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+            updateDeleteButtons();
+            updateNumHorarios();  // Actualizar el número de horarios
+        };
+    
+        // Función para habilitar/deshabilitar botones de eliminar
+        const updateDeleteButtons = () => {
+            const deleteButtons = document.querySelectorAll('.eliminar-horario');
+            deleteButtons.forEach(button => {
+                button.disabled = (tbody.children.length === 1);
+                button.classList.toggle('disabled', tbody.children.length === 1);
+            });
+        };
+    
+        // Función para rellenar horarios según checkbox
+        const fillSchedules = (isFullTime) => {
+            const schedules = isFullTime
+                ? [
+                    { dia: 'Lunes', hora_inicio: '08:00', hora_final: '18:00' },
+                    { dia: 'Martes', hora_inicio: '08:00', hora_final: '18:00' },
+                    { dia: 'Miércoles', hora_inicio: '08:00', hora_final: '18:00' },
+                    { dia: 'Jueves', hora_inicio: '08:00', hora_final: '18:00' },
+                    { dia: 'Viernes', hora_inicio: '08:00', hora_final: '18:00' }
+                ]
+                : [
+                    { dia: 'Sábado', hora_inicio: '08:00', hora_final: '18:00' },
+                    { dia: 'Domingo', hora_inicio: '08:00', hora_final: '18:00' }
+                ];
+            loadOriginalSchedules(schedules);
+        };
+    
+        // Eventos de checkboxes
+        fullTimeCheckbox.addEventListener('change', () => {
+            if (fullTimeCheckbox.checked) {
+                partTimeCheckbox.checked = false;
+                fillSchedules(true);
+            } else {
+                loadOriginalSchedules(window.horariosOriginales); // Volver a los horarios originales
+            }
+        });
+    
+        partTimeCheckbox.addEventListener('change', () => {
+            if (partTimeCheckbox.checked) {
+                fullTimeCheckbox.checked = false;
+                fillSchedules(false);
+            } else {
+                loadOriginalSchedules(window.horariosOriginales); // Volver a los horarios originales
+            }
+        });
+    
+        // Evento para añadir nuevas filas
+        addHorarioButton.addEventListener('click', createEmptyRow);
+    
+        // Evento para eliminar filas
+        tbody.addEventListener('click', (e) => {
+            if (e.target.classList.contains('eliminar-horario')) {
+                e.target.closest('tr').remove();
+                updateDeleteButtons();
+                updateNumHorarios();  // Actualizar el número de horarios después de eliminar una fila
+            }
+        });
+    
+        // Cargar horarios originales al inicio
+        loadOriginalSchedules(window.horariosOriginales || []);
+    });
+    
+
 </script>
 
 <script src="{% static 'js/formatear-rut.js' %}"></script>

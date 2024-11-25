@@ -124,11 +124,11 @@
     background-color: #D9D9D9;
     color: #000000;
     border: none;
-    border-radius: 25px;
+    border-radius: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-    padding: 10px 15px;
+    padding: 8px 12px;
     cursor: pointer;
-    font-size: 20px;
+    font-size: 18px;
 }
 
 /* Estilos para el ícono de suma */

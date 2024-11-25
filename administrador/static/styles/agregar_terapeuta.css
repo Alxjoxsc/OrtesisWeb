@@ -213,6 +213,13 @@ input[type="checkbox"]::after {
     color: white;
 }
 
+.fulltime-checkbox,
+.weekend-parttime-checkbox {
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+
 @media screen and (max-width: 768px) {
     .divisor-formulario {
         flex-direction: column;

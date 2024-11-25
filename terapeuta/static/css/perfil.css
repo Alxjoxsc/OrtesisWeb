@@ -16,9 +16,9 @@
     margin-bottom: 30px;
 }
 
-.profile-info p {
+.profile-info h2 {
     font-weight: 500;
-    font-size: 30px;
+    font-size: 32px;
 }
 
 .contact-info h2 {
@@ -127,6 +127,7 @@
 
 .edit-icon {
     cursor: pointer;
+    color: #008CAB;
 }
 
 .presentation p {
@@ -244,6 +245,42 @@ input[type="file"]::-webkit-file-upload-button {
     color: white;
 }
 
+/* Modal de éxito */
+.contenido-modal {
+    display: flex;
+    padding: 20px;
+    background-color: #fefefe;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 0.625rem;
+    width: 40rem; /* Modal más pequeño */
+    height: 20rem; /* Modal más pequeño */
+    margin: auto;
+    position: fixed; /* Asegura que el modal se mantenga fijo */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999; /* Asegura que el modal esté encima de otros elementos */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8); /* Sombra agregada */
+}
+
+.contenido-modal img {
+    width: 120px; /* Tamaño ajustado de la imagen */
+    height: auto; 
+    margin-bottom: 1rem;
+}
+
+.contenido-modal h1, .contenido-modal h2, .contenido-modal p {
+    font-size: 1.75rem; /* Aumento del tamaño de la fuente para los encabezados */
+}
+
+.contenido-modal p {
+    font-size: 1.25rem; /* Aumento del tamaño de la fuente para el mensaje */
+}
+
 /* Ajustes responsivos */
 @media (max-width: 1400px) {
     .profile-container {
@@ -251,6 +288,11 @@ input[type="file"]::-webkit-file-upload-button {
         align-items: center;
         width: 90%;
         margin-top: 30px;
+        justify-content: center;  /* Asegura que todo el contenido esté centrado */
+    }
+
+    .profile-info {
+        text-align: center;  /* Centra el texto de los elementos dentro de profile-info */
     }
 
     .profile-info h1 {
@@ -259,26 +301,42 @@ input[type="file"]::-webkit-file-upload-button {
         text-align: center;
     }
 
-    .profile-info p {
+    .profile-info h2 {
+        margin-top: 0px;
         font-size: 18px;
-        text-align: justify;
+        text-align: center;
     }
 
-    .doctor-logo h2 {
-        margin-top: 50px;
-        text-align:justify;
+    .doctor-logo {
+        display: flex;
+        justify-content: center;  /* Centra la imagen de perfil horizontalmente */
+        align-items: center;  /* Centra la imagen verticalmente */
+        margin-top: 20px;  /* Añadir margen superior para dar espacio */
+    }
+
+    .perfil-imagen {
+        width: 250px;  /* Ajustar tamaño de la imagen para pantallas pequeñas */
+        height: 250px;
+        border-radius: 50%;
+        object-fit: cover;
+        cursor: pointer;
     }
 
     .contact-item {
         width: 100%;
         padding: 10px;
+        display: flex;
+        justify-content: center;  /* Asegura que el contenido de los elementos de contacto se centre */
+        align-items: center;  /* Centra verticalmente los íconos y texto */
     }
 
     .presentation {
-        width: 100%;
+        width: 90%;  /* Ajusta el ancho para que no se estire demasiado en pantallas pequeñas */
         padding: 15px;
         margin-top: 20px;
         margin-bottom: 25px;
+        margin-left: auto;  /* Centra horizontalmente */
+        margin-right: auto;  /* Centra horizontalmente */
     }
 
     .presentation h2 {
@@ -288,6 +346,22 @@ input[type="file"]::-webkit-file-upload-button {
     .presentation p {
         font-size: 16px;
     }
+
+    .contact-info {
+        margin-left: 0;  /* Elimina el margen izquierdo en pantallas pequeñas */
+        margin-top: 20px;
+    }
+
+    .contact-item {
+        width: 100%;  /* Asegura que los elementos de contacto se adapten al 100% del contenedor */
+        padding: 10px;
+        justify-content: space-between;  /* Mantén el espacio entre los íconos y el texto */
+    }
+
+    /* Asegura que los botones también estén centrados */
+    .btn-editar-credenciales {
+        margin: 20px auto;
+    }
 }
 
 @media (max-width: 480px) {
@@ -295,8 +369,8 @@ input[type="file"]::-webkit-file-upload-button {
         font-size: 22px;
     }
 
-    .profile-info p {
-        font-size: 16px;
+    .profile-info h2 {
+        font-size: 18px;
     }
 
     .contact-item p {

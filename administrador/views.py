@@ -4,15 +4,15 @@ import csv
 from django.conf import settings
 import pandas as pd
 from decimal import Decimal
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from itertools import cycle
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 from autenticacion.decorators import role_required
+from .forms import CrearTerapeutaForm, CrearPacienteForm, EditarPacienteForm, CrearRecepcionistaForm, EditarTerapeutaForm
 from django.http import HttpResponse, JsonResponse
-from .forms import CrearTerapeutaForm, HorarioFormSet, CrearPacienteForm, EditarPacienteForm, CrearRecepcionistaForm, EditarTerapeutaForm
 from autenticacion.models import Comuna, Region
-from terapeuta.models import Paciente, Terapeuta, Cita, Horario
+from terapeuta.models import Paciente, Terapeuta, Cita, Horario, Sesion, HorasTrabajadas
 from recepcionista.models import Recepcionista
 from autenticacion.models import Profile
 from django.contrib.auth.models import User, Group
@@ -32,6 +32,9 @@ from django.conf import settings
 import string
 import random
 from django.contrib.auth.hashers import make_password
+from django.db.models import Sum, Count, Avg
+from django.db.models.functions import TruncMonth
+
 
 ############################### LISTAR TERAPEUTAS ################################
 @role_required('Administrador')
@@ -926,32 +929,62 @@ def restaurar_recepcionista(request):
             'recepcionistas_restaurados': [recepcionista.id for recepcionista in recepcionistas]
         })
 
+
 @role_required('Administrador')
 def agregar_terapeuta(request):
     if request.method == 'POST':
         terapeuta_form = CrearTerapeutaForm(request.POST)
-        horario_formset = HorarioFormSet(request.POST)
+        horario_formset = HorarioFormSet(request.POST, queryset=Horario.objects.none())  # Formset para horarios
 
         if terapeuta_form.is_valid() and horario_formset.is_valid():
-            with transaction.atomic():
-                # Guardamos el terapeuta
-                terapeuta = terapeuta_form.save()
-                
-                # Asignamos el terapeuta a los horarios y guardamos el formset
-                horario_formset.instance = terapeuta
-                horario_formset.save()
+            try:
+                with transaction.atomic():
+                    # Guardar el terapeuta
+                    terapeuta = terapeuta_form.save()
+
+                    # Asignar el terapeuta a los horarios y guardar el formset
+                    horario_formset.instance = terapeuta
+                    horario_formset.save()
+
+                messages.success(request, 'El terapeuta y sus horarios han sido creados exitosamente.')
+                return redirect('mostrar_terapeuta_administrador', terapeuta_id=terapeuta.id)
             
-            # Redirigimos a la vista 'mostrar_terapeuta_administrador' con el ID del terapeuta
-            return redirect('mostrar_terapeuta_administrador', terapeuta_id=terapeuta.id)
+            except ValidationError as e:
+                messages.error(request, f'Error al guardar los horarios: {e.message}')
+            except Exception as e:
+                messages.error(request, f'Ocurrió un error inesperado: {str(e)}')
+        else:
+            messages.error(request, 'Por favor corrige los errores del formulario.')
     else:
         terapeuta_form = CrearTerapeutaForm()
-        horario_formset = HorarioFormSet(queryset=Horario.objects.none())  # Formset vacío
-    
+        horario_formset = HorarioFormSet(queryset=Horario.objects.none())  # Formset vacío para GET
+
     return render(request, 'agregar_terapeuta.html', {
         'terapeuta_form': terapeuta_form,
         'horario_formset': horario_formset,
         'modulo_terapeutas': True,
     })
+
+
+def extract_horarios(post_data):
+    """
+    Extrae y valida los datos de horarios desde request.POST.
+    """
+    horarios = []
+    dias = post_data.getlist('dia')
+    horas_inicio = post_data.getlist('hora_inicio')
+    horas_final = post_data.getlist('hora_final')
+
+    for dia, hora_inicio, hora_final in zip(dias, horas_inicio, horas_final):
+        if dia and hora_inicio and hora_final:
+            horarios.append({
+                'dia': dia,
+                'hora_inicio': datetime.strptime(hora_inicio, '%H:%M').time(),
+                'hora_final': datetime.strptime(hora_final, '%H:%M').time(),
+            })
+
+    return horarios
+
 
 #### CARGA DE DATOS DE REGIONES Y COMUNAS ####
 def comunas_api(request):
@@ -1531,18 +1564,62 @@ def agregar_recepcionista(request):
 def editar_datos_terapeuta_admin(request, terapeuta_id):
     terapeuta = get_object_or_404(Terapeuta, id=terapeuta_id)
 
+    # Obtener horarios actuales del terapeuta para mostrarlos en el frontend
+    horarios = [
+        {
+            'dia': horario['dia'],
+            'hora_inicio': horario['hora_inicio'].strftime('%H:%M'),
+            'hora_final': horario['hora_final'].strftime('%H:%M'),
+        }
+        for horario in Horario.objects.filter(terapeuta=terapeuta).values('dia', 'hora_inicio', 'hora_final')
+    ]
+
     if request.method == 'POST':
         form = EditarTerapeutaForm(request.POST, instance=terapeuta)
+        num_horarios = int(request.POST.get('num_horarios', 0))
+
+        # Procesar horarios desde el formulario
+        horarios_data = []
+        for i in range(num_horarios):
+            dia = request.POST.get(f'horarios[{i}][dia]')
+            hora_inicio = request.POST.get(f'horarios[{i}][hora_inicio]')
+            hora_final = request.POST.get(f'horarios[{i}][hora_final]')
+
+            if dia and hora_inicio and hora_final:
+                horarios_data.append({
+                    'dia': dia,
+                    'hora_inicio': hora_inicio,
+                    'hora_final': hora_final
+                })
 
         if form.is_valid():
-            form.save()
-            return JsonResponse({
-                'success': True,
-                'message': 'Datos guardados exitosamente.',
-                'terapeuta_id': terapeuta.id
-            })
+            try:
+                with transaction.atomic():
+                    # Guardar cambios del terapeuta
+                    form.save()
 
+                    # Actualizar horarios
+                    Horario.objects.filter(terapeuta=terapeuta).delete()
+                    for horario in horarios_data:
+                        Horario.objects.create(
+                            terapeuta=terapeuta,
+                            dia=horario['dia'],
+                            hora_inicio=horario['hora_inicio'],
+                            hora_final=horario['hora_final']
+                        )
+
+                return JsonResponse({
+                    'success': True,
+                    'message': 'Datos y horarios actualizados exitosamente.',
+                    'terapeuta_id': terapeuta.id
+                })
+            except Exception as e:
+                return JsonResponse({
+                    'success': False,
+                    'message': f'Error al guardar los datos: {str(e)}'
+                })
     else:
+        # Inicializar el formulario con los datos actuales del terapeuta
         form = EditarTerapeutaForm(
             initial={
                 'first_name': terapeuta.user.first_name,
@@ -1568,8 +1645,56 @@ def editar_datos_terapeuta_admin(request, terapeuta_id):
     return render(request, 'editar_datos_terapeuta_admin.html', {
         'terapeuta': terapeuta,
         'terapeuta_form': form,
+        'horarios': json.dumps(horarios),
+        'horariosOriginales': horarios,  # Esta es la variable original inyectada en el frontend
         'modulo_terapeutas': True,
         'messages': messages.get_messages(request),
     })
 
+##################################################              REPORTERIA              ########################################################
 
+@role_required('Administrador')
+def reporteria_terapeutas(request):
+    # Obtener datos de promedios mensuales
+    promedios_mensuales = (
+        HorasTrabajadas.objects.values('año', 'mes')
+        .annotate(promedio_horas=Avg('horas'))
+        .order_by('año', 'mes')
+    )
+
+    # Formatear datos para Highcharts
+    meses = [f"{item['mes']}/{item['año']}" for item in promedios_mensuales]
+    promedio_horas = [item['promedio_horas'] for item in promedios_mensuales]
+
+    # Obtener la cantidad de pacientes por terapeuta
+    pacientes_por_terapeuta = (
+        Paciente.objects.filter(is_active=True)  # Solo pacientes activos
+        .values('terapeuta__user__first_name', 'terapeuta__user__last_name')  # Agrupar por terapeuta
+        .annotate(total_pacientes=Count('id'))  # Contar pacientes
+        .order_by('terapeuta__user__first_name', 'terapeuta__user__last_name')  # Ordenar por nombre del terapeuta
+    )
+
+    # Formatear los datos para el gráfico
+    terapeutas = [f"{item['terapeuta__user__first_name']} {item['terapeuta__user__last_name']}" for item in pacientes_por_terapeuta]
+    cantidad_pacientes = [item['total_pacientes'] for item in pacientes_por_terapeuta]
+    
+    # Crear la estructura para Highcharts
+    series_data = [{
+        'name': 'Pacientes por Terapeuta',
+        'data': cantidad_pacientes
+    }]
+
+    # 3. Especialidades de los terapeutas
+    especialidades = Terapeuta.objects.values('especialidad').annotate(
+        total=Count('id')
+    )
+
+    return render(request, 'reporteria_terapeutas.html', {
+        'modulo_terapeutas': True,
+        'meses': meses,
+        'promedio_horas': promedio_horas,
+        'terapeutas': terapeutas,
+        'cantidad_pacientes': cantidad_pacientes,
+        'series_data': series_data,
+        'especialidades': list(especialidades),
+        })
