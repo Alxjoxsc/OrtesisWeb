@@ -735,7 +735,7 @@ def editar_perfil(request, pk):
             # valida el correo
             validar_correo(nuevo_correo)
             if Terapeuta.objects.filter(correo_contacto=nuevo_correo).exclude(pk=terapeuta.pk).exists():
-                messages.error(request, 'El correo ya está en uso por otro terapeuta.')
+                return JsonResponse({'success': False, 'message': 'El correo ya está en uso por otro terapeuta.'})
             else:
                 # Actualiza los datos del terapeuta
                 terapeuta.presentacion = nueva_presentacion
@@ -753,11 +753,11 @@ def editar_perfil(request, pk):
                     terapeuta.imagen_perfil = imagen
 
                 terapeuta.save()
-                messages.success(request, 'Perfil actualizado exitosamente.')
-                return redirect('perfil')
+                # Respuesta de éxito en formato JSON
+                return JsonResponse({'success': True, 'message': 'Perfil actualizado exitosamente.'})
 
         except ValidationError as e:
-            messages.error(request, str(e))
+            return JsonResponse({'success': False, 'message': str(e)})
 
     context = {
         'terapeuta': terapeuta,
@@ -863,13 +863,14 @@ def editar_credenciales(request):
 
         user = request.user
         cambios_realizados = []
+        modal_error = None  # Para manejar errores en el modal
+        modal_exito = None  # Para manejar el éxito en el modal
 
         # Verificar si el usuario ha modificado el correo electrónico
         if nuevo_email and nuevo_email != user.email:
             # Validar que el nuevo correo no esté en uso
             if User.objects.filter(email=nuevo_email).exclude(pk=user.pk).exists():
-                messages.error(request, 'El correo electrónico ya está en uso.')
-                return redirect('editar_credenciales')
+                modal_error = 'El correo electrónico ya está en uso.'
             else:
                 user.email = nuevo_email
                 cambios_realizados.append('correo electrónico')
@@ -877,25 +878,28 @@ def editar_credenciales(request):
         # Verificar si el usuario desea cambiar la contraseña
         if nueva_password:
             if nueva_password != confirmar_password:
-                messages.error(request, 'Las contraseñas no coinciden.')
-                return redirect('editar_credenciales')
+                modal_error = 'Las contraseñas no coinciden.'
             else:
                 user.set_password(nueva_password)
                 cambios_realizados.append('contraseña')
                 # Actualizar la sesión para mantener al usuario autenticado
                 update_session_auth_hash(request, user)
 
-        user.save()
+        # Guardar cambios si no hubo errores
+        if not modal_error:
+            user.save()
+            if cambios_realizados:
+                modal_exito = 'Se han actualizado: ' + ', '.join(cambios_realizados) + '.'
+            else:
+                modal_error = 'No se realizaron cambios.'
 
-        if cambios_realizados:
-            mensaje = 'Se han actualizado: ' + ', '.join(cambios_realizados) + '.'
-            messages.success(request, mensaje)
-        else:
-            messages.info(request, 'No se realizaron cambios.')
+        # Enviar el estado del modal como contexto
+        return render(request, 'editar_credenciales.html', {
+            'modal_error': modal_error,
+            'modal_exito': modal_exito
+        })
 
-        return redirect('perfil')
-    else:
-        return render(request, 'editar_credenciales.html')
+    return render(request, 'editar_credenciales.html')
 
 
 

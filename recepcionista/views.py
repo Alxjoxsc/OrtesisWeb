@@ -416,9 +416,11 @@ def editar_datos_paciente_recepcionista(request, paciente_id, terapeuta=None):
         form = EditarPacienteForm(request.POST, instance=paciente)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Datos guardados exitosamente.')
-            # Redirigir a la misma página con un parámetro de éxito en la URL
-            return redirect('editar_datos_paciente_recepcionista', paciente_id=paciente_id)
+            return JsonResponse({
+                'success': True,
+                'message': 'Datos guardados exitosamente.',
+                'paciente_id': paciente.id
+            })
 
     
     else:
@@ -431,4 +433,6 @@ def editar_datos_paciente_recepcionista(request, paciente_id, terapeuta=None):
         'terapeutas': terapeutas,
         'terapeuta_asignado': paciente.terapeuta.id if paciente.terapeuta else None,
         'paciente_form': form,
-        'modulo_pacientes': True})
+        'modulo_pacientes': True,
+        'messages': messages.get_messages(request),
+    })

@@ -88,45 +88,72 @@
             {% endif %}
         
             <div class="popup-actions">
-                <button type="button" class="cancel-btn" onclick="closePopup('edit-profile-popup')">Cancelar</button>
+                <button type="button" class="cancel-btn" onclick="cancelar()">Cancelar</button>
                 <button type="submit" class="confirm-btn">Confirmar</button>
+            </div>
+            <!-- Modal de éxito -->
+            <div id="modalExito" class="modal" style="display: none;">
+                <div class="contenido-modal">
+                    <img src="{% static 'icons/Exito.svg' %}" alt="Éxito">
+                    <p>¡Datos actualizados con éxito!</p>
+                </div>
             </div>
         </form>
     </div>
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    {% if messages %}
-        let errorMessageContainer = document.getElementById('error-message');
-        errorMessageContainer.innerHTML = '';  // Limpiar mensajes de error previos
+    // Cuando se envía el formulario
+    document.getElementById("edit-profile-form").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
 
-        {% for message in messages %}
-            {% if message.tags == 'success' %}
-                Swal.fire({
-                    title: '¡Éxito al Guardar!',
-                    icon: 'success',
-                    confirmButtonText: 'Aceptar',
-                    confirmButtonColor: '#3085d6',
-                    background: '#f0f0f0',
-                    timer: 2000,
-                });
-                closePopup('edit-profile-popup'); // Cerrar popup si es éxito
-            {% elif message.tags == 'error' %}
-                // Mostrar mensaje de error dentro del popup
-                errorMessageContainer.innerHTML += '<p>{{ message }}</p>';
-                openPopup('edit-profile-popup'); // Asegurarse de que el popup permanezca abierto
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-});
+        var form = new FormData(this); // Obtener los datos del formulario
 
-function openPopup(popupId) {
-    document.getElementById(popupId).style.display = 'flex';
-}
-function closePopup(popupId) {
-    document.getElementById(popupId).style.display = 'none';
-}
+        fetch("{% url 'editar_perfil' terapeuta.id %}", {
+            method: 'POST',
+            body: form,
+        })
+        .then(response => response.json()) // Obtener la respuesta como JSON
+        .then(data => {
+            if (data.success) {
+                // Mostrar el modal de éxito si la respuesta es exitosa
+                document.getElementById("modalExito").style.display = "block";
+                setTimeout(function() {
+                    location.reload();
+                    document.getElementById("modalExito").style.display = "none";
+                }, 2000); // Ocultar el modal después de 2 segundos
+
+                // Actualizar los datos de la página con los nuevos valores
+                document.querySelector('.profile-info h1').textContent = '{{ user.first_name }} {{ user.last_name }}'; // Nombre
+                document.querySelector('.profile-info .presentation p').textContent = document.getElementById('presentacion').value; // Presentación
+                document.querySelector('.profile-info .contact-item p').textContent = document.querySelector('[name="correo_contacto"]').value; // Correo
+
+                // Si se cambió la imagen de perfil
+                var imagenPerfil = document.querySelector('.perfil-imagen');
+                if (imagenPerfil) {
+                    imagenPerfil.src = URL.createObjectURL(form.get('imagen_perfil'));
+                }
+            } else {
+                // En caso de error, mostrar un mensaje de error
+                document.getElementById("error-message").textContent = data.message;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+
+    function openPopup(popupId) {
+        document.getElementById(popupId).style.display = 'flex';
+    }
+
+    function closePopup(popupId) {
+        document.getElementById(popupId).style.display = 'none';
+    }
+    function cancelar() {
+        // Recargar la página
+        location.reload();
+    }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 {% endblock %}

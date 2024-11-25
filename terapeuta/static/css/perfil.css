@@ -245,6 +245,42 @@ input[type="file"]::-webkit-file-upload-button {
     color: white;
 }
 
+/* Modal de éxito */
+.contenido-modal {
+    display: flex;
+    padding: 20px;
+    background-color: #fefefe;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 0.625rem;
+    width: 40rem; /* Modal más pequeño */
+    height: 20rem; /* Modal más pequeño */
+    margin: auto;
+    position: fixed; /* Asegura que el modal se mantenga fijo */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999; /* Asegura que el modal esté encima de otros elementos */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8); /* Sombra agregada */
+}
+
+.contenido-modal img {
+    width: 120px; /* Tamaño ajustado de la imagen */
+    height: auto; 
+    margin-bottom: 1rem;
+}
+
+.contenido-modal h1, .contenido-modal h2, .contenido-modal p {
+    font-size: 1.75rem; /* Aumento del tamaño de la fuente para los encabezados */
+}
+
+.contenido-modal p {
+    font-size: 1.25rem; /* Aumento del tamaño de la fuente para el mensaje */
+}
+
 /* Ajustes responsivos */
 @media (max-width: 1400px) {
     .profile-container {
@@ -348,10 +384,4 @@ input[type="file"]::-webkit-file-upload-button {
     .presentation p {
         font-size: 14px;
     }
-
-    .perfil-imagen {
-        width: 200px;  /* Ajustar tamaño aún más pequeño para pantallas muy pequeñas */
-        height: 200px;
-    }
-
 }
