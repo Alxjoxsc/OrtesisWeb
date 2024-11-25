@@ -934,31 +934,20 @@ def restaurar_recepcionista(request):
 def agregar_terapeuta(request):
     if request.method == 'POST':
         terapeuta_form = CrearTerapeutaForm(request.POST)
+        horario_formset = HorarioFormSet(request.POST, queryset=Horario.objects.none())  # Formset para horarios
 
-        if terapeuta_form.is_valid():
-            horarios_data = extract_horarios(request.POST)  # Función para extraer horarios
-
+        if terapeuta_form.is_valid() and horario_formset.is_valid():
             try:
                 with transaction.atomic():
                     # Guardar el terapeuta
                     terapeuta = terapeuta_form.save()
 
-                    # Validar y guardar los horarios
-                    for horario in horarios_data:
-                        horario_obj = Horario(
-                            terapeuta=terapeuta,
-                            dia=horario['dia'],
-                            hora_inicio=horario['hora_inicio'],
-                            hora_final=horario['hora_final']
-                        )
-                        horario_obj.full_clean()  # Valida el modelo
-                        horario_obj.save()
+                    # Asignar el terapeuta a los horarios y guardar el formset
+                    horario_formset.instance = terapeuta
+                    horario_formset.save()
 
                 messages.success(request, 'El terapeuta y sus horarios han sido creados exitosamente.')
-                return render(request, 'agregar_terapeuta.html', {
-                    'terapeuta_form': CrearTerapeutaForm(),
-                    'modulo_terapeutas': True,
-                })
+                return redirect('mostrar_terapeuta_administrador', terapeuta_id=terapeuta.id)
             
             except ValidationError as e:
                 messages.error(request, f'Error al guardar los horarios: {e.message}')
@@ -966,12 +955,13 @@ def agregar_terapeuta(request):
                 messages.error(request, f'Ocurrió un error inesperado: {str(e)}')
         else:
             messages.error(request, 'Por favor corrige los errores del formulario.')
-
     else:
         terapeuta_form = CrearTerapeutaForm()
+        horario_formset = HorarioFormSet(queryset=Horario.objects.none())  # Formset vacío para GET
 
     return render(request, 'agregar_terapeuta.html', {
         'terapeuta_form': terapeuta_form,
+        'horario_formset': horario_formset,
         'modulo_terapeutas': True,
     })
 
@@ -1107,9 +1097,12 @@ def editar_datos_paciente_admin(request, paciente_id, terapeuta=None):
         form = EditarPacienteForm(request.POST, instance=paciente)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Datos guardados exitosamente.')
             # Redirigir a la misma página con un parámetro de éxito en la URL
-            return redirect('editar_datos_paciente_admin', paciente_id=paciente_id)
+            return JsonResponse({
+                'success': True,
+                'message': 'Datos guardados exitosamente.',
+                'paciente_id': paciente.id
+            })
 
 
     
@@ -1124,8 +1117,9 @@ def editar_datos_paciente_admin(request, paciente_id, terapeuta=None):
         'terapeuta_asignado': paciente.terapeuta.id if paciente.terapeuta else None,
         'paciente_form': form,
         'modulo_pacientes': True,
+        'messages': messages.get_messages(request),
     })
-
+    
 @role_required('Administrador')
 def redirigir_asignar_cita(request, terapeuta_id, paciente_id):
     return redirect('calendar_asignar_paciente_administrador', terapeuta_id=terapeuta_id, paciente_id=paciente_id)
@@ -1551,13 +1545,11 @@ def agregar_recepcionista(request):
         recepcionista_form = CrearRecepcionistaForm(request.POST)
         if recepcionista_form.is_valid():
             with transaction.atomic():
-                recepcionista_form.save()
-            # Enviar mensaje de éxito
-            messages.success(request, 'El recepcionista ha sido creado exitosamente.')
-            return render(request, 'agregar_recepcionista_admin.html', {
-                'recepcionista_form': CrearRecepcionistaForm(),
-                'modulo_recepcionistas': True,
-            })
+                # Guardamos el recepcionista
+                recepcionista = recepcionista_form.save()
+            
+            # Redirigimos a la vista 'mostrar_recepcionista_administrador' con el ID del recepcionista
+            return redirect('mostrar_recepcionista_administrador', recepcionista_id=recepcionista.id)
     else:
         recepcionista_form = CrearRecepcionistaForm()
 
@@ -1588,14 +1580,12 @@ def editar_datos_terapeuta_admin(request, terapeuta_id):
 
         # Procesar horarios desde el formulario
         horarios_data = []
-
-        # Recorrer todos los horarios enviados en el formulario
         for i in range(num_horarios):
             dia = request.POST.get(f'horarios[{i}][dia]')
             hora_inicio = request.POST.get(f'horarios[{i}][hora_inicio]')
             hora_final = request.POST.get(f'horarios[{i}][hora_final]')
 
-            if dia and hora_inicio and hora_final:  # Asegurarse de que no sean nulos
+            if dia and hora_inicio and hora_final:
                 horarios_data.append({
                     'dia': dia,
                     'hora_inicio': hora_inicio,
@@ -1603,26 +1593,33 @@ def editar_datos_terapeuta_admin(request, terapeuta_id):
                 })
 
         if form.is_valid():
-            with transaction.atomic():
-                # Guardar cambios del terapeuta
-                form.save()
+            try:
+                with transaction.atomic():
+                    # Guardar cambios del terapeuta
+                    form.save()
 
-                # Eliminar horarios antiguos
-                Horario.objects.filter(terapeuta=terapeuta).delete()
+                    # Actualizar horarios
+                    Horario.objects.filter(terapeuta=terapeuta).delete()
+                    for horario in horarios_data:
+                        Horario.objects.create(
+                            terapeuta=terapeuta,
+                            dia=horario['dia'],
+                            hora_inicio=horario['hora_inicio'],
+                            hora_final=horario['hora_final']
+                        )
 
-                # Guardar nuevos horarios
-                for horario in horarios_data:
-                    Horario.objects.create(
-                        terapeuta=terapeuta,
-                        dia=horario['dia'],
-                        hora_inicio=horario['hora_inicio'],
-                        hora_final=horario['hora_final']
-                    )
-
-            messages.success(request, 'Datos y horarios actualizados exitosamente.')
-            return redirect('editar_datos_terapeuta_admin', terapeuta_id=terapeuta_id)
-
+                return JsonResponse({
+                    'success': True,
+                    'message': 'Datos y horarios actualizados exitosamente.',
+                    'terapeuta_id': terapeuta.id
+                })
+            except Exception as e:
+                return JsonResponse({
+                    'success': False,
+                    'message': f'Error al guardar los datos: {str(e)}'
+                })
     else:
+        # Inicializar el formulario con los datos actuales del terapeuta
         form = EditarTerapeutaForm(
             initial={
                 'first_name': terapeuta.user.first_name,
