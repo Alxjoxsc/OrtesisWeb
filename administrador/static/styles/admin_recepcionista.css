@@ -265,6 +265,9 @@ input[type="checkbox"] {
     cursor: pointer;
     margin: 0 20px;
 }
+.centro-tabla{
+    font-size: 21px;
+}
 
 .final-tabla {
     display: flex;

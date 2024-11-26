@@ -275,6 +275,9 @@ input[type="checkbox"] {
     max-height: 100%;
     width: auto;
 }
+.centro-tabla{
+    font-size: 21px;
+}
 
 .final-tabla a img{
     width: auto;
