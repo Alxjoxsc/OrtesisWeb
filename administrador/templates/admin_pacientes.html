@@ -276,11 +276,11 @@
             const cantidadSeleccionados = selectedCheckboxes.length;
             const titulo = estado === 'inactivo' ? 'Cambiar a estado inactivo' : 'Restaurar a estado activo';
             const mensaje = estado === 'inactivo' 
-                ? `¿Desea cambiar a estado inactivo a ${cantidadSeleccionados} pacientes? Los pacientes podrán ser visualizados y reactivados en la sección de inactivos.`
-                : `¿Desea restaurar a estado activo a ${cantidadSeleccionados} pacientes? Los pacientes podrán ser visualizados en la sección de activos y se considerarán como pacientes en tratamiento.`;
+                ? `¿Desea cambiar a estado inactivo a <strong>${cantidadSeleccionados}</strong> pacientes?<br><br>Los pacientes podrán ser visualizados y reactivados en la sección de inactivos.`
+                : `¿Desea restaurar a estado activo a <strong>${cantidadSeleccionados}</strong> pacientes?<br><br>Los pacientes podrán ser visualizados en la sección de activos y se considerarán como pacientes en tratamiento.`;
 
-            document.getElementById('popup-titulo').textContent = titulo;
-            document.getElementById('popup-mensaje').textContent = mensaje;
+            document.getElementById('popup-titulo').innerHTML = titulo;
+            document.getElementById('popup-mensaje').innerHTML = mensaje;
             document.getElementById('popupModal').style.display = 'block';
 
             document.getElementById('confirmButton').setAttribute('data-estado', estado);
@@ -289,11 +289,18 @@
 
         // Pop-up individual para un paciente
         window.mostrarPopUpInactivar = function(pacienteId, nombre, rut) {
-            const titulo = `Cambiar a estado inactivo a ${nombre}`;
-            const mensaje = `¿Está seguro de que desea inactivar al paciente ${nombre} (${rut})? Este paciente podrá ser reactivado en la sección de inactivos.`;
+            const titulo = `Cambiar a estado inactivo a<br>${nombre}`;
+            const mensaje = `
+                ¿Está seguro de que desea inactivar al terapeuta:?<br>
+                <div style="display: flex; flex-direction: column; align-items: center; text-align: left;">
+                    <div><strong>Nombre:</strong> ${nombre}</div>
+                    <div><strong>Rut:</strong> ${rut}</div>
+                </div>
+                Este terapeuta podrá ser reactivado en la sección de inactivos.
+                `;
 
-            document.getElementById('popup-titulo').textContent = titulo;
-            document.getElementById('popup-mensaje').textContent = mensaje;
+            document.getElementById('popup-titulo').innerHTML = titulo;
+            document.getElementById('popup-mensaje').innerHTML = mensaje;
             document.getElementById('popupModal').style.display = 'block';
 
             document.getElementById('confirmButton').setAttribute('data-estado', 'inactivo');
