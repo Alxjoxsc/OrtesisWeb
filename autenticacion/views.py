@@ -8,7 +8,7 @@ from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from .forms import RutLoginForm, PasswordResetForm, SetNewPasswordForm
-from .models import PasswordResetToken
+from .models import PasswordResetToken, Profile
 
 
 # AUTENTICACION DE USUARIOS #
@@ -107,6 +107,13 @@ def password_reset_request(request):
             email = form.cleaned_data['email']
             try:
                 user = User.objects.get(email=email)
+
+                # Obtener el RUT del usuario desde su perfil
+                try:
+                    rut = user.profile.rut
+                except Profile.DoesNotExist:
+                    rut = 'No disponible'  # Manejar el caso donde el perfil no existe
+
                 # Generar un token único
                 token = str(uuid.uuid4())
                 # Crear y guardar el token en la base de datos
@@ -120,8 +127,8 @@ def password_reset_request(request):
                 send_mail(
                     'Restablecimiento de contraseña',
                     f'Ha recibido este correo electrónico porque ha solicitado restablecer su contraseña en "OrtesisWeb".\n'
-                    f'Por favor, dirijase al siguiente enlace para reestablecer su contraseña: {reset_url}\n'
-                    f'\nSu nombre de usuario, en caso de que lo haya olvidado: 20.404.729-4\n'
+                    f'Por favor, diríjase al siguiente enlace para reestablecer su contraseña: {reset_url}\n'
+                    f'\nSu nombre de usuario, en caso de que lo haya olvidado: {rut}\n'
                     '¡Gracias por usar nuestro sitio!',
                     'noreply@example.com',
                     [email],
@@ -129,7 +136,10 @@ def password_reset_request(request):
                 )
                 return redirect('password_reset_done')
             except User.DoesNotExist:
-                form.add_error('email', 'No existe una cuenta con este correo electrónico')
+                form.add_error('email', 'No existe una cuenta con este correo electrónico.')
+        else:
+            # Manejar errores de validación del formulario si es necesario
+            pass
     else:
         form = PasswordResetForm()
 
