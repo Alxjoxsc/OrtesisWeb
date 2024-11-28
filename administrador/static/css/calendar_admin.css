@@ -51,7 +51,7 @@ h1{
 .confirm-btn,
 .cancel-btn,
 button {
-    background-color: #373D58;
+    background-color: #001058;
     color: white;
     border: none;
     padding: 12px; /* Ajustado para coincidir con el primer CSS */
@@ -94,7 +94,7 @@ button:hover {
 
 
 .today {
-    background-color: #373D58;
+    background-color: #001058;
     color: white;
 }
 
@@ -109,8 +109,8 @@ button:hover {
     right: 5px;
     width: 4px;
     height: 4px;
-    background-color: #373D58;
-    border: 2px solid #373D58;
+    background-color: #001058;
+    border: 2px solid #001058;
     border-radius: 50%;
 }
 
@@ -143,7 +143,7 @@ button:hover {
 }
 
 .week-view th {
-    background-color: #373D58;
+    background-color: #001058;
     color: white;
     height: auto;
 }
@@ -399,7 +399,7 @@ button:hover {
 }
 
 .week-view th.today-column {
-    background-color: #373D58; 
+    background-color: #001058; 
     color: white; 
 }
 
@@ -424,7 +424,7 @@ button:hover {
 
 /* Estilo específico para citas online */
 .cita-online {
-    background-color: #373D58; 
+    background-color: #001058; 
     color: white;
     height: 90%; 
     transition: background-color 0.3s ease;
@@ -558,7 +558,7 @@ button:hover {
     }
 
     .day-block h3 {
-        background-color: #373D58;
+        background-color: #001058;
         color: white;
         padding: 5px;
         margin: 0;

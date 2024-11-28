@@ -1,0 +1,174 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario</title>
+    <link rel="stylesheet" href="{% static 'css/calendar_admin.css' %}">
+</head>
+
+<body>
+    <div class="calendar-container">
+        <h1 class="header"> Asignar Cita {{paciente.first_name}} {{paciente.last_name}}  </h1>
+        <div class="calendar-header">
+            <div class="button-container">
+                <button id="prev" class="nav-button">&#10094;</button>
+                <button id="next" class="nav-button">&#10095;</button>
+                <button id="today" class="nav-button">Hoy</button>
+            </div>
+            <div class="month-header">
+                <h2 id="month-year">Octubre 2024</h2>
+            </div>
+            <div class="view-options">
+                <button id="week-view" class="nav-button">Semana</button>
+                <button id="month-view" class="nav-button">Mes</button>
+            </div>
+        </div>
+        <div id="calendar"></div>
+    </div>
+
+<!-- Modal Popup para añadir nueva Cita -->
+<div id="nuevaCita" class="modal">
+    <div class="modal-content">
+        <span class="close" id="cerrarModal">&times;</span>
+        <h2>Agendar Cita</h2>
+        <form id="formNuevaCita" action="{% url 'agendar_cita_administrador' paciente.id terapeuta.id %}" method="POST">
+            {% csrf_token %}
+
+            <label for="titulo">Título</label>
+            <input type="text" id="titulo" name="titulo" required>
+
+            <label for="terapeuta">Terapeuta</label>
+            <input type="text" id="terapeuta" name="terapeuta" value="{{terapeuta.user.first_name}} {{terapeuta.user.last_name}}" readonly>
+
+            <label for="paciente">Paciente</label>
+            <input type="text" id="terapeuta" name="paciente" value="{{paciente.first_name}} {{paciente.last_name}}" readonly>
+
+            <label for="fecha">Fecha</label>
+            <input type="date" id="fecha" name="fecha" required>
+
+            <!-- Nueva estructura de etiquetas para Hora -->
+            <div class="hora-container">
+                <div class="hora-item">
+                    <label for="hora_inicio">Hora Inicio</label>
+                    <input class="hora_inicio" type="time" id="hora_inicio" name="hora_inicio" required step="1800">
+                </div>
+                <div class="hora-item">
+                    <label for="hora_final">Hora Final</label>
+                    <input class="hora_final" type="time" id="hora_final" name="hora_final" required step="1800">
+                </div>
+            </div>
+
+            <!-- Nuevo campo para seleccionar el tipo de cita -->
+            <label>Tipo de Cita</label>
+            <div class="tipo-cita-container">
+                <label for="tipo_presencial">
+                    <input type="radio" id="tipo_presencial" name="tipo_cita" value="presencial" checked>
+                    Presencial
+                </label>
+                <label for="tipo_online">
+                    <input type="radio" id="tipo_online" name="tipo_cita" value="online">
+                    Online
+                </label>
+            </div>
+
+            <label for="sala">Sala</label>
+            <input type="text" id="sala" name="sala" required>
+
+            <label for="detalle">Detalle</label>
+            <input type="text" id="detalle" name="detalle" required>
+
+            <div class="modal-footer">
+                <button type="button" class="cancel-btn" id="cancelarNuevaCita">Cancelar</button>
+                <button type="submit" class="confirm-btn">Confirmar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- Modal Popup para Editar una Cita -->
+<div id="editarCita" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="delete-btn" id="eliminarCita">Eliminar</button>
+            <span class="close" id="cerrarEditarModal">&times;</span>
+        </div>
+        <h2>Editar Cita</h2>
+        <form id="formEditarCita" action="{% url 'editar_cita' %}" method="POST">
+            {% csrf_token %}
+
+            <input type="hidden" name="cita_id" id="cita_id">
+
+            <label for="titulo_editar">Título</label>
+            <input type="text" id="titulo_editar" name="titulo_editar" required>
+
+            <label for="paciente_editar">Paciente</label>
+            <select id="paciente_editar" name="paciente_editar" required>
+                {% for paciente in pacientes %}
+                    <option value="{{ paciente.id }}">{{ paciente.first_name }} {{ paciente.last_name }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="fecha_editar">Fecha</label>
+            <input type="date" id="fecha_editar" name="fecha_editar" required>
+
+            <div class="hora-container">
+                <div class="hora-item">
+                    <label for="hora_inicio_editar">Hora Inicio</label>
+                    <input type="time" id="hora_inicio_editar" name="hora_inicio_editar" required step="1800">
+                </div>
+                <div class="hora-item">
+                    <label for="hora_final_editar">Hora Final</label>
+                    <input type="time" id="hora_final_editar" name="hora_final_editar" required step="1800">
+                </div>
+            </div>
+            
+            <label>Tipo de Cita</label>
+            <div class="tipo-cita-container">
+                <label for="tipo_presencial_editar">
+                    <input type="radio" id="tipo_presencial_editar" name="tipo_cita_editar" value="presencial">
+                    Presencial
+                </label>
+                <label for="tipo_online_editar">
+                    <input type="radio" id="tipo_online_editar" name="tipo_cita_editar" value="online">
+                    Online
+                </label>
+            </div>
+
+            <label for="sala_editar">Sala</label>
+            <input type="text" id="sala_editar" name="sala_editar" required>
+
+            <label for="detalle_editar">Detalle</label>
+            <input type="text" id="detalle_editar" name="detalle_editar" required>
+
+            <div class="modal-footer">
+                <button type="button" class="cancel-btn" id="cancelarEditarCita">Cancelar</button>
+                <button type="submit" class="confirm-btn">Confirmar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal de Confirmación para Eliminar Cita -->
+<div id="confirmarEliminarCita" class="modal">
+    <div class="modal-content-confirmacion">
+        <span class="close" id="cerrarConfirmarEliminarModal">&times;</span>
+        <h2>¿Estás seguro de eliminar esta cita?</h2>
+        <div class="modal-footer">
+            <button type="button" class="cancel-btn-confirmar" id="cancelarEliminarCita">Cancelar</button>
+            <button type="button" class="confirm-btn.confirmar" id="confirmarEliminarCitaBtn">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+    <!-- Incluir las citas como variable JavaScript -->
+    <script>
+        const citas = {{ fechas_citas|safe }};
+    </script>
+    <script src="{% static 'js/calendar.js' %}"></script>
+</body>
+
+</html>

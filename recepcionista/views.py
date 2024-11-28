@@ -235,28 +235,6 @@ def recepcionista_terapeutas_activos(request):
     })
 
 @role_required('Recepcionista')
-def calendar_asignar_paciente(request, paciente_id, terapeuta_id):
-    terapeuta = Terapeuta.objects.get(id=terapeuta_id)
-    paciente = Paciente.objects.get(id=paciente_id)
-    cita = Cita.objects.all()
-    horario_terapeuta = {
-        'lunes': {'inicio': 8, 'fin': 13},
-        'martes': {'inicio': 8, 'fin': 13},
-        'miercoles': {'inicio': 8, 'fin': 13},
-        'jueves': {'inicio': 8, 'fin': 13},
-        'viernes': {'inicio': 8, 'fin': 13},
-        'sabado': None,
-        'domingo': None,
-    }
-    return render(request, 'calendar_asignar_paciente.html', {
-        'horario_terapeuta': horario_terapeuta,
-        'cita': cita,
-        'paciente':paciente,
-        'terapeuta':terapeuta,
-        'modulo_terapeutas': True})
-
-###################################     CITAS     ###################################
-@role_required('Recepcionista')
 def agendar_cita_recepcionista(request, paciente_id, terapeuta_id):
     terapeuta_instance = get_object_or_404(Terapeuta, id=terapeuta_id)
     paciente_instance = get_object_or_404(Paciente, id=paciente_id)
@@ -264,7 +242,8 @@ def agendar_cita_recepcionista(request, paciente_id, terapeuta_id):
     if request.method == 'POST':
         titulo = request.POST['titulo']
         fecha = request.POST['fecha']
-        hora = request.POST['hora']
+        hora_inicio = request.POST['hora_inicio']
+        hora_final = request.POST['hora_final']
         sala = request.POST['sala']
         detalle = request.POST['detalle']
 
@@ -280,7 +259,55 @@ def agendar_cita_recepcionista(request, paciente_id, terapeuta_id):
             paciente=paciente_instance,
             titulo=titulo,
             fecha=fecha,
-            hora=hora,
+            hora_inicio=hora_inicio,
+            hora_final = hora_final,
+            sala=sala,
+            detalle=detalle
+        )
+        cita.save()
+
+        mensaje = "Cita creada y citas anteriores eliminadas exitosamente."
+
+        return redirect('mostrar_paciente_recepcionista', paciente_instance.id)
+
+    return render(request, 'mostrar_paciente_recepcionista.html', {'paciente': paciente_instance, 'modulo_pacientes': True})
+
+###################################     CITAS     ###################################
+
+def calendar_asignar_paciente_recepcionista(request, paciente_id, terapeuta_id):
+    terapeuta = Terapeuta.objects.get(id=terapeuta_id)
+    paciente = Paciente.objects.get(id=paciente_id)
+    cita = Cita.objects.all()
+    return render(request, 'calendar_asignar_paciente_recepcionista.html', {'cita': cita,
+                                                              'paciente':paciente, 'terapeuta':terapeuta, 'modulo_pacientes': True})
+
+@role_required('Recepcionista')
+def agendar_cita_recepcionista(request, paciente_id, terapeuta_id):
+    terapeuta_instance = get_object_or_404(Terapeuta, id=terapeuta_id)
+    paciente_instance = get_object_or_404(Paciente, id=paciente_id)
+
+    if request.method == 'POST':
+        titulo = request.POST['titulo']
+        fecha = request.POST['fecha']
+        hora_inicio = request.POST['hora_inicio']
+        hora_final = request.POST['hora_final']
+        sala = request.POST['sala']
+        detalle = request.POST['detalle']
+
+        # Obtener todas las citas existentes del paciente con ese terapeuta
+        citas_existentes = Cita.objects.filter(paciente=paciente_instance)
+
+        # Eliminar todas las citas anteriores (si existen)
+        citas_existentes.delete()
+
+        # Crear una nueva cita
+        cita = Cita(
+            terapeuta=terapeuta_instance,
+            paciente=paciente_instance,
+            titulo=titulo,
+            fecha=fecha,
+            hora_inicio=hora_inicio,
+            hora_final = hora_final,
             sala=sala,
             detalle=detalle
         )

@@ -56,10 +56,10 @@
                     <p><strong>Próxima Cita:</strong><br><span> 
                         {% if cita %}
                             {{ cita.fecha }}
-                            <button class="btn" onclick="window.location.href='{% url 'calendar_asignar_paciente' paciente.id paciente.terapeuta_id %}'">Reasignar Cita</button>
+                            <button class="btn" onclick="window.location.href='{% url 'calendar_asignar_paciente_recepcionista' paciente.id paciente.terapeuta_id %}'">Reasignar Cita</button>
                         {% else %}
                             Sin cita asignada
-                            <button class="btn" onclick="window.location.href='{% url 'calendar_asignar_paciente' paciente.id paciente.terapeuta_id %}'">Asignar Cita</button>
+                            <button class="btn" onclick="window.location.href='{% url 'calendar_asignar_paciente_recepcionista' paciente.id paciente.terapeuta_id %}'">Asignar Cita</button>
                         {% endif %}
                     </span></p>
                 {% endif %}

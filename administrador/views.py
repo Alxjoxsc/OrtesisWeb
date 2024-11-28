@@ -1046,16 +1046,7 @@ def calendar_asignar_paciente_administrador(request, paciente_id, terapeuta_id):
     terapeuta = Terapeuta.objects.get(id=terapeuta_id)
     paciente = Paciente.objects.get(id=paciente_id)
     cita = Cita.objects.all()
-    horario_terapeuta = {
-        'lunes': {'inicio': 8, 'fin': 13},
-        'martes': {'inicio': 8, 'fin': 13},
-        'miercoles': {'inicio': 8, 'fin': 13},
-        'jueves': {'inicio': 8, 'fin': 13},
-        'viernes': {'inicio': 8, 'fin': 13},
-        'sabado': None,
-        'domingo': None,
-    }
-    return render(request, 'calendar_asignar_paciente_administrador.html', {'horario_terapeuta': horario_terapeuta, 'cita': cita,
+    return render(request, 'calendar_asignar_paciente_administrador.html', {'cita': cita,
                                                               'paciente':paciente, 'terapeuta':terapeuta, 'modulo_pacientes': True})
 @role_required('Administrador')
 def agendar_cita_administrador(request, paciente_id, terapeuta_id):
@@ -1065,7 +1056,8 @@ def agendar_cita_administrador(request, paciente_id, terapeuta_id):
     if request.method == 'POST':
         titulo = request.POST['titulo']
         fecha = request.POST['fecha']
-        hora = request.POST['hora']
+        hora_inicio = request.POST['hora_inicio']
+        hora_final = request.POST['hora_final']
         sala = request.POST['sala']
         detalle = request.POST['detalle']
 
@@ -1081,7 +1073,8 @@ def agendar_cita_administrador(request, paciente_id, terapeuta_id):
             paciente=paciente_instance,
             titulo=titulo,
             fecha=fecha,
-            hora=hora,
+            hora_inicio=hora_inicio,
+            hora_final = hora_final,
             sala=sala,
             detalle=detalle
         )
