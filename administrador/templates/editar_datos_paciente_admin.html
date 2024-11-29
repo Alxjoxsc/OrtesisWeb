@@ -175,30 +175,45 @@
 </form>
 
 <script>
-    // Cuando se envía el formulario
-    document.getElementById("editar-form").addEventListener("submit", function(event) {
-        event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+    document.addEventListener("DOMContentLoaded", function () {
+        // Referenciar el formulario
+        const form = document.getElementById("editar-form");
+        const modalExito = document.getElementById("modalExito");
+        const cancelButton = document.getElementById("boton-cancelar");
 
-        var form = new FormData(this); // Obtener los datos del formulario
+        // Enviar el formulario con fetch
+        form.addEventListener("submit", function (event) {
+            event.preventDefault(); // Detener el envío por defecto
 
-        fetch("{% url 'editar_datos_paciente_admin' paciente.id %}", {
-            method: 'POST',
-            body: form,
+            // Crear un FormData con los datos del formulario
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest', // Indicar que es una solicitud AJAX
+                },
+            })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then((data) => {
+                if (data.success) {
+                    // Mostrar modal de éxito
+                    modalExito.style.display = "block";
+                    setTimeout(() => {
+                        modalExito.style.display = "none";
+                        // Redirigir a la página del paciente
+                        window.location.href = `{% url 'editar_datos_paciente_admin' paciente.id %}`;
+                    }, 3000);
+                }
+            })
         })
-        .then(response => response.json()) // Obtener la respuesta como JSON
-        .then(data => {
-            if (data.success) {
-                // Mostrar el modal de éxito si la respuesta es exitosa
-                document.getElementById("modalExito").style.display = "block";
-                setTimeout(function() {
-                    document.getElementById("modalExito").style.display = "none";
-                }, 3000); // Ocultar el modal después de 3 segundos
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    });
+    })
 
 
 
