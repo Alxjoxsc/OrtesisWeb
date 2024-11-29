@@ -279,22 +279,23 @@ class CrearPacienteForm(forms.ModelForm):
             return Decimal(str(altura).replace(',', '.'))
         return altura
     
-        
+
     def clean_first_name(self):
         first_name = self.cleaned_data.get('first_name')
-        # Permitir hasta 3 nombres separados por espacios
-        if not re.match(r'^[a-zA-Z]+( [a-zA-Z]+){0,2}$', first_name):
-            raise forms.ValidationError('El nombre solo puede contener letras y hasta 3 nombres separados por espacios.')
+        # Permitir cualquier cantidad de nombres separados por espacios, solo letras y acentos
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$', first_name):
+            raise forms.ValidationError('El nombre solo puede contener letras y espacios.')
         
         return first_name
-    
+
     def clean_last_name(self):
         last_name = self.cleaned_data.get('last_name')
-        # Permitir hasta 2 apellidos separados por un espacio
-        if not re.match(r'^[a-zA-Z]+( [a-zA-Z]+)?$', last_name):
-            raise forms.ValidationError('El apellido solo puede contener letras y hasta 2 apellidos separados por un espacio.')
+        # Permitir cualquier cantidad de apellidos separados por espacios, solo letras y acentos
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$', last_name):
+            raise forms.ValidationError('El apellido solo puede contener letras y espacios.')
         
         return last_name
+
     
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -541,17 +542,17 @@ class EditarPacienteForm(forms.ModelForm):
         
     def clean_first_name(self):
         first_name = self.cleaned_data.get('first_name')
-        # Permitir hasta 3 nombres con letras, espacios, acentos y la letra ñ
-        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+( [a-zA-ZáéíóúÁÉÍÓÚñÑ]+){0,2}$', first_name):
-            raise forms.ValidationError('El nombre solo puede contener letras (incluyendo acentos y espacios)')
+        # Permitir cualquier cantidad de nombres separados por espacios, solo letras y acentos
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$', first_name):
+            raise forms.ValidationError('El nombre solo puede contener letras y espacios.')
         
         return first_name
-    
+
     def clean_last_name(self):
         last_name = self.cleaned_data.get('last_name')
-        # Permitir hasta 2 apellidos con letras, acentos, espacios y la letra ñ
-        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+( [a-zA-ZáéíóúÁÉÍÓÚñÑ]+)?$', last_name):
-            raise forms.ValidationError('El apellido solo puede contener letras (incluyendo acentos y espacios)')
+        # Permitir cualquier cantidad de apellidos separados por espacios, solo letras y acentos
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$', last_name):
+            raise forms.ValidationError('El apellido solo puede contener letras y espacios.')
         
         return last_name
     
